@@ -24,6 +24,7 @@ import { Helmet } from "react-helmet";
 import { useQuery } from "@tanstack/react-query";
 import { useGet } from "../hooks/useGet";
 import { moneyInTxt } from "../utility";
+import useAuth from "../hooks/useAuth";
 
 const state = {
   series: [
@@ -88,6 +89,7 @@ const state = {
 };
 
 const Dashboard = (props) => {
+  const { auth } = useAuth();
   const [expiredData] = useState([
     {
       key: 1,
@@ -134,9 +136,8 @@ const Dashboard = (props) => {
     { key: 4, image: MacbookIcon, products: "Macbook Pro", price: "$1009.2" },
   ]);
 
-
   const [customerData] = useState([
-    { key: 1, image: EarpodIcon, products: "Kinapharma", price: 8955001.2},
+    { key: 1, image: EarpodIcon, products: "Kinapharma", price: 8955001.2 },
     { key: 2, image: IphoneIcon, products: "Ernest Chemist", price: 7000001.2 },
     { key: 3, image: SamsungIcon, products: "Tobinco", price: 5600001.2 },
     { key: 4, image: MacbookIcon, products: "Pro Pharma", price: 1000909.2 },
@@ -248,13 +249,20 @@ const Dashboard = (props) => {
     {
       title: "Amount Spent (GHS)",
       dataIndex: "price",
-      render: (text, record) => <div style={{ fontSize: "14px" }}>{moneyInTxt(text)}</div>,
-      sorter: (a, b) => (a.price - b.price),
+      render: (text, record) => (
+        <div style={{ fontSize: "14px" }}>{moneyInTxt(text)}</div>
+      ),
+      sorter: (a, b) => a.price - b.price,
     },
   ];
 
-  const { data: catData, isLoading, isError, refetch } = useGet('cat-facts', `https://catfact.ninja/fact`)
-  
+  const {
+    data: catData,
+    isLoading,
+    isError,
+    refetch,
+  } = useGet("cat-facts", `https://catfact.ninja/fact`);
+
   if (isError) {
     return <h2>Sorry there was an error </h2>;
   }
@@ -262,6 +270,8 @@ const Dashboard = (props) => {
   if (isLoading) {
     return <h2>Loading..</h2>;
   }
+
+  console.log({ dashboard: auth });
 
   return (
     <>
@@ -393,10 +403,10 @@ const Dashboard = (props) => {
               </div>
             </div>
           </div>
-         
+
           <div className="row">
             <div className="col-lg-7 col-sm-12 col-12 d-flex">
-            <div className="card flex-fill">
+              <div className="card flex-fill">
                 <div className="card-header pb-0 d-flex justify-content-between align-items-center">
                   <h4 className="card-title mb-0">Top 20 Customers</h4>
                   <div className="dropdown dropdown-action profile-action">

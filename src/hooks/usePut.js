@@ -1,19 +1,14 @@
-import { useMutation } from "@tanstack/react-query"
-import axios from "axios";
+import { useMutation } from "@tanstack/react-query";
+import useCustomApi from "./useCustomApi";
 
+export const usePut = (url) => {
+  const axios = useCustomApi();
+  async function updatePost(postData) {
+    const response = await axios.put(url, postData);
+    return response.data;
+  }
 
-export const usePut = (url, postData) => {
+  const { isLoading, isError, error, mutate } = useMutation(updatePost);
 
-    async function updatePost() {
-        const response = await axios.put(url, postData)
-        return response.data
-    }
-
-    const { isLoading, isError, error, mutate } = useMutation(updatePost);
-
-    return {isLoading, isError, error, mutate}
-}
-
-
-    
-    
+  return { isLoading, isError, error, mutate };
+};

@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
-import Table from "../../EntryFile/datatable"
-import Tabletop from "../../EntryFile/tabletop"
+import Table from "../../EntryFile/datatable";
+import Tabletop from "../../EntryFile/tabletop";
 import {
   PlusIcon,
   MacbookIcon,
@@ -20,9 +20,18 @@ import {
 } from "../../EntryFile/imagePath";
 import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
+import { useGet } from "../../hooks/useGet";
 
 const ProductList = () => {
-  const [inputfilter, setInputfilter] = useState(false);  
+  const [inputfilter, setInputfilter] = useState(false);
+
+  const {
+    data: products,
+    isError,
+    isLoading,
+    isSuccess,
+  } = useGet("products", "/product");
+  console.log({ products });
 
   //select2
   const options = [
@@ -47,10 +56,9 @@ const ProductList = () => {
     { id: 1, text: "Price", text: "Price" },
     { id: 2, text: "150.00", text: "150.00" },
   ];
-  
 
-  const togglefilter = (value) => {    
-    setInputfilter(value);  
+  const togglefilter = (value) => {
+    setInputfilter(value);
   };
   const confirmText = () => {
     Swal.fire({
@@ -222,7 +230,7 @@ const ProductList = () => {
   //   },
   // ]);
 
-  const [data] = useState([])
+  const [data] = useState([]);
 
   const columns = [
     {
@@ -317,15 +325,12 @@ const ProductList = () => {
           {/* /product list */}
           <div className="card">
             <div className="card-body">
-            <Tabletop 
-              inputfilter={inputfilter}
-              togglefilter={togglefilter}
-            />
+              <Tabletop inputfilter={inputfilter} togglefilter={togglefilter} />
               {/* /Filter */}
               <div
-                className={`card mb-0 ${ inputfilter ? "toggleCls" : ""}`}
+                className={`card mb-0 ${inputfilter ? "toggleCls" : ""}`}
                 id="filter_inputs"
-                style={{ display: inputfilter ? "block" :"none"}}
+                style={{ display: inputfilter ? "block" : "none" }}
               >
                 <div className="card-body pb-0">
                   <div className="row">
@@ -400,10 +405,7 @@ const ProductList = () => {
               </div>
               {/* /Filter */}
               <div className="table-responsive">
-                <Table                                    
-                  columns={columns}
-                  dataSource={data}                 
-                />
+                <Table columns={columns} dataSource={data} />
               </div>
             </div>
           </div>

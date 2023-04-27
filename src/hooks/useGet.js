@@ -1,13 +1,17 @@
-import { useQuery } from "@tanstack/react-query"
-import axios from "axios";
-
+import { useQuery } from "@tanstack/react-query";
+import useCustomApi from "./useCustomApi";
 
 export const useGet = (key, url) => {
+  const axios = useCustomApi();
 
-    const getData = async () => {
-        return axios.get(url).then((res) => res.data);
-    }
-    const { data, isLoading, isError, refetch, isSuccess, status } = useQuery([key],getData);
+  const getData = async () => {
+    const res = await axios.get(url);
+    return res.data;
+  };
+  const { data, isLoading, isError, refetch, isSuccess, status } = useQuery(
+    [key],
+    getData
+  );
 
-    return { data, refetch, isError, isLoading, isSuccess, status}
-}
+  return { data, refetch, isError, isLoading, isSuccess, status };
+};
