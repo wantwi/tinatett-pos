@@ -1,33 +1,28 @@
-
-
-const path = require('path');
-const webpack = require('webpack');
-const fs = require('fs');
+const path = require("path");
+const webpack = require("webpack");
+const fs = require("fs");
 
 // const publicPath = '/reactjs/template/';
- const publicPath = '/';
+const publicPath = "/";
 
 // Make sure any symlinks in the project folder are resolved:
 const appDirectory = fs.realpathSync(process.cwd());
-const resolveApp = relativePath => path.resolve(appDirectory, relativePath);
+const resolveApp = (relativePath) => path.resolve(appDirectory, relativePath);
 
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const  {CleanWebpackPlugin}  = require('clean-webpack-plugin');
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
 
 // the path(s) that should be cleaned
-let pathsToClean = [
-  'dist',
-  'build'
-]
+let pathsToClean = ["dist", "build"];
 
 // the clean options to use
 let cleanOptions = {
   root: __dirname,
   verbose: false, // Write logs to console.
-  dry: false
-}
+  dry: false,
+};
 
 module.exports = {
  mode: "development",
