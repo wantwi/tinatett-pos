@@ -7,6 +7,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import * as Yup from 'yup';
 
 
+
 const SignInPage = (props) => {
 
     const[eye,seteye]=useState(true);
@@ -35,7 +36,7 @@ const SignInPage = (props) => {
     });
 
 
-    const onSubmit = (data) => {
+    const onSubmit = async(data) => {
         console.log(JSON.stringify(data, null, 2));
         props.history.push('/dream-pos/dashboard')
     };
