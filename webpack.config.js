@@ -56,14 +56,14 @@ module.exports = {
   contentBase: './src/index.js',
   host: 'localhost',
   compress: true,
-  port: 8002, // port number
+  port: 3001, // port number
   historyApiFallback: true,
   quiet: true
 },
  externals: {
   // global app config object
   config: JSON.stringify({
-      apiUrl: '',
+      apiUrl: 'https://stockmanager.akwaabaevolution.com/api',
       imageapiUrl: '',
       
       publicPath : '/tinatett/pos/'            
