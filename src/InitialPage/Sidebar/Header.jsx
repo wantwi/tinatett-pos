@@ -24,7 +24,13 @@ const Header = (props) => {
   const [searchBar, SetSearchBar] = useState(false);
   const [toggle, SetToggle] = useState(false);
   const [dateState, setDateState] = useState(new Date());
-   
+  const [loggedInUser, setLoggedInUser] = useState({})
+
+  useEffect(() => {
+    let userDetails = sessionStorage.getItem('auth')
+    let user = JSON.parse(userDetails)
+    setLoggedInUser(user)
+  }, [])
 
   const handlesidebar = () => {
     document.body.classList.toggle("mini-sidebar");
@@ -183,7 +189,7 @@ const Header = (props) => {
                         </span>
                         <div className="media-body flex-grow-1">
                           <p className="noti-details">
-                            <span className="noti-title">John Doe</span> added
+                            <span className="noti-title">{loggedInUser?.name}</span> added
                             new task{" "}
                             <span className="noti-title">
                               Patient appointment booking
@@ -320,8 +326,8 @@ const Header = (props) => {
                     <span className="status online" />
                   </span>
                   <div className="profilesets">
-                    <h6>John Doe</h6>
-                    <h5>Admin</h5>
+                    <h6>{loggedInUser?.name}</h6>
+                    <h5>{loggedInUser?.groupName}</h5>
                   </div>
                 </div>
                 <hr className="m-0" />

@@ -1,8 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Macbook, Upload } from "../../EntryFile/imagePath";
 import {Link} from "react-router-dom"
 import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
+import { useParams } from "react-router-dom/cjs/react-router-dom.min";
+import { useGet } from "../../hooks/useGet";
+import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 const options1 = [
   { id: 1, text: "Computers", text: "Computers" },
   { id: 2, text: "Mac", text: "Mac" },
@@ -31,6 +34,26 @@ const options7 = [
 
 const EditProduct = () => {
 
+  const {id} = useParams()
+  console.log(id)
+
+  const {data:product, isLoading, isError}  = useGet("product", `/product/${id}`);
+  const [data, setData] = useState({})
+  
+  useEffect(() => {
+    if(!isLoading){
+      setData(product.data)
+      console.log('loaded..')
+    }
+    else{
+      console.log('loading...')
+    }
+  }, [isLoading])
+
+  if(isLoading){
+    return <LoadingSpinner/>
+  }
+
   return (
     <>
       <div className="page-wrapper">
@@ -48,10 +71,10 @@ const EditProduct = () => {
                 <div className="col-lg-3 col-sm-6 col-12">
                   <div className="form-group">
                     <label>Product Name</label>
-                    <input type="text" defaultValue="Macbook pro" />
+                    <input type="text" value={data?.name} />
                   </div>
                 </div>
-                <div className="col-lg-3 col-sm-6 col-12">
+                {/* <div className="col-lg-3 col-sm-6 col-12">
                   <div className="form-group">
                     <label>Category</label>
                     <Select2
@@ -62,8 +85,8 @@ const EditProduct = () => {
                       }}
                     />
                   </div>
-                </div>
-                <div className="col-lg-3 col-sm-6 col-12">
+                </div> */}
+                {/* <div className="col-lg-3 col-sm-6 col-12">
                   <div className="form-group">
                     <label>Sub Category</label>
                     <Select2
@@ -74,8 +97,8 @@ const EditProduct = () => {
                       }}
                     />
                   </div>
-                </div>
-                <div className="col-lg-3 col-sm-6 col-12">
+                </div> */}
+                {/* <div className="col-lg-3 col-sm-6 col-12">
                   <div className="form-group">
                     <label>Brand</label>
                     <Select2
@@ -86,8 +109,8 @@ const EditProduct = () => {
                       }}
                     />
                   </div>
-                </div>
-                <div className="col-lg-3 col-sm-6 col-12">
+                </div> */}
+                {/* <div className="col-lg-3 col-sm-6 col-12">
                   <div className="form-group">
                     <label>Unit</label>
                     <Select2
@@ -98,37 +121,35 @@ const EditProduct = () => {
                       }}
                     />
                   </div>
-                </div>
+                </div> */}
                 <div className="col-lg-3 col-sm-6 col-12">
                   <div className="form-group">
-                    <label>SKU</label>
-                    <input type="text" defaultValue="PT0002" />
+                    <label>Retail Price</label>
+                    <input type="text" value={data?.retailPrice} />
                   </div>
                 </div>
                 <div className="col-lg-3 col-sm-6 col-12">
                   <div className="form-group">
-                    <label>Minimum Qty</label>
-                    <input type="text" defaultValue={5} />
+                    <label>Wholesale Price</label>
+                    <input type="text" value={data?.wholeSalePrice} />
                   </div>
                 </div>
                 <div className="col-lg-3 col-sm-6 col-12">
                   <div className="form-group">
-                    <label>Quantity</label>
-                    <input type="text" defaultValue={50} />
+                    <label>Special Price</label>
+                    <input type="text" value={data?.specialPrice} />
                   </div>
                 </div>
                 <div className="col-lg-12">
                   <div className="form-group">
-                    <label>Description</label>
+                    <label>Alert</label>
                     <textarea
                       className="form-control"
-                      defaultValue={
-                        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,"
-                      }
+                      value={data?.alert}
                     />
                   </div>
                 </div>
-                <div className="col-lg-3 col-sm-6 col-12">
+                {/* <div className="col-lg-3 col-sm-6 col-12">
                   <div className="form-group">
                     <label>Tax</label>
                     <Select2
@@ -203,7 +224,7 @@ const EditProduct = () => {
                       </li>
                     </ul>
                   </div>
-                </div>
+                </div> */}
                 <div className="col-lg-12">
                   <button
                     href="javascript:void(0);"

@@ -261,7 +261,7 @@ const Dashboard = (props) => {
     isLoading,
     isError,
     refetch,
-  } = useGet("cat-facts", `https://catfact.ninja/fact`);
+  } = useGet("cat-facts", `/menu`);
 
   if (isError) {
     return <h2>Sorry there was an error </h2>;
@@ -280,10 +280,7 @@ const Dashboard = (props) => {
           <title>Tinatett POS</title>
           <meta name="description" content="Dashboard page" />
         </Helmet>
-        <div>
-          <p>{catData?.fact}</p>
-          <button onClick={refetch}>Update Data</button>
-        </div>
+     
         <div className="content">
           <div className="row">
             <div className="col-lg-3 col-sm-6 col-12">

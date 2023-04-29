@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Table from "../../EntryFile/datatable";
 import Tabletop from "../../EntryFile/tabletop"
 import { Link } from "react-router-dom";
@@ -16,9 +16,20 @@ import {
   EditIcon,
   DeleteIcon,
 } from "../../EntryFile/imagePath";
+import { useGet } from "../../hooks/useGet";
+import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 
 const SupplierList = () => {
   const [inputfilter, setInputfilter] = useState(false);
+  const [data, setData] = useState([]);
+
+  const {
+    data: suppliers,
+    isError,
+    isLoading,
+    isSuccess,
+  } = useGet("suppliers", "/supplier");
+
 
   const confirmText = () => {
     Swal.fire({
@@ -46,48 +57,27 @@ const SupplierList = () => {
     setInputfilter(value);
   };
 
-  const [data] = useState([
-    {
-      id: 1,
-      supplierName: "Apex Computers",
-      code: "201",
-      phone: "+12163547758",
-      email: "thomas@example.com",
-      country: "USA",
-    },
-    {
-      id: 2,
-      supplierName: "AIM Infotech",
-      code: "202",
-      phone: "123-456-776",
-      email: "benjamin@example.com",
-      country: "Germany",
-    },
-    {
-      id: 3,
-      supplierName: "Best Power Tools",
-      code: "203",
-      phone: "+123-890-876",
-      email: "james@example.com",
-      country: "Tailand",
-    },
-    {
-      id: 4,
-      supplierName: "Modern Automobile",
-      code: "204",
-      phone: "+123-876-876",
-      email: "bruklin@example.com",
-      country: "Angola",
-    },
-    {
-      id: 5,
-      supplierName: "Vinayak Tools",
-      code: "205",
-      phone: "+0987652112",
-      email: "beverly@example.com",
-      country: "Albania",
-    },
-  ]);
+  useEffect(() => {
+    if (!isLoading) {
+      let mappedData = suppliers?.data.map((supplier) => {
+        return {
+          id: supplier.id,
+          supplierName: supplier.name,
+          status: supplier.status,
+          phone: supplier.phone,
+          email: supplier.email,
+          location: supplier.location,
+          createdBy: "Admin",
+        }
+      })
+      setData(mappedData)
+      console.log('loaded..')
+    }
+    else {
+      console.log('loading...')
+    }
+  }, [isLoading])
+
 
   const columns = [
     {
@@ -105,9 +95,14 @@ const SupplierList = () => {
       width: "250px",
     },
     {
-      title: "Code",
-      dataIndex: "code",
-      sorter: (a, b) => a.code.length - b.code.length,
+      title: "Email",
+      dataIndex: "email",
+      sorter: (a, b) => a.email.length - b.email.length,
+    },
+    {
+      title: "Location",
+      dataIndex: "location",
+      sorter: (a, b) => a.location.length - b.location.length,
     },
     {
       title: "Phone",
@@ -115,14 +110,11 @@ const SupplierList = () => {
       sorter: (a, b) => a.phone.length - b.phone.length,
     },
     {
-      title: "Email",
-      dataIndex: "email",
-      sorter: (a, b) => a.email.length - b.email.length,
-    },
-    {
-      title: "Country",
-      dataIndex: "country",
-      sorter: (a, b) => a.country.length - b.country.length,
+      title: "Status",
+      dataIndex: "status",
+      sorter: (a, b) => a.status.length - b.status.length,
+      render: (text, record) => (record.status == 1 ? <span className="badges bg-lightgreen">Active</span> : <span className="badges bg-lightred">Inctive</span> )
+
     },
     {
       title: "Action",
@@ -138,6 +130,11 @@ const SupplierList = () => {
       ),
     },
   ];
+
+
+  if(isLoading){
+    return (<LoadingSpinner/>)
+  }
   return (
     <>
       <div className="page-wrapper">
@@ -160,12 +157,12 @@ const SupplierList = () => {
           {/* /product list */}
           <div className="card">
             <div className="card-body">
-            <Tabletop inputfilter={inputfilter} togglefilter={togglefilter} />
+              <Tabletop inputfilter={inputfilter} togglefilter={togglefilter} />
               {/* /Filter */}
               <div
-                className={`card mb-0 ${ inputfilter ? "toggleCls" : ""}`}
+                className={`card mb-0 ${inputfilter ? "toggleCls" : ""}`}
                 id="filter_inputs"
-                style={{ display: inputfilter ? "block" :"none"}}
+                style={{ display: inputfilter ? "block" : "none" }}
               >
                 <div className="card-body pb-0">
                   <div className="row">

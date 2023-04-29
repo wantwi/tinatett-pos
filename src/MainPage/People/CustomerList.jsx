@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Table from "../../EntryFile/datatable";
 import Tabletop from "../../EntryFile/tabletop"
 import { Link } from "react-router-dom";
@@ -20,9 +20,47 @@ import {
   Bruklin,
   Beverly,
 } from "../../EntryFile/imagePath";
+import { useGet } from "../../hooks/useGet";
+import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 
 const CustomerList = () => {
   const [inputfilter, setInputfilter] = useState(false);
+  
+  const [data, setData] = useState([])
+
+  const {
+    data: customers,
+    isError,
+    isLoading,
+    isSuccess,
+  } = useGet("products", "/customer");
+
+
+
+
+  useEffect(() => {
+    if(!isLoading){
+      console.log(customers)
+      let mappedData =  customers?.data.map((customer) => {
+          return {
+            id: customer?.id,
+            image: Thomas,
+            customerName: customer?.name,
+            status: customer?.status,
+            customerType: customer?.customerType,
+            location: customer?.location,
+            email: customer?.email,
+            contact: customer?.contact,
+            createdBy: "Admin",
+          }
+        })
+      setData(mappedData)
+      console.log('loaded..')
+    }
+    else{
+      console.log('loading...')
+    }
+  }, [isLoading])
 
   const confirmText = () => {
     Swal.fire({
@@ -50,65 +88,13 @@ const CustomerList = () => {
     setInputfilter(value);
   };
 
-  // const [data] = useState([
-  //   {
-  //     id: 1,
-  //     image: Thomas,
-  //     customerName: "Thomas",
-  //     code: "201",
-  //     customer: "Thomas",
-  //     phone: "+12163547758",
-  //     email: "thomas@example.com",
-  //     country: "USA",
-  //   },
-  //   {
-  //     id: 2,
-  //     image: Benjamin,
-  //     customerName: "Benjamin",
-  //     code: "202",
-  //     customer: "Benjamin",
-  //     phone: "123-456-776",
-  //     email: "benjamin@example.com",
-  //     country: "Germany",
-  //   },
-  //   {
-  //     id: 3,
-  //     image: James,
-  //     customerName: "James",
-  //     code: "203",
-  //     customer: "James",
-  //     phone: "+123-890-876",
-  //     email: "james@example.com",
-  //     country: "Tailand",
-  //   },
-  //   {
-  //     id: 4,
-  //     image: Bruklin,
-  //     customerName: "Bruklin",
-  //     code: "204",
-  //     customer: "Bruklin",
-  //     phone: "+123-876-876",
-  //     email: "bruklin@example.com",
-  //     country: "Angola",
-  //   },
-  //   {
-  //     id: 5,
-  //     image: Beverly,
-  //     customerName: "Beverly",
-  //     code: "205",
-  //     customer: "Beverly",
-  //     phone: "+0987652112",
-  //     email: "beverly@example.com",
-  //     country: "Albania",
-  //   },
-  // ]);
 
-  const [data] = useState([])
+
 
   const columns = [
     {
-      title: "Customer Name",
-      dataIndex: "productName",
+      title: "Customer",
+      dataIndex: "customerName",
       render: (text, record) => (
         <div className="productimgname">
           <Link style={{ width: "30%" }} className="product-img">
@@ -123,19 +109,14 @@ const CustomerList = () => {
       width: "170px",
     },
     {
-      title: "Code",
-      dataIndex: "code",
-      sorter: (a, b) => a.code.length - b.code.length,
-    },
-    {
-      title: "Customer",
-      dataIndex: "customer",
+      title: "Location",
+      dataIndex: "location",
       sorter: (a, b) => a.customer.length - b.customer.length,
     },
     {
       title: "Phone",
-      dataIndex: "phone",
-      sorter: (a, b) => a.phone.length - b.phone.length,
+      dataIndex: "contact",
+      sorter: (a, b) => a.contact.length - b.contact.length,
     },
     {
       title: "Email",
@@ -143,15 +124,16 @@ const CustomerList = () => {
       sorter: (a, b) => a.email.length - b.email.length,
     },
     {
-      title: "Country",
-      dataIndex: "country",
-      sorter: (a, b) => a.country.length - b.country.length,
+      title: "Status",
+      dataIndex: "status",
+      sorter: (a, b) => a.code.length - b.code.length,
+      render: (text, record) => (record.status == 1 ? <span className="badges bg-lightgreen">Active</span> : <span className="badges bg-lightred">Inctive</span> )
     },
     {
       title: "Action",
       render: () => (
         <>
-          <Link className="me-3" to="/dream-pos/people/editcustomer-people">
+          <Link className="me-3" to="/dream-pos/people/editcustomer">
             <img src={EditIcon} alt="img" />
           </Link>
           <Link className="confirm-text" to="#" onClick={confirmText}>
@@ -161,6 +143,12 @@ const CustomerList = () => {
       ),
     },
   ];
+
+
+  if(isLoading){
+    return (<LoadingSpinner/>)
+  }
+
   return (
     <>
       <div className="page-wrapper">

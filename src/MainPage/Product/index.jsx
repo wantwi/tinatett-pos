@@ -21,7 +21,7 @@ const ProductRoute = ({ match }) => (
         <Redirect exact from={`${match.url}/`} to={`${match.url}/productlist-product`} />
         <Route path={`${match.url}/productlist-product`} component={ProductList} />
         <Route path={`${match.url}/addproduct-product`} component={AddProduct} />
-        <Route path={`${match.url}/editproduct-product`} component={EditProduct} />
+        <Route path={`${match.url}/editproduct-product/:id`} component={EditProduct} />
         <Route path={`${match.url}/categorylist-product`} component={CategoryList} />
         <Route path={`${match.url}/addcategory-product`} component={AddCategory} />
         <Route path={`${match.url}/editcategory-product`} component={EditCategory} />

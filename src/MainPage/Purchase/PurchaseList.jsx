@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Table from "../../EntryFile/datatable";
 import Tabletop from "../../EntryFile/tabletop";
 import Select2 from "react-select2-wrapper";
@@ -16,9 +16,43 @@ import {
   EditIcon,
   DeleteIcon,
 } from "../../EntryFile/imagePath";
+import { useGet } from "../../hooks/useGet";
+import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 
 const PurchaseList = () => {
   const [inputfilter, setInputfilter] = useState(false);
+  const [data, setData] = useState([]);
+
+  const {
+    data: purchases,
+    isError,
+    isLoading,
+    isSuccess,
+  } = useGet("purchases", "/purchase");
+
+
+  useEffect(() => {
+    if(!isLoading){
+      let mappedData =  purchases?.data.map((purchase) => {
+          return {
+            id: purchase?.id,
+            supplierName: purchase?.supplier.name,
+            status: purchase?.status,
+            reference: purchase.id,
+            date: new Date(purchase.createdAt).toISOString().substring(0,10),
+            createdBy: "Admin",
+
+            
+          }
+        })
+      setData([...mappedData, ...mappedData, ...mappedData, ...mappedData,...mappedData])
+      console.log('loaded..')
+    }
+    else{
+      console.log('loading...')
+    }
+  }, [isLoading])
+
 
   const options = [
     { id: 1, text: "Choose Product", text: "Choose Product" },
@@ -47,52 +81,7 @@ const PurchaseList = () => {
     setInputfilter(value);
   };
 
-  const [data] = useState([
-    {
-      id: 1,
-      supplierName: "Apex Computers",
-      reference: "PT001",
-      date: "19 Nov 2022",
-      status: "Received",
-      grandTotal: "550",
-      paid: "120",
-      due: "470",
-      paymentStatus: "Paid",
-    },
-    {
-      id: 2,
-      supplierName: "Best Power Tools",
-      reference: "PT001",
-      date: "19 Nov 2022",
-      status: "Pending",
-      grandTotal: "550",
-      paid: "120",
-      due: "470",
-      paymentStatus: "Unpaid",
-    },
-    {
-      id: 3,
-      supplierName: "Modern Automobile",
-      reference: "PT001",
-      date: "19 Nov 2022",
-      status: "Received",
-      grandTotal: "550",
-      paid: "120",
-      due: "470",
-      paymentStatus: "Paid",
-    },
-    {
-      id: 4,
-      supplierName: "AIM Infotech",
-      reference: "PT001",
-      date: "19 Nov 2022",
-      status: "Ordered",
-      grandTotal: "550",
-      paid: "120",
-      due: "470",
-      paymentStatus: "Partial",
-    },
-  ]);
+
 
   const columns = [
     {
@@ -113,56 +102,29 @@ const PurchaseList = () => {
     {
       title: "Status",
       dataIndex: "status",
-      render: (text, record) => (
-        <span
-          className={
-            text === "Received"
-              ? "badges bg-lightgreen"
-              : text == "Pending"
-              ? "badges bg-lightred"
-              : "badges bg-lightyellow"
-          }
-        >
-          {text}
-        </span>
-      ),
+      render: (text, record) => (record.status == 1 ? <span className="badges bg-lightgreen">Active</span> : <span className="badges bg-lightred">Inctive</span> ),
       sorter: (a, b) => a.status.length - b.status.length,
     },
-    {
-      title: "Grand Total",
-      dataIndex: "grandTotal",
-      sorter: (a, b) => a.grandTotal.length - b.grandTotal.length,
-      width: "125px",
-    },
-    {
-      title: "Paid",
-      dataIndex: "paid",
-      sorter: (a, b) => a.paid.length - b.paid.length,
-    },
-    {
-      title: "Due",
-      dataIndex: "due",
-      sorter: (a, b) => a.due.length - b.due.length,
-    },
-    {
-      title: "Payment Status",
-      dataIndex: "paymentStatus",
-      render: (text, record) => (
-        <span
-          className={
-            text === "Paid"
-              ? "badges bg-lightgreen"
-              : text == "Unpaid"
-              ? "badges bg-lightred"
-              : "badges bg-lightyellow"
-          }
-        >
-          {text}
-        </span>
-      ),
-      sorter: (a, b) => a.paymentStatus.length - b.paymentStatus.length,
-      width: "120px",
-    },
+    
+    // {
+    //   title: "Payment Status",
+    //   dataIndex: "paymentStatus",
+    //   render: (text, record) => (
+    //     <span
+    //       className={
+    //         text === "Paid"
+    //           ? "badges bg-lightgreen"
+    //           : text == "Unpaid"
+    //           ? "badges bg-lightred"
+    //           : "badges bg-lightyellow"
+    //       }
+    //     >
+    //       {text}
+    //     </span>
+    //   ),
+    //   sorter: (a, b) => a.paymentStatus.length - b.paymentStatus.length,
+    //   width: "120px",
+    // },
     {
       title: "Action",
       render: () => (
@@ -177,6 +139,11 @@ const PurchaseList = () => {
       ),
     },
   ];
+
+
+  if(isLoading){
+    return (<LoadingSpinner/>)
+  }
 
   return (
     <>

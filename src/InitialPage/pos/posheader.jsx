@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Logo,
   SmallLogo,
@@ -23,11 +23,18 @@ import { Link } from "react-router-dom";
 
 const PosHeader = (props) => {
   const [searchBar, SetSearchBar] = useState(false);
+  const [loggedInUser, setLoggedInUser] = useState({})
   const handlesidebar = () => {
     document.body.classList.toggle("mini-sidebar");
   };
 
   let pathname = location.pathname;
+
+  useEffect(() => {
+    let userDetails = sessionStorage.getItem('auth')
+    let user = JSON.parse(userDetails)
+    setLoggedInUser(user)
+  }, [])
 
   return (
     <>
@@ -271,7 +278,7 @@ const PosHeader = (props) => {
                     <span className="status online" />
                   </span>
                   <div className="profilesets">
-                    <h6>John Doe</h6>
+                    <h6>{loggedInUser?.name}</h6>
                     <h5>Admin</h5>
                   </div>
                 </div>

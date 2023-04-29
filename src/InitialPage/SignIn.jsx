@@ -13,9 +13,11 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import { LoginUser } from "../auth/auth";
 import useAuth from "../hooks/useAuth";
+import LoadingSpinner from "./Sidebar/LoadingSpinner";
 
 const SignInPage = (props) => {
   const [eye, seteye] = useState(true);
+  const [isLoading, setIsLoading] = useState(false)
   const { setAuth } = useAuth();
 
   const onEyeClick = () => {
@@ -38,16 +40,26 @@ const SignInPage = (props) => {
   });
 
   const onSubmit = async (data) => {
-    console.log(JSON.stringify(data, null, 2));
-
+    setIsLoading(true)
     const user = await LoginUser(data);
     const { token, branchId, branchName, groupName } = user;
-    console.log({ user });
-    sessionStorage.setItem("auth", JSON.stringify(user));
-    setAuth(user);
 
-    props.history.push("/dream-pos/dashboard");
+    if(user){
+      setIsLoading(false)
+      sessionStorage.setItem("auth", JSON.stringify(user));
+      setAuth(user);
+      props.history.push("/dream-pos/dashboard");
+  
+    }
+    else{
+      setIsLoading(false)
+    }
+  
   };
+
+  if(isLoading){
+    return <LoadingSpinner/>
+  }
 
   return (
     <>
