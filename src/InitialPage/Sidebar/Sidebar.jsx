@@ -96,7 +96,7 @@ const Sidebar = (props) => {
                         className={
                           pathname.includes("productlist-") ? "active" : ""
                         }
-                        to="/dream-pos/product/productlist-product"
+                        to="/dream-pos/product/productlist"
                       >
                         Product List
                       </Link>
@@ -106,7 +106,7 @@ const Sidebar = (props) => {
                         className={
                           pathname.includes("addproduct-") ? "active" : ""
                         }
-                        to="/dream-pos/product/addproduct-product"
+                        to="/dream-pos/product/addproduct"
                       >
                         Add Product
                       </Link>
@@ -401,7 +401,7 @@ const Sidebar = (props) => {
                         className={
                           pathname.includes("purchaselist-") ? "active" : ""
                         }
-                        to="/dream-pos/purchase/purchaselist-purchase"
+                        to="/dream-pos/purchase/purchaselist"
                       >
                         Purchase List
                       </Link>
@@ -411,7 +411,7 @@ const Sidebar = (props) => {
                         className={
                           pathname.includes("addpurchase-") ? "active" : ""
                         }
-                        to="/dream-pos/purchase/addpurchase-purchase"
+                        to="/dream-pos/purchase/addpurchase"
                       >
                         Add Purchase
                       </Link>

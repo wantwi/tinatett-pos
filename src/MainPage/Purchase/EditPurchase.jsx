@@ -14,6 +14,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
 import { Table } from "antd";
+import { useLocation } from "react-router-dom/cjs/react-router-dom";
 
 const options = [
   { id: 1, text: "Apex Computer", text: "Apex Computer" },
@@ -33,6 +34,9 @@ const deleteRow = () => {
 };
 const AddPurchase = () => {
   const [startDate, setStartDate] = useState(new Date());
+  const {state} = useLocation()
+  console.log(state)
+  const [formData, setFormData] = useState(state)
 
   const [data] = useState([
     {
@@ -81,27 +85,23 @@ const AddPurchase = () => {
       dataIndex: "qty",
     },
     {
-      title: "Purchase Price($)",
+      title: "Unit Price(GHS)",
       dataIndex: "purchasePrice",
     },
     {
-      title: "Discount($)",
+      title: "Amount(GHS)",
       dataIndex: "discount",
     },
     {
-      title: "Tax%",
-      dataIndex: "tax",
-    },
-    {
-      title: "Tax Amount($)",
+      title: "Batch Number",
       dataIndex: "taxAmount",
     },
     {
-      title: "Unit Cost($)",
+      title: "Manufacturing Date",
       dataIndex: "unitCost",
     },
     {
-      title: "Total Cost($)",
+      title: "Expiring Date",
       dataIndex: "totalCost",
     },
     {
@@ -121,39 +121,92 @@ const AddPurchase = () => {
         <div className="content">
           <div className="page-header">
             <div className="page-title">
-              <h4>Purchase Add</h4>
-              <h6>Add/Update Purchase</h6>
+              <h4>Purchase </h4>
+              <h6>Update Purchase</h6>
             </div>
           </div>
           <div className="card">
             <div className="card-body">
-              <div className="row">
-                <div className="col-lg-3 col-sm-6 col-12">
+            <div className="row">
+                <div className="col-lg-12 col-sm-6 col-12">
                   <div className="form-group">
                     <label>Supplier Name</label>
                     <div className="row">
-                      <div className="col-lg-10 col-sm-10 col-10">
+                      <div className="col-lg-12 col-sm-12 col-12">
                         <Select2
                           className="select"
                           data={options}
                           options={{
-                            placeholder: "Apex Computer",
+                            placeholder: "Supplier List",
                           }}
                         />
                       </div>
-                      <div className="col-lg-2 col-sm-2 col-2 ps-0">
+                      {/* <div className="col-lg-1 col-sm-2 col-2 ps-0">
                         <div className="add-icon">
                           <Link to="#">
                             <img src={Plus} alt="img" />
                           </Link>
                         </div>
+                      </div> */}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="row">
+
+                <div className="col-lg-3 col-sm-6 col-12">
+                  <div className="form-group">
+                    <label>Purchase Date </label>
+                    <div className="input-groupicon">
+                      <DatePicker
+                        selected={startDate}
+                        onChange={(date) => setStartDate(formData?.date)}
+                      />
+                      <div className="addonset">
+                        <img src={Calendar} alt="img" />
                       </div>
                     </div>
                   </div>
                 </div>
                 <div className="col-lg-3 col-sm-6 col-12">
                   <div className="form-group">
-                    <label>Purchase Date </label>
+                    <label>Product Name (Designation)</label>
+                    <Select2
+                      className="select"
+                      data={options1}
+                      options={{
+                        placeholder: "Category",
+                      }}
+                    />
+                  </div>
+                </div>
+                <div className="col-lg-3 col-sm-6 col-12">
+                  <div className="form-group">
+                    <label>Batch No.</label>
+                    <input type="text" />
+                  </div>
+                </div>
+                <div className="col-lg-3 col-sm-6 col-12">
+                  <div className="form-group">
+                    <label>Manufacturing Date </label>
+                    <div className="input-groupicon">
+                      <DatePicker
+                        selected={startDate}
+                        onChange={(date) => setStartDate(date)}
+                      />
+                      <div className="addonset">
+                        <img src={Calendar} alt="img" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="row">
+                <div className="col-lg-3 col-sm-6 col-12">
+                  <div className="form-group">
+                    <label>Expiring Date </label>
                     <div className="input-groupicon">
                       <DatePicker
                         selected={startDate}
@@ -167,35 +220,43 @@ const AddPurchase = () => {
                 </div>
                 <div className="col-lg-3 col-sm-6 col-12">
                   <div className="form-group">
-                    <label>Product Name</label>
-                    <Select2
-                      className="select"
-                      data={options1}
-                      options={{
-                        placeholder: "MacBook Pro",
-                      }}
-                    />
+                    <label>Quantity</label>
+                    <input type="text" />
                   </div>
                 </div>
                 <div className="col-lg-3 col-sm-6 col-12">
                   <div className="form-group">
-                    <label>Reference No.</label>
-                    <input type="text" defaultValue="010203" />
+                    <label>Unit Price.</label>
+                    <input type="text" />
                   </div>
                 </div>
-                <div className="col-lg-12 col-sm-6 col-12">
+                <div className="col-lg-3 col-sm-6 col-12">
                   <div className="form-group">
-                    <label>Product Name</label>
+                    <label>Amount</label>
                     <div className="input-groupicon">
                       <input
                         type="text"
-                        placeholder="Scan/Search Product by code and select..."
+                        placeholder=""
                       />
                       <div className="addonset">
                         <img src={Scanner} alt="img" />
                       </div>
                     </div>
                   </div>
+                </div>
+              </div>
+
+              <div className="row">
+                <div className="col-lg-12 col-sm-6 col-12">
+                  <div className="form-group">
+                  <Link to="#" className="btn btn-submit me-2">
+                      Update
+                    </Link>
+                    <Link to="#" className="btn btn-cancel">
+                      Clear
+                    </Link>
+                  </div>
+                  
                 </div>
               </div>
               <div className="row">

@@ -18,21 +18,21 @@ import ProductDetails from './productDetails';
 
 const ProductRoute = ({ match }) => (
     <Switch>
-        <Redirect exact from={`${match.url}/`} to={`${match.url}/productlist-product`} />
-        <Route path={`${match.url}/productlist-product`} component={ProductList} />
-        <Route path={`${match.url}/addproduct-product`} component={AddProduct} />
-        <Route path={`${match.url}/editproduct-product/:id`} component={EditProduct} />
-        <Route path={`${match.url}/categorylist-product`} component={CategoryList} />
-        <Route path={`${match.url}/addcategory-product`} component={AddCategory} />
-        <Route path={`${match.url}/editcategory-product`} component={EditCategory} />
-        <Route path={`${match.url}/subcategorytable-product`} component={SubCategoryTable} />
-        <Route path={`${match.url}/addsubcategory-product`} component={AddSubCategory} />
-        <Route path={`${match.url}/editsubcategory-product`} component={EditSubCategory} />
-        <Route path={`${match.url}/brandlist-product`} component={BrandList} />
-        <Route path={`${match.url}/addbrand-product`} component={AddBrand} />
-        <Route path={`${match.url}/editbrand-product`} component={EditBrand} />
-        <Route path={`${match.url}/importproduct-product`} component={ImportProduct} />
-        <Route path={`${match.url}/printbarcode-product`} component={PrintBarcode} />
+        <Redirect exact from={`${match.url}/`} to={`${match.url}/productlist`} />
+        <Route path={`${match.url}/productlist`} component={ProductList} />
+        <Route path={`${match.url}/addproduct`} component={AddProduct} />
+        <Route path={`${match.url}/editproduct`} component={EditProduct} />
+        <Route path={`${match.url}/categorylist`} component={CategoryList} />
+        <Route path={`${match.url}/addcategory`} component={AddCategory} />
+        <Route path={`${match.url}/editcategory`} component={EditCategory} />
+        <Route path={`${match.url}/subcategorytable`} component={SubCategoryTable} />
+        <Route path={`${match.url}/addsubcategory`} component={AddSubCategory} />
+        <Route path={`${match.url}/editsubcategory`} component={EditSubCategory} />
+        <Route path={`${match.url}/brandlist`} component={BrandList} />
+        <Route path={`${match.url}/addbrand`} component={AddBrand} />
+        <Route path={`${match.url}/editbrand`} component={EditBrand} />
+        <Route path={`${match.url}/importproduct`} component={ImportProduct} />
+        <Route path={`${match.url}/printbarcode`} component={PrintBarcode} />
         <Route path={`${match.url}/product-details`} component={ProductDetails} />
 
     </Switch>

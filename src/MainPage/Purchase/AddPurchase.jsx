@@ -122,7 +122,7 @@ const AddPurchase = () => {
           <div className="page-header">
             <div className="page-title">
               <h4>New Purchase</h4>
-              <h6>Add/Update Purchase</h6>
+              <h6>Add Purchase</h6>
             </div>
           </div>
           <div className="card">

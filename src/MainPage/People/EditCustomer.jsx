@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useLocation } from "react-router-dom/cjs/react-router-dom";
 import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
 
@@ -12,13 +13,16 @@ const options1 = [
 ];
 
 const EditCustomer = () => {
+  const {state} = useLocation()
+  const [formData, setFormData] = useState(state)
+
   return (
     <>
       <div className="page-wrapper">
         <div className="content">
           <div className="page-header">
             <div className="page-title">
-              <h4>Edit Customer Management</h4>
+              <h4>Customer Management</h4>
               <h6>Edit/Update Customer</h6>
             </div>
           </div>
@@ -26,25 +30,25 @@ const EditCustomer = () => {
           <div className="card">
             <div className="card-body">
               <div className="row">
-                <div className="col-lg-3 col-sm-6 col-12">
+                <div className="col-lg-4 col-sm-6 col-12">
                   <div className="form-group">
                     <label>Customer Name</label>
-                    <input type="text" defaultValue="Thomas" />
+                    <input type="text" value={formData.customerName} />
                   </div>
                 </div>
-                <div className="col-lg-3 col-sm-6 col-12">
+                <div className="col-lg-4 col-sm-6 col-12">
                   <div className="form-group">
                     <label>Email</label>
-                    <input type="text" defaultValue="Thomas@example.com" />
+                    <input type="text" value={formData?.email} />
                   </div>
                 </div>
-                <div className="col-lg-3 col-sm-6 col-12">
+                <div className="col-lg-4 col-sm-6 col-12">
                   <div className="form-group">
                     <label>Phone</label>
-                    <input type="text" defaultValue={+12163547758} />
+                    <input type="text" value={formData?.contact} />
                   </div>
                 </div>
-                <div className="col-lg-3 col-sm-6 col-12">
+                {/* <div className="col-lg-3 col-sm-6 col-12">
                   <div className="form-group">
                     <label>Choose Country</label>
                     <Select2
@@ -54,30 +58,28 @@ const EditCustomer = () => {
                         placeholder: "United States",
                       }}
                     />
-                  </div>
-                </div>
-                <div className="col-lg-3 col-sm-6 col-12">
+                    </div> */}
+                </div> 
+                <div className="row">
+                <div className="col-lg-4 col-sm-6 col-12">
                   <div className="form-group">
-                    <label>City</label>
+                    <label>Choose Type</label>
                     <Select2
                       className="select"
-                      data={options1}
+                      data={options}
                       options={{
-                        placeholder: "New York",
+                        placeholder: "Choose Type of Customer",
                       }}
                     />
                   </div>
                 </div>
-                <div className="col-lg-9 col-12">
+                <div className="col-lg-8 col-12">
                   <div className="form-group">
-                    <label>Address</label>
-                    <input
-                      type="text"
-                      defaultValue="132, My Street, Kingston, New York "
-                    />
+                    <label>Location/Address</label>
+                    <input type="text" value={formData?.location} />
                   </div>
                 </div>
-                <div className="col-lg-12">
+                {/* <div className="col-lg-12">
                   <div className="form-group">
                     <label>Description</label>
                     <textarea
@@ -87,10 +89,10 @@ const EditCustomer = () => {
                       }
                     />
                   </div>
-                </div>
+                </div> */}
                 <div className="col-lg-12">
                   <button className="btn btn-submit me-2">Update</button>
-                  <button className="btn btn-cancel">Cancel</button>
+                  <button className="btn btn-cancel">Clear</button>
                 </div>
               </div>
             </div>

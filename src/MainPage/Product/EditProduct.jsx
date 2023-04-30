@@ -6,6 +6,7 @@ import "react-select2-wrapper/css/select2.css";
 import { useParams } from "react-router-dom/cjs/react-router-dom.min";
 import { useGet } from "../../hooks/useGet";
 import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
+import { useLocation } from "react-router-dom/cjs/react-router-dom";
 const options1 = [
   { id: 1, text: "Computers", text: "Computers" },
   { id: 2, text: "Mac", text: "Mac" },
@@ -34,25 +35,10 @@ const options7 = [
 
 const EditProduct = () => {
 
-  const {id} = useParams()
-  console.log(id)
+  const {state} = useLocation()
+  console.log(state)
+  const [data, setData] = useState(state)
 
-  const {data:product, isLoading, isError}  = useGet("product", `/product/${id}`);
-  const [data, setData] = useState({})
-  
-  useEffect(() => {
-    if(!isLoading){
-      setData(product.data)
-      console.log('loaded..')
-    }
-    else{
-      console.log('loading...')
-    }
-  }, [isLoading])
-
-  if(isLoading){
-    return <LoadingSpinner/>
-  }
 
   return (
     <>
@@ -232,7 +218,7 @@ const EditProduct = () => {
                   >
                     Update
                   </button>
-                  <Link to="/productlist" className="btn btn-cancel">
+                  <Link to="/dream-pos/product/productlist" className="btn btn-cancel">
                     Cancel
                   </Link>
                 </div>

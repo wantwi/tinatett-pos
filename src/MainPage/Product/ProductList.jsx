@@ -42,7 +42,7 @@ const ProductList = () => {
           return {
             id: product?.id,
             image: AvocatImage,
-            productName: product?.name,
+            name: product?.name,
             status: product?.status,
             alert: product?.alert,
             retailPrice: product?.retailPrice,
@@ -90,18 +90,18 @@ const ProductList = () => {
   const columns = [
     {
       title: "Product Name",
-      dataIndex: "productName",
+      dataIndex: "name",
       render: (text, record) => (
         <div className="productimgname">
           <Link className="product-img">
             <img alt="" src={record.image} />
           </Link>
           <Link style={{ fontSize: "15px", marginLeft: "10px" }}>
-            {record.productName}
+            {record.name}
           </Link>
         </div>
       ),
-      sorter: (a, b) => a.productName.length - b.productName.length,
+      sorter: (a, b) => a.name.length - b.name.length,
     },
     {
       title: "Retail Price",
@@ -136,7 +136,7 @@ const ProductList = () => {
             <Link className="me-3" to="/dream-pos/product/product-details">
               <img src={EyeIcon} alt="img" />
             </Link>
-            <Link className="me-3" to={`/dream-pos/product/editproduct-product/${record.id}`}>
+            <Link className="me-3" to={{ pathname:`/dream-pos/product/editproduct`, state:record}}>
               <img src={EditIcon} alt="img" />
             </Link>
             <Link className="confirm-text" to="#" onClick={confirmText}>

@@ -20,7 +20,7 @@ const AddCustomer = () => {
           <div className="page-header">
             <div className="page-title">
               <h4>Customer Management</h4>
-              <h6>Add/Update Customer</h6>
+              <h6>Add Customer</h6>
             </div>
           </div>
           {/* /add */}

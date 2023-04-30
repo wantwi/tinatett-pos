@@ -62,9 +62,9 @@ const SupplierList = () => {
       let mappedData = suppliers?.data.map((supplier) => {
         return {
           id: supplier.id,
-          supplierName: supplier.name,
+          name: supplier.name,
           status: supplier.status,
-          phone: supplier.phone,
+          contact: supplier.contact,
           email: supplier.email,
           location: supplier.location,
           createdBy: "Admin",
@@ -82,7 +82,7 @@ const SupplierList = () => {
   const columns = [
     {
       title: "Supplier Name",
-      dataIndex: "supplierName",
+      dataIndex: "name",
       render: (text, record) => (
         <div className="productimgname">
           <Link to="#" className="product-img">
@@ -91,7 +91,7 @@ const SupplierList = () => {
           <Link to="#">{text}</Link>
         </div>
       ),
-      sorter: (a, b) => a.supplierName.length - b.supplierName.length,
+      sorter: (a, b) => a.name.length - b.name.length,
       width: "250px",
     },
     {
@@ -106,8 +106,8 @@ const SupplierList = () => {
     },
     {
       title: "Phone",
-      dataIndex: "phone",
-      sorter: (a, b) => a.phone.length - b.phone.length,
+      dataIndex: "contact",
+      sorter: (a, b) => a.contact.length - b.contact.length,
     },
     {
       title: "Status",
@@ -118,9 +118,9 @@ const SupplierList = () => {
     },
     {
       title: "Action",
-      render: () => (
+      render: (a, record) => (
         <>
-          <Link className="me-3" to="/dream-pos/people/editsupplier-people">
+          <Link className="me-3" to={{pathname:"/dream-pos/people/editsupplier", state:record}}>
             <img src={EditIcon} alt="img" />
           </Link>
           <Link className="confirm-text" to="#" onClick={confirmText}>

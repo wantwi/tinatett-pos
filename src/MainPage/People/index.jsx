@@ -15,7 +15,7 @@ import EditStore from './EditStore';
 
 const PeopleIndex = ({ match}) =>(
     <Switch>
-        <Redirect exact from={`${match.url}/`} to={`${match.url}/customerlist-people`} />
+        <Redirect exact from={`${match.url}/`} to={`${match.url}/customerlist`} />
         <Route path={`${match.url}/customerlist`} component={CustomerList} />
         <Route path={`${match.url}/addcustomer`} component={AddCustomer} />
         <Route path={`${match.url}/editcustomer`} component={EditCustomer} />

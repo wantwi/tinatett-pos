@@ -7,11 +7,11 @@ import EditPurchase from './EditPurchase';
 
 const PurchaseRoute = ({ match}) =>(
     <Switch>
-        <Redirect exact from={`${match.url}/`} to={`${match.url}/purchaselist-purchase`} />
-        <Route path={`${match.url}/purchaselist-purchase`} component={PurchaseList} />
-        <Route path={`${match.url}/addpurchase-purchase`} component={AddPurchase} />
-        <Route path={`${match.url}/importpurchase-purchase`} component={ImportPurchase} />
-        <Route path={`${match.url}/editpurchase-purchase`} component={EditPurchase} />
+        <Redirect exact from={`${match.url}/`} to={`${match.url}/purchaselist`} />
+        <Route path={`${match.url}/purchaselist`} component={PurchaseList} />
+        <Route path={`${match.url}/addpurchase`} component={AddPurchase} />
+        <Route path={`${match.url}/importpurchase`} component={ImportPurchase} />
+        <Route path={`${match.url}/editpurchase`} component={EditPurchase} />
 
 
     </Switch>
