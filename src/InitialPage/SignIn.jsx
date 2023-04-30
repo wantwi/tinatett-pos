@@ -14,6 +14,8 @@ import * as Yup from "yup";
 import { LoginUser } from "../auth/auth";
 import useAuth from "../hooks/useAuth";
 import LoadingSpinner from "./Sidebar/LoadingSpinner";
+import Swal from "sweetalert2";
+import alertify from "alertifyjs";
 
 const SignInPage = (props) => {
   const [eye, seteye] = useState(true);
@@ -41,19 +43,29 @@ const SignInPage = (props) => {
 
   const onSubmit = async (data) => {
     setIsLoading(true)
-    const user = await LoginUser(data);
-    const { token, branchId, branchName, groupName } = user;
+    try{
+      const user = await LoginUser(data);
+      console.log(user)
+      const { token, branchId, branchName, groupName } = user;
+      if(!user){
+        setIsLoading(false)
+        alert('Invalid login credentials')
+       }
+       else{
+        setIsLoading(false)
+        sessionStorage.setItem("auth", JSON.stringify(user));
+        setAuth(user);
+        props.history.push("/dream-pos/dashboard");
+      }
+    }
+    catch(error){
+         setIsLoading(false)
+        alert('Invalid login credentials')
+    }
+    
 
-    if(user){
-      setIsLoading(false)
-      sessionStorage.setItem("auth", JSON.stringify(user));
-      setAuth(user);
-      props.history.push("/dream-pos/dashboard");
-  
-    }
-    else{
-      setIsLoading(false)
-    }
+   
+    
   
   };
 
