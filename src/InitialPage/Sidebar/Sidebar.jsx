@@ -557,7 +557,7 @@ const Sidebar = (props) => {
                 </li>
 
               {/* Sales */}
-              {/* <li className="submenu">
+            <li className="submenu">
                 <a
                   href="#"
                   className={
@@ -586,9 +586,9 @@ const Sidebar = (props) => {
                         Sales List
                       </Link>
                     </li>
-                    <li>
+                    {/* <li>
                       <Link to="/pos">POS</Link>
-                    </li>
+                    </li> */}
                     <li>
                       <Link
                         to="/dream-pos/sales/add-sales"
@@ -599,7 +599,7 @@ const Sidebar = (props) => {
                         New Sales
                       </Link>
                     </li>
-                    <li>
+                    {/* <li>
                       <Link
                         className={
                           pathname.includes("salesreturnlist") ? "active" : ""
@@ -608,8 +608,8 @@ const Sidebar = (props) => {
                       >
                         Sales Return List
                       </Link>
-                    </li>
-                    <li>
+                    </li> */}
+                    {/* <li>
                       <Link
                         className={
                           pathname.includes("addsalesreturn") ? "active" : ""
@@ -618,12 +618,12 @@ const Sidebar = (props) => {
                       >
                         New Sales Return
                       </Link>
-                    </li>
+                    </li> */}
                   </ul>
                 ) : (
                   ""
                 )}
-              </li> */}
+              </li> 
 
 
 
@@ -1332,7 +1332,7 @@ const Sidebar = (props) => {
 
 
               {/* Duplicates */}
-              <li className="submenu">
+              {/* <li className="submenu">
                 <Link
                   to="#"
                   className={
@@ -1383,10 +1383,10 @@ const Sidebar = (props) => {
                 ) : (
                   ""
                 )}
-              </li>
+              </li> */}
 
               {/* Updates */}
-              <li className="submenu">
+              {/* <li className="submenu">
                 <Link
                   to="#"
                   className={
@@ -1429,10 +1429,10 @@ const Sidebar = (props) => {
                 ) : (
                   ""
                 )}
-              </li>
+              </li> */}
 
               {/* Lists */}
-              <li className="submenu">
+              {/* <li className="submenu">
                 <Link
                   to="#"
                   className={
@@ -1540,7 +1540,7 @@ const Sidebar = (props) => {
                 ) : (
                   ""
                 )}
-              </li>
+              </li> */}
 
               {/* Reports */}
               <li className="submenu">
@@ -1640,6 +1640,7 @@ const Sidebar = (props) => {
                 )}
               </li>
 
+              {/* Users */}
               <li className="submenu">
                 <Link
                   to="#"

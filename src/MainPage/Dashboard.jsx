@@ -256,20 +256,20 @@ const Dashboard = (props) => {
     },
   ];
 
-  const {
-    data: catData,
-    isLoading,
-    isError,
-    refetch,
-  } = useGet("cat-facts", `/menu`);
+  // const {
+  //   data: catData,
+  //   isLoading,
+  //   isError,
+  //   refetch,
+  // } = useGet("cat-facts", `/menu`);
 
-  if (isError) {
-    return <h2>Sorry there was an error </h2>;
-  }
+  // if (isError) {
+  //   return <h2>Sorry there was an error </h2>;
+  // }
 
-  if (isLoading) {
-    return <h2>Loading..</h2>;
-  }
+  // if (isLoading) {
+  //   return <h2>Loading..</h2>;
+  // }
 
   console.log({ dashboard: auth });
 

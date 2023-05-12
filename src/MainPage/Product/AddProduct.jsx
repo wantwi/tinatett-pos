@@ -13,6 +13,7 @@ import { useEffect } from "react";
 import alertify from "alertifyjs";
 import "../../../node_modules/alertifyjs/build/css/alertify.css";
 import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
+import { resetServerContext } from "react-beautiful-dnd";
 
 // const options = [
 //     {id: 1, text: 'Choose Category', text: 'Choose Category' },
@@ -22,27 +23,7 @@ import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
 //     {id: 1, text: 'Choose Sub Category', text: 'Choose Sub Category' },
 //     {id: 2, text: 'Fruits', text: 'Fruits' },
 // ]
-// const options2 = [
-//     {id: 1, text: 'Choose Brand', text: 'Choose Brand' },
-//     {id: 2, text: 'Brand', text: 'Brand' },
-// ]
-// const options3 = [
-//     {id: 1, text: 'Choose Unit', text: 'Choose Unit' },
-//     {id: 2, text: 'Unit', text: 'Unit' },
-// ]
-// const options4 = [
-//     {id: 1, text: 'Choose Tax', text: 'Choose Tax' },
-//     {id: 2, text: '2%', text: '2%' },
-// ]
-// const options5 = [
-//     {id: 1, text: 'Percentage', text: 'Percentage' },
-//     {id: 2, text: '10%', text: '10%' },
-//     {id: 3, text: '20%', text: '20%' },
-// ]
-// const options6 = [
-//     {id: 1, text: 'Closed', text: 'Closed' },
-//     {id: 2, text: 'Open', text: 'Open' },
-// ]
+
 
 const AddProduct = (props) => {
   const [isEditMode, setisEditMode] = useState(false);
@@ -95,25 +76,6 @@ const AddProduct = (props) => {
     }
     return () => {};
   }, [isSubmitSuccessful, isError]);
-
-  console.log({ isLoading, data, isError, error });
-  const getProductById = async () => {
-    const request = await axios.get(
-      `/product/${props?.location?.search.replace("?id=", "")}`
-    );
-
-    reset(request?.data?.data);
-  };
-
-  useEffect(() => {
-    if (props?.location.search.length > 0) {
-      setisEditMode(true);
-      getProductById();
-    }
-    return () => {
-      setisEditMode(false);
-    };
-  }, [props]);
 
   return (
     <>
@@ -197,7 +159,7 @@ const AddProduct = (props) => {
                         className={`form-control ${
                           errors.retailPrice ? "is-invalid" : ""
                         }`}
-                        type="text"
+                        type="number"
                         {...register("retailPrice")}
                       />
                       <div className="invalid-feedback">
@@ -212,7 +174,7 @@ const AddProduct = (props) => {
                         className={`form-control ${
                           errors.wholeSalePrice ? "is-invalid" : ""
                         }`}
-                        type="text"
+                        type="number"
                         {...register("wholeSalePrice")}
                       />
                       <div className="invalid-feedback">
@@ -227,7 +189,7 @@ const AddProduct = (props) => {
                         className={`form-control ${
                           errors.specialPrice ? "is-invalid" : ""
                         }`}
-                        type="text"
+                        type="number"
                         {...register("specialPrice")}
                       />
                       <div className="invalid-feedback">
@@ -293,12 +255,12 @@ const AddProduct = (props) => {
                                         </div>
                                     </div>
                                 </div> */}
-                  <div className="col-lg-12">
+                  <div className="col-lg-12" style={{textAlign:'right'}}>
                     <button type="submit" className="btn btn-submit me-2">
                       {isEditMode ? "Update" : "Submit"}
                     </button>
-                    <button type="button" className="btn btn-cancel">
-                      Cancel
+                    <button type="button" className="btn btn-cancel" onClick={() => reset()}>
+                      Clear
                     </button>
                   </div>
                 </div>

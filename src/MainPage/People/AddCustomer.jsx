@@ -2,17 +2,72 @@ import React, { useState } from "react";
 import { Upload } from "../../EntryFile/imagePath";
 import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
-
-const options = [
-  { id: 1, text: "Company", text: "Company" },
-  { id: 2, text: "Individual", text: "Individual" },
-];
-const options1 = [
-  { id: 1, text: "City1", text: "City1" },
-  { id: 2, text: "City2", text: "City2" },
-];
+import useCustomApi from "../../hooks/useCustomApi";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as Yup from "yup";
+import { usePost } from "../../hooks/usePost";
+//import { usePut } from "../../hooks/usePut";
+import { useEffect } from "react";
+import alertify from "alertifyjs";
+import "../../../node_modules/alertifyjs/build/css/alertify.css";
+import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
 
 const AddCustomer = () => {
+  const axios = useCustomApi();
+  const [customerType, setCustomerType] = useState(0)
+  const validationSchema = Yup.object().shape({
+    name: Yup.string().required("Product name is required"),
+    email: Yup.string()
+      .required("Email is required"),
+    contact: Yup.string()
+      .required("Phone number is required"),
+    location: Yup.string()
+      .required("Location is required"),
+  });
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    getValues,
+    formState: { errors, isSubmitSuccessful },
+  } = useForm({
+    defaultValues: {
+      name: "",
+      email: "",
+      contact: "",
+      location: "",
+      customerType: 0,
+      gpsAddress:""
+      
+    },
+    resolver: yupResolver(validationSchema),
+  });
+
+  const { isLoading, data, isError, error, mutate } = usePost("/customer");
+  // const { mutate: updateMutate } = usePut(`/product/${getValues()?.id}`);
+
+
+
+  const onSubmit = (data) => {
+    console.log({...data, customerType})
+    mutate({...data, customerType})
+    // const { name, wholeSalePrice, retailPrice, specialPrice, alert } = data;
+    // isEditMode
+    //   ? updateMutate({ name, wholeSalePrice, retailPrice, specialPrice, alert })
+    //   : mutate(data);
+  };
+
+  useEffect(() => {
+    if (isSubmitSuccessful && !isError) {
+      reset();
+      alertify.set("notifier", "position", "top-right");
+      alertify.success("Customer added successfully.");
+    }
+    return () => {};
+  }, [isSubmitSuccessful, isError]);
+
   return (
     <>
       <div className="page-wrapper">
@@ -26,57 +81,100 @@ const AddCustomer = () => {
           {/* /add */}
           <div className="card">
             <div className="card-body">
+              <form onSubmit={handleSubmit(onSubmit)}>
               <div className="row">
                 <div className="col-lg-4 col-sm-6 col-12">
                   <div className="form-group">
                     <label>Customer Name</label>
-                    <input type="text" />
+                    <input 
+                     className={`form-control ${
+                      errors.name ? "is-invalid" : ""
+                    }`}
+                    type="text"
+                    {...register("name")}
+                  />
+                  <div className="invalid-feedback">
+                    {errors.name?.message}
+                  </div>
                   </div>
                 </div>
                 <div className="col-lg-4 col-sm-6 col-12">
                   <div className="form-group">
                     <label>Email</label>
-                    <input type="text" />
+                    <input 
+                     className={`form-control ${
+                      errors.name ? "is-invalid" : ""
+                    }`}
+                    type="text"
+                    {...register("email")}
+                  />
+                  <div className="invalid-feedback">
+                    {errors.name?.message}
+                  </div> 
                   </div>
                 </div>
                 <div className="col-lg-4 col-sm-6 col-12">
                   <div className="form-group">
                     <label>Phone</label>
-                    <input type="text" />
+                    <input  className={`form-control ${
+                          errors.name ? "is-invalid" : ""
+                        }`}
+                        type="text"
+                        {...register("contact")}
+                      />
+                      <div className="invalid-feedback">
+                        {errors.name?.message}
+                      </div>
                   </div>
                 </div>
               </div>
-
-              {/* <div className="col-lg-3 col-sm-6 col-12">
-                  <div className="form-group">
-                    <label>City</label>
-                    <Select2
-                      className="select"
-                      data={options1}
-                      options={{
-                        placeholder: "Choose City",
-                      }}
-                    />
-                  </div>
-                </div> */}
 
               <div className="row">
                 <div className="col-lg-4 col-sm-6 col-12">
                   <div className="form-group">
                     <label>Choose Type</label>
-                    <Select2
-                      className="select"
-                      data={options}
-                      options={{
-                        placeholder: "Choose Type of Customer",
-                      }}
-                    />
+                    <div className="row">
+                        <div class="col-lg-6">
+                          <div class="input-group">
+                            <div class="input-group-text">
+                              <input className="form-check-input" type="radio" name="customerType" value="0" onChange = {(e) => setCustomerType(e.target.value)}/>
+                            </div>
+                            <input type="text" className="form-control" aria-label="Text input with radio button" value={'Company'}/>
+                          </div>
+                       </div>
+
+                        <div class="col-lg-6">
+
+                          <div class="input-group">
+                            <div class="input-group-text">
+                              <input className="form-check-input" type="radio" name="customerType" value="1" onChange = {(e) => setCustomerType(e.target.value)}/>
+                            </div>
+                            <input type="text" className="form-control" aria-label="Text input with radio button" value={'Individual'} />
+                          </div>
+                        
+                        </div>
+                    </div>
+                     
                   </div>
                 </div>
-                <div className="col-lg-8 col-12">
+                <div className="col-lg-4 col-12">
                   <div className="form-group">
                     <label>Location/Address</label>
-                    <input type="text" />
+                    <input className={`form-control ${
+                          errors.name ? "is-invalid" : ""
+                        }`}
+                        type="text"
+                        {...register("location")}/>
+                  </div>
+                </div>
+                <div className="col-lg-4 col-12">
+                  <div className="form-group">
+                    <label>GPS</label>
+                    <input className={`form-control ${
+                          errors.name ? "is-invalid" : ""
+                        }`}
+                        type="text"
+                        {...register("gpsAddress")}/>
                   </div>
                 </div>
                 {/* <div className="col-lg-12">
@@ -98,11 +196,13 @@ const AddCustomer = () => {
                   </div>
                 </div> */}
               
-                <div className="col-lg-12">
-                  <button className="btn btn-submit me-2">Submit</button>
-                  <button className="btn btn-cancel">Cancel</button>
+                <div className="col-lg-12" style={{textAlign:'right'}}>
+                  <button type="submit" className="btn btn-submit me-2">Submit</button>
+                  <button className="btn btn-cancel" onClick={() =>reset()}>Clear</button>
                 </div>
               </div>
+              </form>
+             
             </div>
           </div>
           {/* /add */}

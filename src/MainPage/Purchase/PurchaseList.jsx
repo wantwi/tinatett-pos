@@ -38,15 +38,16 @@ const PurchaseList = () => {
             id: purchase?.id,
             supplierName: purchase?.supplier.name,
             status: purchase?.status,
-            reference: purchase.id,
+            reference: purchase.purchaseRef,
+            numberOfProduct: purchase.numberOfProduct,
             branch: purchase.branch.name,
-            date: new Date(purchase.createdAt).toISOString().substring(0,10),
+            date: new Date(purchase.purchaseDate).toISOString().substring(0,10),
             createdBy: "Admin",
 
             
           }
         })
-      setData([...mappedData, ...mappedData, ...mappedData, ...mappedData,...mappedData])
+      setData(mappedData)
       console.log('loaded..')
     }
     else{
@@ -99,6 +100,11 @@ const PurchaseList = () => {
       title: "Purchase Date",
       dataIndex: "date",
       sorter: (a, b) => a.date.length - b.date.length,
+    },
+    {
+      title: "# of Products",
+      dataIndex: "numberOfProduct",
+      sorter: (a, b) => a.numberOfProduct.length - b.numberOfProduct.length,
     },
     {
       title: "Branch",

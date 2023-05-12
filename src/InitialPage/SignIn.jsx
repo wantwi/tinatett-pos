@@ -5,6 +5,7 @@ import {
   MailIcon,
   GoogleIcon,
   FacebookIcon,
+  Users1,
 } from "../EntryFile/imagePath";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
@@ -98,7 +99,7 @@ const SignInPage = (props) => {
                     </h4>
                   </div>
                   <div className="form-login">
-                    <label style={{ color: "white" }}>userName</label>
+                    <label style={{ color: "white" }}>Username</label>
                     <div className="form-addons">
                       <input
                         type="text"
@@ -107,7 +108,7 @@ const SignInPage = (props) => {
                         placeholder="Enter your userName"
                         defaultValue=""
                       />
-                      <img src={MailIcon} alt="img" />
+                      <img src={Users1} alt="img" />
                       <div className="invalid-feedback">
                         {errors.userName?.message}
                       </div>
@@ -151,25 +152,25 @@ const SignInPage = (props) => {
                   <h4>
                     Don’t have an account?{" "}
                     <Link to="/signUp" className="hover-a">
-                      Sign Up
+                    
                     </Link>
                   </h4>
                 </div>
                 <div className="form-setlogin">
-                  <h4>Or sign up with</h4>
+                  <h4>Try</h4>
                 </div>
                 <div className="form-sociallink">
                   <ul>
                     <li>
                       <Link to="/signin">
-                        <img src={GoogleIcon} className="me-2" alt="google" />
-                        Sign Up using Google
+                        {/* <img src={GoogleIcon} className="me-2" alt="google" /> */}
+                        Contacting Admin
                       </Link>
                     </li>
                     <li>
                       <Link to="/signin">
-                        <img src={FacebookIcon} className="me-2" alt="google" />
-                        Sign Up using Facebook
+                        {/* <img src={FacebookIcon} className="me-2" alt="google" /> */}
+                        Contacting Support
                       </Link>
                     </li>
                   </ul>

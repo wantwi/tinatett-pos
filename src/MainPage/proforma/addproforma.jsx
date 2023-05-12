@@ -50,11 +50,11 @@ const AddProforma = () => {
         <div className="card">
           <div className="card-body">
             <div className="row">
-              <div className="col-lg-4 col-sm-6 col-12">
+              <div className="col-lg-8 col-sm-6 col-12">
                 <div className="form-group">
                   <label>Customer Name</label>
                   <div className="row">
-                    <div className="col-lg-10 col-sm-10 col-10">
+                    <div className="col-lg-12 col-sm-12 col-12">
                       <Select2
                         className="select"
                         data={options}
@@ -63,19 +63,13 @@ const AddProforma = () => {
                         }}
                       />
                     </div>
-                    <div className="col-lg-2 col-sm-2 col-2 ps-0">
-                      <div className="add-icon">
-                        <span>
-                          <img src={Plus} alt="img" />
-                        </span>
-                      </div>
-                    </div>
+                    
                   </div>
                 </div>
               </div>
               <div className="col-lg-4 col-sm-6 col-12">
                 <div className="form-group">
-                  <label>Customer Date</label>
+                  <label> Date</label>
                   <div className="input-groupicon">
                     <DatePicker
                       selected={startDate}
@@ -89,7 +83,7 @@ const AddProforma = () => {
               </div>
               <div className="col-lg-4 col-sm-6 col-12">
                 <div className="form-group">
-                  <label>Product Designation</label>
+                  <label>Product Name (Designation)</label>
                   <Select2
                     className="select"
                     data={options1}
@@ -112,18 +106,6 @@ const AddProforma = () => {
               </div>
               <div className="col-lg-4 col-sm-6 col-12">
                 <div className="form-group">
-                  <label>Price Type</label>
-                  <Select2
-                    className="select"
-                    data={options1}
-                    options={{
-                      placeholder: "Choose Type",
-                    }}
-                  />
-                </div>
-              </div>
-              <div className="col-lg-4 col-sm-6 col-12">
-                <div className="form-group">
                   <label>Amount</label>
                   <div className="input-groupicon">
                     <input
@@ -134,6 +116,60 @@ const AddProforma = () => {
                   </div>
                 </div>
               </div>
+              <div className="col-lg-8 col-sm-12 col-12">
+                <div className="form-group">
+                  <label>Price Type</label>
+                  <div className="row">
+                        <div class="col-lg-3">
+                          <div class="input-group">
+                            <div class="input-group-text">
+                              <input className="form-check-input" type="radio" name="customerType" value="Unit Price" />
+                            </div>
+                            <input type="text" className="form-control" aria-label="Text input with radio button" value={'Unit Price'}/>
+                          </div>
+                       </div>
+
+                        <div class="col-lg-3">
+
+                          <div class="input-group">
+                            <div class="input-group-text">
+                              <input className="form-check-input" type="radio" name="customerType" value="Retail Price"/>
+                            </div>
+                            <input type="text" className="form-control" aria-label="Text input with radio button" value={'Retail Price'} />
+                          </div>
+                        
+                        </div>
+
+                        <div class="col-lg-3">
+                          <div class="input-group">
+                            <div class="input-group-text">
+                              <input className="form-check-input" type="radio" name="customerType" value="Wholesale Price" />
+                            </div>
+                            <input type="text" className="form-control" aria-label="Text input with radio button" value={'Wholesale Price'}/>
+                          </div>
+                       </div>
+
+                        <div class="col-lg-3">
+
+                          <div class="input-group">
+                            <div class="input-group-text">
+                              <input className="form-check-input" type="radio" name="customerType" value="Special Price"/>
+                            </div>
+                            <input type="text" className="form-control" aria-label="Text input with radio button" value={'Special Price'} />
+                          </div>
+                        
+                        </div>
+                    </div>
+                  {/* <Select2
+                    className="select"
+                    data={options1}
+                    options={{
+                      placeholder: "Choose Type",
+                    }}
+                  /> */}
+                </div>
+              </div>
+              
               <div className="col-lg-12 col-sm-6 col-12">
                 <div className="form-group">
                   <Link to="#" className="btn btn-submit me-2">
@@ -274,7 +310,7 @@ const AddProforma = () => {
                       
                       <li className="total">
                         <h4>Grand Total</h4>
-                        <h5>$ 0.00</h5>
+                        <h5>GHS 0.00</h5>
                       </li>
                     </ul>
                   </div>
@@ -284,9 +320,9 @@ const AddProforma = () => {
                 <Link to="#" className="btn btn-submit me-2">
                   Proforma
                 </Link>
-                <Link to="#" className="btn btn-cancel me-2" style={{backgroundColor:'#FF9F43'}}>
+                {/* <Link to="#" className="btn btn-cancel me-2" style={{backgroundColor:'#FF9F43'}}>
                   Refresh
-                </Link>
+                </Link> */}
                 <Link to="#" className="btn btn-cancel">
                   Delete
                 </Link>

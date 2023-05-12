@@ -49,6 +49,7 @@ const CustomerList = () => {
             status: customer?.status,
             customerType: customer?.customerType,
             location: customer?.location,
+            gpsAddress: customer?.gpsAddress,
             email: customer?.email,
             contact: customer?.contact,
             createdBy: "Admin",
@@ -100,7 +101,7 @@ const CustomerList = () => {
           <Link style={{ width: "30%" }} className="product-img">
             <img alt="" src={record.image} />
           </Link>
-          <Link style={{ fontSize: "15px", marginLeft: "10px" }}>
+          <Link style={{ fontSize: "15px", marginLeft: "10px", textAlign:'left' }}>
             {record.customerName}
           </Link>
         </div>

@@ -65,11 +65,22 @@ const SupplierList = () => {
           name: supplier.name,
           status: supplier.status,
           contact: supplier.contact,
+          othercontact: supplier.othercontact,
           email: supplier.email,
           location: supplier.location,
-          createdBy: "Admin",
+          customerType: supplier.customerType,
+          gpsAddress: supplier.gpsAddress,
+          creditPeriod: supplier.creditPeriod,
+          product: supplier.product,
+          paymentInfo: {
+            type: supplier.paymentInfo.type,
+            accountNumber: supplier.paymentInfo.accountNumber,
+            branch: supplier.paymentInfo.branch,
+            serviceProvider: supplier.paymentInfo.serviceProvider
+          }
         }
       })
+
       setData(mappedData)
       console.log('loaded..')
     }

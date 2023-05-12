@@ -287,18 +287,10 @@ const AddTransfer = () => {
                 <div className="col-lg-12 float-md-right">
                   <div className="total-order">
                     <ul>
-                      {/* <li>
-                        <h4>Order Tax</h4>
-                        <h5>$ 0.00 (0.00%)</h5>
-                      </li> */}
-                      <li>
-                        <h4>Discount </h4>
-                        <h5>$ 0.00</h5>
-                      </li>
                     
                       <li className="total">
                         <h4>Total Estimate</h4>
-                        <h5>$ 0.00</h5>
+                        <h5>GHS 0.00</h5>
                       </li>
                     </ul>
                   </div>
@@ -309,9 +301,9 @@ const AddTransfer = () => {
                 <Link to="#" className="btn btn-submit me-2">
                   <FeatherIcon icon="save"/> Invoice
                 </Link>
-                <Link to="#" className="btn btn-cancel me-2"  style={{backgroundColor:'#FF9F43'}} >
+                {/* <Link to="#" className="btn btn-cancel me-2"  style={{backgroundColor:'#FF9F43'}} >
                   Refresh
-                </Link>
+                </Link> */}
                 <Link to="#" className="btn btn-cancel">
                   Delete
                 </Link>

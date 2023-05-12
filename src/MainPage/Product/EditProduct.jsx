@@ -3,41 +3,83 @@ import { Macbook, Upload } from "../../EntryFile/imagePath";
 import {Link} from "react-router-dom"
 import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
-import { useParams } from "react-router-dom/cjs/react-router-dom.min";
-import { useGet } from "../../hooks/useGet";
+
 import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 import { useLocation } from "react-router-dom/cjs/react-router-dom";
-const options1 = [
-  { id: 1, text: "Computers", text: "Computers" },
-  { id: 2, text: "Mac", text: "Mac" },
-];
-const options2 = [
-  { id: 1, text: "None", text: "None" },
-  { id: 2, text: "Option1", text: "Option1" },
-];
-const options4 = [
-  { id: 1, text: "Piece", text: "Piece" },
-  { id: 2, text: "Kg", text: "Kg" },
-];
-const options5 = [
-  { id: 1, text: "Choose Tax", text: "Choose Tax" },
-  { id: 2, text: "2%", text: "2%" },
-];
-const options6 = [
-  { id: 1, text: "Percentage", text: "Percentage" },
-  { id: 2, text: "10%", text: "10%" },
-  { id: 2, text: "20%", text: "20%" },
-];
-const options7 = [
-  { id: 1, text: "Active", text: "Active" },
-  { id: 2, text: "Open", text: "Open" },
-];
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as Yup from "yup";
+//import { usePost } from "../../hooks/usePost";
+import { usePut } from "../../hooks/usePut";
+import alertify from "alertifyjs";
+import "../../../node_modules/alertifyjs/build/css/alertify.css";
+import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
+import { useForm } from "react-hook-form";
 
 const EditProduct = () => {
 
   const {state} = useLocation()
   console.log(state)
   const [data, setData] = useState(state)
+
+  const history = useHistory()
+
+
+  const validationSchema = Yup.object().shape({
+    name: Yup.string().required("Product name is required"),
+    retailPrice: Yup.number()
+      .required("Retail Price is required")
+      .min(1, "Price must be greater than 0"),
+    wholeSalePrice: Yup.number()
+      .required("WholeSale Price is required")
+      .min(1, "Price must be greater than 0"),
+    specialPrice: Yup.number()
+      .required("Special Price is required")
+      .min(1, "Price must be greater than 0"),
+  });
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    getValues,
+    formState: { errors, isSubmitSuccessful },
+  } = useForm({
+    defaultValues: {
+      id: data?.id,
+      name: data?.name,
+      retailPrice: data?.retailPrice,
+      wholeSalePrice: data?.wholeSalePrice,
+      specialPrice: data?.specialPrice,
+      alert: data?.alert,
+    },
+    resolver: yupResolver(validationSchema),
+  });
+
+
+  const { isLoading, isError, mutate: updateMutate } = usePut(`/product/${getValues()?.id}`);
+
+  const onSubmit = (data) => {
+    const { name, wholeSalePrice, retailPrice, specialPrice, alert } = data;
+    updateMutate({ name, wholeSalePrice, retailPrice, specialPrice, alert: Number(alert) })
+     
+  };
+
+  useEffect(() => {
+    if (isSubmitSuccessful && !isError && !isLoading) {
+      reset();
+      alertify.set("notifier", "position", "top-right");
+      alertify.success("Product updated successfully.");
+      setTimeout(() => {
+        history.push('/dream-pos/product/productlist')
+      })
+    }
+    else if(isError){
+      alertify.set("notifier", "position", "top-right");
+      alertify.warning("Failed to update");
+    }
+    return () => {};
+  }, [isSubmitSuccessful, isError, isLoading]);
 
 
   return (
@@ -53,11 +95,12 @@ const EditProduct = () => {
           {/* /add */}
           <div className="card">
             <div className="card-body">
+            <form onSubmit={handleSubmit(onSubmit)}>
               <div className="row">
                 <div className="col-lg-3 col-sm-6 col-12">
                   <div className="form-group">
                     <label>Product Name</label>
-                    <input type="text" value={data?.name} />
+                    <input type="text"  {...register("name")} />
                   </div>
                 </div>
                 {/* <div className="col-lg-3 col-sm-6 col-12">
@@ -111,19 +154,19 @@ const EditProduct = () => {
                 <div className="col-lg-3 col-sm-6 col-12">
                   <div className="form-group">
                     <label>Retail Price</label>
-                    <input type="text" value={data?.retailPrice} />
+                    <input type="text"  {...register("retailPrice")} />
                   </div>
                 </div>
                 <div className="col-lg-3 col-sm-6 col-12">
                   <div className="form-group">
                     <label>Wholesale Price</label>
-                    <input type="text" value={data?.wholeSalePrice} />
+                    <input type="text"  {...register("wholeSalePrice")} />
                   </div>
                 </div>
                 <div className="col-lg-3 col-sm-6 col-12">
                   <div className="form-group">
                     <label>Special Price</label>
-                    <input type="text" value={data?.specialPrice} />
+                    <input type="text"  {...register("specialPrice")} />
                   </div>
                 </div>
                 <div className="col-lg-12">
@@ -131,7 +174,7 @@ const EditProduct = () => {
                     <label>Alert</label>
                     <textarea
                       className="form-control"
-                      value={data?.alert}
+                      {...register("alert")}
                     />
                   </div>
                 </div>
@@ -211,7 +254,7 @@ const EditProduct = () => {
                     </ul>
                   </div>
                 </div> */}
-                <div className="col-lg-12">
+                <div className="col-lg-12" style={{textAlign:'right'}}>
                   <button
                     href="javascript:void(0);"
                     className="btn btn-submit me-2"
@@ -223,6 +266,7 @@ const EditProduct = () => {
                   </Link>
                 </div>
               </div>
+            </form>
             </div>
           </div>
           {/* /add */}

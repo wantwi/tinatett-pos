@@ -97,6 +97,7 @@ const Header = (props) => {
         </Link>
         {/* Header Menu */}
         <ul className="nav user-menu">
+          <li className="nav-item" style={{display:'flex', alignItems:'center', justifyContent:'flex-start', marginRight:50}}>Branch: {loggedInUser?.branchName}</li>
           <li className="nav-item" style={{display:'flex', alignItems:'center', justifyContent:'flex-end'}}>
             
                {dateState.toUTCString('en-GB', {

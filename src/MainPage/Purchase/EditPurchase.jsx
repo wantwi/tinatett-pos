@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Calendar,
   Plus,
@@ -15,55 +15,108 @@ import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
 import { Table } from "antd";
 import { useLocation } from "react-router-dom/cjs/react-router-dom";
+import { moneyInTxt } from "../../utility";
+import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
+import { useGet } from "../../hooks/useGet";
+import { usePut } from "../../hooks/usePut";
 
-const options = [
-  { id: 1, text: "Apex Computer", text: "Apex Computer" },
-  { id: 2, text: "Computers", text: "Computers" },
-];
-const options1 = [
-  { id: 1, text: "MacBook Pro", text: "MacBook Pro" },
-];
-const options2 = [
-  { id: 1, text: "Delivered", text: "Delivered" },
-  { id: 2, text: "Completed", text: "Completed" },
-];
+
 const deleteRow = () => {
   $(document).on("click", ".delete-set", function () {
     $(this).parent().parent().hide();
   });
 };
-const AddPurchase = () => {
+
+
+const EditPurchase = () => {
   const [startDate, setStartDate] = useState(new Date());
   const {state} = useLocation()
   console.log(state)
   const [formData, setFormData] = useState(state)
 
-  const [data] = useState([
-    {
-      id: 1,
-      image: EarpodIcon,
-      productName: "Apple Earpods",
-      qty: "10.00",
-      purchasePrice: "2000.00",
-      discount: "500.00",
-      tax: "0.00",
-      taxAmount: "0.00",
-      unitCost: "2000.00",
-      totalCost: "2000.00",
-    },
-    {
-      id: 2,
-      image: MacbookIcon,
-      productName: "Macbook Pro",
-      qty: "15.00",
-      purchasePrice: "6000.00",
-      discount: "100.00",
-      tax: "0.00",
-      taxAmount: "0.00",
-      unitCost: "1000.00",
-      totalCost: "1000.00",
-    },
-  ]);
+  const [purDate, setPurDate] = useState('');
+  const [manDate, setManDate] = useState('');
+  const [expDate, setExpDate] = useState('');
+
+
+  const [productList, setProductList] = useState([])
+  const [product, setProduct] = useState({ unitPrice: 0, quantity: 0, amount: 0, batchNumber: ''})
+  const [supplier, setSupplier] = useState('')
+
+  const [productsDropdown, setProductsDropdown] = useState([]);
+  const [suppliersDropdown, setSuppliersDropdown] = useState([]);
+
+  const { data: products, isLoading: productsIsLoading } = useGet("products", "/product");
+  const { data: suppliers, isLoading: suppliersIsLoading } = useGet("suppliers", "/supplier");
+  const { data: purchase, isLoading: purchaseIsLoading } = useGet("purchase", `/purchase/${state?.id}`);
+  const { isLoading, data, isError, error, mutate } = usePut("/purchase");
+
+  const productRef = useRef()
+
+  const handleProductSelect = (e) => {
+    let p = productRef.current?.props?.data?.find((item) => item.value === e.target.value)
+    if(p){
+      setProduct({ ...product, productName: p.text, productId: e.target.value })
+    
+    }
+  }
+
+  const handleAddItem = () => {
+    if(product.expireDate == '' || product.manufacturingDate == '' || product.purchaseDate == '' || product.batchNo == ''){
+      alertify.set("notifier", "position", "top-right");
+      alertify.warning("Please make sure all fields are filled.");
+    }
+    else{
+      setProductList([...productList, product])
+    }
+  
+  }
+
+  const onSubmit = () => {
+    let user = sessionStorage.getItem('auth')
+    let userOBJ = JSON.parse(user)
+    let postBody = {
+      supplierId:supplier,
+      branchId: userOBJ.branchId,
+      products: productList
+    }
+
+    console.log(postBody)
+    mutate(postBody)
+  };
+
+  useEffect(() => {
+    if (!productsIsLoading && !suppliersIsLoading) {
+      let mappedProducts = products?.data.map((item) => {
+        return {
+          id: item?.id,
+          text: item?.name,
+          value: item?.id,
+        }
+
+      })
+      setProductsDropdown(mappedProducts)
+
+      let mappedSuppliers = suppliers?.data.map((item) => {
+        return {
+          id: item?.id,
+          text: item?.name,
+          value: item?.id,
+        }
+
+      })
+      setSuppliersDropdown(mappedSuppliers)
+    }
+
+  }, [suppliers, products])
+
+  useEffect(() => {
+   
+    
+    return () => {};
+  }, [isError]);
+
+
 
   const columns = [
     {
@@ -82,29 +135,36 @@ const AddPurchase = () => {
     },
     {
       title: "QTY",
-      dataIndex: "qty",
+      dataIndex: "quantity",
+      // render: (text, record) => <p style={{textAlign:'center'}}>{text || 0}</p>
     },
     {
       title: "Unit Price(GHS)",
-      dataIndex: "purchasePrice",
+      dataIndex: "unitPrice",
+      //render: (text, record) => <p style={{textAlign:'left'}}>{text || 0}</p>
     },
     {
       title: "Amount(GHS)",
-      dataIndex: "discount",
+      dataIndex: "amount",
+      // render: (text, record) => <p style={{textAlign:'center'}}>{text || 0}</p>
     },
     {
       title: "Batch Number",
-      dataIndex: "taxAmount",
+      dataIndex: "batchNumber",
+      // render: (text, record) => <p style={{textAlign:'center'}}>{text || ''}</p>
     },
     {
       title: "Manufacturing Date",
-      dataIndex: "unitCost",
+      dataIndex: "manufacturingDate",
+      render: (text, record) => <p style={{textAlign:'left'}}>{record.manufacturingDate.substring(0,10) || ''}</p>
     },
     {
       title: "Expiring Date",
-      dataIndex: "totalCost",
+      dataIndex: "expireDate",
+      render: (text, record) => <p style={{textAlign:'left'}}>{record.expireDate.substring(0,10) || ''}</p>
     },
     {
+      title:"Action",
       render: () => (
         <>
           <Link className="delete-set" to="#" onClick={deleteRow}>
@@ -114,6 +174,10 @@ const AddPurchase = () => {
       ),
     },
   ];
+
+  if(purchaseIsLoading){
+    return <LoadingSpinner/>
+  }
 
   return (
     <>
@@ -127,41 +191,45 @@ const AddPurchase = () => {
           </div>
           <div className="card">
             <div className="card-body">
-            <div className="row">
-                <div className="col-lg-12 col-sm-6 col-12">
+
+
+              <div className="row">
+                <div className="col-lg-9 col-sm-6 col-12">
                   <div className="form-group">
                     <label>Supplier Name</label>
                     <div className="row">
                       <div className="col-lg-12 col-sm-12 col-12">
                         <Select2
                           className="select"
-                          data={options}
+                          data={suppliersDropdown}
                           options={{
                             placeholder: "Supplier List",
+                          }} 
+                          value={purchase?.supplierId}
+                          onChange={(e) => {
+                            setSupplier( e.target.value)
                           }}
                         />
                       </div>
-                      {/* <div className="col-lg-1 col-sm-2 col-2 ps-0">
-                        <div className="add-icon">
-                          <Link to="#">
-                            <img src={Plus} alt="img" />
-                          </Link>
-                        </div>
-                      </div> */}
+                    
                     </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="row">
-
+                
                 <div className="col-lg-3 col-sm-6 col-12">
                   <div className="form-group">
                     <label>Purchase Date </label>
                     <div className="input-groupicon">
                       <DatePicker
-                        selected={startDate}
-                        onChange={(date) => setStartDate(formData?.date)}
+                        selected={new Date(state?.date)}
+                        value={purchase?.createdAt}
+                        //value={product?.purchaseDate}
+                        onChange={(e) => {
+                          setPurDate(e)
+                          setProduct({ ...product, purchaseDate: new Date(e).toISOString() })
+                        }
+                        }
                       />
                       <div className="addonset">
                         <img src={Calendar} alt="img" />
@@ -169,22 +237,33 @@ const AddPurchase = () => {
                     </div>
                   </div>
                 </div>
-                <div className="col-lg-3 col-sm-6 col-12">
+              </div>
+
+              <div className="row">
+
+                <div className="col-lg-6 col-sm-6 col-12">
                   <div className="form-group">
                     <label>Product Name (Designation)</label>
                     <Select2
                       className="select"
-                      data={options1}
+                      data={productsDropdown}
                       options={{
-                        placeholder: "Category",
+                        placeholder: "Select Product",
                       }}
+                      value={product?.productId}
+                      ref = {productRef}
+                      onChange={(e) => handleProductSelect(e)}
                     />
                   </div>
                 </div>
                 <div className="col-lg-3 col-sm-6 col-12">
                   <div className="form-group">
                     <label>Batch No.</label>
-                    <input type="text" />
+                    <input
+                      type="text"
+                      placeholder="Batch No."
+                      value={product?.batchNumber}
+                      onChange={(e) => setProduct({ ...product, batchNumber: e.target.value })} />
                   </div>
                 </div>
                 <div className="col-lg-3 col-sm-6 col-12">
@@ -192,8 +271,12 @@ const AddPurchase = () => {
                     <label>Manufacturing Date </label>
                     <div className="input-groupicon">
                       <DatePicker
-                        selected={startDate}
-                        onChange={(date) => setStartDate(date)}
+                        selected={manDate}
+                        //value={product?.manufacturingDate}
+                        onChange={(e) => {
+                          setManDate(e)
+                          setProduct({ ...product, manufacturingDate: new Date(e).toISOString() })
+                        }}
                       />
                       <div className="addonset">
                         <img src={Calendar} alt="img" />
@@ -209,8 +292,12 @@ const AddPurchase = () => {
                     <label>Expiring Date </label>
                     <div className="input-groupicon">
                       <DatePicker
-                        selected={startDate}
-                        onChange={(date) => setStartDate(date)}
+                        selected={expDate}
+                        //value={product?.expiringDate}
+                        onChange={(e) => {
+                          setExpDate(e)
+                          setProduct({ ...product, expireDate: new Date(e).toISOString() })
+                        }}
                       />
                       <div className="addonset">
                         <img src={Calendar} alt="img" />
@@ -221,13 +308,22 @@ const AddPurchase = () => {
                 <div className="col-lg-3 col-sm-6 col-12">
                   <div className="form-group">
                     <label>Quantity</label>
-                    <input type="text" />
+                    <input type="text"
+                      value={product?.quantity}
+                      onChange={(e) => setProduct({ ...product, quantity: e.target.value })} />
                   </div>
                 </div>
                 <div className="col-lg-3 col-sm-6 col-12">
                   <div className="form-group">
-                    <label>Unit Price.</label>
-                    <input type="text" />
+                    <label>Unit Price</label>
+                    <input type="text"
+                      value={product?.unitPrice}
+                      onChange={(e) => {
+                        let unitP = parseInt(e.target.value) || 0
+                        let qty = parseInt(product.quantity) || 0
+                        setProduct({ ...product, unitPrice: e.target.value, amount: unitP * qty })
+                      }
+                      } />
                   </div>
                 </div>
                 <div className="col-lg-3 col-sm-6 col-12">
@@ -237,78 +333,81 @@ const AddPurchase = () => {
                       <input
                         type="text"
                         placeholder=""
+                        value={product?.amount}
+                        disabled
+                      //onChange={(e) => setProduct({...product, amount:e.target.value})}
                       />
-                      <div className="addonset">
-                        <img src={Scanner} alt="img" />
-                      </div>
+
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="row">
+              <div className="row" style={{textAlign:'right'}}>
                 <div className="col-lg-12 col-sm-6 col-12">
                   <div className="form-group">
-                  <Link to="#" className="btn btn-submit me-2">
-                      Update
+                    <Link to="#" className="btn btn-submit me-2" onClick={handleAddItem}>
+                      Add to List
                     </Link>
                     <Link to="#" className="btn btn-cancel">
                       Clear
                     </Link>
                   </div>
-                  
+
                 </div>
               </div>
+
               <div className="row">
                 <div className="table-responsive">
                   <Table
                     columns={columns}
-                    dataSource={data}
+                    dataSource={productList}
                     pagination={false}
                   />
                 </div>
               </div>
-              <div className="row">
+
+              <div className="row" >
                 <div className="col-lg-12 float-md-right">
                   <div className="total-order">
                     <ul>
-                      <li>
+                      {/* <li>
                         <h4>Order Tax</h4>
                         <h5>$ 0.00 (0.00%)</h5>
-                      </li>
+                      </li> */}
                       <li>
                         <h4>Discount </h4>
-                        <h5>$ 0.00</h5>
+                        <h5>GHS 0.00</h5>
                       </li>
-                      <li>
-                        <h4>Shipping</h4>
-                        <h5>$ 0.00</h5>
-                      </li>
+
                       <li className="total">
                         <h4>Grand Total</h4>
-                        <h5>$ 2000.00</h5>
+                        <h5>GHS {moneyInTxt(
+                          productList.reduce((total, item) => total + item.amount, 0)
+                        )}</h5>
                       </li>
                     </ul>
                   </div>
                 </div>
               </div>
+
               <div className="row">
-                <div className="col-lg-3 col-sm-6 col-12">
+                {/* <div className="col-lg-3 col-sm-6 col-12">
                   <div className="form-group">
                     <label>Order Tax</label>
-                    <input type="text" defaultValue="20" />
+                    <input type="text" />
                   </div>
                 </div>
                 <div className="col-lg-3 col-sm-6 col-12">
                   <div className="form-group">
                     <label>Discount</label>
-                    <input type="text" defaultValue="10" />
+                    <input type="text" />
                   </div>
                 </div>
                 <div className="col-lg-3 col-sm-6 col-12">
                   <div className="form-group">
                     <label>Shipping</label>
-                    <input type="text" defaultValue="10" />
+                    <input type="text" />
                   </div>
                 </div>
                 <div className="col-lg-3 col-sm-6 col-12">
@@ -318,22 +417,23 @@ const AddPurchase = () => {
                       className="select"
                       data={options2}
                       options={{
-                        placeholder: "Delivered",
+                        placeholder: "Category",
                       }}
                     />
                   </div>
-                </div>
+                </div> */}
                 <div className="col-lg-12">
                   <div className="form-group">
-                    <label>Description</label>
+                    <label>Note</label>
                     <textarea className="form-control" defaultValue={""} />
                   </div>
                 </div>
-                <div className="col-lg-12">
-                  <button className="btn btn-submit me-2">Submit</button>
+                <div className="col-lg-12" style={{textAlign:'right'}}>
+                  <button className="btn btn-submit me-2" type="submit" onClick={onSubmit}>Submit</button>
                   <button className="btn btn-cancel">Cancel</button>
                 </div>
               </div>
+
             </div>
           </div>
         </div>
@@ -342,4 +442,4 @@ const AddPurchase = () => {
   );
 };
 
-export default AddPurchase;
+export default EditPurchase;
