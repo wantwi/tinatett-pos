@@ -12,6 +12,7 @@ import { useEffect } from "react";
 import alertify from "alertifyjs";
 import "../../../node_modules/alertifyjs/build/css/alertify.css";
 import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
+import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 
 const AddCustomer = () => {
   const axios = useCustomApi();
@@ -66,7 +67,11 @@ const AddCustomer = () => {
       alertify.success("Customer added successfully.");
     }
     return () => {};
-  }, [isSubmitSuccessful, isError]);
+  }, [isSubmitSuccessful, isError, data]);
+
+  if(isLoading){
+    return <LoadingSpinner message={'Please wait, saving..'}/>
+  }
 
   return (
     <>

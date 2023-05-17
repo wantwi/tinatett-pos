@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Table from "../../EntryFile/datatable";
 import { Link } from "react-router-dom";
 import DatePicker from "react-datepicker";
@@ -26,11 +26,52 @@ import {
 } from "../../EntryFile/imagePath";
 import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
+import useCustomApi from "../../hooks/useCustomApi";
+import { useGet } from "../../hooks/useGet";
+import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 
-const SalesList = () => {
+const ProformaList = () => {
   const [startDate, setStartDate] = useState(new Date());
   const [startDate1, setStartDate1] = useState(new Date());
   const [inputfilter, setInputfilter] = useState(false);
+
+  const [data, setData] = useState([])
+
+
+  const {
+    data: proformas,
+    isError,
+    isLoading,
+    isSuccess,
+  } = useGet("proformas", "/proforma");
+
+  useEffect(() => {
+    if(!isLoading){
+      console.log(proformas)
+      let mappedData =  proformas?.data.map((proforma) => {
+          return {
+            id: proforma?.id,
+            customerName: proforma.customer?.name,
+            status: proforma?.status,
+            date:new Date(proforma.createdAt).toISOString().substring(0,10),
+            proformaRef: proforma?.proformaRef,
+            numberOfProduct: proforma?.numberOfProduct,
+            createdBy: "Admin",
+          }
+        })
+      setData(mappedData)
+      console.log('loaded..')
+    }
+    else{
+      console.log('loading...')
+    }
+  }, [isLoading])
+
+
+  if(isLoading){
+    return (<LoadingSpinner message="Loading list.."/>)
+  }
+
 
   const togglefilter = (value) => {
     setInputfilter(value);
@@ -67,205 +108,86 @@ const SalesList = () => {
     { id: 2, text: "Online", text: "Online" },
     { id: 2, text: "Inprogess", text: "Inprogess" },
   ];
-  const [data] = useState([
-    {
-      Date: "walk-in-customer",
-      Name: "19 Nov 2022",
-      Reference: "SL0101",
-      Status: "Completed",
-      Payment: "Paid",
-      Total: 0,
-      Paid: 0,
-      Due: 100,
-      Biller: "Admin",
-    },
-    {
-      Date: "walk-in-customer",
-      Name: "19 Nov 2022",
-      Reference: "SL0102",
-      Status: "Completed",
-      Payment: "Paid",
-      Total: 0,
-      Paid: 0,
-      Due: 100,
-      Biller: "Admin",
-    },
-    {
-      Date: "walk-in-customer",
-      Name: "19 Nov 2022",
-      Reference: "SL0103",
-      Status: "Completed",
-      Payment: "Paid",
-      Total: 0,
-      Paid: 100,
-      Due: 0,
-      Biller: "Admin",
-    },
-    {
-      Date: "Fred C. Rasmussen",
-      Name: "19 Nov 2022",
-      Reference: "SL0104",
-      Status: "Pending",
-      Payment: "Due",
-      Total: 0,
-      Paid: 100,
-      Due: 0,
-      Biller: "Admin",
-    },
-    {
-      Date: "Thomas M. Martin",
-      Name: "19 Nov 2022",
-      Reference: "SL0105",
-      Status: "Pending",
-      Payment: "Due",
-      Total: 0,
-      Paid: 0,
-      Due: 100,
-      Biller: "Admin",
-    },
-    {
-      Date: "Thomas M. Martin",
-      Name: "19 Nov 2022",
-      Reference: "SL0106",
-      Status: "Completed",
-      Payment: "Paid",
-      Total: 0,
-      Paid: 0,
-      Due: 100,
-      Biller: "Admin",
-    },
-    {
-      Date: "walk-in-customer",
-      Name: "19 Nov 2022",
-      Reference: "SL0107",
-      Status: "Completed",
-      Payment: "Paid",
-      Total: 0,
-      Paid: 0,
-      Due: 100,
-      Biller: "Admin",
-    },
-    {
-      Date: "walk-in-customer",
-      Name: "19 Nov 2022",
-      Reference: "SL0108",
-      Status: "Pending",
-      Payment: "Due",
-      Total: 0,
-      Paid: 100,
-      Due: 0,
-      Biller: "Admin",
-    },
-    {
-      Date: "walk-in-customer",
-      Name: "19 Nov 2022",
-      Reference: "SL0109",
-      Status: "Pending",
-      Payment: "Due",
-      Total: 0,
-      Paid: 100,
-      Due: 0,
-      Biller: "Admin",
-    },
-    {
-      Date: "walk-in-customer",
-      Name: "19 Nov 2022",
-      Reference: "SL0110",
-      Status: "Pending",
-      Payment: "Due",
-      Total: 0,
-      Paid: 100,
-      Due: 0,
-      Biller: "Admin",
-    },
-    {
-      Date: "walk-in-customer",
-      Name: "19 Nov 2022",
-      Reference: "SL0111",
-      Status: "Pending",
-      Payment: "Due",
-      Total: 0,
-      Paid: 0,
-      Due: 0,
-      Biller: "Admin",
-    },
-  ]);
+
+
 
   const columns = [
     {
-      title: "Costumer name",
-      dataIndex: "Date",
-      sorter: (a, b) => a.Date.length - b.Date.length,
-    },
-    {
-      title: "Date",
-      dataIndex: "Name",
-      sorter: (a, b) => a.Name.length - b.Name.length,
+      title: "Costumer Name",
+      dataIndex: "customerName",
+      sorter: (a, b) => a.customerName.length - b.customerName.length,
     },
     {
       title: "Reference",
-      dataIndex: "Reference",
-      sorter: (a, b) => a.Reference.length - b.Reference.length,
+      dataIndex: "proformaRef",
+      sorter: (a, b) => a.proformaRef.length - b.proformaRef.length,
     },
+    {
+      title: "Date",
+      dataIndex: "date",
+      sorter: (a, b) => a.createdAt.length - b.createdAt.length,
+    },
+    {
+      title: "# of Products",
+      dataIndex: "numberOfProduct",
+      sorter: (a, b) => a.numberOfProduct.length - b.numberOfProduct.length,
+    },
+   
     {
       title: "Status",
-      dataIndex: "Status",
+      dataIndex: "status",
       render: (text, record) => (
         <>
-          {text === "Pending" && (
-            <span className="badges bg-lightred">{text}</span>
+          {text == "1" && (
+            <span className="badges bg-lightred">{"Pending"}</span>
           )}
-          {text === "Completed" && (
-            <span className="badges bg-lightgreen">{text}</span>
+          {text == "2" && (
+            <span className="badges bg-lightgreen">{"Fulfilled"}</span>
           )}
         </>
       ),
-      sorter: (a, b) => a.Status.length - b.Status.length,
+      sorter: (a, b) => a.status.length - b.status.length,
     },
-    {
-      title: "Payment",
-      dataIndex: "Payment",
-      render: (text, record) => (
-        <>
-          {text === "Paid" && (
-            <span className="badges bg-lightgreen">{text}</span>
-          )}
-          {text === "Due" && <span className="badges bg-lightred">{text}</span>}
-        </>
-      ),
-      sorter: (a, b) => a.Payment.length - b.Payment.length,
-    },
-    {
-      title: "Total",
-      dataIndex: "Total",
-      sorter: (a, b) => a.Total.length - b.Total.length,
-    },
-    {
-      title: "Paid",
-      dataIndex: "Paid",
-      render: (text, record) => (
-        <>
-          {text === 100 && <div className="text-green">{text}</div>}
-          {text === 0 && <div>{text}</div>}
-        </>
-      ),
-      sorter: (a, b) => a.Paid.length - b.Paid.length,
-    },
-    {
-      title: "Due",
-      dataIndex: "Due",
-      render: (text, record) => (
-        <>
-          {text === 100 && <div className="text-red">{text}</div>}
-          {text === 0 && <div>{text}</div>}
-        </>
-      ),
-      sorter: (a, b) => a.Due.length - b.Due.length,
-    },
+    // {
+    //   title: "Payment",
+    //   dataIndex: "Payment",
+    //   render: (text, record) => (
+    //     <>
+    //       {text === "Paid" && (
+    //         <span className="badges bg-lightgreen">{text}</span>
+    //       )}
+    //       {text === "Due" && <span className="badges bg-lightred">{text}</span>}
+    //     </>
+    //   ),
+    //   sorter: (a, b) => a.Payment.length - b.Payment.length,
+    // },
+  
+    // {
+    //   title: "Paid",
+    //   dataIndex: "Paid",
+    //   render: (text, record) => (
+    //     <>
+    //       {text === 100 && <div className="text-green">{text}</div>}
+    //       {text === 0 && <div>{text}</div>}
+    //     </>
+    //   ),
+    //   sorter: (a, b) => a.Paid.length - b.Paid.length,
+    // },
+    // {
+    //   title: "Due",
+    //   dataIndex: "Due",
+    //   render: (text, record) => (
+    //     <>
+    //       {text === 100 && <div className="text-red">{text}</div>}
+    //       {text === 0 && <div>{text}</div>}
+    //     </>
+    //   ),
+    //   sorter: (a, b) => a.Due.length - b.Due.length,
+    // },
     {
       title: "Biller",
-      dataIndex: "Biller",
-      sorter: (a, b) => a.Biller.length - b.Biller.length,
+      dataIndex: "createdBy",
+      sorter: (a, b) => a.createdBy.length - b.createdBy.length,
     },
     {
       title: "Action",
@@ -282,45 +204,12 @@ const SalesList = () => {
             </Link>
             <ul className="dropdown-menu">
               <li>
-                <Link to="/dream-pos/sales/sales-details" className="dropdown-item">
+                <Link to="/dream-pos/proforma/proforma-details" className="dropdown-item">
                   <img src={Eye1} className="me-2" alt="img" />
-                  Sale Detail
+                  View Details
                 </Link>
               </li>
-              <li>
-                <Link to="/dream-pos/sales/edit-sales" className="dropdown-item">
-                  <img src={EditIcon} className="me-2" alt="img" />
-                  Edit Sale
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="#"
-                  className="dropdown-item"
-                  data-bs-toggle="modal"
-                  data-bs-target="#showpayment"
-                >
-                  <img src={Dollar1} className="me-2" alt="img" />
-                  Show Payments
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="#"
-                  className="dropdown-item"
-                  data-bs-toggle="modal"
-                  data-bs-target="#createpayment"
-                >
-                  <img src={plusCircle} className="me-2" alt="img" />
-                  Create Payment
-                </Link>
-              </li>
-              <li>
-                <Link to="#" className="dropdown-item">
-                  <img src={Download} className="me-2" alt="img" />
-                  Download pdf
-                </Link>
-              </li>
+            
               <li>
                 <Link
                   to="#"
@@ -343,13 +232,13 @@ const SalesList = () => {
         <div className="content">
           <div className="page-header">
             <div className="page-title">
-              <h4>Sales List</h4>
-              <h6>Manage your Sales</h6>
+              <h4>Proforma List</h4>
+              <h6>Manage your Proformas</h6>
             </div>
             <div className="page-btn">
-              <Link to="/dream-pos/sales/add-sales" className="btn btn-added">
+              <Link to="/dream-pos/proforma/add-proforma" className="btn btn-added">
                 <img src={PlusIcon} alt="img" className="me-1" />
-                Add Sales
+                Add Proforma
               </Link>
             </div>
           </div>
@@ -656,4 +545,4 @@ const SalesList = () => {
   );
 };
 
-export default SalesList;
+export default ProformaList;

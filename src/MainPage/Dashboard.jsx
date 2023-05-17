@@ -130,10 +130,10 @@ const Dashboard = (props) => {
   ]);
 
   const [recentData] = useState([
-    { key: 1, image: EarpodIcon, products: "Apple Earpods", price: "$891.2" },
-    { key: 2, image: IphoneIcon, products: "iPhone 11", price: "$91.2" },
-    { key: 3, image: SamsungIcon, products: "Samsung", price: "$561.2" },
-    { key: 4, image: MacbookIcon, products: "Macbook Pro", price: "$1009.2" },
+    { key: 1, image: EarpodIcon, products: "Apple Earpods", price: "GHS 891.2" },
+    { key: 2, image: IphoneIcon, products: "iPhone 11", price: "GHS 91.2" },
+    { key: 3, image: SamsungIcon, products: "Samsung", price: "GHS 561.2" },
+    { key: 4, image: MacbookIcon, products: "Macbook Pro", price: "GHS 1009.2" },
   ]);
 
   const [customerData] = useState([
@@ -292,7 +292,7 @@ const Dashboard = (props) => {
                 </div>
                 <div className="dash-widgetcontent">
                   <h5>
-                    $
+                    GHS {' '} 
                     <span className="counters">
                       <CountUp end={307144} />
                     </span>
@@ -310,7 +310,7 @@ const Dashboard = (props) => {
                 </div>
                 <div className="dash-widgetcontent">
                   <h5>
-                    $
+                    GHS {' '} 
                     <span className="counters">
                       <CountUp end={4385} />
                     </span>
@@ -328,7 +328,7 @@ const Dashboard = (props) => {
                 </div>
                 <div className="dash-widgetcontent">
                   <h5>
-                    $
+                    GHS {' '} 
                     <span className="counters">
                       <CountUp end={385656.5} />
                     </span>
@@ -346,7 +346,7 @@ const Dashboard = (props) => {
                 </div>
                 <div className="dash-widgetcontent">
                   <h5>
-                    $
+                    GHS {' '} 
                     <span className="counters">
                       <CountUp end={40000} />
                     </span>

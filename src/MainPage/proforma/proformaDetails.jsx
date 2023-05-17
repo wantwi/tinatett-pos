@@ -13,7 +13,7 @@ import {
 import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
 
-const SalesDetail = () => {
+const ProformaDetail = () => {
   const options = [
     { id: 1, text: "Completed", text: "Completed" },
     { id: 2, text: "Inprogess", text: "Inprogess" },
@@ -24,8 +24,8 @@ const SalesDetail = () => {
       <div className="content">
         <div className="page-header">
           <div className="page-title">
-            <h4>Sale Details</h4>
-            <h6>View sale details</h6>
+            <h4>Proforma Details</h4>
+            <h6>View proforma details</h6>
           </div>
         </div>
         <div className="card">
@@ -641,4 +641,4 @@ const SalesDetail = () => {
   );
 };
 
-export default SalesDetail;
+export default ProformaDetail;

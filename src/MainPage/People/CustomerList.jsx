@@ -33,7 +33,7 @@ const CustomerList = () => {
     isError,
     isLoading,
     isSuccess,
-  } = useGet("products", "/customer");
+  } = useGet("customers", "/customer");
 
 
 
@@ -147,7 +147,7 @@ const CustomerList = () => {
 
 
   if(isLoading){
-    return (<LoadingSpinner/>)
+    return (<LoadingSpinner message="Fetching Customers.."/>)
   }
 
   return (

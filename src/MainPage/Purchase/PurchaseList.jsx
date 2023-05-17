@@ -18,10 +18,15 @@ import {
 } from "../../EntryFile/imagePath";
 import { useGet } from "../../hooks/useGet";
 import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
+import Swal from "sweetalert2";
+import { useDelete } from "../../hooks/useDelete";
+import useCustomApi from "../../hooks/useCustomApi";
 
 const PurchaseList = () => {
   const [inputfilter, setInputfilter] = useState(false);
   const [data, setData] = useState([]);
+  const axios = useCustomApi();
+
 
   const {
     data: purchases,
@@ -30,17 +35,52 @@ const PurchaseList = () => {
     isSuccess,
   } = useGet("purchases", "/purchase");
 
+  const confirmText = (id) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      type: "warning",
+      showCancelButton: !0,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+      confirmButtonClass: "btn btn-primary",
+      cancelButtonClass: "btn btn-danger ml-1",
+      buttonsStyling: !1,
+    })
+    .then(() => {
+      console.log('deleting...')
+      let data = axios.delete(`/purchase/item/${id}`)
+      console.log(data)
+    })
+    .then(function (t) {
+     
+      t.value &&
+        Swal.fire({
+          type: "success",
+          title: "Deleted!",
+          text: "Your transaction has been deleted.",
+          confirmButtonClass: "btn btn-success",
+        });
+    });
+  };
 
   useEffect(() => {
     if(!isLoading){
       let mappedData =  purchases?.data.map((purchase) => {
           return {
             id: purchase?.id,
+            supplier:{
+              id: purchase?.supplierId,
+              text: purchase?.supplier.name,
+              value: purchase?.supplierId,
+            },
             supplierName: purchase?.supplier.name,
+            supplierId: purchase?.supplierId,
             status: purchase?.status,
             reference: purchase.purchaseRef,
             numberOfProduct: purchase.numberOfProduct,
-            branch: purchase.branch.name,
+            branch: purchase.branch?.name || '',
             date: new Date(purchase.purchaseDate).toISOString().substring(0,10),
             createdBy: "Admin",
 
@@ -51,7 +91,7 @@ const PurchaseList = () => {
       console.log('loaded..')
     }
     else{
-      console.log('loading...')
+      // console.log('loading...')
     }
   }, [isLoading])
 
@@ -144,7 +184,7 @@ const PurchaseList = () => {
           <Link className="me-3" to= {{pathname:"/dream-pos/purchase/editpurchase", state: record}}>
             <img src={EditIcon} alt="img" />
           </Link>
-          <Link className="confirm-text" to="">
+          <Link className="confirm-text" to="#" onClick={() => confirmText(record?.id)}>
             <img src={DeleteIcon} alt="img" />
           </Link>
         </>

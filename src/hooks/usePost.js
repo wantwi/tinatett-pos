@@ -7,6 +7,7 @@ export const usePost = (url) => {
 
   async function createPost(postData) {
     const response = await axios.post(url, postData);
+    console.log(response.data)
     return response.data;
   }
 

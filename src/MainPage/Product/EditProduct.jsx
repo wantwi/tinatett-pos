@@ -66,7 +66,7 @@ const EditProduct = () => {
   };
 
   useEffect(() => {
-    if (isSubmitSuccessful && !isError && !isLoading) {
+    if (isSubmitSuccessful && !isError) {
       reset();
       alertify.set("notifier", "position", "top-right");
       alertify.success("Product updated successfully.");
@@ -79,7 +79,7 @@ const EditProduct = () => {
       alertify.warning("Failed to update");
     }
     return () => {};
-  }, [isSubmitSuccessful, isError, isLoading]);
+  }, [isSubmitSuccessful, isError]);
 
 
   return (

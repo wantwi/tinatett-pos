@@ -14,6 +14,7 @@ import alertify from "alertifyjs";
 import "../../../node_modules/alertifyjs/build/css/alertify.css";
 import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
 import { resetServerContext } from "react-beautiful-dnd";
+import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 
 // const options = [
 //     {id: 1, text: 'Choose Category', text: 'Choose Category' },
@@ -76,6 +77,10 @@ const AddProduct = (props) => {
     }
     return () => {};
   }, [isSubmitSuccessful, isError]);
+
+  if(isLoading){
+    return <LoadingSpinner message={'Please wait, saving..'}/>
+  }
 
   return (
     <>

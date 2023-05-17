@@ -391,7 +391,7 @@ const Sidebar = (props) => {
                   }
                 >
                   {" "}
-                  <i class="fa fa-window-restore" data-bs-toggle="tooltip" title="fa fa-window-restore"></i> <span>Purchases</span>{" "}
+                  <i class="fa fa-window-restore" data-bs-toggle="tooltip" title="fa fa-window-restore"></i> <span>Purchase (Intake)</span>{" "}
                   <span className="menu-arrow"></span>
                 </a>
                 {isSideMenu == "purchase" ? (

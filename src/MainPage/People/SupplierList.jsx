@@ -144,7 +144,7 @@ const SupplierList = () => {
 
 
   if(isLoading){
-    return (<LoadingSpinner/>)
+    return (<LoadingSpinner message="Fetching suppliers.."/>)
   }
   return (
     <>

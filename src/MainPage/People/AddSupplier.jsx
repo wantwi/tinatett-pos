@@ -10,6 +10,7 @@ import useCustomApi from "../../hooks/useCustomApi";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import { useForm } from "react-hook-form";
+import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 
 const options = [
   { id: 0, text: "Company", text: "Company" },
@@ -68,18 +69,22 @@ const AddSupplier = () => {
           paymentInfo: {"type": data.type, "accountNumber":data.accountNumber,"branch":data.branch,"serviceProvider":data.serviceProvider} 
       }
     
-    console.log(payload)
     mutate(payload)
   };
 
   useEffect(() => {
-    if (isSubmitSuccessful && !isError && !isLoading) {
+    if (isSubmitSuccessful && !isError) {
       reset();
       alertify.set("notifier", "position", "top-right");
       alertify.success("Supplier added successfully.");
     }
     return () => { };
-  }, [isSubmitSuccessful, isError, isLoading]);
+  }, [isSubmitSuccessful, isError]);
+
+
+  if(isLoading){
+    return <LoadingSpinner message={'Please wait, saving..'}/>
+  }
 
   return (
     <>
