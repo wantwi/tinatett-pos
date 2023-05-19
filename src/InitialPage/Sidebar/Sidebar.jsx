@@ -499,64 +499,7 @@ const Sidebar = (props) => {
                 )}
               </li>
 
-              {/* Transfer */}
-              <li className="submenu">
-                  <a
-                    href="#"
-                    className={
-                      pathname.includes("/dream-pos/transfer")
-                        ? "subdrop active"
-                        : "" || isSideMenu == "transfer"
-                        ? "subdrop active"
-                        : ""
-                    }
-                    onClick={() =>
-                      toggleSidebar(isSideMenu == "transfer" ? "" : "transfer")
-                    }
-                  >
-                    {" "}
-                    <img src={Transfer} alt="img" /> <span>Transfer</span>{" "}
-                    <span className="menu-arrow"></span>
-                  </a>
-                  {isSideMenu == "transfer" ? (
-                    <ul>
-                      <li>
-                        <Link
-                          className={
-                            pathname.includes("transferlist-") ? "active" : ""
-                          }
-                          to="/dream-pos/transfer/transferlist-transfer"
-                        >
-                          Transfer List
-                        </Link>
-                      </li>
-                      <li>
-                        <Link
-                          className={
-                            pathname.includes("addtransfer-") ? "active" : ""
-                          }
-                          to="/dream-pos/transfer/addtransfer-transfer"
-                        >
-                          Add Transfer
-                        </Link>
-                      </li>
-                      {/* <li>
-                        <Link
-                          className={
-                            pathname.includes("importtransfer-") ? "active" : ""
-                          }
-                          to="/dream-pos/transfer/importtransfer-transfer"
-                        >
-                          Import Transfer
-                        </Link>
-                      </li> */}
-                    </ul>
-                  ) : (
-                    ""
-                  )}
-                </li>
-
-              {/* Sales */}
+               {/* Sales */}
             <li className="submenu">
                 <a
                   href="#"
@@ -624,6 +567,65 @@ const Sidebar = (props) => {
                   ""
                 )}
               </li> 
+
+              {/* Transfer */}
+              <li className="submenu">
+                  <a
+                    href="#"
+                    className={
+                      pathname.includes("/dream-pos/transfer")
+                        ? "subdrop active"
+                        : "" || isSideMenu == "transfer"
+                        ? "subdrop active"
+                        : ""
+                    }
+                    onClick={() =>
+                      toggleSidebar(isSideMenu == "transfer" ? "" : "transfer")
+                    }
+                  >
+                    {" "}
+                    <img src={Transfer} alt="img" /> <span>Transfer</span>{" "}
+                    <span className="menu-arrow"></span>
+                  </a>
+                  {isSideMenu == "transfer" ? (
+                    <ul>
+                      <li>
+                        <Link
+                          className={
+                            pathname.includes("transferlist-") ? "active" : ""
+                          }
+                          to="/dream-pos/transfer/transferlist-transfer"
+                        >
+                          Transfer List
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          className={
+                            pathname.includes("addtransfer-") ? "active" : ""
+                          }
+                          to="/dream-pos/transfer/addtransfer-transfer"
+                        >
+                          Add Transfer
+                        </Link>
+                      </li>
+                      {/* <li>
+                        <Link
+                          className={
+                            pathname.includes("importtransfer-") ? "active" : ""
+                          }
+                          to="/dream-pos/transfer/importtransfer-transfer"
+                        >
+                          Import Transfer
+                        </Link>
+                      </li> */}
+                    </ul>
+                  ) : (
+                    ""
+                  )}
+                </li>
+
+             
 
 
 

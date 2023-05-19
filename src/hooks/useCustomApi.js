@@ -8,16 +8,21 @@ const useCustomApi = () => {
   const { auth } = useAuth();
   //  const refresh = useRefreshtoken()
 
+  
+
   useEffect(() => {
     const requestintercept = CustomAxios?.interceptors.request.use(
       (config) => {
         if (!config.headers.Authorization) {
           config.headers.Authorization = `Bearer ${auth?.token}`;
         }
+        console.log('asdasdasdas', config)
         return config;
       },
       (error) => Promise.reject(error)
     );
+
+    
 
     const responseintercept = CustomAxios.interceptors.response.use(
       (response) => response,

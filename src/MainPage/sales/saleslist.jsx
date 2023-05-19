@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Table from "../../EntryFile/datatable";
 import { Link } from "react-router-dom";
 import DatePicker from "react-datepicker";
@@ -26,6 +26,9 @@ import {
 } from "../../EntryFile/imagePath";
 import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
+import { useGet } from "../../hooks/useGet";
+import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
+import { moneyInTxt } from "../../utility";
 
 const SalesList = () => {
   const [startDate, setStartDate] = useState(new Date());
@@ -67,140 +70,52 @@ const SalesList = () => {
     { id: 2, text: "Online", text: "Online" },
     { id: 2, text: "Inprogess", text: "Inprogess" },
   ];
-  const [data] = useState([
-    {
-      Date: "walk-in-customer",
-      Name: "19 Nov 2022",
-      Reference: "SL0101",
-      Status: "Completed",
-      Payment: "Paid",
-      Total: 0,
-      Paid: 0,
-      Due: 100,
-      Biller: "Admin",
-    },
-    {
-      Date: "walk-in-customer",
-      Name: "19 Nov 2022",
-      Reference: "SL0102",
-      Status: "Completed",
-      Payment: "Paid",
-      Total: 0,
-      Paid: 0,
-      Due: 100,
-      Biller: "Admin",
-    },
-    {
-      Date: "walk-in-customer",
-      Name: "19 Nov 2022",
-      Reference: "SL0103",
-      Status: "Completed",
-      Payment: "Paid",
-      Total: 0,
-      Paid: 100,
-      Due: 0,
-      Biller: "Admin",
-    },
-    {
-      Date: "Fred C. Rasmussen",
-      Name: "19 Nov 2022",
-      Reference: "SL0104",
-      Status: "Pending",
-      Payment: "Due",
-      Total: 0,
-      Paid: 100,
-      Due: 0,
-      Biller: "Admin",
-    },
-    {
-      Date: "Thomas M. Martin",
-      Name: "19 Nov 2022",
-      Reference: "SL0105",
-      Status: "Pending",
-      Payment: "Due",
-      Total: 0,
-      Paid: 0,
-      Due: 100,
-      Biller: "Admin",
-    },
-    {
-      Date: "Thomas M. Martin",
-      Name: "19 Nov 2022",
-      Reference: "SL0106",
-      Status: "Completed",
-      Payment: "Paid",
-      Total: 0,
-      Paid: 0,
-      Due: 100,
-      Biller: "Admin",
-    },
-    {
-      Date: "walk-in-customer",
-      Name: "19 Nov 2022",
-      Reference: "SL0107",
-      Status: "Completed",
-      Payment: "Paid",
-      Total: 0,
-      Paid: 0,
-      Due: 100,
-      Biller: "Admin",
-    },
-    {
-      Date: "walk-in-customer",
-      Name: "19 Nov 2022",
-      Reference: "SL0108",
-      Status: "Pending",
-      Payment: "Due",
-      Total: 0,
-      Paid: 100,
-      Due: 0,
-      Biller: "Admin",
-    },
-    {
-      Date: "walk-in-customer",
-      Name: "19 Nov 2022",
-      Reference: "SL0109",
-      Status: "Pending",
-      Payment: "Due",
-      Total: 0,
-      Paid: 100,
-      Due: 0,
-      Biller: "Admin",
-    },
-    {
-      Date: "walk-in-customer",
-      Name: "19 Nov 2022",
-      Reference: "SL0110",
-      Status: "Pending",
-      Payment: "Due",
-      Total: 0,
-      Paid: 100,
-      Due: 0,
-      Biller: "Admin",
-    },
-    {
-      Date: "walk-in-customer",
-      Name: "19 Nov 2022",
-      Reference: "SL0111",
-      Status: "Pending",
-      Payment: "Due",
-      Total: 0,
-      Paid: 0,
-      Due: 0,
-      Biller: "Admin",
-    },
-  ]);
+ const [data, setData] = useState([])
+
+
+  const {
+    data: sales,
+    isError,
+    isLoading,
+    isSuccess,
+  } = useGet("sales", "/sales");
+
+
+  useEffect(() => {
+    if(!isLoading){
+      let mappedData =  sales?.data.map((sale) => {
+          return {
+            id: sale?.id,
+            Date: sale?.transDate,
+            Name: sale?.name || 'Franslina Pharmacy',
+            Status: sale?.status,
+            Reference: sale?.salesRef,
+            Payment: sale?.status,
+            Total: moneyInTxt(sale?.totalAmount),
+            Paid: 0,
+            Due: 0,
+            Biller: sale?.salesPerson,
+          }
+        })
+      setData(mappedData)
+      console.log('loaded..')
+    }
+    else{
+      console.log('loading...')
+    }
+  }, [isLoading])
+
 
   const columns = [
     {
       title: "Costumer name",
-      dataIndex: "Date",
-      sorter: (a, b) => a.Date.length - b.Date.length,
+      dataIndex: "Name",
+      sorter: (a, b) => a.Name.length - b.Name.length,
     },
     {
       title: "Date",
-      dataIndex: "Name",
-      sorter: (a, b) => a.Name.length - b.Name.length,
+      dataIndex: "Date",
+      sorter: (a, b) => a.Date.length - b.Date.length,
     },
     {
       title: "Reference",
@@ -213,10 +128,10 @@ const SalesList = () => {
       render: (text, record) => (
         <>
           {text === "Pending" && (
-            <span className="badges bg-lightred">{text}</span>
+            <span className="badges bg-lightred">{"Incomplete"}</span>
           )}
-          {text === "Completed" && (
-            <span className="badges bg-lightgreen">{text}</span>
+          {text === "Paid" && (
+            <span className="badges bg-lightgreen">{"Complete"}</span>
           )}
         </>
       ),
@@ -228,36 +143,36 @@ const SalesList = () => {
       render: (text, record) => (
         <>
           {text === "Paid" && (
-            <span className="badges bg-lightgreen">{text}</span>
+            <span className="badges bg-lightgreen">{(text)}</span>
           )}
-          {text === "Due" && <span className="badges bg-lightred">{text}</span>}
+          {text === "Due" && <span className="badges bg-lightred">{(text)}</span>}
         </>
       ),
       sorter: (a, b) => a.Payment.length - b.Payment.length,
     },
     {
-      title: "Total",
+      title: "Total (GHS)",
       dataIndex: "Total",
       sorter: (a, b) => a.Total.length - b.Total.length,
     },
     {
-      title: "Paid",
+      title: "Paid (GHS)",
       dataIndex: "Paid",
       render: (text, record) => (
         <>
-          {text === 100 && <div className="text-green">{text}</div>}
-          {text === 0 && <div>{text}</div>}
+          {text === 100 && <div className="text-green">{moneyInTxt(text)}</div>}
+          {text === 0 && <div>{moneyInTxt(text)}</div>}
         </>
       ),
       sorter: (a, b) => a.Paid.length - b.Paid.length,
     },
     {
-      title: "Due",
+      title: "Due (GHS)",
       dataIndex: "Due",
       render: (text, record) => (
         <>
-          {text === 100 && <div className="text-red">{text}</div>}
-          {text === 0 && <div>{text}</div>}
+          {text === 100 && <div className="text-red">{moneyInTxt(text)}</div>}
+          {text === 0 && <div>{moneyInTxt(text)}</div>}
         </>
       ),
       sorter: (a, b) => a.Due.length - b.Due.length,
@@ -337,6 +252,12 @@ const SalesList = () => {
       ),
     },
   ];
+
+
+  if(isLoading){
+    return (<LoadingSpinner message="Fetching Sales.."/>)
+  }
+
   return (
     <>
       <div className="page-wrapper">

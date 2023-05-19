@@ -36,6 +36,8 @@ const ProductList = () => {
   } = useGet("products", "/product");
 
 
+  console.log("Response:", isLoading, isError, products)
+
   useEffect(() => {
     if(!isLoading){
       let mappedData =  products?.data.map((product) => {
@@ -149,7 +151,7 @@ const ProductList = () => {
   ];
 
   if(isLoading){
-    return (<LoadingSpinner message="Fetching Products.."/>)
+    // return (<LoadingSpinner message="Fetching Products.."/>)
   }
 
   return (

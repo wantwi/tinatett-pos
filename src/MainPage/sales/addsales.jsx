@@ -14,29 +14,130 @@ import {
 import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
 import { useEffect } from "react";
+import { useGet } from "../../hooks/useGet";
+import Select from "react-select";
+import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
+import { moneyInTxt } from "../../utility";
+
+
 const Addsales = () => {
   const [startDate, setStartDate] = useState(new Date());
   const [activeTab, setActiveTab] = useState('cash')
   const [disabledUnselectedPrice,setDisableUnselectedPrice] = useState({retail: false, wholesale:false, special:false})
+  const [customerList, setCustomerList] = useState([])
+  const [productsList, setProductsList] = useState([])
+  const [selectedCustomer, setSelectedCustomer] = useState({})
+  const [selectedProduct, setSelectedProduct] = useState({})
+  const [price, setPrice] = useState(0)
+  const [formData, setFormData] = useState({quantity:0, amount:0, batchNo:'', manuDate:'', expDate:'', salesType:{}})
+  const [paymentData, setPaymentData] = useState({paymentType:'', accountNo:'', branch: ''})
+  const [productGridData, setProductGridData] = useState([])
+  const {
+    data: customers,
+    isLoading: customersIsLoading,
+  } = useGet("customers", "/customer");
 
-  const options = [
-    { id: 1, text: "Choose", text: "Choose" },
-    { id: 2, text: "Costumer Name", text: "Costumer Name" },
-  ];
+  const {
+    data: products,
+    isLoading: productsIsLoading,
+  } = useGet("products", "/product");
+
   const options1 = [
-    { id: 1, text: "Choose", text: "Choose" },
-    { id: 2, text: "Supplier Name", text: "Supplier Name" },
+    { value: 1, label: "Retail", text: "Retail"  },
+    { value: 2, label: "Wholesale", text: "Wholesale" },
   ];
-  const options2 = [
-    { id: 1, text: "Completed", text: "Completed" },
-    { id: 2, text: "Inprogess", text: "Inprogess" },
-  ];
+
+  const handleInvoice = () =>{
+
+  }
+
+  const handleNoInvoice = () => {
+
+  }
+
+  const handleCredit = () => {
+
+  }
+
+  const handleSuspend = () => {
+    let payload = {
+      customerId: selectedCustomer.value,
+      totalAmount : productGridData.reduce((total, item) => total + item.amount, 0),
+      salesType:formData.salesType?.value,
+      paymentType: paymentData.paymentType,
+      products: productGridData,
+      formData:formData
+    }
+
+    console.log(payload)
+  }
+
+  const handleAddItem = () => {
+    //console.log(productFormData)
+  
+      let obj = {
+         name: selectedProduct.label,
+         productId:selectedProduct.value,
+         batchNumber:"TA0523189253001",
+         quantity :formData.quantity,
+         unitPrice:price,
+         amount:formData.quantity * price
+      }    
+      setProductGridData([...productGridData, obj])
+      setFormData({quantity:0, amount:0, batchNo:'', manuDate:'', expDate:'', salesType:{}})
+   
+    }
+   
+  
+
 
   useEffect(() => {
-    $(document).on("click", ".delete-set", function () {
-      $(this).parent().parent().hide();
-    });
-  });
+    if (!productsIsLoading && !customersIsLoading) {
+      console.log(customers)
+      let mappedData =  customers?.data.map((customer) => {
+          return {
+            value: customer?.id,
+            label: customer?.name,
+            customerType: customer?.customerType,
+          }
+        })
+      setCustomerList(mappedData)
+
+      console.log(customers)
+      let mappedData2 =  products?.data.map((product) => {
+          return {
+            value: product?.id,
+            label: product?.name,
+            retailPrice: product?.retailPrice,
+            wholeSalePrice: product?.wholeSalePrice,
+            specialPrice: product?.specialPrice,
+            remainingStock: product?.remainingStock,
+            manuDate: product?.manufacturingDate,
+            expDate: product?.expiryDate
+          }
+        })
+        setProductsList(mappedData2)
+      
+    }
+  }, [productsIsLoading, customersIsLoading])
+
+
+
+  useEffect(() => {
+    console.log(selectedCustomer)
+  }, [selectedCustomer])
+
+  useEffect(() => {
+    console.log(selectedProduct)
+  }, [selectedProduct])
+
+  useEffect(() => {
+    console.log(productGridData)
+  }, [productGridData])
+
+  // if(productsIsLoading || customersIsLoading){
+  //   return (<LoadingSpinner/>)
+  // }
 
   return (
     <div className="page-wrapper">
@@ -49,51 +150,64 @@ const Addsales = () => {
         </div>
 
       <div style={{display:'flex', gap:20}}>
-        <div className="card" style={{width: '50%'}}>
-          <div className="card-body">
-            <div className="row">
-             
-                <div className="col-6">
-                  <div className="form-group">
-                    <label>Customer</label>
-                    <div className="row">
-                      <div className="col-lg-12 col-sm-10 col-10">
-                        <Select2
-                          className="select"
-                          data={options}
-                          options={{
-                            placeholder: "Choose",
-                          }}
+        <div style={{width: '50%'}}>
+          <div className="card" >
+            <div className="card-body">
+                <div className="row">
+              
+                  <div className="col-6">
+                    <div className="form-group">
+                      <label>Customer</label>
+                      <div className="row">
+                        <div className="col-lg-12 col-sm-10 col-10">
+                        
+                        <Select style={{width:'100%'}}
+                            options={customerList}
+                            placeholder={'Select customer'}
+                            value={selectedCustomer}
+                            onChange={(e) => setSelectedCustomer(e)}
+                            isSearchable= {true}
+                            
                         />
+                        
+                        </div>
+                        
                       </div>
-                      
                     </div>
                   </div>
-                </div>
 
-                <div className="col-6">
-                  <div className="form-group">
-                    <label>Date</label>
-                    <div className="input-groupicon">
-                      <DatePicker
-                        selected={startDate}
-                        onChange={(date) => setStartDate(date)}
+                  <div className="col-6">
+                    <div className="form-group">
+                      <label>Sales Type</label>
+                      <div className="input-groupicon">
+                      <Select style={{width:'100%'}}
+                        options={options1}
+                        value={formData.salesType}
+                        onChange={(e) => setFormData({...formData, salesType: (e)})}
                       />
-                      <Link className="addonset">
-                        <img src={Calendar} alt="img" />
-                      </Link>
+                      </div>
                     </div>
                   </div>
+
                 </div>
+            </div>
+          </div>
           
+          <div className="card" >
+             <div className="card-body">
+                <div className="row">
                 <div className="col-6">
                   <div className="form-group">
                     <label>Product Name</label>
                     <div className="input-groupicon">
-                      <input
-                        type="text"
-                        placeholder="Please type product code and select..."
-                      />
+                      <Select style={{width:'100%'}}
+                          options={productsList}
+                          placeholder={'Select product'}
+                          value={selectedProduct}
+                          onChange={(e) => setSelectedProduct(e)}
+                          isSearchable= {true}
+                          
+                       />
                       
                     </div>
                   </div>
@@ -106,6 +220,8 @@ const Addsales = () => {
                       <input
                         className="form-control"
                         type="number"
+                        value={selectedProduct?.remainingStock}
+                        disabled
                       />
                       
                     </div>
@@ -119,6 +235,8 @@ const Addsales = () => {
                       <input
                         type="text"
                         placeholder=""
+                        value={formData.batchNo}
+                        onChange={(e) => setFormData({...formData, batchNo: (e.target.value)})}
                       />
                       
                     </div>
@@ -131,7 +249,9 @@ const Addsales = () => {
                     <div className="input-groupicon">
                       <DatePicker
                         selected={startDate}
-                        onChange={(date) => setStartDate(date)}
+                        value={selectedProduct?.manuDate}
+                        disabled
+
                       />
                       <Link className="addonset">
                         <img src={Calendar} alt="img" />
@@ -144,9 +264,11 @@ const Addsales = () => {
                   <div className="form-group">
                     <label>Exp. Date</label>
                     <div className="input-groupicon">
-                      <DatePicker
+                    <DatePicker
                         selected={startDate}
-                        onChange={(date) => setStartDate(date)}
+                        value={selectedProduct?.expDate}
+                        disabled
+
                       />
                       <Link className="addonset">
                         <img src={Calendar} alt="img" />
@@ -165,7 +287,10 @@ const Addsales = () => {
 
                             <div className="input-group">
                               <div className="input-group-text">
-                                <input className="form-check-input" type="radio" name="priceType" onChange={() => setDisableUnselectedPrice({retail:false, wholesale:true, special:true})}/>
+                                <input className="form-check-input" type="radio" name="priceType" value={selectedProduct?.retailPrice} onChange={(e) => {
+                                  setPrice(e.target.value)
+                                  setDisableUnselectedPrice({retail:false, wholesale:true, special:true})
+                                }}/>
                               </div>
                               <input type="text" className="form-control" aria-label="Text input with radio button"  placeholder="Retail" disabled={disabledUnselectedPrice.retail}/>
                             </div>
@@ -175,7 +300,10 @@ const Addsales = () => {
                           <div className="col-lg-4">
                             <div className="input-group">
                               <div className="input-group-text">
-                                <input className="form-check-input" type="radio" name="priceType" value="Wholesale Price" onChange={() => setDisableUnselectedPrice({wholesale:false, retail:true, special:true})} />
+                                <input className="form-check-input" type="radio" name="priceType" value={selectedProduct?.wholeSalePrice} onChange={(e) => {
+                                  setPrice(e.target.value)
+                                  setDisableUnselectedPrice({wholesale:false, retail:true, special:true})}
+                                 } />
                               </div>
                               <input type="text" className="form-control" aria-label="Text input with radio button" placeholder={'Wholesale'} disabled={disabledUnselectedPrice.wholesale}/>
                             </div>
@@ -185,7 +313,10 @@ const Addsales = () => {
 
                             <div className="input-group">
                               <div className="input-group-text">
-                                <input className="form-check-input" type="radio" name="priceType" value="Special Price" onChange={() => setDisableUnselectedPrice({special:false, wholesale:true, retail:true})}/>
+                                <input className="form-check-input" type="radio" name="priceType" value={selectedProduct?.specialPrice} onChange={(e) => {
+                                  setPrice(e.target.value)
+                                  setDisableUnselectedPrice({special:false, wholesale:true, retail:true})
+                                } }/>
                               </div>
                               <input type="text" className="form-control" aria-label="Text input with radio button" placeholder={'Special'} disabled={disabledUnselectedPrice.special} />
                             </div>
@@ -202,7 +333,8 @@ const Addsales = () => {
                       <input
                        className="form-control"
                         type="number"
-                        placeholder=""
+                        value={formData?.quantity}
+                        onChange={(e) => setFormData({...formData, quantity: (e.target.value)})}
                       />
                       
                     </div>
@@ -216,6 +348,7 @@ const Addsales = () => {
                       <input
                         className="form-control"
                         type="number"
+                        value={formData.quantity * price}
                       />
                       
                     </div>
@@ -342,14 +475,19 @@ const Addsales = () => {
                   </div>
                 </div>
 
+                <div className="col-6 mt-3">
+                <div className="form-group">
+                  <label></label>
+                  <Link to="#" className="btn btn-submit me-2" onClick={handleAddItem}>
+                      Add
+                    </Link>
+                  </div>
+                 
+                </div>
+                </div>
                
-                
-
-                
-
-              
-              
             </div>
+            
           </div>
         </div>
 
@@ -357,8 +495,8 @@ const Addsales = () => {
           <div className="card-body">
               <div className="row">
                 <div className="col-lg-12">
-                <div className="row" style={{height:550, maxHeight:550, overflow:'auto'}}>
-                <div className="table-responsive mb-3">
+                <div className="row" >
+                <div className="table-responsive mb-3" style={{height:600, maxHeight:600, overflow:'auto'}}>
                   <table className="table">
                     <thead>
                       <tr>
@@ -366,32 +504,37 @@ const Addsales = () => {
                         <th>Product Name</th>
                         <th>QTY</th>
                         <th>Price</th>
-                        <th>Discount</th>
-                        <th>Tax</th>
                         <th>Subtotal</th>
+                        <th>Action</th>
                         <th />
                       </tr>
                     </thead>
                     <tbody>
-                      <tr>
-                        <td>1</td>
-                        <td className="productimgname">
-                          <Link className="product-img">
-                            <img src={Product7} alt="product" />
-                          </Link>
-                          <Link to="#">Apple Earpods</Link>
-                        </td>
-                        <td>1.00</td>
-                        <td>15000.00</td>
-                        <td>0.00</td>
-                        <td>0.00</td>
-                        <td>1500.00</td>
-                        <td>
-                          <Link to="#" className="delete-set">
-                            <img src={DeleteIcon} alt="svg" />
-                          </Link>
-                        </td>
-                      </tr>
+                      {
+                        productGridData?.map((item, i) => {
+                          return (
+                            <tr>
+                            <td>{i+1}</td>
+                            <td className="productimgname">
+                              <Link className="product-img">
+                                <img src={Product7} alt="product" />
+                              </Link>
+                              <Link to="#">{item.name}</Link>
+                            </td>
+                            <td>{item.quantity}</td>
+                            <td>{item.unitPrice}</td>
+                            <td>{item.amount}</td>
+                            
+                            <td>
+                              <Link to="#" className="delete-set">
+                                <img src={DeleteIcon} alt="svg" />
+                              </Link>
+                            </td>
+                          </tr>
+                          )
+                        })
+                      }
+                     
                      
                     </tbody>
                   </table>
@@ -422,12 +565,12 @@ const Addsales = () => {
                   <div className="total-order w-100 max-widthauto m-auto mb-4">
                     <ul>
                       <li>
-                        <h4>Shipping</h4>
-                        <h5>$ 0.00</h5>
+                        <h4>Discount</h4>
+                        <h5>GHS 0.00</h5>
                       </li>
                       <li className="total">
                         <h4>Grand Total</h4>
-                        <h5>$ 0.00</h5>
+                        <h5>GHS {moneyInTxt(productGridData.reduce((total, item) => total + item.amount, 0))}</h5>
                       </li>
                     </ul>
                   </div>
@@ -436,17 +579,17 @@ const Addsales = () => {
 
               <div className="row">
                 <div className="col-lg-12" style={{textAlign:'right'}}>
-                  <Link to="#" className="btn btn-submit me-2">
+                  <Link to="#" className="btn btn-submit me-2" onClick={handleInvoice}>
                     Invoice
                   </Link>
-                  <Link to="#" className="btn btn-cancel me-2">
+                  <Link to="#" className="btn btn-cancel me-2" onClick={handleNoInvoice}>
                     No Invoice
                   </Link>
-                  <Link to="#" className="btn btn-submit me-2">
+                  <Link to="#" className="btn btn-submit me-2" style={{background:'#FFC107'}} onClick={handleCredit}>
                     Credit
                   </Link>
-                  <Link to="#" className="btn btn-cancel">
-                    Suspend
+                  <Link to="#" className="btn btn-cancel" style={{background:'darkred'}} onClick={handleSuspend}>
+                     Suspend
                   </Link>
                   
                 </div>
