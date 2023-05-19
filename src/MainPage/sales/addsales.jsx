@@ -161,13 +161,12 @@ const Addsales = () => {
                       <div className="row">
                         <div className="col-lg-12 col-sm-10 col-10">
                         
-                        <Select style={{width:'100%'}}
+                        <Select
+                            className="select"
                             options={customerList}
-                            placeholder={'Select customer'}
                             value={selectedCustomer}
                             onChange={(e) => setSelectedCustomer(e)}
-                            isSearchable= {true}
-                            
+
                         />
                         
                         </div>

@@ -16,7 +16,6 @@ const useCustomApi = () => {
         if (!config.headers.Authorization) {
           config.headers.Authorization = `Bearer ${auth?.token}`;
         }
-        console.log('asdasdasdas', config)
         return config;
       },
       (error) => Promise.reject(error)

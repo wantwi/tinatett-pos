@@ -151,7 +151,7 @@ const ProductList = () => {
   ];
 
   if(isLoading){
-    // return (<LoadingSpinner message="Fetching Products.."/>)
+    return (<LoadingSpinner message="Fetching Products.."/>)
   }
 
   return (

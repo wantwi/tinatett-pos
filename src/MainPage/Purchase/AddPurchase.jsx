@@ -12,6 +12,7 @@ import { Link } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Select2 from "react-select2-wrapper";
+import Select from "react-select";
 import "react-select2-wrapper/css/select2.css";
 import { Table } from "antd";
 import { useGet } from "../../hooks/useGet";
@@ -150,7 +151,7 @@ const AddPurchase = () => {
       let mappedProducts = products?.data.map((item) => {
         return {
           id: item?.id,
-          text: item?.name,
+          label: item?.name,
           value: item?.id,
         }
 
@@ -160,7 +161,7 @@ const AddPurchase = () => {
       let mappedSuppliers = suppliers?.data.map((item) => {
         return {
           id: item?.id,
-          text: item?.name,
+          label: item?.name,
           value: item?.id,
         }
 
@@ -211,12 +212,10 @@ const AddPurchase = () => {
                         <label>Supplier Name</label>
                         <div className="row">
                           <div className="col-lg-12 col-sm-12 col-12">
-                            <Select2
+                            <Select
                               className="select"
-                              data={suppliersDropdown}
-                              options={{
-                                placeholder: "Supplier List",
-                              }} 
+                              options={suppliersDropdown}
+                            
                               value={supplier}
                               onChange={(e) => {
                                 setSupplier( e.target.value)
@@ -261,12 +260,9 @@ const AddPurchase = () => {
                         <div className="col-lg-12 col-sm-6 col-12">
                           <div className="form-group">
                             <label>Product Name (Designation)</label>
-                            <Select2
+                            <Select
                               className="select"
-                              data={productsDropdown}
-                              options={{
-                                placeholder: "Select Product",
-                              }}
+                              options={productsDropdown}
                               value={productFormData?.productId}
                               ref = {productRef}
                               onChange={(e) => handleProductSelect(e)}

@@ -11,7 +11,7 @@ import {
   Product8,
   Product1,
 } from "../../EntryFile/imagePath";
-import Select2 from "react-select2-wrapper";
+import Select from "react-select";
 import "react-select2-wrapper/css/select2.css";
 import { useEffect } from "react";
 import { useGet } from "../../hooks/useGet";
@@ -63,7 +63,7 @@ const AddProforma = () => {
       let mappedData =  customers?.data.map((customer) => {
           return {
             id: customer?.id,
-            text: customer?.name,
+            label: customer?.name,
             value: customer?.id,
           }
         })
@@ -72,7 +72,7 @@ const AddProforma = () => {
       let mappedData2 =  products?.data.map((product) => {
         return {
           id: product?.id,
-          text: product?.name,
+          label: product?.name,
           value: product?.id,
         }
       })
@@ -176,13 +176,9 @@ const AddProforma = () => {
                   <label>Customer Name</label>
                   <div className="row">
                     <div className="col-lg-12 col-sm-12 col-12">
-                      <Select2
+                      <Select
                         className="select"
-                        data={customerOptions}
-                        options={{
-                          placeholder: "Choose",
-                        }}
-
+                        options={customerOptions}
                         onChange={handleCustomerSelect}
                         value={selectedCustomer?.id}
                        
@@ -212,12 +208,9 @@ const AddProforma = () => {
               <div className="col-lg-8 col-sm-6 col-12">
                 <div className="form-group">
                   <label>Product Name (Designation)</label>
-                  <Select2
+                  <Select
                     className="select"
-                    data={productOptions}
-                    options={{
-                      placeholder: "Choose Product",
-                    }}
+                    options={productOptions}
                     onChange={handleProductSelect}
                     value={selectedProduct?.id}
                   />

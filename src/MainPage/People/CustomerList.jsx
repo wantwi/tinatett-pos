@@ -147,7 +147,7 @@ const CustomerList = () => {
 
 
   if(isLoading){
-    // return (<LoadingSpinner message="Fetching Customers.."/>)
+     return (<LoadingSpinner message="Fetching Customers.."/>)
   }
 
   return (
