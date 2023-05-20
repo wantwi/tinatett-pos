@@ -98,9 +98,9 @@ const CustomerList = () => {
       dataIndex: "customerName",
       render: (text, record) => (
         <div className="productimgname">
-          <Link style={{ width: "30%" }} className="product-img">
+          {/* <Link style={{ width: "30%" }} className="product-img">
             <img alt="" src={record.image} />
-          </Link>
+          </Link> */}
           <Link style={{ fontSize: "15px", marginLeft: "10px", textAlign:'left' }}>
             {record.customerName}
           </Link>

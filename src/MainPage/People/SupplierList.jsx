@@ -96,9 +96,9 @@ const SupplierList = () => {
       dataIndex: "name",
       render: (text, record) => (
         <div className="productimgname">
-          <Link to="#" className="product-img">
+          {/* <Link to="#" className="product-img">
             <img src={Noimage} alt="product" />
-          </Link>
+          </Link> */}
           <Link to="#">{text}</Link>
         </div>
       ),
