@@ -60,6 +60,11 @@ const AddPurchase = () => {
     setProductGridData(newGridData)
   };
 
+
+  useEffect(() => {
+    setProductFormData({...productFormData, amount: productFormData.quantity * productFormData.unitPrice})
+  }, [productFormData.quantity, productFormData.unitPrice])
+
   const columns = [
     {
       title: "Product Name",
@@ -121,7 +126,7 @@ const AddPurchase = () => {
 
   const handleAddItem = () => {
     //console.log(productFormData)
-    if(productFormData.expireDate == '' || productFormData.manufacturingDate == '' || purDate == ''){
+    if(productFormData.expireDate == '' || productFormData.manufacturingDate == '' || purDate == '' || selectedProduct == '' || supplier == ''){
       alertify.set("notifier", "position", "top-right");
       alertify.warning("Please make sure all fields are filled.");
     }
@@ -130,6 +135,7 @@ const AddPurchase = () => {
       setProductFormData({ unitPrice: 0, quantity: 0, amount: 0})
       setManDate('')
       setExpDate('')
+      setSelectedProduct('')
     }
    
   }
