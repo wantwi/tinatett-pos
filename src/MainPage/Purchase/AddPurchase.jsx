@@ -316,7 +316,6 @@ const AddPurchase = () => {
                           <div className="form-group">
                             <label>Quantity</label>
                             <input type="number"  className={`form-control `}
-                              step={0.01}
                               value={productFormData?.quantity}
                               onChange={(e) => {
                                 let qty = parseInt(e.target.value) || 0
