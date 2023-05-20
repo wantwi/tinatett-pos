@@ -147,8 +147,14 @@ const AddPurchase = () => {
       products: productGridData
     }
 
-    console.log(postBody)
+    //console.log(postBody)
     mutate(postBody)
+    setManDate('')
+    setExpDate('')
+    setPurDate('')
+    setSelectedProduct('')
+    setSupplier('')
+    setProductGridData([])
     setIsSubmitSuccessful(true)
   };
 
