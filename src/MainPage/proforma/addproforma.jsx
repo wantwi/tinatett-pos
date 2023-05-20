@@ -388,7 +388,8 @@ const AddProforma = () => {
                           return (
                             <tr key={item?.id}>
                               <td>{index + 1}</td>
-                              <td className="productimgname">
+                              <td>
+                              {/* <td className="productimgname"> */}
                                 {/* <Link className="product-img">
                                   <img src={Product7} alt="product" />
                                 </Link> */}
