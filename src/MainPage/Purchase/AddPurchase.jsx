@@ -33,7 +33,7 @@ const options2 = [
 ];
 
 const AddPurchase = () => {
-  const [purDate, setPurDate] = useState('');
+  const [purDate, setPurDate] = useState(new Date());
   const [manDate, setManDate] = useState('');
   const [expDate, setExpDate] = useState('');
 
@@ -41,6 +41,7 @@ const AddPurchase = () => {
   const [productGridData, setProductGridData] = useState([])
   const [productFormData, setProductFormData] = useState({ unitPrice: 0, quantity: 0, amount: 0, manufacturingDate:'', expireDate:''})
   const [supplier, setSupplier] = useState('')
+  const [selectedProduct, setSelectedProduct] = useState('')
 
   const [productsDropdown, setProductsDropdown] = useState([]);
   const [suppliersDropdown, setSuppliersDropdown] = useState([]);
@@ -48,8 +49,8 @@ const AddPurchase = () => {
   const { data: products, isLoading: productsIsLoading } = useGet("products", "/product");
   const { data: suppliers, isLoading: suppliersIsLoading } = useGet("suppliers", "/supplier");
   const { isLoading, data, isError, error, mutate } = usePost("/purchase");
+  const [isSubmitSuccessful, setIsSubmitSuccessful] = useState(false)
 
-  const productRef = useRef()
 
   const deleteRow = (record) => {
     // console.log(record)
@@ -113,11 +114,9 @@ const AddPurchase = () => {
 
 
   const handleProductSelect = (e) => {
-      let p = productRef.current?.props?.data?.find((item) => item.value === e.target.value)
-      if(p){
-        setProductFormData({ ...productFormData, productName: p.text, productId: e.target.value })
-      
-      }
+      console.log(e)
+      setSelectedProduct(e)
+      setProductFormData({ ...productFormData, productName: e.label, productId: e.value })
   }
 
   const handleAddItem = () => {
@@ -137,13 +136,14 @@ const AddPurchase = () => {
 
   const onSubmit = (data) => {
     let postBody = {
-      supplierId:supplier,
+      supplierId:supplier.id,
       purchaseDate: new Date(purDate).toISOString(),
       products: productGridData
     }
 
     console.log(postBody)
     mutate(postBody)
+    setIsSubmitSuccessful(true)
   };
 
   useEffect(() => {
@@ -153,6 +153,9 @@ const AddPurchase = () => {
           id: item?.id,
           label: item?.name,
           value: item?.id,
+          retailPrice: item?.retailPrice,
+          wholeSalePrice : item?.wholeSalePrice,
+          specialPrice: item?.wholeSalePrice
         }
 
       })
@@ -172,7 +175,7 @@ const AddPurchase = () => {
   }, [suppliers, products])
 
   useEffect(() => {
-    if (!isError && data) {
+    if (!isError &&  isSubmitSuccessful) {
       alertify.set("notifier", "position", "top-right");
       alertify.success("Purchase added successfully.");
     }
@@ -182,7 +185,7 @@ const AddPurchase = () => {
     }
     
     return () => {};
-  }, [isError]);
+  }, [isError, !isSubmitSuccessful]);
 
   if(isLoading){
     <LoadingSpinner/>
@@ -215,10 +218,11 @@ const AddPurchase = () => {
                             <Select
                               className="select"
                               options={suppliersDropdown}
-                            
                               value={supplier}
+                              //onChange={(e) => handleSupplierSelect(e)}
                               onChange={(e) => {
-                                setSupplier( e.target.value)
+                                console.log(e)
+                                setSupplier(e)
                               }}
                             />
                           </div>
@@ -263,8 +267,7 @@ const AddPurchase = () => {
                             <Select
                               className="select"
                               options={productsDropdown}
-                              value={productFormData?.productId}
-                              ref = {productRef}
+                              value={selectedProduct}
                               onChange={(e) => handleProductSelect(e)}
                             />
                           </div>
@@ -312,7 +315,8 @@ const AddPurchase = () => {
                         <div className="col-lg-6 col-sm-6 col-12">
                           <div className="form-group">
                             <label>Quantity</label>
-                            <input type="text"
+                            <input type="number"  className={`form-control `}
+                              step={0.01}
                               value={productFormData?.quantity}
                               onChange={(e) => {
                                 let qty = parseInt(e.target.value) || 0
@@ -326,7 +330,8 @@ const AddPurchase = () => {
                         <div className="col-lg-6 col-sm-6 col-12">
                           <div className="form-group">
                             <label>Unit Price</label>
-                            <input type="text"
+                            <input type="number" className={`form-control `}
+                              step={0.01}
                               value={productFormData?.unitPrice}
                               onChange={(e) => {
                                 let unitP = parseInt(e.target.value) || 0
@@ -342,7 +347,8 @@ const AddPurchase = () => {
                             <label>Amount</label>
                             <div className="input-groupicon">
                               <input
-                                type="text"
+                                type="number" className={`form-control `}
+                                step={0.01}
                                 placeholder=""
                                 value={productFormData?.amount}
                                 disabled

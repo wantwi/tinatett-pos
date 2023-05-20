@@ -155,7 +155,7 @@ const Addsales = () => {
             <div className="card-body">
                 <div className="row">
               
-                  <div className="col-6">
+                  <div className="col-12">
                     <div className="form-group">
                       <label>Customer</label>
                       <div className="row">
@@ -175,7 +175,45 @@ const Addsales = () => {
                     </div>
                   </div>
 
-                  <div className="col-6">
+                  <div className="col-12">
+                  <div className="form-group">
+                    <label>Sales Type</label>
+                    <div className="row">
+                        
+
+                          <div className="col-lg-6">
+
+                            <div className="input-group">
+                              <div className="input-group-text">
+                                <input className="form-check-input" type="radio" name="salesType" checked={true} value={''} onChange={(e) => {
+                                 // setPrice(e.target.value)
+                                
+                                }}/>
+                              </div>
+                              <input type="text" className="form-control" aria-label="Text input with radio button"  placeholder="Retail" />
+                            </div>
+                          
+                          </div>
+
+                          <div className="col-lg-6">
+                            <div className="input-group">
+                              <div className="input-group-text">
+                                <input className="form-check-input" type="radio" name="salesType" value={''} onChange={(e) => {
+                                  // setPrice(e.target.value)
+                                
+                                }
+                                 } />
+                              </div>
+                              <input type="text" className="form-control" aria-label="Text input with radio button" placeholder={'Wholesale'} />
+                            </div>
+                        </div>
+
+                          
+                      </div>
+                  </div>
+                  </div>
+
+                  {/* <div className="col-6">
                     <div className="form-group">
                       <label>Sales Type</label>
                       <div className="input-groupicon">
@@ -186,7 +224,7 @@ const Addsales = () => {
                       />
                       </div>
                     </div>
-                  </div>
+                  </div> */}
 
                 </div>
             </div>

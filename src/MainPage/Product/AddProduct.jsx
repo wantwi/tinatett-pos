@@ -165,6 +165,7 @@ const AddProduct = (props) => {
                           errors.retailPrice ? "is-invalid" : ""
                         }`}
                         type="number"
+                        step={0.01}
                         {...register("retailPrice")}
                       />
                       <div className="invalid-feedback">
@@ -180,6 +181,7 @@ const AddProduct = (props) => {
                           errors.wholeSalePrice ? "is-invalid" : ""
                         }`}
                         type="number"
+                        step={0.01}
                         {...register("wholeSalePrice")}
                       />
                       <div className="invalid-feedback">
@@ -195,6 +197,7 @@ const AddProduct = (props) => {
                           errors.specialPrice ? "is-invalid" : ""
                         }`}
                         type="number"
+                        step={0.01}
                         {...register("specialPrice")}
                       />
                       <div className="invalid-feedback">

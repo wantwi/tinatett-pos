@@ -133,21 +133,21 @@ const ProformaList = () => {
       sorter: (a, b) => a.numberOfProduct.length - b.numberOfProduct.length,
     },
    
-    {
-      title: "Status",
-      dataIndex: "status",
-      render: (text, record) => (
-        <>
-          {text == "1" && (
-            <span className="badges bg-lightred">{"Pending"}</span>
-          )}
-          {text == "2" && (
-            <span className="badges bg-lightgreen">{"Fulfilled"}</span>
-          )}
-        </>
-      ),
-      sorter: (a, b) => a.status.length - b.status.length,
-    },
+    // {
+    //   title: "Status",
+    //   dataIndex: "status",
+    //   render: (text, record) => (
+    //     <>
+    //       {text == "1" && (
+    //         <span className="badges bg-lightred">{"Pending"}</span>
+    //       )}
+    //       {text == "2" && (
+    //         <span className="badges bg-lightgreen">{"Fulfilled"}</span>
+    //       )}
+    //     </>
+    //   ),
+    //   sorter: (a, b) => a.status.length - b.status.length,
+    // },
     // {
     //   title: "Payment",
     //   dataIndex: "Payment",

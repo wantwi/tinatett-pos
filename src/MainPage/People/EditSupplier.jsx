@@ -302,7 +302,7 @@ const EditSupplier = () => {
 
 
                   <div className="col-lg-12" style={{ textAlign: 'right' }}>
-                    <button type="submit" className="btn btn-submit me-2">Submit</button>
+                    <button type="submit" className="btn btn-submit me-2">Update</button>
                     <Link to="/dream-pos/people/supplierlist" className="btn btn-cancel">
                     Cancel
                   </Link>
