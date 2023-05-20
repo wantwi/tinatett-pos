@@ -155,6 +155,7 @@ const AddProforma = () => {
     
       setProductGridData([...productGridData, item])
       setFormData({  quantity: 1, amount: 1})
+      setSelectedProduct('')
       
    // }
    
@@ -180,7 +181,7 @@ const AddProforma = () => {
     setFormData({...formData,price:selectedProduct.retailPrice, amount: selectedProduct.retailPrice * formData.quantity})
     setFormData({...formData,price:selectedProduct.wholeSalePrice, amount: selectedProduct.wholeSalePrice * formData.quantity})
     setFormData({...formData, price:selectedProduct.specialPrice, amount: selectedProduct.specialPrice * formData.quantity})
-  }, [formData.quantity])
+  }, [formData.quantity, formData.retailPrice, formData.wholeSalePrice, formData.specialPrice])
 
 
 
@@ -388,9 +389,9 @@ const AddProforma = () => {
                             <tr key={item?.id}>
                               <td>{index + 1}</td>
                               <td className="productimgname">
-                                <Link className="product-img">
+                                {/* <Link className="product-img">
                                   <img src={Product7} alt="product" />
-                                </Link>
+                                </Link> */}
                                 <Link to="#">{item?.productName}</Link>
                               </td>
                               <td>{item?.quantity}</td>

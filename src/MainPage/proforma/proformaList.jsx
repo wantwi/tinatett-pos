@@ -189,42 +189,42 @@ const ProformaList = () => {
       dataIndex: "createdBy",
       sorter: (a, b) => a.createdBy.length - b.createdBy.length,
     },
-    {
-      title: "Action",
-      render: (text, record) => (
-        <>
-          <div className="text-center">
-            <Link
-              className="action-set"
-              to="#"
-              data-bs-toggle="dropdown"
-              aria-expanded="true"
-            >
-              <i className="fa fa-ellipsis-v" aria-hidden="true" />
-            </Link>
-            <ul className="dropdown-menu">
-              <li>
-                <Link to="/dream-pos/proforma/proforma-details" className="dropdown-item">
-                  <img src={Eye1} className="me-2" alt="img" />
-                  View Details
-                </Link>
-              </li>
+    // {
+    //   title: "Action",
+    //   render: (text, record) => (
+    //     <>
+    //       <div className="text-center">
+    //         <Link
+    //           className="action-set"
+    //           to="#"
+    //           data-bs-toggle="dropdown"
+    //           aria-expanded="true"
+    //         >
+    //           <i className="fa fa-ellipsis-v" aria-hidden="true" />
+    //         </Link>
+    //         <ul className="dropdown-menu">
+    //           <li>
+    //             <Link to="/dream-pos/proforma/proforma-details" className="dropdown-item">
+    //               <img src={Eye1} className="me-2" alt="img" />
+    //               View Details
+    //             </Link>
+    //           </li>
             
-              <li>
-                <Link
-                  to="#"
-                  className="dropdown-item confirm-text"
-                  onClick={confirmText}
-                >
-                  <img src={delete1} className="me-2" alt="img" />
-                  Delete Sale
-                </Link>
-              </li>
-            </ul>
-          </div>
-        </>
-      ),
-    },
+    //           <li>
+    //             <Link
+    //               to="#"
+    //               className="dropdown-item confirm-text"
+    //               onClick={confirmText}
+    //             >
+    //               <img src={delete1} className="me-2" alt="img" />
+    //               Delete Sale
+    //             </Link>
+    //           </li>
+    //         </ul>
+    //       </div>
+    //     </>
+    //   ),
+    // },
   ];
   return (
     <>
