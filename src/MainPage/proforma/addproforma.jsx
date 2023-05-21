@@ -1,4 +1,4 @@
-import React,{useState} from "react";
+import React,{useRef, useState} from "react";
 import { Link } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -47,11 +47,12 @@ const AddProforma = () => {
   const { data: products, isLoading: isProductLoading} = useGet("products", "/product");
   const { isLoading, data, isError: isPostError, error, mutate } = usePost("/proforma");
 
-  const [selectedProduct, setSelectedProduct] = useState({})
-  const [selectedCustomer, setSelectedCustomer] = useState({})
+  const [selectedProduct, setSelectedProduct] = useState('')
+  const [selectedCustomer, setSelectedCustomer] = useState('')
   const [formData, setFormData] = useState({amount:0, quantity:1, price:0})
   const [productGridData, setProductGridData] = useState([])
-  const [transDate, setTransDate] = useState('');
+  const [transDate, setTransDate] = useState(new Date());
+  const priceTypeRef = useRef()
 
   const validationSchema = Yup.object().shape({
     quantity: Yup.number().required("Quantity is required"),
@@ -136,13 +137,7 @@ const AddProforma = () => {
   }
 
   const handleAddItem = () => {
-    //console.log(productFormData)
-    // if(formData.expireDate == '' || formData.manufacturingDate == '' ){
-    //   alertify.set("notifier", "position", "top-right");
-    //   alertify.warning("Please make sure all fields are filled.");
-    // }
-    // else{
-      let item = 
+    let item = 
      
           {
             productId:selectedProduct.id,
@@ -152,12 +147,19 @@ const AddProforma = () => {
             amount: formData?.price * formData?.quantity
             
           }
+    if(item.amount < 1 || formData.unitPrice == '' || item.productName == '' || selectedCustomer == '' ){
+      alertify.set("notifier", "position", "top-right");
+      alertify.warning("Please make sure all fields are filled.");
+    }
+    else{
+      
     
       setProductGridData([...productGridData, item])
       setFormData({  quantity: 1, amount: 1})
       setSelectedProduct('')
+      priceTypeRef.current.checked = false
       
-   // }
+   }
    
   }
 
@@ -178,10 +180,9 @@ const AddProforma = () => {
 
 
   useEffect(() => {
-    setFormData({...formData,price:selectedProduct.retailPrice, amount: selectedProduct.retailPrice * formData.quantity})
-    setFormData({...formData,price:selectedProduct.wholeSalePrice, amount: selectedProduct.wholeSalePrice * formData.quantity})
-    setFormData({...formData, price:selectedProduct.specialPrice, amount: selectedProduct.specialPrice * formData.quantity})
-  }, [formData.quantity, formData.retailPrice, formData.wholeSalePrice, formData.specialPrice])
+    setFormData({...formData,  amount: formData.price * formData.quantity})
+    console.log(formData.price)
+  }, [formData.quantity])
 
 
 
@@ -272,10 +273,10 @@ const AddProforma = () => {
 
                               <div class="input-group">
                                 <div class="input-group-text">
-                                  <input className="form-check-input" type="radio" name="customerType" value={selectedProduct?.retailPrice}
-                                  onChange={(e) => {
-                                    console.log(selectedProduct?.retailPrice, formData.quantity)
-                                    setFormData({...formData,price:selectedProduct.retailPrice, amount: selectedProduct.retailPrice * formData.quantity})
+                                  <input className="form-check-input" type="radio" name="customerType" value={selectedProduct?.retailPrice} ref={priceTypeRef}
+                                  onChange={(e) => {                                   
+                                    setFormData({...formData,price:selectedProduct.retailPrice, amount: selectedProduct?.retailPrice * formData.quantity})
+                                    console.log(selectedProduct?.retailPrice, formData.quantity, formData.amount)
                                   }} />
                                 </div>
                                 <input type="text" className="form-control" aria-label="Text input with radio button" value={'Retail Price'} />
@@ -286,10 +287,10 @@ const AddProforma = () => {
                             <div class="col-lg-6">
                               <div class="input-group">
                                 <div class="input-group-text">
-                                  <input className="form-check-input" type="radio" name="customerType" value={selectedProduct?.wholeSalePrice}
+                                  <input className="form-check-input" type="radio" name="customerType" value={selectedProduct?.wholeSalePrice} ref={priceTypeRef}
                                   onChange={(e) => {
-                                    console.log(selectedProduct?.wholeSalePrice, formData.quantity)
                                     setFormData({...formData,price:selectedProduct.wholeSalePrice, amount: selectedProduct.wholeSalePrice * formData.quantity})
+                                    console.log(selectedProduct?.wholeSalePrice, formData.quantity, formData.amount)
                                   }} />
                                 </div>
                                 <input type="text" className="form-control" aria-label="Text input with radio button" value={'Wholesale Price'}/>
@@ -302,10 +303,10 @@ const AddProforma = () => {
 
                               <div class="input-group">
                                 <div class="input-group-text">
-                                  <input className="form-check-input" type="radio" name="customerType" value={selectedProduct?.specialPrice} 
-                                  onChange={(e) => {
-                                    console.log(selectedProduct?.specialPrice, formData.quantity)
+                                  <input className="form-check-input" type="radio" name="customerType" value={selectedProduct?.specialPrice} ref={priceTypeRef}
+                                  onChange={(e) => {    
                                     setFormData({...formData, price:selectedProduct.specialPrice, amount: selectedProduct.specialPrice * formData.quantity})
+                                    console.log(selectedProduct?.specialPrice, formData.quantity, formData.amount)
                                   }} />
                                 </div>
                                 <input type="text" className="form-control" aria-label="Text input with radio button" value={'Special Price'} />

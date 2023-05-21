@@ -12,25 +12,32 @@ import "../../../node_modules/alertifyjs/build/css/alertify.css";
 import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import { useForm } from "react-hook-form";
+import Select from "react-select";
+import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 
 const options = [
-  { id: 1, text: "United States", text: "United States" },
-  { id: 2, text: "India", text: "India" },
-];
-const options1 = [
-  { id: 1, text: "City1", text: "City1" },
-  { id: 2, text: "City2", text: "City2" },
+  { id: 0, label: "Cash", value: "Cash" },
+  { id: 1, label: "Cheque", value: "Cheque" },
+  { id: 2, label: "Momo", value: "Momo" }
 ];
 
 const EditSupplier = () => {
   const {state} = useLocation()
-  console.log(state)
+  //console.log(state)
   const [formData, setFormData] = useState(state)
+
+  const [customerType, setCustomerType] = useState(formData?.customerType)
+
+  const selectedPaymentt = options.find((item) => item.label.toLocaleLowerCase() == (formData.paymentInfo.type).toLowerCase())
+  const [paymentType, selectedPaymentType] = useState(selectedPaymentt)
 
   const history = useHistory()
 
+  useEffect(() => {
+    console.log("Payment Type:", paymentType)
+  }, [paymentType])
 
-  const [customerType, setCustomerType] = useState(formData?.customerType)
+
   const validationSchema = Yup.object().shape({
     name: Yup.string().required("Supplier name is required"),
     email: Yup.string()
@@ -109,6 +116,10 @@ const EditSupplier = () => {
     return () => { };
   }, [isSubmitSuccessful, isError, isLoading]);
 
+  if(isLoading){
+    return <LoadingSpinner message={'Please wait, updating..'}/>
+  }
+
   return (
     <>
       <div className="page-wrapper">
@@ -116,7 +127,7 @@ const EditSupplier = () => {
           <div className="page-header">
             <div className="page-title">
               <h4>Supplier Management</h4>
-              <h6>Add/Update Supplier</h6>
+              <h6>Update Supplier</h6>
             </div>
           </div>
           {/* /add */}
@@ -261,14 +272,20 @@ const EditSupplier = () => {
                       <div className="col-lg-4 col-sm-6 col-12">
                         <div className="form-group">
                           <label>Payment Type</label>
-                          <input className={`form-control ${errors.name ? "is-invalid" : ""
+                          <Select
+                            className="select"
+                            options={options}
+                            value={paymentType}
+                            onChange={(e) => selectedPaymentType(e)}
+                          />
+                          {/* <input className={`form-control ${errors.name ? "is-invalid" : ""
                             }`}
                             type="text"
-                            {...register("type")} />
+                            {...register("type")} /> */}
                         </div>
                       </div>
 
-                      <div className="col-lg-4 col-sm-6 col-12">
+                      {paymentType.label == "Cheque" ?(<div className="col-lg-4 col-sm-6 col-12">
                         <div className="form-group">
                           <label>Account Number</label>
                           <input className={`form-control ${errors.name ? "is-invalid" : ""
@@ -276,9 +293,29 @@ const EditSupplier = () => {
                             type="text"
                             {...register("accountNumber")} />
                         </div>
-                      </div>
+                      </div>) : null}
 
-                      <div className="col-lg-4 col-sm-6 col-12">
+                      { paymentType.label == "Momo" ? (<div className="col-lg-4 col-sm-6 col-12">
+                        <div className="form-group">
+                          <label>Momo Number</label>
+                          <input className={`form-control ${errors.name ? "is-invalid" : ""
+                            }`}
+                            type="text"
+                            {...register("accountNumber")} />
+                        </div>
+                      </div>) : null}
+
+                      {paymentType.label == "Cash" ? (<div className="col-lg-4 col-sm-6 col-12">
+                        <div className="form-group">
+                          <label>Waybill Number</label>
+                          <input className={`form-control ${errors.name ? "is-invalid" : ""
+                            }`}
+                            type="text"
+                            {...register("accountNumber")} />
+                        </div>
+                      </div>) : null}
+
+                      {paymentType.label == "Cheque" ? (<div className="col-lg-4 col-sm-6 col-12">
                         <div className="form-group">
                           <label>Branch</label>
                           <input className={`form-control ${errors.name ? "is-invalid" : ""
@@ -286,9 +323,9 @@ const EditSupplier = () => {
                             type="text"
                             {...register("branch")} />
                         </div>
-                      </div>
+                      </div>) : null}
 
-                      <div className="col-lg-4 col-sm-6 col-12">
+                      {paymentType.label == "Momo" ? (<div className="col-lg-4 col-sm-6 col-12">
                         <div className="form-group">
                           <label>Service Provider</label>
                           <input className={`form-control ${errors.name ? "is-invalid" : ""
@@ -296,7 +333,7 @@ const EditSupplier = () => {
                             type="text"
                             {...register("serviceProvider")} />
                         </div>
-                      </div>
+                      </div>) : null}
                     </div>
                   </fieldset>
 

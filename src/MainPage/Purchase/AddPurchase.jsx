@@ -39,7 +39,7 @@ const AddPurchase = () => {
 
 
   const [productGridData, setProductGridData] = useState([])
-  const [productFormData, setProductFormData] = useState({ unitPrice: 0, quantity: 0, amount: 0, manufacturingDate:'', expireDate:''})
+  const [productFormData, setProductFormData] = useState({ unitPrice: 0, quantity: 1, amount: 0, manufacturingDate:'', expireDate:''})
   const [supplier, setSupplier] = useState('')
   const [selectedProduct, setSelectedProduct] = useState('')
 
@@ -231,6 +231,7 @@ const AddPurchase = () => {
                               className="select"
                               options={suppliersDropdown}
                               value={supplier}
+                              isLoading={suppliersIsLoading}
                               //onChange={(e) => handleSupplierSelect(e)}
                               onChange={(e) => {
                                 console.log(e)
@@ -280,6 +281,7 @@ const AddPurchase = () => {
                               className="select"
                               options={productsDropdown}
                               value={selectedProduct}
+                              isLoading={productsIsLoading}
                               onChange={(e) => handleProductSelect(e)}
                             />
                           </div>

@@ -12,6 +12,7 @@ import alertify from "alertifyjs";
 import "../../../node_modules/alertifyjs/build/css/alertify.css";
 import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
+import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 
 
 
@@ -72,6 +73,10 @@ const EditCustomer = () => {
     }
     return () => {};
   }, [isSubmitSuccessful, isError, isLoading]);
+
+  if(isLoading){
+    return <LoadingSpinner message={'Please wait, updating..'}/>
+  }
 
   return (
     <>

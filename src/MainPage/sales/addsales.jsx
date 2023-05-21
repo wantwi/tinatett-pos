@@ -18,6 +18,8 @@ import { useGet } from "../../hooks/useGet";
 import Select from "react-select";
 import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 import { moneyInTxt } from "../../utility";
+import { BASE_URL } from "../../api/CustomAxios";
+import useCustomApi from "../../hooks/useCustomApi";
 
 
 const Addsales = () => {
@@ -28,6 +30,7 @@ const Addsales = () => {
   const [productsList, setProductsList] = useState([])
   const [selectedCustomer, setSelectedCustomer] = useState({})
   const [selectedProduct, setSelectedProduct] = useState({})
+  const [selectedProductInfo, setSelectedProductInfo] = useState()
   const [price, setPrice] = useState(0)
   const [formData, setFormData] = useState({quantity:0, amount:0, batchNo:'', manuDate:'', expDate:'', salesType:{}})
   const [paymentData, setPaymentData] = useState({paymentType:'', accountNo:'', branch: ''})
@@ -42,10 +45,7 @@ const Addsales = () => {
     isLoading: productsIsLoading,
   } = useGet("products", "/product");
 
-  const options1 = [
-    { value: 1, label: "Retail", text: "Retail"  },
-    { value: 2, label: "Wholesale", text: "Wholesale" },
-  ];
+  const axios = useCustomApi()
 
   const handleInvoice = () =>{
 
@@ -87,13 +87,25 @@ const Addsales = () => {
       setFormData({quantity:0, amount:0, batchNo:'', manuDate:'', expDate:'', salesType:{}})
    
     }
-   
-  
+
+  const handleProductSelect = (e) => {
+    setSelectedProduct(e)
+
+  }
+
+  useEffect(() => {
+    axios.get(`${BASE_URL}/purchase/product/${selectedProduct?.value}`).then((data) => {
+      if(data.data.success){
+        setSelectedProductInfo(data.data.data)
+      }
+    })
+
+  }, [selectedProduct])
 
 
   useEffect(() => {
     if (!productsIsLoading && !customersIsLoading) {
-      console.log(customers)
+
       let mappedData =  customers?.data.map((customer) => {
           return {
             value: customer?.id,
@@ -103,7 +115,7 @@ const Addsales = () => {
         })
       setCustomerList(mappedData)
 
-      console.log(customers)
+          
       let mappedData2 =  products?.data.map((product) => {
           return {
             value: product?.id,
@@ -121,19 +133,6 @@ const Addsales = () => {
     }
   }, [productsIsLoading, customersIsLoading])
 
-
-
-  useEffect(() => {
-    console.log(selectedCustomer)
-  }, [selectedCustomer])
-
-  useEffect(() => {
-    console.log(selectedProduct)
-  }, [selectedProduct])
-
-  useEffect(() => {
-    console.log(productGridData)
-  }, [productGridData])
 
   // if(productsIsLoading || customersIsLoading){
   //   return (<LoadingSpinner/>)
@@ -166,7 +165,7 @@ const Addsales = () => {
                             options={customerList}
                             value={selectedCustomer}
                             onChange={(e) => setSelectedCustomer(e)}
-
+                            isLoading={customersIsLoading}
                         />
                         
                         </div>
@@ -185,7 +184,7 @@ const Addsales = () => {
 
                             <div className="input-group">
                               <div className="input-group-text">
-                                <input className="form-check-input" type="radio" name="salesType" checked={true} value={''} onChange={(e) => {
+                                <input className="form-check-input" type="radio" name="salesType" checked={true} value={'Retail'} onChange={(e) => {
                                  // setPrice(e.target.value)
                                 
                                 }}/>
@@ -198,7 +197,7 @@ const Addsales = () => {
                           <div className="col-lg-6">
                             <div className="input-group">
                               <div className="input-group-text">
-                                <input className="form-check-input" type="radio" name="salesType" value={''} onChange={(e) => {
+                                <input className="form-check-input" type="radio" name="salesType" value={'Wholesale'} onChange={(e) => {
                                   // setPrice(e.target.value)
                                 
                                 }
@@ -241,8 +240,9 @@ const Addsales = () => {
                           options={productsList}
                           placeholder={'Select product'}
                           value={selectedProduct}
-                          onChange={(e) => setSelectedProduct(e)}
+                          onChange={handleProductSelect}
                           isSearchable= {true}
+                          isLoading={productsIsLoading}
                           
                        />
                       
@@ -257,7 +257,7 @@ const Addsales = () => {
                       <input
                         className="form-control"
                         type="number"
-                        value={selectedProduct?.remainingStock}
+                        value={selectedProductInfo?.totalQuantity}
                         disabled
                       />
                       
@@ -269,11 +269,14 @@ const Addsales = () => {
                   <div className="form-group">
                     <label>Batch No.</label>
                     <div className="input-groupicon">
-                      <input
-                        type="text"
+                      <Select
+                        options={selectedProductInfo?.batchNumber?.map((item) => {
+                          return {value:item.batchNumber, label:item?.batchNumber, expireDate:item?.expireDate, manufacturingDate: item?.manufacturingDate}
+                        })}
                         placeholder=""
                         value={formData.batchNo}
-                        onChange={(e) => setFormData({...formData, batchNo: (e.target.value)})}
+                        onChange={(e) => setFormData({...formData, batchNo: (e), manuDate: e.manufacturingDate, expDate: e.expireDate})}
+                        //onChange={(e) => console.log(e)}
                       />
                       
                     </div>
@@ -286,7 +289,7 @@ const Addsales = () => {
                     <div className="input-groupicon">
                       <DatePicker
                         selected={startDate}
-                        value={selectedProduct?.manuDate}
+                        value={formData?.manuDate.substring(0,10)}
                         disabled
 
                       />
@@ -303,7 +306,7 @@ const Addsales = () => {
                     <div className="input-groupicon">
                     <DatePicker
                         selected={startDate}
-                        value={selectedProduct?.expDate}
+                        value={formData?.expDate.substring(0,10)}
                         disabled
 
                       />
@@ -552,10 +555,11 @@ const Addsales = () => {
                           return (
                             <tr>
                             <td>{i+1}</td>
-                            <td className="productimgname">
-                              <Link className="product-img">
+                            <td>
+                            {/* <td className="productimgname"> */}
+                              {/* <Link className="product-img">
                                 <img src={Product7} alt="product" />
-                              </Link>
+                              </Link> */}
                               <Link to="#">{item.name}</Link>
                             </td>
                             <td>{item.quantity}</td>

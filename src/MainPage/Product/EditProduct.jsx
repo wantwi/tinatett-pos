@@ -81,6 +81,9 @@ const EditProduct = () => {
     return () => {};
   }, [isSubmitSuccessful, isError]);
 
+  if(isLoading){
+    return <LoadingSpinner message={'Please wait, updating..'}/>
+  }
 
   return (
     <>

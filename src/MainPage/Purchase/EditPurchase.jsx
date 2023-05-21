@@ -4,6 +4,7 @@ import {
   Plus,
   Scanner,
   DeleteIcon,
+  EditIcon,
 
 } from "../../EntryFile/imagePath";
 import { Link } from "react-router-dom";
@@ -31,14 +32,13 @@ const deleteRow = () => {
 
 const EditPurchase = () => {
   const {state} = useLocation()
-  console.log(state)
-  const [purDate] = useState(new Date(state?.date))
+  //console.log("State", state)
   const [manDate, setManDate] = useState('');
   const [expDate, setExpDate] = useState('');
   const [purchaseId] = useState(state?.id)
 
 
-  const [supplier] = useState(state?.supplierId)
+
 
   const [productsDropdown, setProductsDropdown] = useState([]);
   const [suppliersDropdown, setSuppliersDropdown] = useState([]);
@@ -46,11 +46,13 @@ const EditPurchase = () => {
   const { data: products, isLoading: productsIsLoading } = useGet("products", "/product");
   const { data: suppliers, isLoading: suppliersIsLoading } = useGet("suppliers", "/supplier");
   const { data: purchase, isLoading: purchaseIsLoading } = useGet("purchase", `/purchase/${state?.id}`);
+  const [purDate] = useState(new Date(state?.date) || new Date())
+  const [supplier] = useState(purchase?.supplierId)
   const { data: purchaseDetails, isLoading: purchaseIsLoadingDetails } = useGet("purchase-details", `/purchase/products/${state?.id}`);
   const { isLoading, data, isError, error, mutate } = usePut(`/purchase/${purchaseId}`); 
 
 
-  const [productFormData, setProductFormData] = useState({ unitPrice: 0, quantity: 0, amount: 0, manufacturingDate:'', expireDate:''})
+  const [productFormData, setProductFormData] = useState({ id:'', unitPrice: 0, quantity: 1, amount: '', manufacturingDate:'', expireDate:''})
   const [productList, setProductList] = useState([])
 
   const productRef = useRef()
@@ -64,30 +66,69 @@ const EditPurchase = () => {
   }
 
   const handleAddItem = () => {
-    
-    console.log(productFormData)
     if(productFormData.expireDate == '' || productFormData.manufacturingDate == ''){
       alertify.set("notifier", "position", "top-right");
       alertify.warning("Please make sure all fields are filled.");
     }
     else{
-      setProductList([...productList, productFormData])
-      setProductFormData({ unitPrice: 0, quantity: 0, amount: 0})
+      
+      let newList = [...productList]
+      //console.log("new List", newList)
+      let index = newList.findIndex((item) => item.id == productFormData.id)
+      if(index != -1){
+        newList[index] = productFormData
+        setProductList(newList)
+      }
+      else{
+        setProductList([...productList, productFormData])
+      }
+     
+     
+      setProductFormData({ unitPrice: 0, quantity: 1, amount: 0})
       setManDate('')
       setExpDate('')
     }
    
   }
 
+  const handleEdit = (record) => {
+    console.log("Record:", record)
+    setProductFormData({
+      id: record?.id,
+      productId: record.productId,
+      unitPrice: record.unitPrice,
+      quantity:record.quantity,
+      amount: record.quantity * record.unitPrice,
+      manufacturingDate: record?.manufacturingDate,
+      expireDate: record?.expireDate,
+      batchNumber: record?.batchNumber
+    })
+    setExpDate(new Date(record?.expireDate))
+    setManDate(new Date(record?.manufacturingDate))
+  }
+
   const onSubmit = () => {
     let postBody = {
-      supplierId:supplier,
+      supplierId:state?.supplierId,
       purchaseDate: new Date(purDate).toISOString(),
-      products: productList
+      products: productList.map((item) => {
+        return {
+          id: item?.id,
+          productName: item?.productName,
+          productId: item?.productId,
+          unitPrice: item?.unitPrice,
+          quantity: item?.quantity,
+          amount: item?.amount,
+          manufacturingDate: item?.manufacturingDate,
+          expireDate: item?.expireDate,
+          batchNumber: item?.batchNumber || ''
+
+        }
+      })
     }
 
     console.log(postBody)
-    mutate(postBody)
+    //mutate(postBody)
   };
 
   useEffect(() => {
@@ -190,11 +231,14 @@ const EditPurchase = () => {
     },
     {
       title:"Action",
-      render: () => (
+      render: (text, record) => (
         <>
-          <Link className="delete-set" to="#" onClick={deleteRow}>
+         <span className="me-3" to="#" onClick={() => handleEdit(record)} style={{cursor:'pointer'}}>
+            <img src={EditIcon} alt="img" />
+          </span>
+          <span className="delete-set" to="#" onClick={deleteRow} style={{cursor:'pointer'}}>
             <img src={DeleteIcon} alt="img" />
-          </Link>
+          </span>
         </>
       ),
     },
@@ -324,11 +368,12 @@ const EditPurchase = () => {
                         <div className="col-lg-6 col-sm-6 col-12">
                           <div className="form-group">
                             <label>Quantity</label>
-                            <input type="text"
+                            <input type="number"
+                            className="form-control"
                               value={productFormData?.quantity}
                               onChange={(e) => {
-                                let qty = parseInt(e.target.value) || 0
-                                let unitP = parseInt(productFormData.unitPrice) || 0
+                                let qty = (e.target.value) 
+                                let unitP = (productFormData.unitPrice)
                                 setProductFormData({ ...productFormData, quantity: e.target.value, amount: unitP * qty  })
                                 }
                               } />
@@ -338,11 +383,15 @@ const EditPurchase = () => {
                         <div className="col-lg-6 col-sm-6 col-12">
                           <div className="form-group">
                             <label>Unit Price</label>
-                            <input type="text"
+                            <input type="number"
+                            className="form-control"
+                            step={0.01}
                               value={productFormData?.unitPrice}
                               onChange={(e) => {
-                                let unitP = parseInt(e.target.value) || 0
-                                let qty = parseInt(productFormData.quantity) || 0
+                              
+                                let unitP = (e.target.value) 
+                                let qty = (productFormData.quantity) 
+                                console.log(e.target.value, unitP)
                                 setProductFormData({ ...productFormData, unitPrice: e.target.value, amount: unitP * qty })
                               }
                               } />
@@ -354,9 +403,10 @@ const EditPurchase = () => {
                             <label>Amount</label>
                             <div className="input-groupicon">
                               <input
-                                type="text"
+                                type="number" className={`form-control `}
+                                step={0.01}
                                 placeholder=""
-                                value={productFormData?.amount}
+                                value={Number(productFormData?.amount).toFixed(2)}
                                 disabled
                               />
 
@@ -368,9 +418,9 @@ const EditPurchase = () => {
                       <div className="row" style={{textAlign:'right'}}>
                         <div className="col-lg-12 col-sm-6 col-12">
                           <div className="form-group">
-                            <Link to="#" className="btn btn-submit me-2" onClick={handleAddItem}>
+                            <button to="#" className="btn btn-submit me-2" onClick={handleAddItem}>
                               Add to List
-                            </Link>
+                            </button>
                             <Link to="#" className="btn btn-cancel">
                               Clear
                             </Link>

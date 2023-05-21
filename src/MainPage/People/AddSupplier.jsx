@@ -106,7 +106,7 @@ const AddSupplier = () => {
           <div className="page-header">
             <div className="page-title">
               <h4>Supplier Management</h4>
-              <h6>Add/Update Supplier</h6>
+              <h6>Add Supplier</h6>
             </div>
           </div>
           {/* /add */}
