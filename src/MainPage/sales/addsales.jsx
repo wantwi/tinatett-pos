@@ -232,7 +232,7 @@ const Addsales = () => {
           <div className="card" >
              <div className="card-body">
                 <div className="row">
-                <div className="col-6">
+                <div className="col-12">
                   <div className="form-group">
                     <label>Product Name</label>
                     <div className="input-groupicon">
@@ -250,7 +250,7 @@ const Addsales = () => {
                   </div>
                 </div>
 
-                <div className="col-3">
+                <div className="col-6">
                   <div className="form-group">
                     <label>Quantity Left</label>
                     <div className="input-groupicon">
@@ -265,13 +265,13 @@ const Addsales = () => {
                   </div>
                 </div>
 
-                <div className="col-3">
+                <div className="col-6">
                   <div className="form-group">
                     <label>Batch No.</label>
                     <div className="input-groupicon">
                       <Select
                         options={selectedProductInfo?.batchNumber?.map((item) => {
-                          return {value:item.batchNumber, label:item?.batchNumber, expireDate:item?.expireDate, manufacturingDate: item?.manufacturingDate}
+                          return {value:item.batchNumber, label:item?.batchNumber + '-' + item?.remainingQuantity, expireDate:item?.expireDate, manufacturingDate: item?.manufacturingDate}
                         })}
                         placeholder=""
                         value={formData.batchNo}
