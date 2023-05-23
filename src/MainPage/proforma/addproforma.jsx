@@ -16,7 +16,7 @@ import "react-select2-wrapper/css/select2.css";
 import { useEffect } from "react";
 import { useGet } from "../../hooks/useGet";
 import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
-import { moneyInTxt } from "../../utility";
+import { isValidNumber, moneyInTxt } from "../../utility";
 import { usePost } from "../../hooks/usePost";
 import alertify from "alertifyjs";
 import "../../../node_modules/alertifyjs/build/css/alertify.css";
@@ -24,6 +24,7 @@ import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
+import FeatherIcon from 'feather-icons-react'
 
 
 const AddProforma = () => {
@@ -49,7 +50,7 @@ const AddProforma = () => {
 
   const [selectedProduct, setSelectedProduct] = useState('')
   const [selectedCustomer, setSelectedCustomer] = useState('')
-  const [formData, setFormData] = useState({amount:0, quantity:1, price:0})
+  const [formData, setFormData] = useState({amount:'', quantity:'', price:''})
   const [productGridData, setProductGridData] = useState([])
   const [transDate, setTransDate] = useState(new Date());
   const priceTypeRef = useRef()
@@ -65,7 +66,7 @@ const AddProforma = () => {
     formState: { errors, isSubmitSuccessful },
   } = useForm({
     defaultValues: {
-      quantity: 0,
+      quantity: '',
     },
     resolver: yupResolver(validationSchema),
   });
@@ -155,32 +156,40 @@ const AddProforma = () => {
       
     
       setProductGridData([...productGridData, item])
-      setFormData({  quantity: 1, amount: 1})
+      setFormData({  quantity: '', amount: ''})
       setSelectedProduct('')
-      priceTypeRef.current.checked = false
+      console.log("XXX", priceTypeRef.current) 
       
    }
    
   }
 
   const onSubmit = (data) => {
-    let postBody = {
-      customerId: selectedCustomer.id,
-      transDate: transDate,
-      products: productGridData
+
+    if(productGridData.length < 1){
+      alertify.set("notifier", "position", "top-right");
+      alertify.warning("Please add at least one item to list before saving.");
     }
-    mutate(postBody)
-    setSelectedCustomer({})
-    setSelectedProduct({})
-    setFormData({amount:0, quantity:1, price:0})
-    setProductGridData([])
-    setTransDate('')
+    else{
+      let postBody = {
+        customerId: selectedCustomer.id,
+        transDate: transDate,
+        products: productGridData
+      }
+      mutate(postBody)
+      setSelectedCustomer({})
+      setSelectedProduct({})
+      setFormData({amount:'', quantity:'', price:''})
+      setProductGridData([])
+      setTransDate('')
+    }
+    
   
   };
 
 
   useEffect(() => {
-    setFormData({...formData,  amount: formData.price * formData.quantity})
+    setFormData({...formData,  amount: Number(formData.price) * Number(formData.quantity) || ''})
     console.log(formData.price)
   }, [formData.quantity])
 
@@ -275,8 +284,8 @@ const AddProforma = () => {
                                 <div class="input-group-text">
                                   <input className="form-check-input" type="radio" name="customerType" value={selectedProduct?.retailPrice} ref={priceTypeRef}
                                   onChange={(e) => {                                   
-                                    setFormData({...formData,price:selectedProduct.retailPrice, amount: selectedProduct?.retailPrice * formData.quantity})
-                                    console.log(selectedProduct?.retailPrice, formData.quantity, formData.amount)
+                                    setFormData({...formData,price:selectedProduct.retailPrice, amount: formData.quantity ? selectedProduct?.retailPrice * formData.quantity : selectedProduct?.retailPrice * 1})
+                                    //console.log(selectedProduct?.retailPrice, formData.quantity, formData.amount)
                                   }} />
                                 </div>
                                 <input type="text" className="form-control" aria-label="Text input with radio button" value={'Retail Price'} />
@@ -289,8 +298,8 @@ const AddProforma = () => {
                                 <div class="input-group-text">
                                   <input className="form-check-input" type="radio" name="customerType" value={selectedProduct?.wholeSalePrice} ref={priceTypeRef}
                                   onChange={(e) => {
-                                    setFormData({...formData,price:selectedProduct.wholeSalePrice, amount: selectedProduct.wholeSalePrice * formData.quantity})
-                                    console.log(selectedProduct?.wholeSalePrice, formData.quantity, formData.amount)
+                                    setFormData({...formData,price:selectedProduct.wholeSalePrice, amount: formData.quantity ? selectedProduct.wholeSalePrice * formData.quantity : selectedProduct.wholeSalePrice * 1})
+                                    //console.log(selectedProduct?.wholeSalePrice, formData.quantity, formData.amount)
                                   }} />
                                 </div>
                                 <input type="text" className="form-control" aria-label="Text input with radio button" value={'Wholesale Price'}/>
@@ -305,8 +314,8 @@ const AddProforma = () => {
                                 <div class="input-group-text">
                                   <input className="form-check-input" type="radio" name="customerType" value={selectedProduct?.specialPrice} ref={priceTypeRef}
                                   onChange={(e) => {    
-                                    setFormData({...formData, price:selectedProduct.specialPrice, amount: selectedProduct.specialPrice * formData.quantity})
-                                    console.log(selectedProduct?.specialPrice, formData.quantity, formData.amount)
+                                    setFormData({...formData, price:selectedProduct.specialPrice, amount: formData.quantity ? selectedProduct.specialPrice * formData.quantity : selectedProduct.specialPrice * 1})
+                                    //console.log(selectedProduct?.specialPrice, formData.quantity, formData.amount)
                                   }} />
                                 </div>
                                 <input type="text" className="form-control" aria-label="Text input with radio button" value={'Special Price'} />
@@ -324,12 +333,17 @@ const AddProforma = () => {
                       <label>Quantity</label>
                       <div className="input-groupicon">
                         <input
-                          type="number"
-                          min={1}
+                          type="text"
+                          //min={1}
                           className="form-control"
                           value={formData.quantity}
                           // {...register("quantity")}
-                          onChange={(e) => setFormData({...formData, quantity: Number(e.target.value)})}
+                          onChange={(e) => {
+                            if(isValidNumber(e.target.value)){
+                              setFormData({...formData, quantity: Number(e.target.value)})
+                            }
+                            
+                          }}
                         />
                       </div>
                     </div>
@@ -340,8 +354,9 @@ const AddProforma = () => {
                       <label>Amount</label>
                       <div className="input-groupicon">
                         <input
-                          type="number"
+                          type="text"
                           className="form-control"
+                          disabled
                           value={formData.amount}
                         
                         />
@@ -354,8 +369,8 @@ const AddProforma = () => {
                   
                   <div className="col-lg-12 col-sm-6 col-12">
                     <div className="form-group">
-                      <Link to="#" className="btn btn-submit me-2" onClick={handleAddItem}>
-                        Add
+                      <Link to="#" className="btn btn-submit me-2" onClick={handleAddItem}><FeatherIcon icon="shopping-cart"/>
+                        {" Add"}
                       </Link>
                       <Link to="#" className="btn btn-cancel">
                         Clear
@@ -474,8 +489,8 @@ const AddProforma = () => {
                     </div>
                   </div>
                   <div className="col-lg-12" style={{textAlign:'right'}}>
-                    <button type="submit" className="btn btn-submit me-2" onClick={onSubmit}>
-                      Proforma
+                    <button type="submit" className="btn btn-submit me-2" onClick={onSubmit}><FeatherIcon icon="save"/>
+                    {" Generate Proforma"}
                     </button>
                     {/* <Link to="#" className="btn btn-cancel me-2" style={{backgroundColor:'#FF9F43'}}>
                       Refresh

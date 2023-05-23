@@ -6896,3 +6896,13 @@ span.select2-container.select2-container--default.select2-container--open {
 .css-1fdsijx-ValueContainer{
   height: 40px !important;
 }
+
+.css-qbdosj-Input{
+  margin: 0px !important;
+  padding-bottom: 0px !important;
+  padding-top: 0px !important;
+}
+
+body{
+  background-color: #FFFF66 !important;
+}

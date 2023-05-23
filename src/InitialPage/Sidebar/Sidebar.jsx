@@ -54,7 +54,7 @@ const Sidebar = (props) => {
         <div className="sidebar-inner slimscroll">
           <div
             id="sidebar-menu"
-            style={{ height: '90vh' }}
+            style={{ height: '93.5vh', overflow:'hidden' }}
             className="sidebar-menu"
             onMouseLeave={expandMenu}
             onMouseOver={expandMenuOpen}
@@ -91,6 +91,16 @@ const Sidebar = (props) => {
                 </a>
                 {isSideMenu == "product" ? (
                   <ul className="sidebar-ul">
+                     <li>
+                      <Link
+                        className={
+                          pathname.includes("addproduct-") ? "active" : ""
+                        }
+                        to="/dream-pos/product/addproduct"
+                      >
+                        Add Product
+                      </Link>
+                    </li>
                     <li>
                       <Link
                         className={
@@ -101,16 +111,7 @@ const Sidebar = (props) => {
                         Product List
                       </Link>
                     </li>
-                    <li>
-                      <Link
-                        className={
-                          pathname.includes("addproduct-") ? "active" : ""
-                        }
-                        to="/dream-pos/product/addproduct"
-                      >
-                        Add Product
-                      </Link>
-                    </li>
+                   
                     {/* <li>
                         <Link
                           className={
@@ -220,6 +221,16 @@ const Sidebar = (props) => {
                 </a>
                 {isSideMenu == "customer" ? (
                   <ul>
+                     <li>
+                      <Link
+                        className={
+                          pathname.includes("addcustomer-") ? "active" : ""
+                        }
+                        to="/dream-pos/people/addcustomer"
+                      >
+                        Add Customer
+                      </Link>
+                    </li>
                     <li>
                       <Link
                         className={
@@ -230,16 +241,7 @@ const Sidebar = (props) => {
                         Customer List
                       </Link>
                     </li>
-                    <li>
-                      <Link
-                        className={
-                          pathname.includes("addcustomer-") ? "active" : ""
-                        }
-                        to="/dream-pos/people/addcustomer"
-                      >
-                        Add Customer
-                      </Link>
-                    </li>
+                   
                     
                    
                     {/* <li>
@@ -309,6 +311,16 @@ const Sidebar = (props) => {
                 </a>
                 {isSideMenu == "supplier" ? (
                   <ul>
+                     <li>
+                      <Link
+                        className={
+                          pathname.includes("addsupplier-") ? "active" : ""
+                        }
+                        to="/dream-pos/people/addsupplier"
+                      >
+                        Add Supplier
+                      </Link>
+                    </li>
                     <li>
                       <Link
                         className={
@@ -319,16 +331,7 @@ const Sidebar = (props) => {
                         Supplier List
                       </Link>
                     </li>
-                    <li>
-                      <Link
-                        className={
-                          pathname.includes("addsupplier-") ? "active" : ""
-                        }
-                        to="/dream-pos/people/addsupplier"
-                      >
-                        Add Supplier
-                      </Link>
-                    </li>
+                   
                     {/* <li>
                         <Link
                           className={
@@ -396,6 +399,16 @@ const Sidebar = (props) => {
                 </a>
                 {isSideMenu == "purchase" ? (
                   <ul>
+                     <li>
+                      <Link
+                        className={
+                          pathname.includes("addpurchase-") ? "active" : ""
+                        }
+                        to="/dream-pos/purchase/addpurchase"
+                      >
+                        Add Purchase
+                      </Link>
+                    </li>
                     <li>
                       <Link
                         className={
@@ -406,16 +419,7 @@ const Sidebar = (props) => {
                         Purchase List
                       </Link>
                     </li>
-                    <li>
-                      <Link
-                        className={
-                          pathname.includes("addpurchase-") ? "active" : ""
-                        }
-                        to="/dream-pos/purchase/addpurchase"
-                      >
-                        Add Purchase
-                      </Link>
-                    </li>
+                   
                     {/* <li>
                       <Link
                         className={
@@ -452,6 +456,16 @@ const Sidebar = (props) => {
                 </a>
                 {isSideMenu == "proforma" ? (
                   <ul>
+                     <li>
+                      <Link
+                        to="/dream-pos/proforma/add-proforma"
+                        className={
+                          pathname.includes("add-proforma") ? "active" : ""
+                        }
+                      >
+                        New Proforma
+                      </Link>
+                    </li>
                     <li>
                       <Link
                         className={
@@ -463,16 +477,7 @@ const Sidebar = (props) => {
                       </Link>
                     </li>
 
-                    <li>
-                      <Link
-                        to="/dream-pos/proforma/add-proforma"
-                        className={
-                          pathname.includes("add-proforma") ? "active" : ""
-                        }
-                      >
-                        New Proforma
-                      </Link>
-                    </li>
+                   
                     {/* <li>
                         <Link
                           className={
@@ -519,6 +524,16 @@ const Sidebar = (props) => {
                 </a>
                 {isSideMenu == "sales" ? (
                   <ul>
+                     <li>
+                      <Link
+                        to="/dream-pos/sales/add-sales"
+                        className={
+                          pathname.includes("add-sales") ? "active" : ""
+                        }
+                      >
+                        New Sales
+                      </Link>
+                    </li>
                     <li>
                       <Link
                         className={
@@ -532,16 +547,7 @@ const Sidebar = (props) => {
                     {/* <li>
                       <Link to="/pos">POS</Link>
                     </li> */}
-                    <li>
-                      <Link
-                        to="/dream-pos/sales/add-sales"
-                        className={
-                          pathname.includes("add-sales") ? "active" : ""
-                        }
-                      >
-                        New Sales
-                      </Link>
-                    </li>
+                   
                     {/* <li>
                       <Link
                         className={
@@ -589,6 +595,16 @@ const Sidebar = (props) => {
                   </a>
                   {isSideMenu == "transfer" ? (
                     <ul>
+                       <li>
+                        <Link
+                          className={
+                            pathname.includes("addtransfer-") ? "active" : ""
+                          }
+                          to="/dream-pos/transfer/addtransfer-transfer"
+                        >
+                          Add Transfer
+                        </Link>
+                      </li>
                       <li>
                         <Link
                           className={
@@ -599,16 +615,7 @@ const Sidebar = (props) => {
                           Transfer List
                         </Link>
                       </li>
-                      <li>
-                        <Link
-                          className={
-                            pathname.includes("addtransfer-") ? "active" : ""
-                          }
-                          to="/dream-pos/transfer/addtransfer-transfer"
-                        >
-                          Add Transfer
-                        </Link>
-                      </li>
+                     
                       {/* <li>
                         <Link
                           className={

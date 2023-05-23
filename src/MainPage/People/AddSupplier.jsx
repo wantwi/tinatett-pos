@@ -12,6 +12,7 @@ import * as Yup from "yup";
 import { useForm } from "react-hook-form";
 import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 import Select from "react-select";
+import FeatherIcon from "feather-icons-react";
 
 const options = [
   { id: 0, label: "Cash", value: "Cash" },
@@ -158,6 +159,7 @@ const AddSupplier = () => {
                       <input className={`form-control ${errors.name ? "is-invalid" : ""
                         }`}
                         type="text"
+                        placeholder="month, days, weeks..."
                         {...register("creditPeriod")} />
                     </div>
                   </div>
@@ -167,7 +169,7 @@ const AddSupplier = () => {
                 <div className="row">
                   <div className="col-lg-4 col-sm-6 col-12">
                     <div className="form-group">
-                      <label>Product</label>
+                      <label>Product Supplied</label>
                       <input className={`form-control ${errors.name ? "is-invalid" : ""
                         }`}
                         type="text"
@@ -217,10 +219,11 @@ const AddSupplier = () => {
 
                   <div className="col-lg-4 col-12">
                     <div className="form-group">
-                      <label>GPS Address</label>
+                      <label>Ghana Post Address</label>
                       <input className={`form-control ${errors.name ? "is-invalid" : ""
                         }`}
                         type="text"
+                        placeholder="GZ-000-0000"
                         {...register("gpsAddress")} />
                     </div>
                   </div>
@@ -317,7 +320,7 @@ const AddSupplier = () => {
 
 
                   <div className="col-lg-12" style={{ textAlign: 'right' }}>
-                    <button type="submit" className="btn btn-submit me-2">Submit</button>
+                    <button type="submit" className="btn btn-submit me-2"><FeatherIcon icon="save"/>Save</button>
                     <button className="btn btn-cancel" onClick={() => reset()}>Clear</button>
                   </div>
                 </div>

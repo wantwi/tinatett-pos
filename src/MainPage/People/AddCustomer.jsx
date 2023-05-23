@@ -13,6 +13,7 @@ import alertify from "alertifyjs";
 import "../../../node_modules/alertifyjs/build/css/alertify.css";
 import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
 import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
+import FeatherIcon from "feather-icons-react";
 
 const AddCustomer = () => {
   const axios = useCustomApi();
@@ -107,6 +108,7 @@ const AddCustomer = () => {
                   <div className="form-group">
                     <label>Email</label>
                     <input 
+                     placeholder="someone@gmail.com"
                      className={`form-control ${
                       errors.name ? "is-invalid" : ""
                     }`}
@@ -174,11 +176,12 @@ const AddCustomer = () => {
                 </div>
                 <div className="col-lg-4 col-12">
                   <div className="form-group">
-                    <label>GPS</label>
+                    <label>Ghana Post Address</label>
                     <input className={`form-control ${
                           errors.name ? "is-invalid" : ""
                         }`}
                         type="text"
+                        placeholder="GZ-000-0000"
                         {...register("gpsAddress")}/>
                   </div>
                 </div>
@@ -202,7 +205,7 @@ const AddCustomer = () => {
                 </div> */}
               
                 <div className="col-lg-12" style={{textAlign:'right'}}>
-                  <button type="submit" className="btn btn-submit me-2">Submit</button>
+                  <button type="submit" className="btn btn-submit me-2"><FeatherIcon icon="save"/> Save</button>
                   <button className="btn btn-cancel" onClick={() =>reset()}>Clear</button>
                 </div>
               </div>

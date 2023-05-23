@@ -7,3 +7,7 @@ export const moneyInTxt = (value, standard, dec = 2) => {
   }
 
   
+  export const isValidNumber = (input) => {
+    var p = new RegExp(/^[0-9]+([.][0-9]+)?$/);
+    return p.test(input);
+  }; 

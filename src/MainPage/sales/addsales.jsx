@@ -10,6 +10,7 @@ import {
   Calendar,
   Product8,
   Product1,
+  EditIcon,
 } from "../../EntryFile/imagePath";
 import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
@@ -20,6 +21,7 @@ import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 import { moneyInTxt } from "../../utility";
 import { BASE_URL } from "../../api/CustomAxios";
 import useCustomApi from "../../hooks/useCustomApi";
+import FeatherIcon from 'feather-icons-react'
 
 
 const Addsales = () => {
@@ -153,26 +155,25 @@ const Addsales = () => {
           <div className="card" >
             <div className="card-body">
                 <div className="row">
-              
-                  <div className="col-12">
+                <div className="col-6">
                     <div className="form-group">
-                      <label>Customer</label>
-                      <div className="row">
-                        <div className="col-lg-12 col-sm-10 col-10">
-                        
-                        <Select
-                            className="select"
-                            options={customerList}
-                            value={selectedCustomer}
-                            onChange={(e) => setSelectedCustomer(e)}
-                            isLoading={customersIsLoading}
-                        />
-                        
-                        </div>
-                        
+                      <label> Date</label>
+                      <div className="input-groupicon">
+                      <input type="date" className="form-control" />
                       </div>
                     </div>
                   </div>
+
+                  <div className="col-6">
+                    <div className="form-group">
+                      <label>Invoice no. (Hard Copy)</label>
+                      <div className="input-groupicon">
+                      <input type="text" placeholder=""/>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="row">
 
                   <div className="col-12">
                   <div className="form-group">
@@ -231,8 +232,29 @@ const Addsales = () => {
           
           <div className="card" >
              <div className="card-body">
-                <div className="row">
-                <div className="col-12">
+              <div className="row">
+
+              <div className="col-12">
+                    <div className="form-group">
+                      <label>Customer</label>
+                      <div className="row">
+                        <div className="col-lg-12 col-sm-10 col-10">
+                        
+                        <Select
+                            className="select"
+                            options={customerList}
+                            value={selectedCustomer}
+                            onChange={(e) => setSelectedCustomer(e)}
+                            isLoading={customersIsLoading}
+                        />
+                        
+                        </div>
+                        
+                      </div>
+                    </div>
+                  </div>
+
+                <div className="col-8">
                   <div className="form-group">
                     <label>Product Name</label>
                     <div className="input-groupicon">
@@ -250,7 +272,7 @@ const Addsales = () => {
                   </div>
                 </div>
 
-                <div className="col-6">
+                <div className="col-4">
                   <div className="form-group">
                     <label>Quantity Left</label>
                     <div className="input-groupicon">
@@ -265,13 +287,13 @@ const Addsales = () => {
                   </div>
                 </div>
 
-                <div className="col-6">
+                <div className="col-4">
                   <div className="form-group">
                     <label>Batch No.</label>
                     <div className="input-groupicon">
                       <Select
                         options={selectedProductInfo?.batchNumber?.map((item) => {
-                          return {value:item.batchNumber, label:item?.batchNumber + '-' + item?.remainingQuantity, expireDate:item?.expireDate, manufacturingDate: item?.manufacturingDate}
+                          return {value:item.batchNumber, label:item?.batchNumber + '-(' + item?.remainingQuantity +')', expireDate:item?.expireDate, manufacturingDate: item?.manufacturingDate}
                         })}
                         placeholder=""
                         value={formData.batchNo}
@@ -283,7 +305,7 @@ const Addsales = () => {
                   </div>
                 </div>
 
-                <div className="col-6">
+                <div className="col-4">
                   <div className="form-group">
                     <label>Manufacturing Date</label>
                     <div className="input-groupicon">
@@ -300,7 +322,7 @@ const Addsales = () => {
                   </div>
                 </div>
 
-                <div className="col-6">
+                <div className="col-4">
                   <div className="form-group">
                     <label>Exp. Date</label>
                     <div className="input-groupicon">
@@ -395,18 +417,50 @@ const Addsales = () => {
                   </div>
                 </div>
 
-                <div className="payment-div" style={{border: '1px solid #e3e3e3', paddingTop:20}}>
+               
+
+                {/* <div className="col-6">
+                  <div className="form-group">
+                    <label>Balance</label>
+                    <div className="input-groupicon">
+                      <input
+                        className="form-control"
+                        type="number"
+                      />
+                      
+                    </div>
+                  </div>
+                </div> */}
+
+                <div className="col-12" style={{display:'flex', justifyContent:'flex-end'}}>
+                <div className="form-group">
+                  <label></label>
+                  <Link to="#" className="btn btn-submit me-2" style={{width: '100%', textAlign:'center', marginTop:8}} onClick={handleAddItem}>
+                  <FeatherIcon icon="save"/> {" Add to Basket"}
+                    </Link>
+                  </div>
+                 
+                </div>
+                </div>
+               
+            </div>
+            
+          </div>
+
+          <div className="card">
+            <div className="card-body">
+                <div className="payment-div">
                   <ul className="nav nav-tabs">
                       <li className="nav-item" onClick={()=>setActiveTab('cash')}>
-                        <a className={activeTab == 'cash' ? `nav-link active`: `nav-link`} href="#">Cash</a>
+                        <a className={activeTab == 'cash' ? `nav-link active`: `nav-link`} href="javascript:void(0);">Cash</a>
                       </li>
 
                       <li className="nav-item" onClick={()=>setActiveTab('cheque')}>
-                        <a className={activeTab == 'cheque' ? `nav-link active`: `nav-link`} href="#">Cheque</a>
+                        <a className={activeTab == 'cheque' ? `nav-link active`: `nav-link`} href="javascript:void(0);">Cheque</a>
                       </li>
 
                       <li className="nav-item" onClick={()=>setActiveTab('momo')}>
-                        <a className={activeTab == 'momo' ? `nav-link active`: `nav-link`} href="#">Mobile Money</a>
+                        <a className={activeTab == 'momo' ? `nav-link active`: `nav-link`} href="javascript:void(0);">Mobile Money</a>
                       </li>
                       
                   </ul>
@@ -501,47 +555,25 @@ const Addsales = () => {
                    
                 </div> :null}
                 </div>
-
-                <div className="col-6 mt-3">
-                  <div className="form-group">
-                    <label>Balance</label>
-                    <div className="input-groupicon">
-                      <input
-                        className="form-control"
-                        type="number"
-                      />
-                      
-                    </div>
-                  </div>
-                </div>
-
-                <div className="col-6 mt-3">
-                <div className="form-group">
-                  <label></label>
-                  <Link to="#" className="btn btn-submit me-2" onClick={handleAddItem}>
-                      Add
-                    </Link>
-                  </div>
-                 
-                </div>
-                </div>
-               
             </div>
-            
           </div>
         </div>
 
-        <div className="card" style={{width: '50%'}}>
+
+
+        <div style={{width:'50%'}}>
+        <div className="card" >
           <div className="card-body">
               <div className="row">
                 <div className="col-lg-12">
                 <div className="row" >
-                <div className="table-responsive mb-3" style={{height:600, maxHeight:600, overflow:'auto'}}>
+                <div className="table-responsive mb-3" style={{height:720, maxHeight:720, overflow:'auto'}}>
                   <table className="table">
                     <thead>
                       <tr>
                         <th>#</th>
                         <th>Product Name</th>
+                        <th>Exp Date</th>
                         <th>QTY</th>
                         <th>Price</th>
                         <th>Subtotal</th>
@@ -562,11 +594,15 @@ const Addsales = () => {
                               </Link> */}
                               <Link to="#">{item.name}</Link>
                             </td>
+                            <td>{item?.expDate}</td>
                             <td>{item.quantity}</td>
                             <td>{item.unitPrice}</td>
                             <td>{item.amount}</td>
                             
                             <td>
+                            <Link to="#" className="delete-set me-2">
+                                <img src={EditIcon} alt="svg" />
+                              </Link>
                               <Link to="#" className="delete-set">
                                 <img src={DeleteIcon} alt="svg" />
                               </Link>
@@ -585,59 +621,76 @@ const Addsales = () => {
 
 
 
-              </div>       
+              </div>  
+          </div>
+        </div>     
             
+        <div className="card" >
+          <div className="card-body">
               <div className="row">
                 <div className="col-lg-6 ">
                   <div className="total-order w-100 max-widthauto m-auto mb-4">
                     <ul>
-                      {/* <li>
-                        <h4>Order Tax</h4>
-                        <h5>$ 0.00 (0.00%)</h5>
+                      <li>
+                        <h4>Amount Given</h4>
+                        <h5>GHS 0.00 </h5>
                       </li>
                       <li>
                         <h4>Discount </h4>
-                        <h5>$ 0.00</h5>
-                      </li> */}
+                        <h5>GHS 0.00</h5>
+                      </li>
                     </ul>
                   </div>
                 </div>
                 <div className="col-lg-6 ">
                   <div className="total-order w-100 max-widthauto m-auto mb-4">
                     <ul>
-                      <li>
-                        <h4>Discount</h4>
-                        <h5>GHS 0.00</h5>
-                      </li>
-                      <li className="total">
+                    <li className="total">
                         <h4>Grand Total</h4>
                         <h5>GHS {moneyInTxt(productGridData.reduce((total, item) => total + item.amount, 0))}</h5>
                       </li>
+                      <li>
+                        <h4>Balance</h4>
+                        <h5>GHS 0.00</h5>
+                      </li>
+                     
                     </ul>
                   </div>
                 </div>
               </div>
 
               <div className="row">
-                <div className="col-lg-12" style={{textAlign:'right'}}>
-                  <Link to="#" className="btn btn-submit me-2" onClick={handleInvoice}>
-                    Invoice
-                  </Link>
-                  <Link to="#" className="btn btn-cancel me-2" onClick={handleNoInvoice}>
-                    No Invoice
-                  </Link>
-                  <Link to="#" className="btn btn-submit me-2" style={{background:'#FFC107'}} onClick={handleCredit}>
-                    Credit
-                  </Link>
-                  <Link to="#" className="btn btn-cancel" style={{background:'darkred'}} onClick={handleSuspend}>
-                     Suspend
-                  </Link>
+                <div className="col-lg-12" >
+                  <Link to="#" className="btn btn-submit me-2" onClick={handleSuspend} style={{width:'100%'}}>
+                  <FeatherIcon icon="pause"/>
+                    Suspend Sale
+                  </Link>                
+                </div>
+              </div>
+
+              <div className="row mt-2">
+                <div className="col-lg-12" style={{display:'flex', justifyContent:'space-between'}} >
+                  <button className="btn btn-info me-2" onClick={handleInvoice} style={{width:'20%'}}>
+                    Sell and Print
+                  </button>
+                  <button className="btn btn-warning me-2" onClick={handleNoInvoice} style={{width:'20%'}}>
+                    Sell Only
+                  </button>
+                  <button className="btn btn-danger me-2" style={{width:'20%'}} onClick={handleCredit} >
+                    Credit and Print
+                  </button>
+                  <button  className="btn btn-cancel" style={{width:'20%'}} onClick={handleCredit}>
+                     Credit Only
+                  </button>
                   
                 </div>
               </div>
                
             </div>
         </div>
+        </div>
+
+       
       </div>
         
         </div>

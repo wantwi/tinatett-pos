@@ -15,6 +15,7 @@ import "../../../node_modules/alertifyjs/build/css/alertify.css";
 import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
 import { resetServerContext } from "react-beautiful-dnd";
 import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
+import FeatherIcon  from "feather-icons-react";
 
 // const options = [
 //     {id: 1, text: 'Choose Category', text: 'Choose Category' },
@@ -27,7 +28,7 @@ import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 
 
 const AddProduct = (props) => {
-  const [isEditMode, setisEditMode] = useState(false);
+
   const axios = useCustomApi();
   const validationSchema = Yup.object().shape({
     name: Yup.string().required("Product name is required"),
@@ -51,22 +52,20 @@ const AddProduct = (props) => {
   } = useForm({
     defaultValues: {
       name: "",
-      retailPrice: 0,
-      wholeSalePrice: 0,
-      specialPrice: 0,
-      alert: 0,
+      retailPrice: "",
+      wholeSalePrice: "",
+      specialPrice: "",
+      alert: "",
     },
     resolver: yupResolver(validationSchema),
   });
 
   const { isLoading, data, isError, error, mutate } = usePost("/product");
-  const { mutate: updateMutate } = usePut(`/product/${getValues()?.id}`);
+ // const { mutate: updateMutate } = usePut(`/product/${getValues()?.id}`);
 
   const onSubmit = (data) => {
     const { name, wholeSalePrice, retailPrice, specialPrice, alert } = data;
-    isEditMode
-      ? updateMutate({ name, wholeSalePrice, retailPrice, specialPrice, alert })
-      : mutate(data);
+    mutate(data);
   };
 
   useEffect(() => {
@@ -164,8 +163,8 @@ const AddProduct = (props) => {
                         className={`form-control ${
                           errors.retailPrice ? "is-invalid" : ""
                         }`}
-                        type="number"
-                        step={0.01}
+                        type="text"
+                        //step={0.01}
                         {...register("retailPrice")}
                       />
                       <div className="invalid-feedback">
@@ -180,8 +179,8 @@ const AddProduct = (props) => {
                         className={`form-control ${
                           errors.wholeSalePrice ? "is-invalid" : ""
                         }`}
-                        type="number"
-                        step={0.01}
+                        type="text"
+                        //step={0.01}
                         {...register("wholeSalePrice")}
                       />
                       <div className="invalid-feedback">
@@ -196,8 +195,8 @@ const AddProduct = (props) => {
                         className={`form-control ${
                           errors.specialPrice ? "is-invalid" : ""
                         }`}
-                        type="number"
-                        step={0.01}
+                        type="text"
+                        //step={0.01}
                         {...register("specialPrice")}
                       />
                       <div className="invalid-feedback">
@@ -264,8 +263,8 @@ const AddProduct = (props) => {
                                     </div>
                                 </div> */}
                   <div className="col-lg-12" style={{textAlign:'right'}}>
-                    <button type="submit" className="btn btn-submit me-2">
-                      {isEditMode ? "Update" : "Submit"}
+                    <button type="submit" className="btn btn-submit me-2"> <FeatherIcon icon="save"/>
+                      {"Save"}
                     </button>
                     <button type="button" className="btn btn-cancel" onClick={() => reset()}>
                       Clear
