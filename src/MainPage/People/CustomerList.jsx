@@ -24,6 +24,7 @@ import { useGet } from "../../hooks/useGet";
 import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 
 const CustomerList = () => {
+  const [tableID] = useState("customerList")
   const [inputfilter, setInputfilter] = useState(false);
   
   const [data, setData] = useState([])
@@ -172,7 +173,7 @@ const CustomerList = () => {
           {/* /product list */}
           <div className="card">
             <div className="card-body">
-            <Tabletop inputfilter={inputfilter} togglefilter={togglefilter} />
+            <Tabletop inputfilter={inputfilter} togglefilter={togglefilter} tableID={tableID}/>
               {/* /Filter */}
               <div
                 className={`card mb-0 ${ inputfilter ? "toggleCls" : ""}`}
@@ -213,7 +214,7 @@ const CustomerList = () => {
               </div>
 
               {/* /Filter */}
-              <div className="table-responsive">
+              <div className="table-responsive" id={tableID}>
                 <Table columns={columns} dataSource={data} />
               </div>
             </div>

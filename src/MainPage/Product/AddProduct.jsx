@@ -43,6 +43,7 @@ const AddProduct = (props) => {
       .min(1, "Price must be greater than 0"),
   });
 
+  const [ownershipType, setOwnershipType] = useState('Tinatett')
   const {
     register,
     handleSubmit,
@@ -64,8 +65,8 @@ const AddProduct = (props) => {
  // const { mutate: updateMutate } = usePut(`/product/${getValues()?.id}`);
 
   const onSubmit = (data) => {
-    const { name, wholeSalePrice, retailPrice, specialPrice, alert } = data;
-    mutate(data);
+
+    mutate({...data, ownershipType});
   };
 
   useEffect(() => {
@@ -96,7 +97,7 @@ const AddProduct = (props) => {
             <div className="card-body">
               <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="row">
-                  <div className="col-lg-3 col-sm-6 col-12">
+                  <div className="col-lg-6 col-sm-6 col-12">
                     <div className="form-group">
                       <label>Product Name (Designation)</label>
                       <input
@@ -111,6 +112,33 @@ const AddProduct = (props) => {
                       </div>
                     </div>
                   </div>
+                  <div className="col-lg-6 col-sm-6 col-12">
+                    <div className="form-group">
+                      <label>Tinatett/Competitor Product</label>
+                      <div className="row">
+                          <div class="col-lg-6">
+                            <div class="input-group">
+                              <div class="input-group-text">
+                                <input className="form-check-input" type="radio" name="customerType" value="Tinatett" onChange = {(e) => setOwnershipType(e.target.value)}/>
+                              </div>
+                              <input type="text" className="form-control" aria-label="Text input with radio button" value={'Tinatett'}/>
+                            </div>
+                        </div>
+
+                          <div class="col-lg-6">
+
+                            <div class="input-group">
+                              <div class="input-group-text">
+                                <input className="form-check-input" type="radio" name="customerType" value="Competitor" onChange = {(e) => setOwnershipType(e.target.value)}/>
+                              </div>
+                              <input type="text" className="form-control" aria-label="Text input with radio button" value={'Competitor'} />
+                            </div>
+                          
+                          </div>
+                      </div>
+                      
+                    </div>
+                </div>
                   {/* <div className="col-lg-3 col-sm-6 col-12">
                                     <div className="form-group">
                                         <label>Category</label>
@@ -204,10 +232,10 @@ const AddProduct = (props) => {
                       </div>
                     </div>
                   </div>
-                  <div className="col-lg-12">
+                  <div className="col-lg-3">
                     <div className="form-group">
                       <label>Alert</label>
-                      <textarea className="form-control" defaultValue={""} />
+                      <input type="text" className="form-control" defaultValue={""} />
                     </div>
                   </div>
                   {/* <div className="col-lg-3 col-sm-6 col-12">

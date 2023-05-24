@@ -9,8 +9,19 @@ import {
     Printer,
     Search    
   } from "../EntryFile/imagePath";
+  import {jsPDF} from 'jspdf'
 
-const Tabletop = ({inputfilter,togglefilter}) => {
+const Tabletop = ({inputfilter,togglefilter, tableID}) => {
+
+
+    const createPDF = async (id) => {
+      const pdf = new jsPDF("landscape", "in", "a4");
+      const data = await document.getElementById(id);
+      pdf.html(data).then(() => {
+        pdf.save("shipping_label.pdf");
+      });
+    };
+  
   return (
     <div className="table-top">
       <div className="search-set">
@@ -42,7 +53,7 @@ const Tabletop = ({inputfilter,togglefilter}) => {
       <div className="wordset">
         <ul>
           <ReactTooltip place="top" type="dark" effect="solid" />
-          <li>
+          <li onClick={() =>  createPDF(tableID)}>
             <a data-tip="Pdf">
               <img src={Pdf} alt="img" />
             </a>

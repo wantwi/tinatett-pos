@@ -34,7 +34,7 @@ const Addsales = () => {
   const [selectedProduct, setSelectedProduct] = useState({})
   const [selectedProductInfo, setSelectedProductInfo] = useState()
   const [price, setPrice] = useState(0)
-  const [formData, setFormData] = useState({quantity:0, amount:0, batchNo:'', manuDate:'', expDate:'', salesType:{}})
+  const [formData, setFormData] = useState({quantity:'', amount:'', batchNo:'', manuDate:'', expDate:'', salesType:{}})
   const [paymentData, setPaymentData] = useState({paymentType:'', accountNo:'', branch: ''})
   const [productGridData, setProductGridData] = useState([])
   const {
@@ -278,7 +278,7 @@ const Addsales = () => {
                     <div className="input-groupicon">
                       <input
                         className="form-control"
-                        type="number"
+                        type="text"
                         value={selectedProductInfo?.totalQuantity}
                         disabled
                       />
@@ -394,7 +394,7 @@ const Addsales = () => {
                     <div className="input-groupicon">
                       <input
                        className="form-control"
-                        type="number"
+                        type="text"
                         value={formData?.quantity}
                         onChange={(e) => setFormData({...formData, quantity: (e.target.value)})}
                       />
@@ -409,8 +409,8 @@ const Addsales = () => {
                     <div className="input-groupicon">
                       <input
                         className="form-control"
-                        type="number"
-                        value={formData.quantity * price}
+                        type="text"
+                        value={formData.quantity ? formData.quantity * price : ''}
                       />
                       
                     </div>
@@ -436,7 +436,7 @@ const Addsales = () => {
                 <div className="form-group">
                   <label></label>
                   <Link to="#" className="btn btn-submit me-2" style={{width: '100%', textAlign:'center', marginTop:8}} onClick={handleAddItem}>
-                  <FeatherIcon icon="save"/> {" Add to Basket"}
+                  <FeatherIcon icon="shopping-cart"/> {" Add to Basket"}
                     </Link>
                   </div>
                  

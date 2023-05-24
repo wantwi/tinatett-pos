@@ -39,6 +39,7 @@ const AddCustomer = () => {
       name: "",
       email: "",
       contact: "",
+      othercontact: "",
       location: "",
       customerType: 0,
       gpsAddress:""
@@ -104,39 +105,7 @@ const AddCustomer = () => {
                   </div>
                   </div>
                 </div>
-                <div className="col-lg-4 col-sm-6 col-12">
-                  <div className="form-group">
-                    <label>Email</label>
-                    <input 
-                     placeholder="someone@gmail.com"
-                     className={`form-control ${
-                      errors.name ? "is-invalid" : ""
-                    }`}
-                    type="text"
-                    {...register("email")}
-                  />
-                  <div className="invalid-feedback">
-                    {errors.name?.message}
-                  </div> 
-                  </div>
-                </div>
-                <div className="col-lg-4 col-sm-6 col-12">
-                  <div className="form-group">
-                    <label>Phone</label>
-                    <input  className={`form-control ${
-                          errors.name ? "is-invalid" : ""
-                        }`}
-                        type="text"
-                        {...register("contact")}
-                      />
-                      <div className="invalid-feedback">
-                        {errors.name?.message}
-                      </div>
-                  </div>
-                </div>
-              </div>
 
-              <div className="row">
                 <div className="col-lg-4 col-sm-6 col-12">
                   <div className="form-group">
                     <label>Choose Type</label>
@@ -164,6 +133,59 @@ const AddCustomer = () => {
                      
                   </div>
                 </div>
+
+                <div className="col-lg-4 col-sm-6 col-12">
+                  <div className="form-group">
+                    <label>Email</label>
+                    <input 
+                     placeholder="someone@gmail.com"
+                     className={`form-control ${
+                      errors.name ? "is-invalid" : ""
+                    }`}
+                    type="text"
+                    {...register("email")}
+                  />
+                  <div className="invalid-feedback">
+                    {errors.name?.message}
+                  </div> 
+                  </div>
+                </div>
+
+                
+              </div>
+
+            <div className="row">
+                <div className="col-lg-4 col-sm-6 col-12">
+                  <div className="form-group">
+                    <label>Contact</label>
+                    <input  className={`form-control ${
+                          errors.name ? "is-invalid" : ""
+                        }`}
+                        type="text"
+                        {...register("contact")}
+                      />
+                      <div className="invalid-feedback">
+                        {errors.name?.message}
+                      </div>
+                  </div>
+                </div>
+
+                <div className="col-lg-4 col-12">
+                  <div className="form-group">
+                    <label>Other Contact</label>
+                    <input  className={`form-control ${
+                          errors.name ? "is-invalid" : ""
+                        }`}
+                        type="text"
+                        {...register("othercontact")}
+                      />
+                      <div className="invalid-feedback">
+                        {errors.name?.message}
+                      </div>
+                  </div>
+                </div>
+              
+            
                 <div className="col-lg-4 col-12">
                   <div className="form-group">
                     <label>Location/Address</label>
@@ -174,6 +196,7 @@ const AddCustomer = () => {
                         {...register("location")}/>
                   </div>
                 </div>
+
                 <div className="col-lg-4 col-12">
                   <div className="form-group">
                     <label>Ghana Post Address</label>
