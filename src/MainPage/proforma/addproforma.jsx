@@ -31,18 +31,6 @@ const AddProforma = () => {
   const [customerOptions, setCustomerOptions] = useState([])
   const [productOptions, setProductOptions] = useState([])
 
-  const options1 = [
-    { id: 1, text: "Choose", text: "Choose" },
-    { id: 2, text: "Unit Price", text: "Unit Price" },
-    { id: 2, text: "Retail Price", text: "Retail Price" },
-    { id: 2, text: "Wholesale Price", text: "Wholesale Price" },
-    { id: 2, text: "Special Price", text: "Special Price" },
-  ];
-  const options2 = [
-    { id: 1, text: "Completed", text: "Completed" },
-    { id: 2, text: "Inprogess", text: "Inprogess" },
-  ];
-
 
   const {data: customers,isError,isLoading: isCustomerLoading,isSuccess} = useGet("customers", "/customer");
   const { data: products, isLoading: isProductLoading} = useGet("products", "/product");
@@ -52,7 +40,7 @@ const AddProforma = () => {
   const [selectedCustomer, setSelectedCustomer] = useState('')
   const [formData, setFormData] = useState({amount:'', quantity:'', price:''})
   const [productGridData, setProductGridData] = useState([])
-  const [transDate, setTransDate] = useState(new Date());
+  const [transDate, setTransDate] = useState(new Date().toISOString().slice(0,10));
   const priceTypeRef = useRef()
 
   const validationSchema = Yup.object().shape({
@@ -215,7 +203,7 @@ const AddProforma = () => {
       
       <div style={{display:'flex', gap:20}}>
 
-        <div style={{display:'flex', flexDirection:'column', width:'35%', }}>
+        <div style={{display:'flex', flexDirection:'column', width:'37%', }}>
           <div className="card">
             {/* <form onSubmit={handleSubmit(onSubmit)}> */}
               <div className="card-body">
@@ -240,7 +228,7 @@ const AddProforma = () => {
                   <div className="col-lg-4 col-sm-6 col-12">
                     <div className="form-group">
                       <label> Date</label>
-                      <div className="input-groupicon">
+                      <input type="date" className="form-control" value={transDate} onChange={(e) => setTransDate(e.target.value)}/>                      {/* <div className="input-groupicon">
                         <DatePicker
                           selected={transDate}
                             onChange={(e) => {
@@ -251,7 +239,7 @@ const AddProforma = () => {
                         <Link className="addonset">
                           <img src={Calendar} alt="img" />
                         </Link>
-                      </div>
+                      </div> */}
                     </div>
                   </div>
                 </div>
@@ -369,12 +357,12 @@ const AddProforma = () => {
                   
                   <div className="col-lg-12 col-sm-6 col-12">
                     <div className="form-group">
-                      <Link to="#" className="btn btn-submit me-2" onClick={handleAddItem}><FeatherIcon icon="shopping-cart"/>
-                        {" Add"}
+                      <Link to="#" className="btn btn-submit me-2" onClick={handleAddItem} style={{width:'100%'}}><FeatherIcon icon="shopping-cart"/>
+                        {" Add to Basket"}
                       </Link>
-                      <Link to="#" className="btn btn-cancel">
+                      {/* <Link to="#" className="btn btn-cancel">
                         Clear
-                      </Link>
+                      </Link> */}
                     </div>
                     
                   </div>
@@ -383,7 +371,7 @@ const AddProforma = () => {
         </div>
 
 
-          <div className="card" style={{width:'65%'}} >
+          <div className="card" style={{width:'62%'}} >
               <div className="card-body">
                 <div className="row">
                   <div className="table-responsive mb-3">
@@ -495,9 +483,9 @@ const AddProforma = () => {
                     {/* <Link to="#" className="btn btn-cancel me-2" style={{backgroundColor:'#FF9F43'}}>
                       Refresh
                     </Link> */}
-                    <Link to="#" className="btn btn-cancel">
-                      Cancel
-                    </Link>
+                     <Link to="/dream-pos/proforma/proformalist" className="btn btn-cancel">
+                        Cancel
+                      </Link>
                   </div>
                 </div>
               </div>

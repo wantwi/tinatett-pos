@@ -21,7 +21,7 @@ import { usePut } from "../../hooks/usePut";
 import alertify from "alertifyjs";
 import "../../../node_modules/alertifyjs/build/css/alertify.css";
 import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
-
+import Select from "react-select";
 
 const deleteRow = () => {
   $(document).on("click", ".delete-set", function () {
@@ -46,27 +46,26 @@ const EditPurchase = () => {
   const { data: products, isLoading: productsIsLoading } = useGet("products", "/product");
   const { data: suppliers, isLoading: suppliersIsLoading } = useGet("suppliers", "/supplier");
   const { data: purchase, isLoading: purchaseIsLoading } = useGet("purchase", `/purchase/${state?.id}`);
-  const [purDate] = useState(new Date(state?.date) || new Date())
+  const [purDate] = useState(state?.date)
   const [supplier] = useState(purchase?.supplierId)
+  const [selectedProduct, setSelectedProduct] = useState('')
   const { data: purchaseDetails, isLoading: purchaseIsLoadingDetails } = useGet("purchase-details", `/purchase/products/${state?.id}`);
   const { isLoading, data, isError, error, mutate } = usePut(`/purchase/${purchaseId}`); 
 
 
-  const [productFormData, setProductFormData] = useState({ id:'', unitPrice: 0, quantity: 1, amount: '', manufacturingDate:'', expireDate:''})
+  const [productFormData, setProductFormData] = useState({ id:'', unitPrice: '', quantity: '', amount: '', manufacturingDate:'', expireDate:''})
   const [productList, setProductList] = useState([])
 
   const productRef = useRef()
 
   const handleProductSelect = (e) => {
-    let p = productRef.current?.props?.data?.find((item) => item.value === e.target.value)
-    if(p){
-      setProductFormData({ ...productFormData, productName: p.text, productId: e.target.value })
-    
-    }
-  }
+    // console.log(e)
+    setSelectedProduct(e)
+    setProductFormData({ ...productFormData, productName: e.label, productId: e.value })
+}
 
   const handleAddItem = () => {
-    if(productFormData.expireDate == '' || productFormData.manufacturingDate == ''){
+    if(productFormData.expireDate == '' || productFormData.manufacturingDate == '' || manDate == '' || expDate == '' || productFormData.quantity == '' || productFormData.unitPrice == ''){
       alertify.set("notifier", "position", "top-right");
       alertify.warning("Please make sure all fields are filled.");
     }
@@ -84,7 +83,8 @@ const EditPurchase = () => {
       }
      
      
-      setProductFormData({ unitPrice: 0, quantity: 1, amount: 0})
+      setSelectedProduct('')
+      setProductFormData({ unitPrice: '', quantity: '', amount: '', manufacturingDate:'', expireDate:''}) 
       setManDate('')
       setExpDate('')
     }
@@ -128,7 +128,7 @@ const EditPurchase = () => {
     }
 
     console.log(postBody)
-    //mutate(postBody)
+    mutate(postBody)
   };
 
   useEffect(() => {
@@ -148,8 +148,11 @@ const EditPurchase = () => {
       let mappedProducts = products?.data.map((item) => {
         return {
           id: item?.id,
-          text: item?.name,
+          label: item?.name,
           value: item?.id,
+          retailPrice: item?.retailPrice,
+          wholeSalePrice : item?.wholeSalePrice,
+          specialPrice: item?.wholeSalePrice
         }
 
       })
@@ -207,12 +210,12 @@ const EditPurchase = () => {
     {
       title: "Unit Price(GHS)",
       dataIndex: "unitPrice",
-      //render: (text, record) => <p style={{textAlign:'left'}}>{text || 0}</p>
+      render: (text, record) => <p style={{textAlign:'right'}}>{moneyInTxt(text)}</p>
     },
     {
       title: "Amount(GHS)",
       dataIndex: "amount",
-      // render: (text, record) => <p style={{textAlign:'center'}}>{text || 0}</p>
+      render: (text, record) => <p style={{textAlign:'right'}}>{moneyInTxt(text)}</p>
     },
     // {
     //   title: "Batch Number",
@@ -222,12 +225,12 @@ const EditPurchase = () => {
     {
       title: "Manufacturing Date",
       dataIndex: "manufacturingDate",
-      render: (text, record) => <p style={{textAlign:'left'}}>{record.manufacturingDate.substring(0,10) || ''}</p>
+      render: (text, record) => <p style={{textAlign:'center'}}>{record.manufacturingDate.substring(0,10) || ''}</p>
     },
     {
       title: "Expiring Date",
       dataIndex: "expireDate",
-      render: (text, record) => <p style={{textAlign:'left'}}>{record.expireDate.substring(0,10) || ''}</p>
+      render: (text, record) => <p style={{textAlign:'center'}}>{record.expireDate.substring(0,10) || ''}</p>
     },
     {
       title:"Action",
@@ -290,13 +293,14 @@ const EditPurchase = () => {
                       <div className="form-group">
                         <label>Purchase Date </label>
                         <div className="input-groupicon">
-                          <DatePicker
+                        <input type="date" className="form-control" value={purDate} disabled/>
+                          {/* <DatePicker
                            selected={purDate}
                            disabled
                           />
                           <div className="addonset">
                             <img src={Calendar} alt="img" />
-                          </div>
+                          </div> */}
                         </div>
                       </div>
                     </div>
@@ -313,7 +317,14 @@ const EditPurchase = () => {
                         <div className="col-lg-12 col-sm-6 col-12">
                           <div className="form-group">
                             <label>Product Name (Designation)</label>
-                            <Select2
+                            <Select
+                              className="select"
+                              options={productsDropdown}
+                              isLoading={productsIsLoading}
+                              value={selectedProduct}
+                              onChange={(e) => handleProductSelect(e)}
+                            />
+                            {/* <Select2
                               className="select"
                               data={productsDropdown}
                               options={{
@@ -322,7 +333,7 @@ const EditPurchase = () => {
                               value={productFormData?.productId}
                               ref = {productRef}
                               onChange={(e) => handleProductSelect(e)}
-                            />
+                            /> */}
                           </div>
                         </div>
                         
@@ -330,7 +341,11 @@ const EditPurchase = () => {
                           <div className="form-group">
                             <label>Manufacturing Date </label>
                             <div className="input-groupicon">
-                              <DatePicker
+                            <input type="date" className="form-control" value={manDate} onChange={(e) => {
+                                  setManDate(e.target.value)
+                                  setProductFormData({ ...productFormData, manufacturingDate: e.target.value })
+                                }}/>
+                              {/* <DatePicker
                                 selected={manDate}
                                 //value={product?.manufacturingDate}
                                 onChange={(e) => {
@@ -340,7 +355,7 @@ const EditPurchase = () => {
                               />
                               <div className="addonset">
                                 <img src={Calendar} alt="img" />
-                              </div>
+                              </div> */}
                             </div>
                           </div>
                         </div>
@@ -349,7 +364,11 @@ const EditPurchase = () => {
                           <div className="form-group">
                             <label>Expiring Date </label>
                             <div className="input-groupicon">
-                              <DatePicker
+                            <input type="date" className="form-control" value={expDate} onChange={(e) => {
+                                  setExpDate(e.target.value)
+                                  setProductFormData({ ...productFormData, expireDate: e.target.value })
+                                }}/>
+                              {/* <DatePicker
                                 selected={expDate}
                                 onChange={(e) => {
                                   setExpDate(e)
@@ -358,7 +377,7 @@ const EditPurchase = () => {
                               />
                               <div className="addonset">
                                 <img src={Calendar} alt="img" />
-                              </div>
+                              </div> */}
                             </div>
                           </div>
                         </div>
@@ -368,8 +387,7 @@ const EditPurchase = () => {
                         <div className="col-lg-6 col-sm-6 col-12">
                           <div className="form-group">
                             <label>Quantity</label>
-                            <input type="number"
-                            className="form-control"
+                            <input type="text" className={`form-control `}
                               value={productFormData?.quantity}
                               onChange={(e) => {
                                 let qty = (e.target.value) 
@@ -383,9 +401,7 @@ const EditPurchase = () => {
                         <div className="col-lg-6 col-sm-6 col-12">
                           <div className="form-group">
                             <label>Unit Price</label>
-                            <input type="number"
-                            className="form-control"
-                            step={0.01}
+                            <input type="text" className={`form-control `}
                               value={productFormData?.unitPrice}
                               onChange={(e) => {
                               
@@ -403,8 +419,7 @@ const EditPurchase = () => {
                             <label>Amount</label>
                             <div className="input-groupicon">
                               <input
-                                type="number" className={`form-control `}
-                                step={0.01}
+                                type="text" className={`form-control `}
                                 placeholder=""
                                 value={Number(productFormData?.amount).toFixed(2)}
                                 disabled
@@ -502,7 +517,9 @@ const EditPurchase = () => {
                   
                   <div className="col-lg-12" style={{textAlign:'right'}}>
                     <button className="btn btn-submit me-2" type="submit" onClick={onSubmit}>Update</button>
-                    <button className="btn btn-cancel">Cancel</button>
+                    <Link to="/dream-pos/purchase/purchaselist" className="btn btn-cancel">
+                    Cancel
+                   </Link>
                   </div>
                 </div>
 

@@ -34,7 +34,7 @@ const options2 = [
 ];
 
 const AddPurchase = () => {
-  const [purDate, setPurDate] = useState(new Date());
+  const [purDate, setPurDate] = useState(new Date().toISOString().slice(0,10));
   const [manDate, setManDate] = useState('');
   const [expDate, setExpDate] = useState('');
 
@@ -91,22 +91,22 @@ const AddPurchase = () => {
     {
       title: "Unit Price(GHS)",
       dataIndex: "unitPrice",
-      //render: (text, record) => <p style={{textAlign:'left'}}>{text || 0}</p>
+      render: (text, record) => <p style={{textAlign:'right'}}>{moneyInTxt(text)}</p>
     },
     {
       title: "Amount(GHS)",
       dataIndex: "amount",
-      // render: (text, record) => <p style={{textAlign:'center'}}>{text || 0}</p>
+      render: (text, record) => <p style={{textAlign:'right'}}>{moneyInTxt(text)}</p>
     },
     {
       title: "Manufacturing Date",
       dataIndex: "manufacturingDate",
-      render: (text, record) => <p key={text} style={{textAlign:'left'}}>{record?.manufacturingDate.substring(0,10) || ''}</p>
+      render: (text, record) => <p key={text} style={{textAlign:'center'}}>{record?.manufacturingDate.substring(0,10) || ''}</p>
     },
     {
       title: "Expiring Date",
       dataIndex: "expireDate",
-      render: (text, record) => <p key={text} style={{textAlign:'left'}}>{record?.expireDate.substring(0,10) || ''}</p>
+      render: (text, record) => <p key={text} style={{textAlign:'center'}}>{record?.expireDate.substring(0,10) || ''}</p>
     },
     {
       title:"Action",
@@ -155,7 +155,7 @@ const AddPurchase = () => {
         products: productGridData
       }
   
-      //console.log(postBody)
+      console.log(postBody)
       mutate(postBody)
       setManDate('')
       setExpDate('')
@@ -257,8 +257,8 @@ const AddPurchase = () => {
                     <div className="col-lg-5 col-sm-6 col-12">
                       <div className="form-group">
                         <label>Purchase Date </label>
-                        {/* <input type="date" className="form-control"/> */}
-                        <div className="input-groupicon">
+                        <input type="date" className="form-control" value={purDate} onChange={(e) => {setPurDate(e.target.value)}} />
+                        {/* <div className="input-groupicon">
                           <DatePicker
                             selected={purDate}
                             ref = {dateRef}
@@ -267,11 +267,11 @@ const AddPurchase = () => {
                               // setProductFormData({ ...productFormData, purchaseDate: new Date(e).toISOString() })
                             }
                             }
-                          />
+                          /> 
                           <div className="addonset">
                             <img src={Calendar} alt="img" onClick={() => dateRef.current.setFocus()}/>
-                          </div>
-                        </div>
+                          </div> 
+                        </div>*/}
                       </div>
                     </div>
                   </div>
@@ -455,7 +455,9 @@ const AddPurchase = () => {
                     
                     <div className="col-lg-12" style={{textAlign:'right'}}>
                       <button className="btn btn-submit me-2" type="submit" onClick={onSubmit}><FeatherIcon icon="save"/>Save</button>
-                      <button className="btn btn-cancel">Cancel</button>
+                      <Link to="/dream-pos/purchase/purchaselist" className="btn btn-cancel">
+                        Cancel
+                      </Link>
                     </div>
                   </div>
                 </div>
