@@ -56,7 +56,7 @@ const ProformaList = () => {
             date:new Date(proforma.createdAt).toISOString().substring(0,10),
             proformaRef: proforma?.proformaRef,
             numberOfProduct: proforma?.numberOfProduct,
-            createdBy: "Admin",
+            createdBy: proforma?.createdBy || 'N/A',
           }
         })
       setData(mappedData)
@@ -245,7 +245,7 @@ const ProformaList = () => {
           {/* /product list */}
           <div className="card">
             <div className="card-body">
-              <Tabletop inputfilter={inputfilter} togglefilter={togglefilter} />
+              <Tabletop inputfilter={inputfilter} togglefilter={togglefilter} data={data} title={'Proforma List'}/>
               {/* /Filter */}
               <div
                 className={`card mb-0 ${ inputfilter ? "toggleCls" : ""}`}

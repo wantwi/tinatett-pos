@@ -51,7 +51,7 @@ const ProductList = () => {
             wholeSalePrice: product?.wholeSalePrice,
             specialPrice: product?.specialPrice,
             remainingStock: product?.remainingStock || 0,
-            createdBy: "Admin",
+            createdBy: product?.createdBy
           }
         })
       setData([...mappedData])
@@ -176,7 +176,7 @@ const ProductList = () => {
           {/* /product list */}
           <div className="card">
             <div className="card-body">
-              <Tabletop inputfilter={inputfilter} togglefilter={togglefilter} />
+              <Tabletop inputfilter={inputfilter} togglefilter={togglefilter} title={'Products List'} data={data}/>
               {/* /Filter */}
               <div
                 className={`card mb-0 ${inputfilter ? "toggleCls" : ""}`}

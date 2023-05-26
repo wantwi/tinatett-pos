@@ -169,10 +169,11 @@ const AddSupplier = () => {
                 <div className="row">
                   <div className="col-lg-4 col-sm-6 col-12">
                     <div className="form-group">
-                      <label>Product Supplied</label>
-                      <input className={`form-control ${errors.name ? "is-invalid" : ""
+                      <label>Products Supplied</label>
+                      <textarea className={`form-control ${errors.name ? "is-invalid" : ""
                         }`}
                         type="text"
+                        placeholder="Enter products, separated by comma"
                         {...register("product")} />
                     </div>
                   </div>

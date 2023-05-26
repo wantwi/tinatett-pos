@@ -48,19 +48,33 @@ const PurchaseList = () => {
       cancelButtonClass: "btn btn-danger ml-1",
       buttonsStyling: !1,
     })
-    .then(() => {
+    .then( async() => {
       console.log('deleting...')
-      let data = axios.delete(`/purchase/item/${id}`)
-      console.log(data)
-    })
-    .then(function (t) {
-     
-      t.value &&
+      let data = await axios.delete(`/purchase/${id}`)
+      console.log(data.response.code)
+      if(data.response.data.success){
         Swal.fire({
           type: "success",
           title: "Deleted!",
           text: "Your transaction has been deleted.",
           confirmButtonClass: "btn btn-success",
+        });
+      }
+      else{
+        Swal.fire({
+          type: "danger",
+          title: "Error!",
+          text: data.response.data.message,
+          confirmButtonClass: "btn btn-danger",
+        });
+      }
+    })
+    .catch( (error) => {
+        Swal.fire({
+          type: "danger",
+          title: "Error!",
+          text: error,
+          confirmButtonClass: "btn btn-danger",
         });
     });
   };
@@ -219,7 +233,7 @@ const PurchaseList = () => {
           {/* /product list */}
           <div className="card">
             <div className="card-body">
-              <Tabletop inputfilter={inputfilter} togglefilter={togglefilter} />
+              <Tabletop inputfilter={inputfilter} togglefilter={togglefilter} data={data} title={'Purchase List'}/>
               {/* /Filter */}
               <div
                 className={`card mb-0 ${ inputfilter ? "toggleCls" : ""}`}

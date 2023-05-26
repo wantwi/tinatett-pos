@@ -6906,3 +6906,9 @@ span.select2-container.select2-container--default.select2-container--open {
 body{
   background-color: #FFFF66 !important;
 }
+
+@media print{
+  table td:last-child, th:last-child{
+    display:none!important;
+    }
+  }

@@ -53,7 +53,8 @@ const CustomerList = () => {
             gpsAddress: customer?.gpsAddress,
             email: customer?.email,
             contact: customer?.contact,
-            createdBy: "Admin",
+            othercontact: customer?.othercontact,
+            createdBy: customer?.user.firstName  + ' ' + customer.user.lastName,
           }
         })
       setData(mappedData)
@@ -173,7 +174,7 @@ const CustomerList = () => {
           {/* /product list */}
           <div className="card">
             <div className="card-body">
-            <Tabletop inputfilter={inputfilter} togglefilter={togglefilter} tableID={tableID}/>
+            <Tabletop inputfilter={inputfilter} togglefilter={togglefilter} tableID={tableID} data={data} title={'Customers List'}/>
               {/* /Filter */}
               <div
                 className={`card mb-0 ${ inputfilter ? "toggleCls" : ""}`}
@@ -214,7 +215,7 @@ const CustomerList = () => {
               </div>
 
               {/* /Filter */}
-              <div className="table-responsive" id={tableID}>
+              <div className="table-responsive" id={tableID} title={'Customers List'}>
                 <Table columns={columns} dataSource={data} />
               </div>
             </div>

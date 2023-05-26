@@ -23,12 +23,6 @@ import "../../../node_modules/alertifyjs/build/css/alertify.css";
 import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
 import Select from "react-select";
 
-const deleteRow = () => {
-  $(document).on("click", ".delete-set", function () {
-    $(this).parent().parent().hide();
-  });
-};
-
 
 const EditPurchase = () => {
   const {state} = useLocation()
@@ -90,6 +84,12 @@ const EditPurchase = () => {
     }
    
   }
+
+  
+const deleteRow = (row) => {
+  console.log(row)
+ };
+ 
 
   const handleEdit = (record) => {
     console.log("Record:", record)
@@ -239,7 +239,7 @@ const EditPurchase = () => {
          <span className="me-3" to="#" onClick={() => handleEdit(record)} style={{cursor:'pointer'}}>
             <img src={EditIcon} alt="img" />
           </span>
-          <span className="delete-set" to="#" onClick={deleteRow} style={{cursor:'pointer'}}>
+          <span className="delete-set" to="#" onClick={() => deleteRow(record)} style={{cursor:'pointer'}}>
             <img src={DeleteIcon} alt="img" />
           </span>
         </>

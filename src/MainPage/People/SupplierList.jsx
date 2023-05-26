@@ -77,7 +77,8 @@ const SupplierList = () => {
             accountNumber: supplier.paymentInfo.accountNumber,
             branch: supplier.paymentInfo.branch,
             serviceProvider: supplier.paymentInfo.serviceProvider
-          }
+          },
+          createdBy: supplier.user.firstName + ' ' + supplier.user.lastName
         }
       })
 
@@ -168,7 +169,7 @@ const SupplierList = () => {
           {/* /product list */}
           <div className="card">
             <div className="card-body">
-              <Tabletop inputfilter={inputfilter} togglefilter={togglefilter} />
+              <Tabletop inputfilter={inputfilter} togglefilter={togglefilter} data={data} title={'Suppliers List'}/>
               {/* /Filter */}
               <div
                 className={`card mb-0 ${inputfilter ? "toggleCls" : ""}`}
