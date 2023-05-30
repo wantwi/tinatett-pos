@@ -19,10 +19,11 @@ import { useForm } from "react-hook-form";
 const EditProduct = () => {
 
   const {state} = useLocation()
-  console.log(state)
+  //console.log(state)
   const [data, setData] = useState(state)
 
   const history = useHistory()
+  const [ownershipType, setOwnershipType] = useState(state?.ownershipType)
 
 
   const validationSchema = Yup.object().shape({
@@ -61,7 +62,7 @@ const EditProduct = () => {
 
   const onSubmit = (data) => {
     const { name, wholeSalePrice, retailPrice, specialPrice, alert } = data;
-    updateMutate({ name, wholeSalePrice, retailPrice, specialPrice, alert: Number(alert) })
+    updateMutate({ name, wholeSalePrice, retailPrice, specialPrice, alert: Number(alert), ownershipType })
      
   };
 
@@ -100,11 +101,38 @@ const EditProduct = () => {
             <div className="card-body">
             <form onSubmit={handleSubmit(onSubmit)}>
               <div className="row">
-                <div className="col-lg-3 col-sm-6 col-12">
+                <div className="col-lg-6 col-sm-6 col-12">
                   <div className="form-group">
                     <label>Product Name</label>
                     <input type="text"  {...register("name")} />
                   </div>
+                </div>
+                <div className="col-lg-6 col-sm-6 col-12">
+                    <div className="form-group">
+                      <label>Tinatett/Competitor Product</label>
+                      <div className="row">
+                          <div class="col-lg-6">
+                            <div class="input-group">
+                              <div class="input-group-text">
+                                <input className="form-check-input" type="radio" name="customerType" checked={ownershipType == 'Tinatett' ? true : false} value="Tinatett" onChange = {(e) => setOwnershipType(e.target.value)}/>
+                              </div>
+                              <input type="text" className="form-control" aria-label="Text input with radio button" value={'Tinatett'}/>
+                            </div>
+                        </div>
+
+                          <div class="col-lg-6">
+
+                            <div class="input-group">
+                              <div class="input-group-text">
+                                <input className="form-check-input" type="radio" name="customerType" checked={ownershipType == 'Competitor' ? true : false} value="Competitor" onChange = {(e) => setOwnershipType(e.target.value)}/>
+                              </div>
+                              <input type="text" className="form-control" aria-label="Text input with radio button" value={'Competitor'} />
+                            </div>
+                          
+                          </div>
+                      </div>
+                      
+                    </div>
                 </div>
                 {/* <div className="col-lg-3 col-sm-6 col-12">
                   <div className="form-group">
@@ -172,10 +200,10 @@ const EditProduct = () => {
                     <input type="text"  {...register("specialPrice")} />
                   </div>
                 </div>
-                <div className="col-lg-12">
+                <div className="col-lg-3">
                   <div className="form-group">
                     <label>Alert</label>
-                    <textarea
+                    <input type="text"
                       className="form-control"
                       {...register("alert")}
                     />

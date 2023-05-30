@@ -22,6 +22,10 @@ import { moneyInTxt } from "../../utility";
 import { BASE_URL } from "../../api/CustomAxios";
 import useCustomApi from "../../hooks/useCustomApi";
 import FeatherIcon from 'feather-icons-react'
+import { usePost } from "../../hooks/usePost";
+import alertify from "alertifyjs";
+import "../../../node_modules/alertifyjs/build/css/alertify.css";
+import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
 
 
 const Addsales = () => {
@@ -34,9 +38,11 @@ const Addsales = () => {
   const [selectedProduct, setSelectedProduct] = useState({})
   const [selectedProductInfo, setSelectedProductInfo] = useState()
   const [price, setPrice] = useState(0)
-  const [formData, setFormData] = useState({quantity:'', amount:'', batchNo:'', manuDate:'', expDate:'', salesType:{}})
+  const [formData, setFormData] = useState({quantity:'', amount:'', batchNo:'', manuDate:'', expDate:''})
+  const [salesType, setSalesType] = useState('Retail')
   const [paymentData, setPaymentData] = useState({paymentType:'', accountNo:'', branch: ''})
   const [productGridData, setProductGridData] = useState([])
+  const [isSubmitSuccessful, setIsSubmitSuccessful] = useState(false)
   const {
     data: customers,
     isLoading: customersIsLoading,
@@ -46,6 +52,16 @@ const Addsales = () => {
     data: products,
     isLoading: productsIsLoading,
   } = useGet("products", "/product");
+  const { isLoading, data, isError, error, mutate } = usePost("/sales/suspend");
+
+  // useEffect(() => {
+  //   if(data?.success){
+  //     setIsSubmitSuccessful(true)
+  //     setProductGridData([])
+  //     setFormData({quantity:0, amount:0, batchNo:'', manuDate:'', expDate:''})
+  //     setSelectedProduct('')
+  //   }
+  // }, [data])
 
   const axios = useCustomApi()
 
@@ -65,14 +81,32 @@ const Addsales = () => {
     let payload = {
       customerId: selectedCustomer.value,
       totalAmount : productGridData.reduce((total, item) => total + item.amount, 0),
-      salesType:formData.salesType?.value,
+      salesType:salesType,
       paymentType: paymentData.paymentType,
       products: productGridData,
-      formData:formData
     }
 
-    console.log(payload)
+    //console.log(payload)
+    mutate(payload)
+    setProductGridData([])
+    setFormData({quantity:0, amount:0, batchNo:'', manuDate:'', expDate:''})
+    setSelectedProduct('')
+    setIsSubmitSuccessful(true)
   }
+
+  useEffect(() => {
+    if (!isError && !isLoading && isSubmitSuccessful) {
+      console.log("res", data)
+      alertify.set("notifier", "position", "top-right");
+      alertify.success("Sales suspended successfully.");
+    }
+    else if(isError){
+      alertify.set("notifier", "position", "top-right");
+      alertify.error("Error...Could not suspend transaction");
+    }
+    
+    return () => {};
+  }, [isError, isLoading, isSubmitSuccessful]);
 
   const handleAddItem = () => {
     //console.log(productFormData)
@@ -86,7 +120,8 @@ const Addsales = () => {
          amount:formData.quantity * price
       }    
       setProductGridData([...productGridData, obj])
-      setFormData({quantity:0, amount:0, batchNo:'', manuDate:'', expDate:'', salesType:{}})
+      setFormData({quantity:0, amount:0, batchNo:'', manuDate:'', expDate:''})
+      setSelectedProduct('')
    
     }
 
@@ -186,9 +221,8 @@ const Addsales = () => {
                             <div className="input-group">
                               <div className="input-group-text">
                                 <input className="form-check-input" type="radio" name="salesType" checked={true} value={'Retail'} onChange={(e) => {
-                                 // setPrice(e.target.value)
-                                
-                                }}/>
+                                 setSalesType(e.target.value)}}
+                                />
                               </div>
                               <input type="text" className="form-control" aria-label="Text input with radio button"  placeholder="Retail" />
                             </div>
@@ -199,10 +233,8 @@ const Addsales = () => {
                             <div className="input-group">
                               <div className="input-group-text">
                                 <input className="form-check-input" type="radio" name="salesType" value={'Wholesale'} onChange={(e) => {
-                                  // setPrice(e.target.value)
-                                
-                                }
-                                 } />
+                                 setSalesType(e.target.value)}}
+                                />
                               </div>
                               <input type="text" className="form-control" aria-label="Text input with radio button" placeholder={'Wholesale'} />
                             </div>

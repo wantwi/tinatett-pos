@@ -40,7 +40,7 @@ const AddPurchase = () => {
 
 
   const [productGridData, setProductGridData] = useState([])
-  const [productFormData, setProductFormData] = useState({ unitPrice: '', quantity: '', amount: '', manufacturingDate:'', expireDate:''})
+  const [productFormData, setProductFormData] = useState({ unitPrice: '', quantity: '', amount: '', manufacturingDate:'', expireDate:'', batchNumber:''})
   const [supplier, setSupplier] = useState('')
   const [selectedProduct, setSelectedProduct] = useState('')
 
@@ -122,9 +122,9 @@ const AddPurchase = () => {
 
 
   const handleProductSelect = (e) => {
-      console.log(e)
+      //console.log("Product:", e)
       setSelectedProduct(e)
-      setProductFormData({ ...productFormData, productName: e.label, productId: e.value })
+      setProductFormData({ ...productFormData, productName: e.label, productId: e.value, })
   }
 
   const handleAddItem = () => {
@@ -137,7 +137,7 @@ const AddPurchase = () => {
       setManDate('')
       setExpDate('')
       setProductGridData([...productGridData, productFormData])
-      setProductFormData({ unitPrice: '', quantity: '', amount: '', manufacturingDate:'', expireDate:''}) 
+      setProductFormData({ unitPrice: '', quantity: '', amount: '', manufacturingDate:'', expireDate:'', batchNumber:''}) 
       setSelectedProduct('')
     }
    
@@ -177,7 +177,8 @@ const AddPurchase = () => {
           value: item?.id,
           retailPrice: item?.retailPrice,
           wholeSalePrice : item?.wholeSalePrice,
-          specialPrice: item?.wholeSalePrice
+          specialPrice: item?.wholeSalePrice,
+          ownershipType: item?.ownershipType
         }
 
       })
@@ -198,6 +199,7 @@ const AddPurchase = () => {
 
   useEffect(() => {
     if (!isError &&  isSubmitSuccessful) {
+      console.log("res", data)
       alertify.set("notifier", "position", "top-right");
       alertify.success("Purchase added successfully.");
     }
@@ -346,6 +348,21 @@ const AddPurchase = () => {
                       </div>
                   
                       <div className="row">
+
+                      <div className="col-lg-6 col-sm-6 col-12">
+                          <div className="form-group">
+                            <label>Batch No</label>
+                            <input type="text"  className={`form-control `} disabled = {selectedProduct?.ownershipType == "Tinatett" ? false : true} 
+                              value={productFormData?.batchNumber}
+                              onChange={(e) => {
+                      
+                                  setProductFormData({ ...productFormData, batchNumber: e.target.value })
+                                              
+                              }
+                              } />
+                          </div>
+                        </div>
+
                         <div className="col-lg-6 col-sm-6 col-12">
                           <div className="form-group">
                             <label>Quantity</label>
@@ -397,12 +414,12 @@ const AddPurchase = () => {
                       <div className="row" style={{textAlign:'right'}}>
                         <div className="col-lg-12 col-sm-6 col-12">
                           <div className="form-group">
-                            <Link to="#" className="btn btn-submit me-2" onClick={handleAddItem}>
-                              Add to List
+                            <Link to="#" className="btn btn-submit me-2" onClick={handleAddItem} style={{width:'100%'}}>
+                            <FeatherIcon icon="shopping-cart"/> {" Add to Basket"}
                             </Link>
-                            <Link to="#" className="btn btn-cancel">
+                            {/* <Link to="#" className="btn btn-cancel">
                               Clear
-                            </Link>
+                            </Link> */}
                           </div>
 
                         </div>

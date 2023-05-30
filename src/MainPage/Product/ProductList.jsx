@@ -51,6 +51,7 @@ const ProductList = () => {
             wholeSalePrice: product?.wholeSalePrice,
             specialPrice: product?.specialPrice,
             remainingStock: product?.remainingStock || 0,
+            ownershipType: product?.ownershipType,
             createdBy: product?.createdBy
           }
         })

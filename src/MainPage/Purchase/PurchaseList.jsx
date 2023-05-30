@@ -49,7 +49,7 @@ const PurchaseList = () => {
       buttonsStyling: !1,
     })
     .then( async() => {
-      console.log('deleting...')
+      //console.log('deleting...')
       let data = await axios.delete(`/purchase/${id}`)
       console.log(data.response.code)
       if(data.response.data.success){
@@ -102,7 +102,7 @@ const PurchaseList = () => {
           }
         })
       setData(mappedData)
-      console.log('loaded..')
+
     }
     else{
       // console.log('loading...')

@@ -56,7 +56,7 @@ const AddProduct = (props) => {
       retailPrice: "",
       wholeSalePrice: "",
       specialPrice: "",
-      alert: "",
+      alert: ""
     },
     resolver: yupResolver(validationSchema),
   });
@@ -235,7 +235,7 @@ const AddProduct = (props) => {
                   <div className="col-lg-3">
                     <div className="form-group">
                       <label>Alert</label>
-                      <input type="text" className="form-control" defaultValue={""} />
+                      <input type="text" className="form-control" defaultValue={""}  {...register("alert")}/>
                     </div>
                   </div>
                   {/* <div className="col-lg-3 col-sm-6 col-12">

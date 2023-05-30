@@ -284,11 +284,11 @@ const Tabletop = ({ inputfilter, togglefilter, tableID, data, title }) => {
               <img src={Excel} alt="img" />
             </a>
           </li>
-          <li>
+          {/* <li>
             <a data-tip="Print">
               <img src={Printer} alt="img" />
             </a>
-          </li>
+          </li> */}
         </ul>
       </div>
     </div>

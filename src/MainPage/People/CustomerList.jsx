@@ -53,7 +53,7 @@ const CustomerList = () => {
             gpsAddress: customer?.gpsAddress,
             email: customer?.email,
             contact: customer?.contact,
-            othercontact: customer?.othercontact,
+            othercontact: customer?.otherContact,
             createdBy: customer?.user.firstName  + ' ' + customer.user.lastName,
           }
         })

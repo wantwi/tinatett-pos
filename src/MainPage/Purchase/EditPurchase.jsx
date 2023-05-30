@@ -53,7 +53,7 @@ const EditPurchase = () => {
   const productRef = useRef()
 
   const handleProductSelect = (e) => {
-    // console.log(e)
+    console.log("Product:", e)
     setSelectedProduct(e)
     setProductFormData({ ...productFormData, productName: e.label, productId: e.value })
 }
@@ -92,7 +92,6 @@ const deleteRow = (row) => {
  
 
   const handleEdit = (record) => {
-    console.log("Record:", record)
     setProductFormData({
       id: record?.id,
       productId: record.productId,
@@ -140,7 +139,7 @@ const deleteRow = (row) => {
       }
     })
     setProductList(mappedData)
-    console.log("Details:", purchaseDetails?.data)
+    // console.log("Details:", purchaseDetails?.data)
   }, [purchaseDetails])
 
   useEffect(() => {
@@ -152,7 +151,8 @@ const deleteRow = (row) => {
           value: item?.id,
           retailPrice: item?.retailPrice,
           wholeSalePrice : item?.wholeSalePrice,
-          specialPrice: item?.wholeSalePrice
+          specialPrice: item?.wholeSalePrice,
+          ownershipType: item?.ownershipType
         }
 
       })
@@ -407,7 +407,7 @@ const deleteRow = (row) => {
                               
                                 let unitP = (e.target.value) 
                                 let qty = (productFormData.quantity) 
-                                console.log(e.target.value, unitP)
+                                // console.log(e.target.value, unitP)
                                 setProductFormData({ ...productFormData, unitPrice: e.target.value, amount: unitP * qty })
                               }
                               } />
