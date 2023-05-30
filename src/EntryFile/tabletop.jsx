@@ -274,11 +274,11 @@ const Tabletop = ({ inputfilter, togglefilter, tableID, data, title }) => {
       <div className="wordset">
         <ul>
           <ReactTooltip place="top" type="dark" effect="solid" />
-          <li onClick={() => createPDF(tableID)}>
+          {/* <li onClick={() => createPDF(tableID)}>
             <a data-tip="Pdf">
               <img src={Pdf} alt="img" />
             </a>
-          </li>
+          </li> */}
           <li onClick={() => exportToCSV()}>
             <a data-tip="Excel">
               <img src={Excel} alt="img" />

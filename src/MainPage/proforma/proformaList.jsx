@@ -204,7 +204,7 @@ const ProformaList = () => {
             </Link>
             <ul className="dropdown-menu">
               <li>
-                <Link to="/dream-pos/proforma/proforma-details" className="dropdown-item">
+                <Link className="dropdown-item" to={{pathname:"/dream-pos/proforma/proforma-details", state:record}}>
                   <img src={Eye1} className="me-2" alt="img" />
                   View Details
                 </Link>
@@ -217,7 +217,7 @@ const ProformaList = () => {
                   onClick={confirmText}
                 >
                   <img src={delete1} className="me-2" alt="img" />
-                  Delete Sale
+                  Delete
                 </Link>
               </li>
             </ul>

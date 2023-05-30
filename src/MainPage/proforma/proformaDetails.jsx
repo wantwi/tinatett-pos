@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Pdf,
@@ -12,12 +12,44 @@ import {
 } from "../../EntryFile/imagePath";
 import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
+import { useLocation } from "react-router-dom/cjs/react-router-dom";
+import { useGet } from "../../hooks/useGet";
+import { moneyInTxt } from "../../utility";
+import jsPDF from "jspdf";
 
 const ProformaDetail = () => {
-  const options = [
-    { id: 1, text: "Completed", text: "Completed" },
-    { id: 2, text: "Inprogess", text: "Inprogess" },
-  ];
+
+
+  const {state} = useLocation()
+  console.log(state)
+  const { data, isLoading } = useGet("proforma-product-details", `/proforma/products/${state?.id}`);
+  const [products, setProducts] = useState([])
+
+
+  useEffect(() => {
+    if(!isLoading){
+      //console.log("Products:", data)
+      let mappedData = data.data.map((item) => {
+        return {
+          productName:  item?.product?.name,
+          quantity: item?.quantity,
+          unitPrice: item?.unitPrice,
+          amount: item?.amount
+        }
+      })
+      setProducts(mappedData)
+    }
+  }, [isLoading])
+
+
+  const createPDF =  (id, title) => {
+    const pdf = new jsPDF("landscape", "pt", "a4");
+    const data =  document.getElementById(id);
+    pdf.html(data).then(() => {
+      pdf.save(`${title}.pdf`);
+    });
+  };
+
 
   return (
     <div className="page-wrapper">
@@ -31,31 +63,32 @@ const ProformaDetail = () => {
         <div className="card">
           <div className="card-body">
             <div className="card-sales-split">
-              <h2>Sale Detail : SL0101</h2>
+              <h2>Proforma Ref : {state?.proformaRef}</h2>
               <ul>
-                <li>
+                {/* <li>
                   <Link to="#">
                     <img src={EditIcon} alt="img" />
                   </Link>
-                </li>
+                </li> */}
                 <li>
                   <Link to="#">
-                    <img src={Pdf} alt="img" />
+                    <img src={Pdf} alt="img" onClick={() => createPDF("proformaDetails" , "Proforma")}/>
                   </Link>
                 </li>
                 <li>
-                  <Link to="#">
+                  {/* <Link to="#">
                     <img src={Excel} alt="img" />
-                  </Link>
+                  </Link> */}
                 </li>
-                <li>
+                {/* <li>
                   <Link to="#">
                     <img src={Printer} alt="img" />
                   </Link>
-                </li>
+                </li> */}
               </ul>
             </div>
             <div
+             id="proformaDetails"
               className="invoice-box table-height"
               style={{
                 maxWidth: 1600,
@@ -69,6 +102,7 @@ const ProformaDetail = () => {
               }}
             >
               <table
+              
                 cellPadding={0}
                 cellSpacing={0}
                 style={{
@@ -129,7 +163,7 @@ const ProformaDetail = () => {
                                   }}
                                 >
                                   {" "}
-                                  walk-in-customer
+                                  {state?.customerName}
                                 </font>
                               </font>
                               <br />
@@ -176,7 +210,8 @@ const ProformaDetail = () => {
                               </font>
                               <br />
                             </td>
-                            <td
+
+                            {/* <td
                               style={{
                                 padding: 5,
                                 verticalAlign: "top",
@@ -259,6 +294,7 @@ const ProformaDetail = () => {
                               </font>
                               <br />
                             </td>
+
                             <td
                               style={{
                                 padding: 5,
@@ -329,6 +365,7 @@ const ProformaDetail = () => {
                               </font>
                               <br />
                             </td>
+
                             <td
                               style={{
                                 padding: 5,
@@ -397,12 +434,14 @@ const ProformaDetail = () => {
                                 </font>
                               </font>
                               <br />
-                            </td>
+                            </td> */}
                           </tr>
                         </tbody>
                       </table>
                     </td>
                   </tr>
+
+                  {/* Product info */}
                   <tr className="heading " style={{ background: "#F3F2F7" }}>
                     <td
                       style={{
@@ -437,28 +476,8 @@ const ProformaDetail = () => {
                     >
                       Price
                     </td>
-                    <td
-                      style={{
-                        padding: 10,
-                        verticalAlign: "middle",
-                        fontWeight: 600,
-                        color: "#5E5873",
-                        fontSize: 14,
-                      }}
-                    >
-                      Discount
-                    </td>
-                    <td
-                      style={{
-                        padding: 10,
-                        verticalAlign: "middle",
-                        fontWeight: 600,
-                        color: "#5E5873",
-                        fontSize: 14,
-                      }}
-                    >
-                      TAX
-                    </td>
+                   
+                    
                     <td
                       style={{
                         padding: 10,
@@ -471,7 +490,8 @@ const ProformaDetail = () => {
                       Subtotal
                     </td>
                   </tr>
-                  <tr
+                  {products.map((product) => (
+                    <tr
                     className="details"
                     style={{ borderBottom: "1px solid #E9ECEF" }}
                   >
@@ -483,89 +503,26 @@ const ProformaDetail = () => {
                         alignItems: "center",
                       }}
                     >
-                      <img
-                        src={Product1}
-                        alt="img"
-                        className="me-2"
-                        style={{ width: 40, height: 40 }}
-                      />
-                      Macbook pro
+                      
+                     {product?.productName}
                     </td>
-                    <td style={{ padding: 10, verticalAlign: "top" }}>1.00</td>
+                    <td style={{ padding: 10, verticalAlign: "top" }}>{product?.quantity}</td>
                     <td style={{ padding: 10, verticalAlign: "top" }}>
-                      1500.00
+                      {moneyInTxt(product?.unitPrice)}
                     </td>
-                    <td style={{ padding: 10, verticalAlign: "top" }}>0.00</td>
-                    <td style={{ padding: 10, verticalAlign: "top" }}>0.00</td>
+                    
                     <td style={{ padding: 10, verticalAlign: "top" }}>
-                      1500.00
+                     {moneyInTxt(product?.amount)}
                     </td>
                   </tr>
-                  <tr
-                    className="details"
-                    style={{ borderBottom: "1px solid #E9ECEF" }}
-                  >
-                    <td
-                      style={{
-                        padding: 10,
-                        verticalAlign: "top",
-                        display: "flex",
-                        alignItems: "center",
-                      }}
-                    >
-                      <img
-                        src={Product7}
-                        alt="img"
-                        className="me-2"
-                        style={{ width: 40, height: 40 }}
-                      />
-                      Apple Earpods
-                    </td>
-                    <td style={{ padding: 10, verticalAlign: "top" }}>1.00</td>
-                    <td style={{ padding: 10, verticalAlign: "top" }}>
-                      2000.00
-                    </td>
-                    <td style={{ padding: 10, verticalAlign: "top" }}>0.00</td>
-                    <td style={{ padding: 10, verticalAlign: "top" }}>0.00</td>
-                    <td style={{ padding: 10, verticalAlign: "top" }}>
-                      1500.00
-                    </td>
-                  </tr>
-                  <tr
-                    className="details"
-                    style={{ borderBottom: "1px solid #E9ECEF" }}
-                  >
-                    <td
-                      style={{
-                        padding: 10,
-                        verticalAlign: "top",
-                        display: "flex",
-                        alignItems: "center",
-                      }}
-                    >
-                      <img
-                        src={Product8}
-                        alt="img"
-                        className="me-2"
-                        style={{ width: 40, height: 40 }}
-                      />
-                      samsung
-                    </td>
-                    <td style={{ padding: 10, verticalAlign: "top" }}>1.00</td>
-                    <td style={{ padding: 10, verticalAlign: "top" }}>
-                      8000.00
-                    </td>
-                    <td style={{ padding: 10, verticalAlign: "top" }}>0.00</td>
-                    <td style={{ padding: 10, verticalAlign: "top" }}>0.00</td>
-                    <td style={{ padding: 10, verticalAlign: "top" }}>
-                      1500.00
-                    </td>
-                  </tr>
+                  ))}
+                  
+                
                 </tbody>
               </table>
             </div>
             <div className="row">
-              <div className="col-lg-3 col-sm-6 col-12">
+              {/* <div className="col-lg-3 col-sm-6 col-12">
                 <div className="form-group">
                   <label>Order Tax</label>
                   <input type="text" />
@@ -594,19 +551,19 @@ const ProformaDetail = () => {
                     }}
                   />
                 </div>
-              </div>
+              </div> */}
               <div className="row">
                 <div className="col-lg-6 ">
                   <div className="total-order w-100 max-widthauto m-auto mb-4">
                     <ul>
-                      <li>
+                      {/* <li>
                         <h4>Order Tax</h4>
                         <h5>$ 0.00 (0.00%)</h5>
                       </li>
                       <li>
                         <h4>Discount </h4>
                         <h5>$ 0.00</h5>
-                      </li>
+                      </li> */}
                     </ul>
                   </div>
                 </div>
@@ -614,24 +571,24 @@ const ProformaDetail = () => {
                   <div className="total-order w-100 max-widthauto m-auto mb-4">
                     <ul>
                       <li>
-                        <h4>Shipping</h4>
-                        <h5>$ 0.00</h5>
+                        <h4>Number of Products</h4>
+                        <h5>{products.length}</h5>
                       </li>
                       <li className="total">
                         <h4>Grand Total</h4>
-                        <h5>$ 0.00</h5>
+                        <h5>GHS {moneyInTxt(products.reduce((total, item) => total + item?.amount, 0))}</h5>
                       </li>
                     </ul>
                   </div>
                 </div>
               </div>
               <div className="col-lg-12">
-                <Link to="#" className="btn btn-submit me-2">
+                {/* <Link to="#" className="btn btn-submit me-2">
                   Update
                 </Link>
                 <Link to="#" className="btn btn-cancel">
                   Cancel
-                </Link>
+                </Link> */}
               </div>
             </div>
           </div>
