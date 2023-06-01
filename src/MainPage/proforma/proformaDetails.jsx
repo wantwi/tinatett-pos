@@ -87,8 +87,8 @@ const ProformaDetail = () => {
                 </li> */}
               </ul>
             </div>
-            <div
-             id="proformaDetails"
+          <div  id="proformaDetails">
+            <div     
               className="invoice-box table-height"
               style={{
                 maxWidth: 1600,
@@ -494,6 +494,7 @@ const ProformaDetail = () => {
                     <tr
                     className="details"
                     style={{ borderBottom: "1px solid #E9ECEF" }}
+                    key={product?.productId}
                   >
                     <td
                       style={{
@@ -572,16 +573,17 @@ const ProformaDetail = () => {
                     <ul>
                       <li>
                         <h4>Number of Products</h4>
-                        <h5>{products.length}</h5>
+                        <h5 style={{textAlign:'left'}}>{products.length}</h5>
                       </li>
                       <li className="total">
                         <h4>Grand Total</h4>
-                        <h5>GHS {moneyInTxt(products.reduce((total, item) => total + item?.amount, 0))}</h5>
+                        <h5 style={{textAlign:'left'}}>GHS {moneyInTxt(products.reduce((total, item) => total + item?.amount, 0))}</h5>
                       </li>
                     </ul>
                   </div>
                 </div>
               </div>
+          </div>
               <div className="col-lg-12">
                 {/* <Link to="#" className="btn btn-submit me-2">
                   Update

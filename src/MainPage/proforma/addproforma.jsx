@@ -34,32 +34,17 @@ const AddProforma = () => {
 
   const {data: customers,isError,isLoading: isCustomerLoading,isSuccess} = useGet("customers", "/customer");
   const { data: products, isLoading: isProductLoading} = useGet("products", "/product");
-  const { isLoading, data, isError: isPostError, error, mutate } = usePost("/proforma");
+  const { isLoading, isError: isPostError, error, mutate } = usePost("/proforma");
 
   const [selectedProduct, setSelectedProduct] = useState('')
   const [selectedCustomer, setSelectedCustomer] = useState('')
   const [formData, setFormData] = useState({amount:'', quantity:'', price:''})
   const [productGridData, setProductGridData] = useState([])
   const [transDate, setTransDate] = useState(new Date().toISOString().slice(0,10));
-  const priceTypeRef = useRef()
-
-  const validationSchema = Yup.object().shape({
-    quantity: Yup.number().required("Quantity is required"),
-  });
-  const {
-    register,
-    handleSubmit,
-    reset,
-    getValues,
-    formState: { errors, isSubmitSuccessful },
-  } = useForm({
-    defaultValues: {
-      quantity: '',
-    },
-    resolver: yupResolver(validationSchema),
-  });
-
-
+  const retailpriceTypeRef = useRef()
+  const specialpriceTypeRef = useRef()
+  const wholesalepriceTypeRef = useRef()
+  const [isSubmitSuccessful, setIsSubmitSuccessful] = useState(false)
 
 
   useEffect(() => {
@@ -146,13 +131,15 @@ const AddProforma = () => {
       setProductGridData([...productGridData, item])
       setFormData({  quantity: '', amount: ''})
       setSelectedProduct('')
-      console.log("XXX", priceTypeRef.current) 
+      retailpriceTypeRef.current.checked = false
+      wholesalepriceTypeRef.current.checked = false
+      specialpriceTypeRef.current.checked = false
       
    }
    
   }
 
-  const onSubmit = (data) => {
+  const onSubmit = () => {
 
     if(productGridData.length < 1){
       alertify.set("notifier", "position", "top-right");
@@ -165,11 +152,23 @@ const AddProforma = () => {
         products: productGridData
       }
       mutate(postBody)
-      setSelectedCustomer({})
-      setSelectedProduct({})
-      setFormData({amount:'', quantity:'', price:''})
-      setProductGridData([])
-      setTransDate('')
+
+      if(!isError){
+        setTimeout(() => {
+          setIsSubmitSuccessful(true)
+        },1500)
+        setSelectedCustomer({})
+        setSelectedProduct({})
+        setFormData({amount:'', quantity:'', price:''})
+        setProductGridData([])
+        setTransDate('')
+      }
+      else{
+        alertify.set("notifier", "position", "top-right");
+        alertify.warning("Unable to save. Please try again"); 
+      }
+     
+     
     }
     
   
@@ -187,9 +186,9 @@ const AddProforma = () => {
     return <LoadingSpinner/>
   }
 
-  if(isLoading){
-    return <LoadingSpinner message="Saving Proforma.."/>
-  }
+  // if(isLoading){
+  //   return <LoadingSpinner message="Saving Proforma.."/>
+  // }
 
   return (
     <div className="page-wrapper">
@@ -270,7 +269,7 @@ const AddProforma = () => {
 
                               <div class="input-group">
                                 <div class="input-group-text">
-                                  <input className="form-check-input" type="radio" name="customerType" value={selectedProduct?.retailPrice} ref={priceTypeRef}
+                                  <input className="form-check-input" type="radio" name="customerType" value={selectedProduct?.retailPrice} ref={retailpriceTypeRef}
                                   onChange={(e) => {                                   
                                     setFormData({...formData,price:selectedProduct.retailPrice, amount: formData.quantity ? selectedProduct?.retailPrice * formData.quantity : selectedProduct?.retailPrice * 1})
                                     //console.log(selectedProduct?.retailPrice, formData.quantity, formData.amount)
@@ -284,7 +283,7 @@ const AddProforma = () => {
                             <div class="col-lg-6">
                               <div class="input-group">
                                 <div class="input-group-text">
-                                  <input className="form-check-input" type="radio" name="customerType" value={selectedProduct?.wholeSalePrice} ref={priceTypeRef}
+                                  <input className="form-check-input" type="radio" name="customerType" value={selectedProduct?.wholeSalePrice} ref={wholesalepriceTypeRef}
                                   onChange={(e) => {
                                     setFormData({...formData,price:selectedProduct.wholeSalePrice, amount: formData.quantity ? selectedProduct.wholeSalePrice * formData.quantity : selectedProduct.wholeSalePrice * 1})
                                     //console.log(selectedProduct?.wholeSalePrice, formData.quantity, formData.amount)
@@ -300,7 +299,7 @@ const AddProforma = () => {
 
                               <div class="input-group">
                                 <div class="input-group-text">
-                                  <input className="form-check-input" type="radio" name="customerType" value={selectedProduct?.specialPrice} ref={priceTypeRef}
+                                  <input className="form-check-input" type="radio" name="customerType" value={selectedProduct?.specialPrice} ref={specialpriceTypeRef}
                                   onChange={(e) => {    
                                     setFormData({...formData, price:selectedProduct.specialPrice, amount: formData.quantity ? selectedProduct.specialPrice * formData.quantity : selectedProduct.specialPrice * 1})
                                     //console.log(selectedProduct?.specialPrice, formData.quantity, formData.amount)

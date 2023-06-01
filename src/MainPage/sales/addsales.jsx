@@ -127,7 +127,7 @@ const Addsales = () => {
 
   const handleProductSelect = (e) => {
     setSelectedProduct(e)
-
+    console.log
   }
 
   useEffect(() => {
@@ -442,7 +442,7 @@ const Addsales = () => {
                       <input
                         className="form-control"
                         type="text"
-                        value={formData.quantity ? formData.quantity * price : ''}
+                        value={formData.quantity ? formData.quantity * price : price * 1}  
                       />
                       
                     </div>
