@@ -177,7 +177,7 @@ const ProformaDetail = () => {
                                   }}
                                 >
                                   {" "}
-                                  walk-in-customer@example.com
+                                  {state?.customer?.email}
                                 </font>
                               </font>
                               <br />
@@ -191,7 +191,7 @@ const ProformaDetail = () => {
                                   }}
                                 >
                                   {" "}
-                                  123456780
+                                  {state?.customer?.contact}
                                 </font>
                               </font>
                               <br />
@@ -205,7 +205,7 @@ const ProformaDetail = () => {
                                   }}
                                 >
                                   {" "}
-                                  N45 , Dhaka
+                                  {state?.customer?.location}
                                 </font>
                               </font>
                               <br />

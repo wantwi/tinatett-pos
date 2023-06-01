@@ -52,6 +52,7 @@ const ProformaList = () => {
           return {
             id: proforma?.id,
             customerName: proforma.customer?.name,
+            customer: proforma?.customer,
             status: proforma?.status,
             date:new Date(proforma.createdAt).toISOString().substring(0,10),
             proformaRef: proforma?.proformaRef,

@@ -270,9 +270,16 @@ const AddProforma = () => {
                               <div class="input-group">
                                 <div class="input-group-text">
                                   <input className="form-check-input" type="radio" name="customerType" value={selectedProduct?.retailPrice} ref={retailpriceTypeRef}
-                                  onChange={(e) => {                                   
-                                    setFormData({...formData,price:selectedProduct.retailPrice, amount: formData.quantity ? selectedProduct?.retailPrice * formData.quantity : selectedProduct?.retailPrice * 1})
-                                    //console.log(selectedProduct?.retailPrice, formData.quantity, formData.amount)
+                                  onChange={(e) => {     
+                                    if(selectedProduct == ''){
+                                      alertify.set("notifier", "position", "top-right");
+                                      alertify.warning("Please select a product first.");
+                                      retailpriceTypeRef.current.checked =false
+                                    } else{
+                                      setFormData({...formData,price:selectedProduct.retailPrice, amount: formData.quantity ? selectedProduct?.retailPrice * formData.quantity : selectedProduct?.retailPrice * 1})
+                                      //console.log(selectedProduct?.retailPrice, formData.quantity, formData.amount)
+                                    }                             
+                                    
                                   }} />
                                 </div>
                                 <input type="text" className="form-control" aria-label="Text input with radio button" value={'Retail Price'} />
@@ -285,8 +292,15 @@ const AddProforma = () => {
                                 <div class="input-group-text">
                                   <input className="form-check-input" type="radio" name="customerType" value={selectedProduct?.wholeSalePrice} ref={wholesalepriceTypeRef}
                                   onChange={(e) => {
-                                    setFormData({...formData,price:selectedProduct.wholeSalePrice, amount: formData.quantity ? selectedProduct.wholeSalePrice * formData.quantity : selectedProduct.wholeSalePrice * 1})
-                                    //console.log(selectedProduct?.wholeSalePrice, formData.quantity, formData.amount)
+                                    if(selectedProduct == ''){
+                                      alertify.set("notifier", "position", "top-right");
+                                      alertify.warning("Please select a product first.");
+                                      wholesalepriceTypeRef.current.checked = false
+                                    } else{
+                                      setFormData({...formData,price:selectedProduct.wholeSalePrice, amount: formData.quantity ? selectedProduct.wholeSalePrice * formData.quantity : selectedProduct.wholeSalePrice * 1})
+                                      //console.log(selectedProduct?.wholeSalePrice, formData.quantity, formData.amount)
+                                    }   
+                                   
                                   }} />
                                 </div>
                                 <input type="text" className="form-control" aria-label="Text input with radio button" value={'Wholesale Price'}/>
@@ -300,9 +314,16 @@ const AddProforma = () => {
                               <div class="input-group">
                                 <div class="input-group-text">
                                   <input className="form-check-input" type="radio" name="customerType" value={selectedProduct?.specialPrice} ref={specialpriceTypeRef}
-                                  onChange={(e) => {    
-                                    setFormData({...formData, price:selectedProduct.specialPrice, amount: formData.quantity ? selectedProduct.specialPrice * formData.quantity : selectedProduct.specialPrice * 1})
-                                    //console.log(selectedProduct?.specialPrice, formData.quantity, formData.amount)
+                                  onChange={(e) => {  
+                                    if(selectedProduct == ''){
+                                      alertify.set("notifier", "position", "top-right");
+                                      alertify.warning("Please select a product first.");
+                                      specialpriceTypeRef.current.checked = false
+                                    } else{
+                                      setFormData({...formData, price:selectedProduct.specialPrice, amount: formData.quantity ? selectedProduct.specialPrice * formData.quantity : selectedProduct.specialPrice * 1})
+                                      //console.log(selectedProduct?.specialPrice, formData.quantity, formData.amount)
+                                    }     
+                                    
                                   }} />
                                 </div>
                                 <input type="text" className="form-control" aria-label="Text input with radio button" value={'Special Price'} />
