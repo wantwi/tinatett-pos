@@ -122,7 +122,7 @@ const SignInPage = (props) => {
                         className={` ${errors.password ? "is-invalid" : ""}`}
                         placeholder="Enter your password"
                         {...register("password")}
-                        defaultValue={123456}
+                        defaultValue={''}
                       />
                       <span
                         onClick={onEyeClick}

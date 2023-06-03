@@ -88,6 +88,15 @@ const ProformaDetail = () => {
               </ul>
             </div>
           <div  id="proformaDetails">
+            <div>
+                      <h5 style={{textAlign:'center', fontWeight:900}}>TINATETT HERBAL MANUFACTURING AND MARKKETING COMPANY LIMITED</h5>
+                     <center>
+                       <span style={{textAlign:'center'}}>P.O. BOX CO 2699, TEMA-ACCRA, WHOLESALE AND RETAIL OF HERBAL MEDICINE </span><br/>
+                      <span style={{textAlign:'center'}}>KOTOBABI SPINTEX - FACTORY WEARHOUSE, 02081660807, tinatettonline@gmail.com</span>
+                      </center>
+                      <h5 style={{textAlign:'center', textDecoration:'underline', fontWeight:700, marginTop:30}}>PROFORMA INVOICE</h5>
+            </div>
+                     
             <div     
               className="invoice-box table-height"
               style={{
