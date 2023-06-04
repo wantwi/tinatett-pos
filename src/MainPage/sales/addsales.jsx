@@ -38,6 +38,9 @@ const Addsales = () => {
   const [selectedProduct, setSelectedProduct] = useState({})
   const [selectedProductInfo, setSelectedProductInfo] = useState()
   const [price, setPrice] = useState(0)
+  const [retailprice, setRetailPrice] = useState('')
+  const [wholesaleprice, setWholesalePrice] = useState('')
+  const [specialprice, setSpecialPrice] = useState('')
   const [formData, setFormData] = useState({quantity:'', amount:'', batchNo:'', manuDate:'', expDate:''})
   const [salesType, setSalesType] = useState('Retail')
   const [paymentData, setPaymentData] = useState({paymentType:'', accountNo:'', branch: ''})
@@ -127,7 +130,10 @@ const Addsales = () => {
 
   const handleProductSelect = (e) => {
     setSelectedProduct(e)
-    console.log
+    setRetailPrice('(' + e.retailPrice + 'GHS)')
+    setWholesalePrice('(' + e.wholeSalePrice  + 'GHS)')
+    setSpecialPrice('(' + e.specialPrice  + 'GHS)')
+    //console.log(e)
   }
 
   useEffect(() => {
@@ -224,7 +230,7 @@ const Addsales = () => {
                                  setSalesType(e.target.value)}}
                                 />
                               </div>
-                              <input type="text" className="form-control" aria-label="Text input with radio button"  placeholder="Retail" />
+                              <input type="text" className="form-control" aria-label="Text input with radio button"  placeholder={`Retail`} />
                             </div>
                           
                           </div>
@@ -236,7 +242,7 @@ const Addsales = () => {
                                  setSalesType(e.target.value)}}
                                 />
                               </div>
-                              <input type="text" className="form-control" aria-label="Text input with radio button" placeholder={'Wholesale'} />
+                              <input type="text" className="form-control" aria-label="Text input with radio button" placeholder={`Wholesale`} />
                             </div>
                         </div>
 
@@ -386,7 +392,7 @@ const Addsales = () => {
                                   setDisableUnselectedPrice({retail:false, wholesale:true, special:true})
                                 }}/>
                               </div>
-                              <input type="text" className="form-control" aria-label="Text input with radio button"  placeholder="Retail" disabled={disabledUnselectedPrice.retail}/>
+                              <input type="text" className="form-control" aria-label="Text input with radio button"  placeholder={`Retail ${retailprice}`} disabled={disabledUnselectedPrice.retail}/>
                             </div>
                           
                           </div>
@@ -399,7 +405,7 @@ const Addsales = () => {
                                   setDisableUnselectedPrice({wholesale:false, retail:true, special:true})}
                                  } />
                               </div>
-                              <input type="text" className="form-control" aria-label="Text input with radio button" placeholder={'Wholesale'} disabled={disabledUnselectedPrice.wholesale}/>
+                              <input type="text" className="form-control" aria-label="Text input with radio button" placeholder={`Wholesale ${wholesaleprice}`} disabled={disabledUnselectedPrice.wholesale}/>
                             </div>
                         </div>
 
@@ -412,7 +418,7 @@ const Addsales = () => {
                                   setDisableUnselectedPrice({special:false, wholesale:true, retail:true})
                                 } }/>
                               </div>
-                              <input type="text" className="form-control" aria-label="Text input with radio button" placeholder={'Special'} disabled={disabledUnselectedPrice.special} />
+                              <input type="text" className="form-control" aria-label="Text input with radio button" placeholder={`Special ${specialprice}`} disabled={disabledUnselectedPrice.special} />
                             </div>
                           
                           </div>

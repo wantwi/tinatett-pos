@@ -176,7 +176,7 @@ const deleteRow = (row) => {
       alertify.set("notifier", "position", "top-right");
       alertify.success("Purchase updated successfully.");
       setTimeout(() => {
-        history.push('/dream-pos/purchase/purchaselist')
+        history.push('/tinatett-pos/purchase/purchaselist')
       })
     }
     else if(isError){
@@ -517,7 +517,7 @@ const deleteRow = (row) => {
                   
                   <div className="col-lg-12" style={{textAlign:'right'}}>
                     <button className="btn btn-submit me-2" type="submit" onClick={onSubmit}>Update</button>
-                    <Link to="/dream-pos/purchase/purchaselist" className="btn btn-cancel">
+                    <Link to="/tinatett-pos/purchase/purchaselist" className="btn btn-cancel">
                     Cancel
                    </Link>
                   </div>

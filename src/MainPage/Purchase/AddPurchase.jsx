@@ -472,7 +472,7 @@ const AddPurchase = () => {
                     
                     <div className="col-lg-12" style={{textAlign:'right'}}>
                       <button className="btn btn-submit me-2" type="submit" onClick={onSubmit}><FeatherIcon icon="save"/>Save</button>
-                      <Link to="/dream-pos/purchase/purchaselist" className="btn btn-cancel">
+                      <Link to="/tinatett-pos/purchase/purchaselist" className="btn btn-cancel">
                         Cancel
                       </Link>
                     </div>

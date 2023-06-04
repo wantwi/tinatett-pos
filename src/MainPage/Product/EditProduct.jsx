@@ -72,7 +72,7 @@ const EditProduct = () => {
       alertify.set("notifier", "position", "top-right");
       alertify.success("Product updated successfully.");
       setTimeout(() => {
-        history.push('/dream-pos/product/productlist')
+        history.push('/tinatett-pos/product/productlist')
       })
     }
     else if(isError){
@@ -292,7 +292,7 @@ const EditProduct = () => {
                   >
                     Update
                   </button>
-                  <Link to="/dream-pos/product/productlist" className="btn btn-cancel">
+                  <Link to="/tinatett-pos/product/productlist" className="btn btn-cancel">
                     Cancel
                   </Link>
                 </div>

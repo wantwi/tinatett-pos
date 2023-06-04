@@ -205,7 +205,7 @@ const ProformaList = () => {
             </Link>
             <ul className="dropdown-menu">
               <li>
-                <Link className="dropdown-item" to={{pathname:"/dream-pos/proforma/proforma-details", state:record}}>
+                <Link className="dropdown-item" to={{pathname:"/tinatett-pos/proforma/proforma-details", state:record}}>
                   <img src={Eye1} className="me-2" alt="img" />
                   View Details
                 </Link>
@@ -237,7 +237,7 @@ const ProformaList = () => {
               <h6>Manage your Proformas</h6>
             </div>
             <div className="page-btn">
-              <Link to="/dream-pos/proforma/add-proforma" className="btn btn-added">
+              <Link to="/tinatett-pos/proforma/add-proforma" className="btn btn-added">
                 <img src={PlusIcon} alt="img" className="me-1" />
                 Add Proforma
               </Link>

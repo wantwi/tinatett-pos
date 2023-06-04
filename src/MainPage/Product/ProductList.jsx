@@ -136,10 +136,10 @@ const ProductList = () => {
       render: (text, record) => (
         <>
           <>
-            {/* <Link className="me-3" to="/dream-pos/product/product-details">
+            {/* <Link className="me-3" to="/tinatett-pos/product/product-details">
               <img src={EyeIcon} alt="img" />
             </Link> */}
-            <Link className="me-3" to={{ pathname:`/dream-pos/product/editproduct`, state:record}} title="Edit Product">
+            <Link className="me-3" to={{ pathname:`/tinatett-pos/product/editproduct`, state:record}} title="Edit Product">
               <img src={EditIcon} alt="img" />
             </Link>
             <Link className="confirm-text" to="#" onClick={confirmText} title="Delete Product">
@@ -166,7 +166,7 @@ const ProductList = () => {
             </div>
             <div className="page-btn">
               <Link
-                to="/dream-pos/product/addproduct"
+                to="/tinatett-pos/product/addproduct"
                 className="btn btn-added"
               >
                 <img src={PlusIcon} alt="img" className="me-1" />

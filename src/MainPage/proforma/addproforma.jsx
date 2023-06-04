@@ -500,7 +500,7 @@ const AddProforma = () => {
                     data-bs-target="#create" >
                     Refresh
                   </Link> */}
-                  <Link to="/dream-pos/proforma/proformalist" className="btn btn-cancel">
+                  <Link to="/tinatett-pos/proforma/proformalist" className="btn btn-cancel">
                     Cancel
                   </Link>
                 </div>

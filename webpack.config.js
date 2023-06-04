@@ -48,7 +48,8 @@ module.exports = {
     hotUpdateMainFilename: "hot/hot-update.json",
   },
   devServer: {
-    contentBase: "./src/index.js",
+    //contentBase: "./src/index.js",
+    contentBase: "/",
     host: "localhost",
     compress: true,
     port: 3000, // port number
@@ -61,7 +62,8 @@ module.exports = {
       apiUrl: "",
       imageapiUrl: "",
 
-      publicPath: "/tinatett/pos/",
+      //publicPath: "/tinatett/pos/",
+      publicPath:'/'
     }),
   },
   resolve: {

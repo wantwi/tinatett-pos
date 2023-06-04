@@ -68,7 +68,7 @@ const EditCustomer = () => {
       alertify.set("notifier", "position", "top-right");
       alertify.success("Customer updated successfully.");
       setTimeout(() => {
-        history.push('/dream-pos/people/customerlist')
+        history.push('/tinatett-pos/people/customerlist')
       })
     }
     return () => {};
@@ -157,7 +157,7 @@ const EditCustomer = () => {
                 </div>
                 <div className="col-lg-12" style={{textAlign:'right'}}>
                   <button  type="submit" className="btn btn-submit me-2">Update</button>
-                  <Link to="/dream-pos/people/customerlist" className="btn btn-cancel">
+                  <Link to="/tinatett-pos/people/customerlist" className="btn btn-cancel">
                     Cancel
                   </Link>
                 </div>

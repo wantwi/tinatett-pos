@@ -44,7 +44,7 @@ export default function App(props) {
                         <Route path="/signIn" component={SignIn} />
                         <Route path="/forgetPassword" component={ForgetPassword} />
                         <Route path="/signUp" component={SignUp} />
-                        <Route path="/dream-pos" component={DefaultLayout} />
+                        <Route path="/tinatett-pos" component={DefaultLayout} />
                         <Route path="/error-404" component={Error404} />
                         <Route path="/error-500" component={Error500} />
                         <Route path="/pos" component={Pos} />

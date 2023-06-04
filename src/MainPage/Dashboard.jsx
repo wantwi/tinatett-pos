@@ -271,7 +271,7 @@ const Dashboard = (props) => {
   //   return <h2>Loading..</h2>;
   // }
 
-  console.log({ dashboard: auth });
+  //console.log({ dashboard: auth });
 
   return (
     <>

@@ -132,7 +132,7 @@ const SupplierList = () => {
       title: "Action",
       render: (a, record) => (
         <>
-          <Link className="me-3" to={{pathname:"/dream-pos/people/editsupplier", state:record}}>
+          <Link className="me-3" to={{pathname:"/tinatett-pos/people/editsupplier", state:record}}>
             <img src={EditIcon} alt="img" />
           </Link>
           <Link className="confirm-text" to="#" onClick={confirmText}>
@@ -158,7 +158,7 @@ const SupplierList = () => {
             </div>
             <div className="page-btn">
               <Link
-                to="/dream-pos/people/addsupplier"
+                to="/tinatett-pos/people/addsupplier"
                 className="btn btn-added"
               >
                 <img src={PlusIcon} alt="img" className="me-1" />

@@ -16,7 +16,7 @@ import FeatherIcon from "feather-icons-react";
 
 const options = [
   { id: 0, label: "Cash", value: "Cash" },
-  { id: 1, label: "Cheque", value: "Cheque" },
+  { id: 1, label: "Bank", value: "Bank" },
   { id: 2, label: "Momo", value: "Momo" }
 ];
 
@@ -51,7 +51,8 @@ const AddSupplier = () => {
       customerType: 0,
       type: 0,
       creditPeriod:"",
-      othercontact:""
+      othercontact:"",
+      details:""
 
     },
     resolver: yupResolver(validationSchema),
@@ -267,7 +268,18 @@ const AddSupplier = () => {
                         </div>
                       </div>
 
-                      {paymentType.label == 'Cheque' ?(<div className="col-lg-4 col-sm-6 col-12">
+                     <div className="col-lg-4 col-sm-6 col-12">
+                        <div className="form-group">
+                          <label>{paymentType?.label || 'Ass'} Details</label>
+                          <textarea className={`form-control ${errors.name ? "is-invalid" : ""
+                            }`}
+                            type="text"
+                            {...register("details")} ></textarea>
+                        </div>
+                      </div>
+
+
+                      {/* {paymentType.label == 'Cheque' ?(<div className="col-lg-4 col-sm-6 col-12">
                         <div className="form-group">
                           <label>Account Number</label>
                           <input className={`form-control ${errors.name ? "is-invalid" : ""
@@ -316,7 +328,8 @@ const AddSupplier = () => {
                             {...register("serviceProvider")} />
                         </div>
                       </div>) : null}
-                    </div>
+                      */}
+                    </div> 
                   </fieldset>
 
 

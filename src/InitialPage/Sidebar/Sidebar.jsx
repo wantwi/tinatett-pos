@@ -34,7 +34,7 @@ const Sidebar = (props) => {
     document.body.classList.add("expand-menu");
   };
   const pageRefresh = (url, page) => {
-    history.push(`/dream-pos/${url}/${page}`);
+    history.push(`/tinatett-pos/${url}/${page}`);
     window.location.reload();
   };
   const location = useLocation();
@@ -63,7 +63,7 @@ const Sidebar = (props) => {
               {/* Dashboard */}
               <li className={pathname.includes("dashboard") ? "active" : ""}>
                 <Link
-                  to="/dream-pos/dashboard"
+                  to="/tinatett-pos/dashboard"
                   onClick={() => toggleSidebar(isSideMenu == "" ? "" : "")}
                 >
                   <img src={Dashboard} alt="img" />
@@ -76,7 +76,7 @@ const Sidebar = (props) => {
                 <a
                   href="#"
                   className={
-                    pathname.includes("/dream-pos/product")
+                    pathname.includes("/tinatett-pos/product")
                       ? "active subdrop"
                       : "" || isSideMenu == "product"
                         ? "subdrop active"
@@ -96,7 +96,7 @@ const Sidebar = (props) => {
                         className={
                           pathname.includes("addproduct-") ? "active" : ""
                         }
-                        to="/dream-pos/product/addproduct"
+                        to="/tinatett-pos/product/addproduct"
                       >
                         Add Product
                       </Link>
@@ -106,7 +106,7 @@ const Sidebar = (props) => {
                         className={
                           pathname.includes("productlist-") ? "active" : ""
                         }
-                        to="/dream-pos/product/productlist"
+                        to="/tinatett-pos/product/productlist"
                       >
                         Product List
                       </Link>
@@ -117,7 +117,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("categorylist-") ? "active" : ""
                           }
-                          to="/dream-pos/product/categorylist-product"
+                          to="/tinatett-pos/product/categorylist-product"
                         >
                           Category List
                         </Link>
@@ -127,7 +127,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("addcategory-") ? "active" : ""
                           }
-                          to="/dream-pos/product/addcategory-product"
+                          to="/tinatett-pos/product/addcategory-product"
                         >
                           Add Category{" "}
                         </Link>
@@ -139,7 +139,7 @@ const Sidebar = (props) => {
                               ? "active"
                               : ""
                           }
-                          to="/dream-pos/product/subcategorytable-product"
+                          to="/tinatett-pos/product/subcategorytable-product"
                         >
                           Sub Category List
                         </Link>
@@ -149,7 +149,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("addsubcategory-") ? "active" : ""
                           }
-                          to="/dream-pos/product/addsubcategory-product"
+                          to="/tinatett-pos/product/addsubcategory-product"
                         >
                           Add Sub Category{" "}
                         </Link>
@@ -159,7 +159,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("brandlist-") ? "active" : ""
                           }
-                          to="/dream-pos/product/brandlist-product"
+                          to="/tinatett-pos/product/brandlist-product"
                         >
                           Brand list{" "}
                         </Link>
@@ -169,7 +169,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("addbrand-") ? "active" : ""
                           }
-                          to="/dream-pos/product/addbrand-product"
+                          to="/tinatett-pos/product/addbrand-product"
                         >
                           Add Brand
                         </Link>
@@ -179,7 +179,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("importproduct-") ? "active" : ""
                           }
-                          to="/dream-pos/product/importproduct-product"
+                          to="/tinatett-pos/product/importproduct-product"
                         >
                           Import Product
                         </Link>
@@ -189,7 +189,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("printbarcode-") ? "active" : ""
                           }
-                          to="/dream-pos/product/printbarcode-product"
+                          to="/tinatett-pos/product/printbarcode-product"
                         >
                           Print Barcode
                         </Link>
@@ -205,7 +205,7 @@ const Sidebar = (props) => {
                 <a
                   href="#"
                   className={
-                    pathname.includes("/dream-pos/customer")
+                    pathname.includes("/tinatett-pos/customer")
                       ? "subdrop active"
                       : "" || isSideMenu == "customer"
                         ? "subdrop active"
@@ -226,7 +226,7 @@ const Sidebar = (props) => {
                         className={
                           pathname.includes("addcustomer-") ? "active" : ""
                         }
-                        to="/dream-pos/people/addcustomer"
+                        to="/tinatett-pos/people/addcustomer"
                       >
                         Add Customer
                       </Link>
@@ -236,7 +236,7 @@ const Sidebar = (props) => {
                         className={
                           pathname.includes("customerlist-") ? "active" : ""
                         }
-                        to="/dream-pos/people/customerlist"
+                        to="/tinatett-pos/people/customerlist"
                       >
                         Customer List
                       </Link>
@@ -249,7 +249,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("userlist-") ? "active" : ""
                           }
-                          to="/dream-pos/people/userlist-people"
+                          to="/tinatett-pos/people/userlist-people"
                         >
                           User List
                         </Link>
@@ -259,7 +259,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("adduser-") ? "active" : ""
                           }
-                          to="/dream-pos/people/adduser-people"
+                          to="/tinatett-pos/people/adduser-people"
                         >
                           Add User
                         </Link>
@@ -269,7 +269,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("storelist-") ? "active" : ""
                           }
-                          to="/dream-pos/people/storelist-people"
+                          to="/tinatett-pos/people/storelist-people"
                         >
                           Store List
                         </Link>
@@ -279,7 +279,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("addstore-") ? "active" : ""
                           }
-                          to="/dream-pos/people/addstore-people"
+                          to="/tinatett-pos/people/addstore-people"
                         >
                           Add Store
                         </Link>
@@ -295,7 +295,7 @@ const Sidebar = (props) => {
                 <a
                   href="#"
                   className={
-                    pathname.includes("/dream-pos/supplier")
+                    pathname.includes("/tinatett-pos/supplier")
                       ? "subdrop active"
                       : "" || isSideMenu == "supplier"
                         ? "subdrop active"
@@ -316,7 +316,7 @@ const Sidebar = (props) => {
                         className={
                           pathname.includes("addsupplier-") ? "active" : ""
                         }
-                        to="/dream-pos/people/addsupplier"
+                        to="/tinatett-pos/people/addsupplier"
                       >
                         Add Supplier
                       </Link>
@@ -326,7 +326,7 @@ const Sidebar = (props) => {
                         className={
                           pathname.includes("supplierlist-") ? "active" : ""
                         }
-                        to="/dream-pos/people/supplierlist"
+                        to="/tinatett-pos/people/supplierlist"
                       >
                         Supplier List
                       </Link>
@@ -337,7 +337,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("userlist-") ? "active" : ""
                           }
-                          to="/dream-pos/people/userlist-people"
+                          to="/tinatett-pos/people/userlist-people"
                         >
                           User List
                         </Link>
@@ -347,7 +347,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("adduser-") ? "active" : ""
                           }
-                          to="/dream-pos/people/adduser-people"
+                          to="/tinatett-pos/people/adduser-people"
                         >
                           Add User
                         </Link>
@@ -357,7 +357,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("storelist-") ? "active" : ""
                           }
-                          to="/dream-pos/people/storelist-people"
+                          to="/tinatett-pos/people/storelist-people"
                         >
                           Store List
                         </Link>
@@ -367,7 +367,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("addstore-") ? "active" : ""
                           }
-                          to="/dream-pos/people/addstore-people"
+                          to="/tinatett-pos/people/addstore-people"
                         >
                           Add Store
                         </Link>
@@ -383,7 +383,7 @@ const Sidebar = (props) => {
                 <a
                   href="#"
                   className={
-                    pathname.includes("/dream-pos/purchase")
+                    pathname.includes("/tinatett-pos/purchase")
                       ? "subdrop active"
                       : "" || isSideMenu == "purchase"
                         ? "subdrop active"
@@ -404,7 +404,7 @@ const Sidebar = (props) => {
                         className={
                           pathname.includes("addpurchase-") ? "active" : ""
                         }
-                        to="/dream-pos/purchase/addpurchase"
+                        to="/tinatett-pos/purchase/addpurchase"
                       >
                         Add Purchase
                       </Link>
@@ -414,7 +414,7 @@ const Sidebar = (props) => {
                         className={
                           pathname.includes("purchaselist-") ? "active" : ""
                         }
-                        to="/dream-pos/purchase/purchaselist"
+                        to="/tinatett-pos/purchase/purchaselist"
                       >
                         Purchase List
                       </Link>
@@ -425,7 +425,7 @@ const Sidebar = (props) => {
                         className={
                           pathname.includes("importpurchase-") ? "active" : ""
                         }
-                        to="/dream-pos/purchase/importpurchase-purchase"
+                        to="/tinatett-pos/purchase/importpurchase-purchase"
                       >
                         Import Purchase
                       </Link>
@@ -441,7 +441,7 @@ const Sidebar = (props) => {
                 <a
                   href="#"
                   className={
-                    pathname.includes("/dream-pos/proforma")
+                    pathname.includes("/tinatett-pos/proforma")
                       ? "active subdrop"
                       : "" || isSideMenu == "proforma"
                         ? "subdrop active"
@@ -458,7 +458,7 @@ const Sidebar = (props) => {
                   <ul>
                      <li>
                       <Link
-                        to="/dream-pos/proforma/add-proforma"
+                        to="/tinatett-pos/proforma/add-proforma"
                         className={
                           pathname.includes("add-proforma") ? "active" : ""
                         }
@@ -471,7 +471,7 @@ const Sidebar = (props) => {
                         className={
                           pathname.includes("proformalist") ? "active" : ""
                         }
-                        to="/dream-pos/proforma/proformalist"
+                        to="/tinatett-pos/proforma/proformalist"
                       >
                         Proforma List
                       </Link>
@@ -483,7 +483,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("salesreturnlist") ? "active" : ""
                           }
-                          to="/dream-pos/sales/salesreturnlist-return"
+                          to="/tinatett-pos/sales/salesreturnlist-return"
                         >
                           Sales Return List
                         </Link>
@@ -493,7 +493,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("addsalesreturn") ? "active" : ""
                           }
-                          to="/dream-pos/sales/addsalesreturn-return"
+                          to="/tinatett-pos/sales/addsalesreturn-return"
                         >
                           New Sales Return
                         </Link>
@@ -509,7 +509,7 @@ const Sidebar = (props) => {
                 <a
                   href="#"
                   className={
-                    pathname.includes("/dream-pos/sales")
+                    pathname.includes("/tinatett-pos/sales")
                       ? "active subdrop"
                       : "" || isSideMenu == "sales"
                         ? "subdrop active"
@@ -526,7 +526,7 @@ const Sidebar = (props) => {
                   <ul>
                      <li>
                       <Link
-                        to="/dream-pos/sales/add-sales"
+                        to="/tinatett-pos/sales/add-sales"
                         className={
                           pathname.includes("add-sales") ? "active" : ""
                         }
@@ -539,7 +539,7 @@ const Sidebar = (props) => {
                         className={
                           pathname.includes("saleslist") ? "active" : ""
                         }
-                        to="/dream-pos/sales/saleslist"
+                        to="/tinatett-pos/sales/saleslist"
                       >
                         Sales List
                       </Link>
@@ -553,7 +553,7 @@ const Sidebar = (props) => {
                         className={
                           pathname.includes("salesreturnlist") ? "active" : ""
                         }
-                        to="/dream-pos/sales/salesreturnlist-return"
+                        to="/tinatett-pos/sales/salesreturnlist-return"
                       >
                         Sales Return List
                       </Link>
@@ -563,7 +563,7 @@ const Sidebar = (props) => {
                         className={
                           pathname.includes("addsalesreturn") ? "active" : ""
                         }
-                        to="/dream-pos/sales/addsalesreturn-return"
+                        to="/tinatett-pos/sales/addsalesreturn-return"
                       >
                         New Sales Return
                       </Link>
@@ -579,7 +579,7 @@ const Sidebar = (props) => {
                   <a
                     href="#"
                     className={
-                      pathname.includes("/dream-pos/transfer")
+                      pathname.includes("/tinatett-pos/transfer")
                         ? "subdrop active"
                         : "" || isSideMenu == "transfer"
                         ? "subdrop active"
@@ -600,7 +600,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("addtransfer-") ? "active" : ""
                           }
-                          to="/dream-pos/transfer/addtransfer-transfer"
+                          to="/tinatett-pos/transfer/addtransfer-transfer"
                         >
                           Add Transfer
                         </Link>
@@ -610,7 +610,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("transferlist-") ? "active" : ""
                           }
-                          to="/dream-pos/transfer/transferlist-transfer"
+                          to="/tinatett-pos/transfer/transferlist-transfer"
                         >
                           Transfer List
                         </Link>
@@ -621,7 +621,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("importtransfer-") ? "active" : ""
                           }
-                          to="/dream-pos/transfer/importtransfer-transfer"
+                          to="/tinatett-pos/transfer/importtransfer-transfer"
                         >
                           Import Transfer
                         </Link>
@@ -641,7 +641,7 @@ const Sidebar = (props) => {
                   <a
                     href="#"
                     className={
-                      pathname.includes("/dream-pos/expense")
+                      pathname.includes("/tinatett-pos/expense")
                         ? "subdrop active"
                         : "" || isSideMenu == "expense"
                         ? "subdrop active"
@@ -662,7 +662,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("expenselist-") ? "active" : ""
                           }
-                          to="/dream-pos/expense/expenselist-expense"
+                          to="/tinatett-pos/expense/expenselist-expense"
                         >
                           Expense List
                         </Link>
@@ -672,7 +672,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("addexpense-") ? "active" : ""
                           }
-                          to="/dream-pos/expense/addexpense-expense"
+                          to="/tinatett-pos/expense/addexpense-expense"
                         >
                           Add Expense
                         </Link>
@@ -684,7 +684,7 @@ const Sidebar = (props) => {
                               ? "active"
                               : ""
                           }
-                          to="/dream-pos/expense/expensecategory-expense"
+                          to="/tinatett-pos/expense/expensecategory-expense"
                         >
                           Expense Category
                         </Link>
@@ -698,7 +698,7 @@ const Sidebar = (props) => {
                   <a
                     href="#"
                     className={
-                      pathname.includes("/dream-pos/quotation")
+                      pathname.includes("/tinatett-pos/quotation")
                         ? "subdrop active"
                         : "" || isSideMenu == "quotation"
                         ? "subdrop active"
@@ -721,7 +721,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("quotationlist-") ? "active" : ""
                           }
-                          to="/dream-pos/quotation/quotationlist-quotation"
+                          to="/tinatett-pos/quotation/quotationlist-quotation"
                         >
                           Quotation List
                         </Link>
@@ -731,7 +731,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("addquotation-") ? "active" : ""
                           }
-                          to="/dream-pos/quotation/addquotation-quotation"
+                          to="/tinatett-pos/quotation/addquotation-quotation"
                         >
                           Add Quotation
                         </Link>
@@ -746,7 +746,7 @@ const Sidebar = (props) => {
                   <a
                     href="#"
                     className={
-                      pathname.includes("/dream-pos/return")
+                      pathname.includes("/tinatett-pos/return")
                         ? "subdrop active"
                         : "" || isSideMenu == "return"
                         ? "subdrop active"
@@ -769,7 +769,7 @@ const Sidebar = (props) => {
                               ? "active"
                               : ""
                           }
-                          to="/dream-pos/return/salesreturnlist-return"
+                          to="/tinatett-pos/return/salesreturnlist-return"
                         >
                           Sales Return List
                         </Link>
@@ -779,7 +779,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("addsalesreturn-") ? "active" : ""
                           }
-                          to="/dream-pos/return/addsalesreturn-return"
+                          to="/tinatett-pos/return/addsalesreturn-return"
                         >
                           Add Sales Return
                         </Link>
@@ -791,7 +791,7 @@ const Sidebar = (props) => {
                               ? "active"
                               : ""
                           }
-                          to="/dream-pos/return/purchasereturnlist-return"
+                          to="/tinatett-pos/return/purchasereturnlist-return"
                         >
                           Purchase Return List
                         </Link>
@@ -803,7 +803,7 @@ const Sidebar = (props) => {
                               ? "active"
                               : ""
                           }
-                          to="/dream-pos/return/addpurchasereturn-return"
+                          to="/tinatett-pos/return/addpurchasereturn-return"
                         >
                           Add Purchase Return
                         </Link>
@@ -819,7 +819,7 @@ const Sidebar = (props) => {
                   <a
                     href="#"
                     className={
-                      pathname.includes("/dream-pos/places")
+                      pathname.includes("/tinatett-pos/places")
                         ? "subdrop active"
                         : "" || isSideMenu == "places"
                         ? "subdrop active"
@@ -840,7 +840,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("newcountry-") ? "active" : ""
                           }
-                          to="/dream-pos/places/newcountry-places"
+                          to="/tinatett-pos/places/newcountry-places"
                         >
                           New Country
                         </Link>
@@ -850,7 +850,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("countrylist-") ? "active" : ""
                           }
-                          to="/dream-pos/places/countrylist-places"
+                          to="/tinatett-pos/places/countrylist-places"
                         >
                           Country List
                         </Link>
@@ -860,7 +860,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("newstate-") ? "active" : ""
                           }
-                          to="/dream-pos/places/newstate-places"
+                          to="/tinatett-pos/places/newstate-places"
                         >
                           New State
                         </Link>
@@ -870,7 +870,7 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("statelist-") ? "active" : ""
                           }
-                          to="/dream-pos/places/statelist-places"
+                          to="/tinatett-pos/places/statelist-places"
                         >
                           State List
                         </Link>
@@ -882,7 +882,7 @@ const Sidebar = (props) => {
                 </li> */}
               {/* <li className={pathname.includes("components") ? "active" : ""}>
                   <Link
-                    to="/dream-pos/components"
+                    to="/tinatett-pos/components"
                     onClick={() => toggleSidebar(isSideMenu == "" ? "" : "")}
                   >
                     {" "}
@@ -892,7 +892,7 @@ const Sidebar = (props) => {
                 </li> */}
               {/* <li className={pathname.includes("blankpage") ? "active" : ""}>
                   <Link
-                    to="/dream-pos/blankpage"
+                    to="/tinatett-pos/blankpage"
                     onClick={() => toggleSidebar(isSideMenu == "" ? "" : "")}
                   >
                     {" "}
@@ -933,7 +933,7 @@ const Sidebar = (props) => {
                   <Link
                     to="#"
                     className={
-                      pathname.includes("/dream-pos/elements")
+                      pathname.includes("/tinatett-pos/elements")
                         ? "subdrop active"
                         : "" || isSideMenu == "elements"
                         ? "subdrop active"
@@ -950,7 +950,7 @@ const Sidebar = (props) => {
                     <ul>
                       <li>
                         <Link
-                          to="/dream-pos/elements/sweetalerts"
+                          to="/tinatett-pos/elements/sweetalerts"
                           className={
                             pathname.includes("sweetalerts") ? "active" : ""
                           }
@@ -960,7 +960,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/elements/tooltip"
+                          to="/tinatett-pos/elements/tooltip"
                           className={
                             pathname.includes("tooltip") ? "active" : ""
                           }
@@ -973,14 +973,14 @@ const Sidebar = (props) => {
                           className={
                             pathname.includes("popover") ? "active" : ""
                           }
-                          to="/dream-pos/elements/popover"
+                          to="/tinatett-pos/elements/popover"
                         >
                           Popover
                         </Link>
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/elements/ribbon"
+                          to="/tinatett-pos/elements/ribbon"
                           className={
                             pathname.includes("ribbon") ? "active" : ""
                           }
@@ -990,7 +990,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/elements/clipboard"
+                          to="/tinatett-pos/elements/clipboard"
                           className={
                             pathname.includes("clipboard") ? "active" : ""
                           }
@@ -1000,7 +1000,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/elements/drag-drop"
+                          to="/tinatett-pos/elements/drag-drop"
                           className={
                             pathname.includes("drag-drop") ? "active" : ""
                           }
@@ -1010,7 +1010,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/elements/rangeslider"
+                          to="/tinatett-pos/elements/rangeslider"
                           className={
                             pathname.includes("rangeslider") ? "active" : ""
                           }
@@ -1023,7 +1023,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/elements/rating"
+                          to="/tinatett-pos/elements/rating"
                           className={
                             pathname.includes("rating") ? "active" : ""
                           }
@@ -1033,7 +1033,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/elements/toastr"
+                          to="/tinatett-pos/elements/toastr"
                           className={
                             pathname.includes("toastr") ? "active" : ""
                           }
@@ -1043,7 +1043,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/elements/text-editor"
+                          to="/tinatett-pos/elements/text-editor"
                           className={
                             pathname.includes("text-editor") ? "active" : ""
                           }
@@ -1053,7 +1053,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/elements/counter"
+                          to="/tinatett-pos/elements/counter"
                           className={
                             pathname.includes("counter") ? "active" : ""
                           }
@@ -1063,7 +1063,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/elements/scrollbar"
+                          to="/tinatett-pos/elements/scrollbar"
                           className={
                             pathname.includes("scrollbar") ? "active" : ""
                           }
@@ -1073,7 +1073,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/elements/spinner"
+                          to="/tinatett-pos/elements/spinner"
                           className={
                             pathname.includes("spinner") ? "active" : ""
                           }
@@ -1083,7 +1083,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/elements/notification"
+                          to="/tinatett-pos/elements/notification"
                           className={
                             pathname.includes("notification") ? "active" : ""
                           }
@@ -1093,7 +1093,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/elements/lightbox"
+                          to="/tinatett-pos/elements/lightbox"
                           className={
                             pathname.includes("lightbox") ? "active" : ""
                           }
@@ -1103,7 +1103,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/elements/stickynote"
+                          to="/tinatett-pos/elements/stickynote"
                           className={
                             pathname.includes("stickynote") ? "active" : ""
                           }
@@ -1113,7 +1113,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/elements/timeline"
+                          to="/tinatett-pos/elements/timeline"
                           className={
                             pathname.includes("timeline") ? "active" : ""
                           }
@@ -1123,7 +1123,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/elements/form-wizard"
+                          to="/tinatett-pos/elements/form-wizard"
                           className={
                             pathname.includes("form-wizard") ? "active" : ""
                           }
@@ -1143,7 +1143,7 @@ const Sidebar = (props) => {
                   <Link
                     to="#"
                     className={
-                      pathname.includes("/dream-pos/charts")
+                      pathname.includes("/tinatett-pos/charts")
                         ? "subdrop active"
                         : "" || isSideMenu == "Charts"
                         ? "subdrop active"
@@ -1160,7 +1160,7 @@ const Sidebar = (props) => {
                     <ul>
                       <li>
                         <Link
-                          to="/dream-pos/charts/chart-apex"
+                          to="/tinatett-pos/charts/chart-apex"
                           className={
                             pathname.includes("chart-apex") ? "active" : ""
                           }
@@ -1170,7 +1170,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/charts/chart-js"
+                          to="/tinatett-pos/charts/chart-js"
                           className={
                             pathname.includes("chart-js") ? "active" : ""
                           }
@@ -1181,7 +1181,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/charts/chart-morris"
+                          to="/tinatett-pos/charts/chart-morris"
                           className={
                             pathname.includes("chart-morris") ? "active" : ""
                           }
@@ -1191,7 +1191,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/charts/chart-flot"
+                          to="/tinatett-pos/charts/chart-flot"
                           className={
                             pathname.includes("chart-flot") ? "active" : ""
                           }
@@ -1202,7 +1202,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/charts/chart-peity"
+                          to="/tinatett-pos/charts/chart-peity"
                           className={
                             pathname.includes("chart-peity") ? "active" : ""
                           }
@@ -1220,7 +1220,7 @@ const Sidebar = (props) => {
                   <Link
                     to="#"
                     className={
-                      pathname.includes("/dream-pos/icons")
+                      pathname.includes("/tinatett-pos/icons")
                         ? "subdrop active"
                         : "" || isSideMenu == "Icons"
                         ? "subdrop active"
@@ -1237,7 +1237,7 @@ const Sidebar = (props) => {
                     <ul>
                       <li>
                         <Link
-                          to="/dream-pos/icons/icon-fontawesome"
+                          to="/tinatett-pos/icons/icon-fontawesome"
                           className={
                             pathname.includes("fontawesome") ? "active" : ""
                           }
@@ -1247,7 +1247,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/icons/icon-feather"
+                          to="/tinatett-pos/icons/icon-feather"
                           className={
                             pathname.includes("feather") ? "active" : ""
                           }
@@ -1257,7 +1257,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/icons/icon-ionic"
+                          to="/tinatett-pos/icons/icon-ionic"
                           className={pathname.includes("ionic") ? "active" : ""}
                         >
                           Ionic Icons
@@ -1265,7 +1265,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/icons/icon-material"
+                          to="/tinatett-pos/icons/icon-material"
                           className={
                             pathname.includes("material") ? "active" : ""
                           }
@@ -1275,7 +1275,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/icons/icon-pe7"
+                          to="/tinatett-pos/icons/icon-pe7"
                           className={
                             pathname.includes("icon-pe7") ? "active" : ""
                           }
@@ -1285,7 +1285,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/icons/icon-simpleline"
+                          to="/tinatett-pos/icons/icon-simpleline"
                           className={
                             pathname.includes("simpleline") ? "active" : ""
                           }
@@ -1295,7 +1295,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/icons/icon-themify"
+                          to="/tinatett-pos/icons/icon-themify"
                           className={
                             pathname.includes("themify") ? "active" : ""
                           }
@@ -1305,7 +1305,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/icons/icon-weather"
+                          to="/tinatett-pos/icons/icon-weather"
                           className={
                             pathname.includes("weather") ? "active" : ""
                           }
@@ -1315,7 +1315,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/icons/icon-typicon"
+                          to="/tinatett-pos/icons/icon-typicon"
                           className={
                             pathname.includes("typicon") ? "active" : ""
                           }
@@ -1325,7 +1325,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/icons/icon-flag"
+                          to="/tinatett-pos/icons/icon-flag"
                           className={
                             pathname.includes("icon-flag") ? "active" : ""
                           }
@@ -1345,7 +1345,7 @@ const Sidebar = (props) => {
                 <Link
                   to="#"
                   className={
-                    pathname.includes("/dream-pos/application")
+                    pathname.includes("/tinatett-pos/application")
                       ? "subdrop active"
                       : "" || isSideMenu == "Application"
                         ? "subdrop active"
@@ -1364,7 +1364,7 @@ const Sidebar = (props) => {
                   <ul>
                     <li>
                       <Link
-                        to="/dream-pos/application/chat"
+                        to="/tinatett-pos/application/chat"
                         className={pathname.includes("chat") ? "active" : ""}
                       >
                         Chat
@@ -1372,7 +1372,7 @@ const Sidebar = (props) => {
                     </li>
                     <li>
                       <Link
-                        to="/dream-pos/application/calendar"
+                        to="/tinatett-pos/application/calendar"
                         className={
                           pathname.includes("calendar") ? "active" : ""
                         }
@@ -1382,7 +1382,7 @@ const Sidebar = (props) => {
                     </li>
                     <li>
                       <Link
-                        to="/dream-pos/application/email"
+                        to="/tinatett-pos/application/email"
                         className={pathname.includes("email") ? "active" : ""}
                       >
                         Email
@@ -1399,7 +1399,7 @@ const Sidebar = (props) => {
                 <Link
                   to="#"
                   className={
-                    pathname.includes("/dream-pos/table")
+                    pathname.includes("/tinatett-pos/table")
                       ? "subdrop active"
                       : "" || isSideMenu == "Table"
                         ? "subdrop active"
@@ -1416,7 +1416,7 @@ const Sidebar = (props) => {
                   <ul>
                     <li>
                       <Link
-                        to="/dream-pos/table/tables-basic"
+                        to="/tinatett-pos/table/tables-basic"
                         className={
                           pathname.includes("tables-basic") ? "active" : ""
                         }
@@ -1426,7 +1426,7 @@ const Sidebar = (props) => {
                     </li>
                     <li>
                       <Link
-                        to="/dream-pos/table/data-tables"
+                        to="/tinatett-pos/table/data-tables"
                         className={
                           pathname.includes("data-tables") ? "active" : ""
                         }
@@ -1445,7 +1445,7 @@ const Sidebar = (props) => {
                 <Link
                   to="#"
                   className={
-                    pathname.includes("/dream-pos/forms")
+                    pathname.includes("/tinatett-pos/forms")
                       ? "subdrop active"
                       : "" || isSideMenu == "Forms"
                         ? "subdrop active"
@@ -1462,7 +1462,7 @@ const Sidebar = (props) => {
                   <ul>
                     <li>
                       <Link
-                        to="/dream-pos/forms/form-basic-inputs"
+                        to="/tinatett-pos/forms/form-basic-inputs"
                         className={
                           pathname.includes("form-basic-inputs")
                             ? "active"
@@ -1474,7 +1474,7 @@ const Sidebar = (props) => {
                     </li>
                     <li>
                       <Link
-                        to="/dream-pos/forms/form-input-groups"
+                        to="/tinatett-pos/forms/form-input-groups"
                         className={
                           pathname.includes("form-input-groups")
                             ? "active"
@@ -1486,7 +1486,7 @@ const Sidebar = (props) => {
                     </li>
                     <li>
                       <Link
-                        to="/dream-pos/forms/form-horizontal"
+                        to="/tinatett-pos/forms/form-horizontal"
                         className={
                           pathname.includes("horizontal") ? "active" : ""
                         }
@@ -1496,7 +1496,7 @@ const Sidebar = (props) => {
                     </li>
                     <li>
                       <Link
-                        to="/dream-pos/forms/form-vertical"
+                        to="/tinatett-pos/forms/form-vertical"
                         className={
                           pathname.includes("form-vertical") ? "active" : ""
                         }
@@ -1507,7 +1507,7 @@ const Sidebar = (props) => {
                     </li>
                     <li>
                       <Link
-                        to="/dream-pos/forms/form-mask"
+                        to="/tinatett-pos/forms/form-mask"
                         className={
                           pathname.includes("form-mask") ? "active" : ""
                         }
@@ -1517,7 +1517,7 @@ const Sidebar = (props) => {
                     </li>
                     <li>
                       <Link
-                        to="/dream-pos/forms/form-validation"
+                        to="/tinatett-pos/forms/form-validation"
                         className={
                           pathname.includes("validation") ? "active" : ""
                         }
@@ -1527,7 +1527,7 @@ const Sidebar = (props) => {
                     </li>
                     <li>
                       <Link
-                        to="/dream-pos/forms/form-select2"
+                        to="/tinatett-pos/forms/form-select2"
                         className={
                           pathname.includes("form-select2") ? "active" : ""
                         }
@@ -1537,7 +1537,7 @@ const Sidebar = (props) => {
                     </li>
                     <li>
                       <Link
-                        to="/dream-pos/forms/form-fileupload"
+                        to="/tinatett-pos/forms/form-fileupload"
                         className={
                           pathname.includes("fileupload") ? "active" : ""
                         }
@@ -1556,7 +1556,7 @@ const Sidebar = (props) => {
                 <Link
                   to="#"
                   className={
-                    pathname.includes("/dream-pos/report")
+                    pathname.includes("/tinatett-pos/report")
                       ? "subdrop active"
                       : "" || isSideMenu == "Report"
                         ? "subdrop active"
@@ -1573,7 +1573,7 @@ const Sidebar = (props) => {
                   <ul>
                     <li>
                       <Link
-                        to="/dream-pos/report/purchaseorderreport"
+                        to="/tinatett-pos/report/purchaseorderreport"
                         className={
                           pathname.includes("purchaseorderreport")
                             ? "active"
@@ -1585,7 +1585,7 @@ const Sidebar = (props) => {
                     </li>
                     <li>
                       <Link
-                        to="/dream-pos/report/inventoryreport"
+                        to="/tinatett-pos/report/inventoryreport"
                         className={
                           pathname.includes("inventoryreport") ? "active" : ""
                         }
@@ -1595,7 +1595,7 @@ const Sidebar = (props) => {
                     </li>
                     <li>
                       <Link
-                        to="/dream-pos/report/salesreport"
+                        to="/tinatett-pos/report/salesreport"
                         className={
                           pathname.includes("salesreport") ? "active" : ""
                         }
@@ -1605,7 +1605,7 @@ const Sidebar = (props) => {
                     </li>
                     <li>
                       <Link
-                        to="/dream-pos/report/invoicereport"
+                        to="/tinatett-pos/report/invoicereport"
                         className={
                           pathname.includes("invoicereport") ? "active" : ""
                         }
@@ -1615,7 +1615,7 @@ const Sidebar = (props) => {
                     </li>
                     <li>
                       <Link
-                        to="/dream-pos/report/purchasereport"
+                        to="/tinatett-pos/report/purchasereport"
                         className={
                           pathname.includes("purchasereport") ? "active" : ""
                         }
@@ -1625,7 +1625,7 @@ const Sidebar = (props) => {
                     </li>
                     <li>
                       <Link
-                        to="/dream-pos/report/supplierreport"
+                        to="/tinatett-pos/report/supplierreport"
                         className={
                           pathname.includes("supplierreport") ? "active" : ""
                         }
@@ -1635,7 +1635,7 @@ const Sidebar = (props) => {
                     </li>
                     <li>
                       <Link
-                        to="/dream-pos/report/customerreport"
+                        to="/tinatett-pos/report/customerreport"
                         className={
                           pathname.includes("customerreport") ? "active" : ""
                         }
@@ -1654,7 +1654,7 @@ const Sidebar = (props) => {
                 <Link
                   to="#"
                   className={
-                    pathname.includes("/dream-pos/users")
+                    pathname.includes("/tinatett-pos/users")
                       ? "subdrop active"
                       : "" || isSideMenu == "Users"
                         ? "subdrop active"
@@ -1671,7 +1671,7 @@ const Sidebar = (props) => {
                   <ul>
                     <li>
                       <Link
-                        to="/dream-pos/users/newuser"
+                        to="/tinatett-pos/users/newuser"
                         className={
                           pathname.includes("newuser") ? "active" : ""
                         }
@@ -1681,7 +1681,7 @@ const Sidebar = (props) => {
                     </li>
                     <li>
                       <Link
-                        to="/dream-pos/users/userlists"
+                        to="/tinatett-pos/users/userlists"
                         className={
                           pathname.includes("userlists") ? "active" : ""
                         }
@@ -1698,7 +1698,7 @@ const Sidebar = (props) => {
                   <Link
                     to="#"
                     className={
-                      pathname.includes("/dream-pos/settings")
+                      pathname.includes("/tinatett-pos/settings")
                         ? "subdrop active"
                         : "" || isSideMenu == "Settings"
                         ? "subdrop active"
@@ -1715,7 +1715,7 @@ const Sidebar = (props) => {
                     <ul>
                       <li>
                         <Link
-                          to="/dream-pos/settings/generalsettings"
+                          to="/tinatett-pos/settings/generalsettings"
                           className={
                             pathname.includes("generalsettings") ? "active" : ""
                           }
@@ -1725,7 +1725,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/settings/emailsettings"
+                          to="/tinatett-pos/settings/emailsettings"
                           className={
                             pathname.includes("emailsettings") ? "active" : ""
                           }
@@ -1735,7 +1735,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/settings/paymentsettings"
+                          to="/tinatett-pos/settings/paymentsettings"
                           className={
                             pathname.includes("paymentsettings") ? "active" : ""
                           }
@@ -1745,7 +1745,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/settings/currencysettings"
+                          to="/tinatett-pos/settings/currencysettings"
                           className={
                             pathname.includes("currencysettings")
                               ? "active"
@@ -1757,7 +1757,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/settings/grouppermissions"
+                          to="/tinatett-pos/settings/grouppermissions"
                           className={
                             pathname.includes("permission") ? "active" : ""
                           }
@@ -1767,7 +1767,7 @@ const Sidebar = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/settings/taxrates"
+                          to="/tinatett-pos/settings/taxrates"
                           className={
                             pathname.includes("taxrates") ? "active" : ""
                           }

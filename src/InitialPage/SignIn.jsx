@@ -56,7 +56,7 @@ const SignInPage = (props) => {
         setIsLoading(false)
         sessionStorage.setItem("auth", JSON.stringify(user));
         setAuth(user);
-        props.history.push("/dream-pos/dashboard");
+        props.history.push("/tinatett-pos/dashboard");
       }
     }
     catch(error){

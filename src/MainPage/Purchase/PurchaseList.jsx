@@ -195,7 +195,7 @@ const PurchaseList = () => {
       title: "Action",
       render: (a, record) => (
         <>
-          <Link className="me-3" to= {{pathname:"/dream-pos/purchase/editpurchase", state: record}}>
+          <Link className="me-3" to= {{pathname:"/tinatett-pos/purchase/editpurchase", state: record}}>
             <img src={EditIcon} alt="img" />
           </Link>
           <Link className="confirm-text" to="#" onClick={() => confirmText(record?.id)}>
@@ -222,7 +222,7 @@ const PurchaseList = () => {
             </div>
             <div className="page-btn">
               <Link
-                to="/dream-pos/purchase/addpurchase"
+                to="/tinatett-pos/purchase/addpurchase"
                 className="btn btn-added"
               >
                 <img src={PlusIcon} alt="img" className="me-1" />
