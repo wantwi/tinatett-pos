@@ -539,6 +539,16 @@ const Sidebar = (props) => {
                         className={
                           pathname.includes("saleslist") ? "active" : ""
                         }
+                        to="/tinatett-pos/sales/suspended"
+                      >
+                        Suspended Sales
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        className={
+                          pathname.includes("saleslist") ? "active" : ""
+                        }
                         to="/tinatett-pos/sales/saleslist"
                       >
                         Sales List
