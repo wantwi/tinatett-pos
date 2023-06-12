@@ -373,7 +373,10 @@ const AddProforma = () => {
                           value={formData.quantity}
                           // {...register("quantity")}
                           onChange={(e) => {
-                            if (isValidNumber(e.target.value)) {
+                            if(e.target.value == ''){
+                              setFormData({...formData, quantity: ''})
+                            }
+                            else if(isValidNumber(e.target.value)) {
                               setFormData({ ...formData, quantity: Number(e.target.value) })
                             }
 

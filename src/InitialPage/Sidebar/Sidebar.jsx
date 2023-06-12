@@ -537,7 +537,7 @@ const Sidebar = (props) => {
                     <li>
                       <Link
                         className={
-                          pathname.includes("saleslist") ? "active" : ""
+                          pathname.includes("suspended") ? "active" : ""
                         }
                         to="/tinatett-pos/sales/suspended"
                       >

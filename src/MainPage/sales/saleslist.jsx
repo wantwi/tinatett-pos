@@ -28,7 +28,7 @@ import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
 import { useGet } from "../../hooks/useGet";
 import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
-import { moneyInTxt } from "../../utility";
+import { getInvoiceReceipt, moneyInTxt } from "../../utility";
 
 const SalesList = () => {
   const [startDate, setStartDate] = useState(new Date());
@@ -78,22 +78,24 @@ const SalesList = () => {
     isError,
     isLoading,
     isSuccess,
-  } = useGet("sales", "/sales");
+  } = useGet("suspend", "/sales");
 
 
   useEffect(() => {
     if(!isLoading){
+     
       let mappedData =  sales?.data.map((sale) => {
+        console.log("Payment Infor:", (JSON.parse(sale?.paymentInfo)).type)
           return {
             id: sale?.id,
-            Date: sale?.transDate,
-            Name: sale?.name || 'Franslina Pharmacy',
+            Date: sale?.transDate, 
+            Name: sale?.customer?.name,
             Status: sale?.status,
             Reference: sale?.salesRef,
-            Payment: sale?.status,
+            Payment: JSON.parse(sale?.paymentInfo).type,
             Total: moneyInTxt(sale?.totalAmount),
-            Paid: 0,
-            Due: 0,
+            Paid: JSON.parse(sale?.paymentInfo).amountPaid,
+            Due: Number(sale?.totalAmount) - Number(JSON.parse(sale?.paymentInfo).amountPaid),
             Biller: sale?.salesPerson,
           }
         })
@@ -127,11 +129,11 @@ const SalesList = () => {
       dataIndex: "Status",
       render: (text, record) => (
         <>
-          {text === "Pending" && (
-            <span className="badges bg-lightred">{"Incomplete"}</span>
+          {text === "Suspend" && (
+            <span className="badges bg-lightred">{"Suspended"}</span>
           )}
           {text === "Paid" && (
-            <span className="badges bg-lightgreen">{"Complete"}</span>
+            <span className="badges bg-lightgreen">{"Paid"}</span>
           )}
         </>
       ),
@@ -142,10 +144,9 @@ const SalesList = () => {
       dataIndex: "Payment",
       render: (text, record) => (
         <>
-          {text === "Paid" && (
+         
             <span className="badges bg-lightgreen">{(text)}</span>
-          )}
-          {text === "Due" && <span className="badges bg-lightred">{(text)}</span>}
+        
         </>
       ),
       sorter: (a, b) => a.Payment.length - b.Payment.length,
@@ -160,8 +161,8 @@ const SalesList = () => {
       dataIndex: "Paid",
       render: (text, record) => (
         <>
-          {text === 100 && <div className="text-green">{moneyInTxt(text)}</div>}
-          {text === 0 && <div>{moneyInTxt(text)}</div>}
+          { <div className="text-green">{moneyInTxt(text)}</div>}
+          {/* {text === 0 && <div>{moneyInTxt(text)}</div>} */}
         </>
       ),
       sorter: (a, b) => a.Paid.length - b.Paid.length,
@@ -171,17 +172,17 @@ const SalesList = () => {
       dataIndex: "Due",
       render: (text, record) => (
         <>
-          {text === 100 && <div className="text-red">{moneyInTxt(text)}</div>}
-          {text === 0 && <div>{moneyInTxt(text)}</div>}
+          {<div className="text-red">{moneyInTxt(text)}</div>}
+          {/* {text === 0 && <div>{moneyInTxt(text)}</div>} */}
         </>
       ),
       sorter: (a, b) => a.Due.length - b.Due.length,
     },
-    {
-      title: "Biller",
-      dataIndex: "Biller",
-      sorter: (a, b) => a.Biller.length - b.Biller.length,
-    },
+    // {
+    //   title: "Biller",
+    //   dataIndex: "Biller",
+    //   sorter: (a, b) => a.Biller.length - b.Biller.length,
+    // },
     {
       title: "Action",
       render: (text, record) => (
@@ -196,19 +197,19 @@ const SalesList = () => {
               <i className="fa fa-ellipsis-v" aria-hidden="true" />
             </Link>
             <ul className="dropdown-menu">
-              <li>
+              {/* <li>
                 <Link to="/tinatett-pos/sales/sales-details" className="dropdown-item">
                   <img src={Eye1} className="me-2" alt="img" />
                   Sale Detail
                 </Link>
-              </li>
-              <li>
+              </li> */}
+              {/* <li>
                 <Link to="/tinatett-pos/sales/edit-sales" className="dropdown-item">
                   <img src={EditIcon} className="me-2" alt="img" />
                   Edit Sale
                 </Link>
-              </li>
-              <li>
+              </li> */}
+              {/* <li>
                 <Link
                   to="#"
                   className="dropdown-item"
@@ -218,8 +219,8 @@ const SalesList = () => {
                   <img src={Dollar1} className="me-2" alt="img" />
                   Show Payments
                 </Link>
-              </li>
-              <li>
+              </li> */}
+              {/* <li>
                 <Link
                   to="#"
                   className="dropdown-item"
@@ -229,12 +230,12 @@ const SalesList = () => {
                   <img src={plusCircle} className="me-2" alt="img" />
                   Create Payment
                 </Link>
-              </li>
+              </li> */}
               <li>
-                <Link to="#" className="dropdown-item">
-                  <img src={Download} className="me-2" alt="img" />
-                  Download pdf
-                </Link>
+                <a href="javascript:void(0);"  className="dropdown-item" onClick={() =>getInvoiceReceipt(record?.Reference)}>
+                  <img src={Download} className="me-2" alt="img"  />
+                  Download Invoice
+                </a>
               </li>
               <li>
                 <Link

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -18,7 +18,7 @@ import { useEffect } from "react";
 import { useGet } from "../../hooks/useGet";
 import Select from "react-select";
 import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
-import { moneyInTxt } from "../../utility";
+import { isValidNumber, moneyInTxt } from "../../utility";
 import { BASE_URL } from "../../api/CustomAxios";
 import useCustomApi from "../../hooks/useCustomApi";
 import FeatherIcon from 'feather-icons-react'
@@ -34,18 +34,23 @@ const Addsales = () => {
   const [disabledUnselectedPrice,setDisableUnselectedPrice] = useState({retail: false, wholesale:false, special:false})
   const [customerList, setCustomerList] = useState([])
   const [productsList, setProductsList] = useState([])
-  const [selectedCustomer, setSelectedCustomer] = useState({})
+  const [selectedCustomer, setSelectedCustomer] = useState(null)
   const [selectedProduct, setSelectedProduct] = useState({})
   const [selectedProductInfo, setSelectedProductInfo] = useState()
   const [price, setPrice] = useState(0)
   const [retailprice, setRetailPrice] = useState('')
   const [wholesaleprice, setWholesalePrice] = useState('')
   const [specialprice, setSpecialPrice] = useState('')
-  const [formData, setFormData] = useState({quantity:'', amount:'', batchNo:'', manuDate:'', expDate:''})
+  const [formData, setFormData] = useState({quantity:'', amount:'', batchNumber:'', manuDate:'', expDate:''})
   const [salesType, setSalesType] = useState('Retail')
   const [paymentData, setPaymentData] = useState({paymentType:'', accountNo:'', branch: ''})
   const [productGridData, setProductGridData] = useState([])
+  const [transDate, setTransDate] = useState(new Date().toISOString().substring(0,10))
+  const [invoiceNo, setInvoiceNo] = useState('')
   const [isSubmitSuccessful, setIsSubmitSuccessful] = useState(false)
+  const retailpriceTypeRef = useRef()
+  const specialpriceTypeRef = useRef()
+  const wholesalepriceTypeRef = useRef()
   const {
     data: customers,
     isLoading: customersIsLoading,
@@ -61,7 +66,7 @@ const Addsales = () => {
   //   if(data?.success){
   //     setIsSubmitSuccessful(true)
   //     setProductGridData([])
-  //     setFormData({quantity:0, amount:0, batchNo:'', manuDate:'', expDate:''})
+  //     setFormData({quantity:0, amount:0, batchNumber:'', manuDate:'', expDate:''})
   //     setSelectedProduct('')
   //   }
   // }, [data])
@@ -83,17 +88,20 @@ const Addsales = () => {
   const handleSuspend = () => {
     let payload = {
       customerId: selectedCustomer.value,
+      transDate: transDate,
       totalAmount : productGridData.reduce((total, item) => total + item.amount, 0),
       salesType:salesType,
-      paymentType: paymentData.paymentType,
       products: productGridData,
     }
+
+
 
     //console.log(payload)
     mutate(payload)
     setProductGridData([])
-    setFormData({quantity:0, amount:0, batchNo:'', manuDate:'', expDate:''})
+    setFormData({quantity:'', amount:'', batchNumber:'', manuDate:'', expDate:''})
     setSelectedProduct('')
+    setInvoiceNo('')
     setIsSubmitSuccessful(true)
   }
 
@@ -113,18 +121,31 @@ const Addsales = () => {
 
   const handleAddItem = () => {
     //console.log(productFormData)
-  
+  console.log(selectedCustomer)
       let obj = {
          name: selectedProduct.label,
          productId:selectedProduct.value,
-         batchNumber:"TA0523189253001",
+         batchNumber: formData.batchNumber?.value,
          quantity :formData.quantity,
          unitPrice:price,
          amount:formData.quantity * price
-      }    
-      setProductGridData([...productGridData, obj])
-      setFormData({quantity:0, amount:0, batchNo:'', manuDate:'', expDate:''})
-      setSelectedProduct('')
+      } 
+      if (obj.amount < 1 || obj.unitPrice == '' || obj.name == '' || selectedCustomer == null) {
+        alertify.set("notifier", "position", "top-right");
+        alertify.warning("Please make sure all fields are filled.");
+      }   
+      else{
+        setProductGridData([...productGridData, obj])
+        setFormData({quantity:'', amount:'', batchNumber:'', manuDate:'', expDate:''})
+        setSelectedProduct('')
+        retailpriceTypeRef.current.checked = false
+        wholesalepriceTypeRef.current.checked = false
+        specialpriceTypeRef.current.checked = false
+        setWholesalePrice('')
+        setSpecialPrice('')
+        setRetailPrice('')
+      }
+  
    
     }
 
@@ -200,7 +221,7 @@ const Addsales = () => {
                     <div className="form-group">
                       <label> Date</label>
                       <div className="input-groupicon">
-                      <input type="date" className="form-control" />
+                      <input type="date" className="form-control" value={transDate} onChange={(e) => setTransDate(e.target.value)}/>
                       </div>
                     </div>
                   </div>
@@ -209,7 +230,7 @@ const Addsales = () => {
                     <div className="form-group">
                       <label>Invoice no. (Hard Copy)</label>
                       <div className="input-groupicon">
-                      <input type="text" placeholder=""/>
+                      <input type="text" placeholder="" value={invoiceNo} onChange={(e) => setInvoiceNo(e.target.value)}/>
                       </div>
                     </div>
                   </div>
@@ -226,7 +247,7 @@ const Addsales = () => {
 
                             <div className="input-group">
                               <div className="input-group-text">
-                                <input className="form-check-input" type="radio" name="salesType" checked={true} value={'Retail'} onChange={(e) => {
+                                <input className="form-check-input" type="radio" name="salesType" checked={true}  value={'Retail'} onChange={(e) => {
                                  setSalesType(e.target.value)}}
                                 />
                               </div>
@@ -334,8 +355,8 @@ const Addsales = () => {
                           return {value:item.batchNumber, label:item?.batchNumber + '-(' + item?.remainingQuantity +')', expireDate:item?.expireDate, manufacturingDate: item?.manufacturingDate}
                         })}
                         placeholder=""
-                        value={formData.batchNo}
-                        onChange={(e) => setFormData({...formData, batchNo: (e), manuDate: e.manufacturingDate, expDate: e.expireDate})}
+                        value={formData.batchNumber}
+                        onChange={(e) => setFormData({...formData, batchNumber: (e), manuDate: e.manufacturingDate, expDate: e.expireDate})}
                         //onChange={(e) => console.log(e)}
                       />
                       
@@ -387,7 +408,7 @@ const Addsales = () => {
 
                             <div className="input-group">
                               <div className="input-group-text">
-                                <input className="form-check-input" type="radio" name="priceType" value={selectedProduct?.retailPrice} onChange={(e) => {
+                                <input className="form-check-input" type="radio" ref={retailpriceTypeRef} name="priceType" value={selectedProduct?.retailPrice} onChange={(e) => {
                                   setPrice(e.target.value)
                                   setDisableUnselectedPrice({retail:false, wholesale:true, special:true})
                                 }}/>
@@ -400,7 +421,7 @@ const Addsales = () => {
                           <div className="col-lg-4">
                             <div className="input-group">
                               <div className="input-group-text">
-                                <input className="form-check-input" type="radio" name="priceType" value={selectedProduct?.wholeSalePrice} onChange={(e) => {
+                                <input className="form-check-input" type="radio" ref={wholesalepriceTypeRef} name="priceType" value={selectedProduct?.wholeSalePrice} onChange={(e) => {
                                   setPrice(e.target.value)
                                   setDisableUnselectedPrice({wholesale:false, retail:true, special:true})}
                                  } />
@@ -413,7 +434,7 @@ const Addsales = () => {
 
                             <div className="input-group">
                               <div className="input-group-text">
-                                <input className="form-check-input" type="radio" name="priceType" value={selectedProduct?.specialPrice} onChange={(e) => {
+                                <input className="form-check-input" type="radio" ref={specialpriceTypeRef} name="priceType" value={selectedProduct?.specialPrice} onChange={(e) => {
                                   setPrice(e.target.value)
                                   setDisableUnselectedPrice({special:false, wholesale:true, retail:true})
                                 } }/>
@@ -434,7 +455,14 @@ const Addsales = () => {
                        className="form-control"
                         type="text"
                         value={formData?.quantity}
-                        onChange={(e) => setFormData({...formData, quantity: (e.target.value)})}
+                        onChange={(e) => {
+                          if(e.target.value == ''){
+                            setFormData({...formData, quantity: ''})
+                          }
+                          else if(isValidNumber(e.target.value)){
+                            setFormData({...formData, quantity: Number(e.target.value)})
+                          }
+                        }}
                       />
                       
                     </div>
@@ -530,10 +558,38 @@ const Addsales = () => {
                         </div>
                       </div>
                     </div>
+
+                    <div className="col-6">
+                      <div className="form-group">
+                        <label>Receipt No </label>
+                        <div className="input-groupicon">
+                          <input
+                            type="text"
+                            placeholder=""
+                          />
+                          
+                        </div>
+                      </div>
+                    </div>
+
                   </div>
                 </div> : null}
                 {activeTab == 'cheque' ? <div id="cheque-tab" style={{marginTop:20}}>
                   <div className="row">
+
+                  <div className="col-6">
+                      <div className="form-group">
+                        <label>Waybill</label>
+                        <div className="input-groupicon">
+                          <input
+                            type="text"
+                            placeholder=""
+                          />
+                          
+                        </div>
+                      </div>
+                    </div>
+
                     <div className="col-6">
                         <div className="form-group">
                           <label>Cheque No</label>
@@ -546,6 +602,49 @@ const Addsales = () => {
                           </div>
                         </div>
                       </div>
+
+
+                      <div className="col-6">
+                      <div className="form-group">
+                        <label>Receipt No</label>
+                        <div className="input-groupicon">
+                          <input
+                            type="text"
+                            placeholder=""
+                          />
+                          
+                        </div>
+                      </div>
+                    </div>
+
+                      <div className="col-6">
+                      <div className="form-group">
+                        <label>Due Date</label>
+                        <div className="input-groupicon">
+                          <input
+                            type="date"
+                            placeholder=""
+                            className="form-control"
+                          />
+                          
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="col-6">
+                      <div className="form-group">
+                        <label>Bank</label>
+                        <div className="input-groupicon">
+                          <input
+                            type="text"
+                            placeholder=""
+                          />
+                          
+                        </div>
+                      </div>
+                    </div>
+
+                      
 
                       <div className="col-6">
                         <div className="form-group">
@@ -566,7 +665,21 @@ const Addsales = () => {
                   <div className="row">
                   <div className="col-6">
                       <div className="form-group">
-                        <label>Momo number</label>
+                        <label>Receipt No</label>
+                        <div className="input-groupicon">
+                          <input
+                            type="text"
+                            placeholder=""
+                          />
+                          
+                        </div>
+                      </div>
+                    </div>
+
+
+                    <div className="col-6">
+                      <div className="form-group">
+                        <label>Name</label>
                         <div className="input-groupicon">
                           <input
                             type="text"
@@ -580,6 +693,19 @@ const Addsales = () => {
                     <div className="col-6">
                       <div className="form-group">
                         <label>Amount</label>
+                        <div className="input-groupicon">
+                          <input
+                            type="text"
+                            placeholder=""
+                          />
+                          
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="col-6">
+                      <div className="form-group">
+                        <label>Transaction ID</label>
                         <div className="input-groupicon">
                           <input
                             type="text"

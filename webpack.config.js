@@ -55,6 +55,8 @@ module.exports = {
     port: 3000, // port number
     historyApiFallback: true,
     quiet: true,
+    //static: true,
+    //static: "dist"
   },
   externals: {
     // global app config object
@@ -67,7 +69,7 @@ module.exports = {
     }),
   },
   resolve: {
-    extensions: ["*", ".js", ".jsx"],
+    extensions: ["*", ".js", ".jsx", ".json"],
     alias: {
       Assets: path.resolve(__dirname, "src/assets/"),
     },
@@ -115,6 +117,11 @@ module.exports = {
         test: /\.(woff|woff2|eot|ttf|svg)$/,
         loader: "url-loader?limit=100000",
       },
+      {
+        test: /\.(ico|json)$/,
+        exclude: /node_modules/,
+        use: ["file-loader?name=[name].[ext]"] // ?name=[name].[ext] is only necessary to preserve the original file name
+      }
       //  { // config for fonts
       //    test: /\.(woff|woff2|eot|ttf|otf)$/,
       //    use: [
@@ -139,6 +146,7 @@ module.exports = {
       template: "./public/index.html",
       filename: "./index.html",
       favicon: "./public/favicon.ico",
+      manifest: "./public/manifest.json"
     }),
     new MiniCssExtractPlugin({
       // plugin for controlling how compiled css will be outputted and named

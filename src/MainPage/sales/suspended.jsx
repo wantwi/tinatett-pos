@@ -6,35 +6,62 @@ import Tabletop from "../../EntryFile/tabletop";
 import Swal from "sweetalert2";
 import "react-datepicker/dist/react-datepicker.css";
 import {
-  ClosesIcon,
-  Excel,
-  Filter,
-  Pdf,
-  Eye1,
+  // ClosesIcon,
+  // Excel,
+  // Filter,
+  // Pdf,
+  // Eye1,
   Calendar,
   Printer,
   search_whites,
-  Search,
+  //Search,
   PlusIcon,
-  EditIcon,
+  //EditIcon,
   Dollar1,
-  plusCircle,
+ // plusCircle,
   Download,
   delete1,
-  DeleteIcon,
+  //DeleteIcon,
   datepicker,
 } from "../../EntryFile/imagePath";
 import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
 import { useGet } from "../../hooks/useGet";
 import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
-import { moneyInTxt } from "../../utility";
+import { commaRemover, isValidNumber, moneyInTxt } from "../../utility";
+import useCustomApi from "../../hooks/useCustomApi";
+import { usePost } from "../../hooks/usePost";
+import alertify from "alertifyjs";
+import "../../../node_modules/alertifyjs/build/css/alertify.css";
+import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
+
 
 const Suspended = () => {
   const [startDate, setStartDate] = useState(new Date());
   const [startDate1, setStartDate1] = useState(new Date());
   const [inputfilter, setInputfilter] = useState(false);
-  const [activeTab, setActiveTab] = useState('cash')
+  const [activeTab, setActiveTab] = useState('Cash')
+  const [modalData, setModalData] = useState(null)
+  const [paymentInfo, setPaymentInfo] = useState({
+    type:'',
+    waybill:'',
+    chequeNo:'',
+    receiptNo:'',
+    dueDate:'',
+    bank:'',
+    momoName:'',
+    transactionID:'',
+    amountPaid:'' 
+  })
+
+  const {
+    data: sales,
+    isError,
+    isLoading,
+    isSuccess,
+  } = useGet("suspend", "/sales/suspend");
+  const [data, setData] = useState([])
+
 
   const togglefilter = (value) => {
     setInputfilter(value);
@@ -62,6 +89,124 @@ const Suspended = () => {
         });
     });
   };
+
+  const axios = useCustomApi()
+
+  const handleSellAndPrint = () =>{
+    let payload = {
+      status:"Paid",
+      salesRef:modalData.Reference,
+      amount:modalData?.Total,
+      paymentInfo: {...paymentInfo, type:activeTab}
+    }
+
+    //console.log(payload)
+    axios.post('/sales',payload)
+    .then((res) => {
+      console.log(res.data.success)
+      if(res.data.success){
+        getInvoiceReceipt(modalData.Reference)
+        alertify.set("notifier", "position", "top-right");
+        alertify.success("Sale completed.");
+       
+      }
+    })
+    .catch((error) => {
+      alertify.set("notifier", "position", "top-right");
+      alertify.error("Error...Could not complete transaction");
+    })
+    .finally(() => {
+      setPaymentInfo({type:'',
+      waybill:'',
+      chequeNo:'',
+      receiptNo:'',
+      dueDate:'',
+      bank:'',
+      momoName:'',
+      transactionID:'',
+      amountPaid:'' })
+      setTimeout(() => {
+        $('.modal').modal('hide')
+        window.location.reload()
+      }, 1500)
+      //
+    })
+
+  }
+
+  const handleSellOnly = () => {
+    let payload = {
+      status:"Paid",
+      salesRef:modalData.Reference,
+      amount:modalData?.Total,
+      paymentInfo: {...paymentInfo, type:activeTab}
+    }
+
+    //console.log(payload)
+    axios.post('/sales',payload)
+    .then((res) => {
+      console.log(res.data.success)
+      if(res.data.success){
+        alertify.set("notifier", "position", "top-right");
+        alertify.success("Sale completed.");
+       
+      }
+    })
+    .catch((error) => {
+      alertify.set("notifier", "position", "top-right");
+      alertify.error("Error...Could not complete transaction");
+    })
+    .finally(() => {
+      setPaymentInfo({type:'',
+      waybill:'',
+      chequeNo:'',
+      receiptNo:'',
+      dueDate:'',
+      bank:'',
+      momoName:'',
+      transactionID:'',
+      amountPaid:'' })
+      setTimeout(() => {
+        $('.modal').modal('hide')
+        window.location.reload()
+      }, 1500)
+      //
+    })
+  }
+
+  const handleCreditAndPrint = () => {
+    getInvoiceReceipt(modalData.Reference)
+  }
+
+  const handleCreditOnly = () => {
+    getInvoiceReceipt(modalData.Reference)
+  }
+
+  const getInvoiceReceipt = (salesref) => {
+    axios.get('/sales/getSaleReceipt/'+ salesref)
+    .then((res) =>{
+    console.log(res.data)
+    var base64 = res.data.base64
+    const blob = base64ToBlob( base64, 'application/pdf' );
+    const url = URL.createObjectURL( blob );
+    const pdfWindow = window.open("");
+    pdfWindow.document.write("<iframe width='100%' height='100%' src='" + url + "'></iframe>");
+    })
+    
+    function base64ToBlob( base64, type = "application/octet-stream" ) {
+      const binStr = atob( base64 );
+      const len = binStr.length;
+      const arr = new Uint8Array(len);
+      for (let i = 0; i < len; i++) {
+        arr[ i ] = binStr.charCodeAt( i );
+      }
+      return new Blob( [ arr ], { type: type } );
+    }
+  }
+
+ 
+
+
   const options = [
     { id: 1, text: "Completed", text: "Completed" },
     { id: 2, text: "Paid", text: "Paid" },
@@ -71,104 +216,108 @@ const Suspended = () => {
     { id: 2, text: "Online", text: "Online" },
     { id: 2, text: "Inprogess", text: "Inprogess" },
   ];
- const [data, setData] = useState([{
-  name: 'Ernest',
-  date: new Date().toISOString(),
-  reference: 'REF001',
-  status: 'Suspended',
-  total: 30000,
-  payment: "Paid",
-  paid: 1000,
-  due: 2000,
-  biller: 'admin'
-
- }])
 
 
-  const {
-    data: sales,
-    isError,
-    isLoading,
-    isSuccess,
-  } = useGet("sales", "/sales");
 
-
-  // useEffect(() => {
-  //   if(!isLoading){
-  //     let mappedData =  sales?.data.map((sale) => {
-  //         return {
-  //           id: sale?.id,
-  //           Date: sale?.transDate,
-  //           Name: sale?.name || 'Franslina Pharmacy',
-  //           Status: sale?.status,
-  //           Reference: sale?.salesRef,
-  //           Payment: sale?.status,
-  //           Total: moneyInTxt(sale?.totalAmount),
-  //           Paid: 0,
-  //           Due: 0,
-  //           Biller: sale?.salesPerson,
-  //         }
-  //       })
-  //     setData(mappedData)
-  //     console.log('loaded..')
-  //   }
-  //   else{
-  //     console.log('loading...')
-  //   }
-  // }, [isLoading])
-
-  const handleCredit = () => {
-
-  }
+  useEffect(() => {
+    if(!isLoading){
+      let mappedData =  sales?.data.map((sale) => {
+          return {
+            id: sale?.id,
+            Date: sale?.transDate,
+            Name: sale?.name || 'Franslina Pharmacy',
+            Status: sale?.status,
+            Reference: sale?.salesRef,
+            Payment: sale?.paymentType,
+            Total: moneyInTxt(sale?.totalAmount),
+            Paid: sale?.changeAmt,
+            Due: sale?.balance,
+            Biller: sale?.salesPerson,
+            salesType: sale?.salesType
+          }
+        })
+      setData(mappedData)
+      console.log('loaded..')
+    }
+    else{
+      console.log('loading...')
+    }
+  }, [isLoading])
 
   const columns = [
     {
       title: "Costumer name",
-      dataIndex: "name",
-      sorter: (a, b) => a.name.length - b.name.length,
+      dataIndex: "Name",
+      sorter: (a, b) => a.Name.length - b.Name.length,
     },
     {
       title: "Date",
-      dataIndex: "date",
-      sorter: (a, b) => a.date.length - b.date.length,
+      dataIndex: "Date",
+      sorter: (a, b) => a.Date.length - b.Date.length,
     },
     {
       title: "Reference",
-      dataIndex: "reference",
-      sorter: (a, b) => a.reference.length - b.reference.length,
-    },
-
-    {
-      title: "Total (GHS)",
-      dataIndex: "total",
-      sorter: (a, b) => a.total.length - b.total.length,
+      dataIndex: "Reference",
+      sorter: (a, b) => a.Reference.length - b.Reference.length,
     },
     {
-      title: "Paid (GHS)",
-      dataIndex: "paid",
+      title: "Status",
+      dataIndex: "Status",
       render: (text, record) => (
         <>
-          {/* {text === 100 && <div className="text-green">{moneyInTxt(text)}</div>} */}
-          {<div>{moneyInTxt(text)}</div>}
+          {text === "Suspend" && (
+            <span className="badges bg-lightred">{text}</span>
+          )}
+          {text === "Paid" && (
+            <span className="badges bg-lightgreen">{"Complete"}</span>
+          )}
         </>
       ),
-      sorter: (a, b) => a.paid.length - b.paid.length,
+      sorter: (a, b) => a.Status.length - b.Status.length,
     },
     {
-      title: "Balance Due (GHS)",
-      dataIndex: "due",
+      title: "Payment",
+      dataIndex: "Payment",
       render: (text, record) => (
         <>
-          {/* {text === 100 && <div className="text-red">{moneyInTxt(text)}</div>} */}
-          {<div>{moneyInTxt(text)}</div>}
+         
+            <span className="badges bg-lightgreen">{(text)}</span>
+        
         </>
       ),
-      sorter: (a, b) => a.due.length - b.due.length,
+      sorter: (a, b) => a.Payment.length - b.Payment.length,
     },
     {
-      title: "Cashier",
-      dataIndex: "biller",
-      sorter: (a, b) => a.biller.length - b.biller.length,
+      title: "Amt Due (GHS)",
+      dataIndex: "Total",
+      sorter: (a, b) => a.Total.length - b.Total.length,
+    },
+    //{
+    //   title: "Paid (GHS)",
+    //   dataIndex: "Paid",
+    //   render: (text, record) => (
+    //     <>
+    //       {text === 100 && <div className="text-green">{moneyInTxt(text)}</div>}
+    //       {text === 0 && <div>{moneyInTxt(text)}</div>}
+    //     </>
+    //   ),
+    //   sorter: (a, b) => a.Paid.length - b.Paid.length,
+    // },
+    // {
+    //   title: "Due (GHS)",
+    //   dataIndex: "Due",
+    //   render: (text, record) => (
+    //     <>
+    //       {text === 100 && <div className="text-red">{moneyInTxt(text)}</div>}
+    //       {text === 0 && <div>{moneyInTxt(text)}</div>}
+    //     </>
+    //   ),
+    //   sorter: (a, b) => a.Due.length - b.Due.length,
+    // },
+    {
+      title: "Biller",
+      dataIndex: "Biller",
+      sorter: (a, b) => a.Biller.length - b.Biller.length,
     },
     {
       title: "Action",
@@ -202,12 +351,13 @@ const Suspended = () => {
                   className="dropdown-item"
                   data-bs-toggle="modal"
                   data-bs-target="#showpayment"
+                  onClick={() => setModalData(record)}
                 >
                   <img src={Dollar1} className="me-2" alt="img" />
                   Make Payments
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link
                   to="#"
                   className="dropdown-item"
@@ -218,10 +368,11 @@ const Suspended = () => {
                   Create Payment
                 </Link>
               </li>
+              */}
               <li>
                 <Link to="#" className="dropdown-item">
                   <img src={Download} className="me-2" alt="img" />
-                  Download pdf
+                  Hold Sale
                 </Link>
               </li>
               <li>
@@ -231,7 +382,7 @@ const Suspended = () => {
                   onClick={confirmText}
                 >
                   <img src={delete1} className="me-2" alt="img" />
-                  Delete Sale
+                  Remove Sale
                 </Link>
               </li>
             </ul>
@@ -242,8 +393,8 @@ const Suspended = () => {
   ];
 
 
-  if(isLoading){
-    return (<LoadingSpinner message="Fetching Sales.."/>)
+  if (isLoading) {
+    return (<LoadingSpinner message="Fetching Suspended sales.." />)
   }
 
   return (
@@ -268,9 +419,9 @@ const Suspended = () => {
               <Tabletop inputfilter={inputfilter} togglefilter={togglefilter} />
               {/* /Filter */}
               <div
-                className={`card mb-0 ${ inputfilter ? "toggleCls" : ""}`}
+                className={`card mb-0 ${inputfilter ? "toggleCls" : ""}`}
                 id="filter_inputs"
-                style={{ display: inputfilter ? "block" :"none"}}
+                style={{ display: inputfilter ? "block" : "none" }}
               >
                 <div className="card-body pb-0">
                   <div className="row">
@@ -325,7 +476,7 @@ const Suspended = () => {
           <div className="modal-dialog modal-lg modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">Sales Type: Wholesale</h5>
+                <h5 className="modal-title">Sales Type: {modalData?.salesType}</h5>
                 <button
                   type="button"
                   className="close"
@@ -336,26 +487,26 @@ const Suspended = () => {
                 </button>
               </div>
               <div className="modal-body">
-                <div style={{display:'grid', gridTemplateColumns:'4fr 1fr'}}>
-                  <div className="card" style={{border: '1px solid #252525'}}>
+                <div style={{ display: 'grid', gridTemplateColumns: '4fr 1fr' }}>
+                  <div className="card" style={{ border: '1px solid #252525' }}>
                     <div className="card-body">
-                        <div className="payment-div" >
-                          <ul className="nav nav-tabs">
-                              <li className="nav-item" onClick={()=>setActiveTab('cash')}>
-                                <a className={activeTab == 'cash' ? `nav-link active`: `nav-link`} href="javascript:void(0);">Cash</a>
-                              </li>
+                      <div className="payment-div" >
+                        <ul className="nav nav-tabs">
+                          <li className="nav-item" onClick={() => setActiveTab('Cash')}>
+                            <a className={activeTab == 'Cash' ? `nav-link active` : `nav-link`} href="javascript:void(0);">Cash</a>
+                          </li>
 
-                              <li className="nav-item" onClick={()=>setActiveTab('cheque')}>
-                                <a className={activeTab == 'cheque' ? `nav-link active`: `nav-link`} href="javascript:void(0);">Cheque</a>
-                              </li>
+                          <li className="nav-item" onClick={() => setActiveTab('Cheque')}>
+                            <a className={activeTab == 'Cheque' ? `nav-link active` : `nav-link`} href="javascript:void(0);">Cheque</a>
+                          </li>
 
-                              <li className="nav-item" onClick={()=>setActiveTab('momo')}>
-                                <a className={activeTab == 'momo' ? `nav-link active`: `nav-link`} href="javascript:void(0);">Mobile Money</a>
-                              </li>
-                              
-                          </ul>
+                          <li className="nav-item" onClick={() => setActiveTab('Momo')}>
+                            <a className={activeTab == 'Momo' ? `nav-link active` : `nav-link`} href="javascript:void(0);">Mobile Money</a>
+                          </li>
 
-                          {activeTab == 'cash' ? <div id="cash-tab" style={{marginTop:20}}>
+                        </ul>
+
+                        {activeTab == 'Cash' ? <div id="cash-tab" style={{ marginTop: 20 }}>
                           <div className="row">
                             <div className="col-6">
                               <div className="form-group">
@@ -364,8 +515,10 @@ const Suspended = () => {
                                   <input
                                     type="text"
                                     placeholder=""
+                                    value={paymentInfo.waybill}
+                                    onChange={(e) => setPaymentInfo({...paymentInfo, waybill: e.target.value})}
                                   />
-                                  
+
                                 </div>
                               </div>
                             </div>
@@ -377,54 +530,172 @@ const Suspended = () => {
                                   <input
                                     type="text"
                                     placeholder=""
+                                    value={paymentInfo.amountPaid}
+                                    onChange={(e) => {
+                                      ``
+                                      if(e.target.value == ''){
+                                        setPaymentInfo({...paymentInfo, amountPaid: ''})
+                                      }
+                                      if(Number(e.target.value) >  commaRemover(modalData?.Total)){
+                                        alertify.set("notifier", "position", "top-right");
+                                        alertify.warning('Amount can not be greater than amount due')
+                                      }
+                                      else if(isValidNumber(e.target.value)){
+                                        setPaymentInfo({...paymentInfo, amountPaid: Number(e.target.value)})
+                                      }
+                                     
+                                    }}
                                   />
-                                  
+
                                 </div>
                               </div>
                             </div>
-                          </div>
-                        </div> : null}
-                        {activeTab == 'cheque' ? <div id="cheque-tab" style={{marginTop:20}}>
-                          <div className="row">
-                            <div className="col-6">
-                                <div className="form-group">
-                                  <label>Cheque No</label>
-                                  <div className="input-groupicon">
-                                    <input
-                                      type="text"
-                                      placeholder=""
-                                    />
-                                    
-                                  </div>
-                                </div>
-                              </div>
 
-                              <div className="col-6">
-                                <div className="form-group">
-                                  <label>Amount</label>
-                                  <div className="input-groupicon">
-                                    <input
-                                      type="text"
-                                      placeholder=""
-                                    />
-                                    
-                                  </div>
-                                </div>
-                              </div>
-                          </div>
-                          
-                        </div> : null}
-                        {activeTab == 'momo' ? <div id="momo-tab" style={{marginTop:20}}>
-                          <div className="row">
-                          <div className="col-6">
+                            <div className="col-6">
                               <div className="form-group">
-                                <label>Momo number</label>
+                                <label>Receipt No </label>
                                 <div className="input-groupicon">
                                   <input
                                     type="text"
                                     placeholder=""
+                                    value={paymentInfo.receiptNo}
+                                    onChange={(e) => setPaymentInfo({...paymentInfo, receiptNo: e.target.value})}
                                   />
-                                  
+
+                                </div>
+                              </div>
+                            </div>
+
+                          </div>
+                        </div> : null}
+                        {activeTab == 'Cheque' ? <div id="cheque-tab" style={{ marginTop: 20 }}>
+                          <div className="row">
+
+                            <div className="col-6">
+                              <div className="form-group">
+                                <label>Waybill</label>
+                                <div className="input-groupicon">
+                                  <input
+                                    type="text"
+                                    placeholder=""
+                                    value={paymentInfo.waybill}
+                                    onChange={(e) => setPaymentInfo({...paymentInfo, waybill: e.target.value})}
+                                  />
+
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="col-6">
+                              <div className="form-group">
+                                <label>Cheque No</label>
+                                <div className="input-groupicon">
+                                  <input
+                                    type="text"
+                                    placeholder=""
+                                    value={paymentInfo.chequeNo}
+                                    onChange={(e) => setPaymentInfo({...paymentInfo, chequeNo: e.target.value})}
+                                  />
+
+                                </div>
+                              </div>
+                            </div>
+
+
+                            <div className="col-6">
+                              <div className="form-group">
+                                <label>Receipt No</label>
+                                <div className="input-groupicon">
+                                  <input
+                                    type="text"
+                                    placeholder=""
+                                    value={paymentInfo.receiptNo}
+                                    onChange={(e) => setPaymentInfo({...paymentInfo, receiptNo: e.target.value})}
+                                  />
+
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="col-6">
+                              <div className="form-group">
+                                <label>Due Date</label>
+                                <div className="input-groupicon">
+                                  <input
+                                    type="date"
+                                    placeholder=""
+                                    className="form-control"
+                                    value={paymentInfo.dueDate}
+                                    onChange={(e) => setPaymentInfo({...paymentInfo, dueDate: e.target.value})}
+                                  />
+
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="col-6">
+                              <div className="form-group">
+                                <label>Bank</label>
+                                <div className="input-groupicon">
+                                  <input
+                                    type="text"
+                                    placeholder=""
+                                    value={paymentInfo.bank}
+                                    onChange={(e) => setPaymentInfo({...paymentInfo, bank: e.target.value})}
+                                  />
+
+                                </div>
+                              </div>
+                            </div>
+
+
+
+                            <div className="col-6">
+                              <div className="form-group">
+                                <label>Amount</label>
+                                <div className="input-groupicon">
+                                  <input
+                                    type="text"
+                                    placeholder=""
+                                    value={paymentInfo.amountPaid}
+                                    onChange={(e) => setPaymentInfo({...paymentInfo, amountPaid: e.target.value})}
+                                  />
+
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                        </div> : null}
+                        {activeTab == 'Momo' ? <div id="momo-tab" style={{ marginTop: 20 }}>
+                          <div className="row">
+                            <div className="col-6">
+                              <div className="form-group">
+                                <label>Receipt No</label>
+                                <div className="input-groupicon">
+                                  <input
+                                    type="text"
+                                    placeholder=""
+                                    value={paymentInfo.receiptNo}
+                                    onChange={(e) => setPaymentInfo({...paymentInfo, receiptNo: e.target.value})}
+                                  />
+
+                                </div>
+                              </div>
+                            </div>
+
+
+                            <div className="col-6">
+                              <div className="form-group">
+                                <label>Name</label>
+                                <div className="input-groupicon">
+                                  <input
+                                    type="text"
+                                    placeholder=""
+                                    value={paymentInfo.momoName}
+                                    onChange={(e) => setPaymentInfo({...paymentInfo, momoName: e.target.value})}
+                                  />
+
                                 </div>
                               </div>
                             </div>
@@ -436,70 +707,87 @@ const Suspended = () => {
                                   <input
                                     type="text"
                                     placeholder=""
+                                    value={paymentInfo.amountPaid}
+                                    onChange={(e) => setPaymentInfo({...paymentInfo, amountPaid: e.target.value})}
                                   />
-                                  
+
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="col-6">
+                              <div className="form-group">
+                                <label>Transaction ID</label>
+                                <div className="input-groupicon">
+                                  <input
+                                    type="text"
+                                    placeholder=""
+                                    value={paymentInfo.transactionID}
+                                    onChange={(e) => setPaymentInfo({...paymentInfo, transactionID: e.target.value})}
+                                  />
+
                                 </div>
                               </div>
                             </div>
                           </div>
-                          
-                        </div> :null}
-                        </div>
 
-                        <div className="row">
-                          <div className="col-lg-6 ">
-                            <div className="total-order w-100 max-widthauto m-auto mb-4">
-                              <ul>
-                                <li>
-                                  <h4>Amount Given</h4>
-                                  <h5>GHS 0.00 </h5>
-                                </li>
-                                <li>
-                                  <h4>Discount </h4>
-                                  <h5>GHS 0.00</h5>
-                                </li>
-                              </ul>
-                            </div>
-                          </div>
-                          <div className="col-lg-6 ">
-                            <div className="total-order w-100 max-widthauto m-auto mb-4">
-                              <ul>
-                              <li className="total">
-                                  <h4>Grand Total</h4>
-                                  <h5>GHS 0.00</h5>
-                                </li>
-                                <li>
-                                  <h4>Balance</h4>
-                                  <h5>GHS 0.00</h5>
-                                </li>
-                              
-                              </ul>
-                            </div>
+                        </div> : null}
+                      </div>
+
+                      <div className="row">
+                        <div className="col-lg-6 ">
+                          <div className="total-order w-100 max-widthauto m-auto mb-4">
+                            <ul>
+                              <li>
+                                <h4>Amount Given</h4>
+                                <h5>GHS {moneyInTxt(paymentInfo?.amountPaid)} </h5>
+                              </li>
+                              <li>
+                                <h4>Discount </h4>
+                                <h5>GHS 0.00</h5>
+                              </li>
+                            </ul>
                           </div>
                         </div>
+                        <div className="col-lg-6 ">
+                          <div className="total-order w-100 max-widthauto m-auto mb-4">
+                            <ul>
+                              <li className="total">
+                                <h4>Grand Total</h4>
+                                <h5>GHS {moneyInTxt(modalData?.Total)}</h5>
+                              </li>
+                              <li>
+                                <h4>Balance</h4>
+                                <h5>GHS {moneyInTxt(Number(modalData?.Total) - Number(paymentInfo.amountPaid))}</h5>
+                              </li>
+
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
-                  <div style={{display:'flex', justifyContent:'center', alignItems:'center', fontSize:20, fontWeight:900}}>GHS 50,000</div>
+                  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: 20, fontWeight: 900 }}>GHS {modalData?.Total}</div>
                 </div>
-                
+
                 <div className="row mt-2">
-                <div className="col-lg-12" style={{display:'flex', justifyContent:'space-between'}} >
-                  <button className="btn btn-info me-2" onClick={handleCredit} style={{width:'20%'}}>
-                    Sell and Print
-                  </button>
-                  <button className="btn btn-warning me-2" onClick={handleCredit} style={{width:'20%'}}>
-                    Sell Only
-                  </button>
-                  <button className="btn btn-danger me-2" style={{width:'20%'}} onClick={handleCredit} >
-                    Credit and Print
-                  </button>
-                  <button  className="btn btn-cancel" style={{width:'20%'}} onClick={handleCredit}>
-                     Credit Only
-                  </button>
-                  
+                  <div className="col-lg-12" style={{ display: 'flex', justifyContent: 'space-between' }} >
+                    <button className="btn btn-info me-2" onClick={handleSellAndPrint} style={{ width: '20%' }}>
+                      Sell and Print
+                    </button>
+                    <button className="btn btn-warning me-2" onClick={handleSellOnly} style={{ width: '20%' }}>
+                      Sell Only
+                    </button>
+                    <button className="btn btn-danger me-2" style={{ width: '20%' }} onClick={handleCreditAndPrint} >
+                      Credit and Print
+                    </button>
+                    <button className="btn btn-cancel" style={{ width: '20%' }} onClick={handleCreditOnly}>
+                      Credit Only
+                    </button>
+
+                  </div>
                 </div>
-              </div>
               </div>
             </div>
           </div>
