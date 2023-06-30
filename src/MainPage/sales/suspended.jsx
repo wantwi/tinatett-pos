@@ -20,9 +20,11 @@ import {
   Dollar1,
  // plusCircle,
   Download,
+  pause1,
   delete1,
   //DeleteIcon,
   datepicker,
+  DeleteIcon,
 } from "../../EntryFile/imagePath";
 import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
@@ -34,6 +36,7 @@ import { usePost } from "../../hooks/usePost";
 import alertify from "alertifyjs";
 import "../../../node_modules/alertifyjs/build/css/alertify.css";
 import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
+import { Button } from "antd";
 
 
 const Suspended = () => {
@@ -44,15 +47,27 @@ const Suspended = () => {
   const [modalData, setModalData] = useState(null)
   const [paymentInfo, setPaymentInfo] = useState({
     type:'',
-    waybill:'',
+    cashWaybill:'',
+    cashReceiptNo:'',
+    cashAmount:'',
     chequeNo:'',
-    receiptNo:'',
+    chequeReceiptNo:'',
+    chequeAmount:'',
+    chequeWaybill:'',
     dueDate:'',
     bank:'',
     momoName:'',
+    momoReceiptNo:'',
+    momoAmount:'' ,
     transactionID:'',
-    amountPaid:'' 
+    amountPaid:''
+     
   })
+
+
+  useEffect(() => {
+   setPaymentInfo({...paymentInfo, amountPaid: Number(paymentInfo.cashAmount) + Number(paymentInfo.chequeAmount) + Number(paymentInfo.momoAmount)})
+  }, [paymentInfo.cashAmount, paymentInfo.chequeAmount, paymentInfo.momoAmount])
 
   const {
     data: sales,
@@ -97,40 +112,47 @@ const Suspended = () => {
       status:"Paid",
       salesRef:modalData.Reference,
       amount:modalData?.Total,
-      paymentInfo: {...paymentInfo, type:activeTab}
+      paymentInfo: {...paymentInfo}
     }
 
-    //console.log(payload)
-    axios.post('/sales',payload)
-    .then((res) => {
-      console.log(res.data.success)
-      if(res.data.success){
-        getInvoiceReceipt(modalData.Reference)
-        alertify.set("notifier", "position", "top-right");
-        alertify.success("Sale completed.");
+    console.log(payload)
+    // axios.post('/sales',payload)
+    // .then((res) => {
+    //   console.log(res.data.success)
+    //   if(res.data.success){
+    //     getInvoiceReceipt(modalData.Reference)
+    //     alertify.set("notifier", "position", "top-right");
+    //     alertify.success("Sale completed.");
        
-      }
-    })
-    .catch((error) => {
-      alertify.set("notifier", "position", "top-right");
-      alertify.error("Error...Could not complete transaction");
-    })
-    .finally(() => {
-      setPaymentInfo({type:'',
-      waybill:'',
-      chequeNo:'',
-      receiptNo:'',
-      dueDate:'',
-      bank:'',
-      momoName:'',
-      transactionID:'',
-      amountPaid:'' })
-      setTimeout(() => {
-        $('.modal').modal('hide')
-        window.location.reload()
-      }, 1500)
-      //
-    })
+    //   }
+    // })
+    // .catch((error) => {
+    //   alertify.set("notifier", "position", "top-right");
+    //   alertify.error("Error...Could not complete transaction");
+    // })
+    // .finally(() => {
+    //   setPaymentInfo({type:'',
+    //   cashWaybill:'',
+    //   cashReceiptNo:'',
+    //   cashAmount:'',
+    //   chequeNo:'',
+    //   chequeReceiptNo:'',
+    //   chequeAmount:'',
+    //   chequeWaybill:'',
+    //   dueDate:'',
+    //   bank:'',
+    //   momoName:'',
+    //   momoReceiptNo:'',
+    //   momoAmount:'' ,
+    //   transactionID:'',
+    //   amountPaid:''
+    //  })
+    //   setTimeout(() => {
+    //     $('.modal').modal('hide')
+    //     window.location.reload()
+    //   }, 1500)
+    //   //
+    // })
 
   }
 
@@ -225,7 +247,7 @@ const Suspended = () => {
           return {
             id: sale?.id,
             Date: sale?.transDate,
-            Name: sale?.name || 'Franslina Pharmacy',
+            Name: sale?.customer?.name || 'N/A',
             Status: sale?.status,
             Reference: sale?.salesRef,
             Payment: sale?.paymentType,
@@ -233,7 +255,7 @@ const Suspended = () => {
             Paid: sale?.changeAmt,
             Due: sale?.balance,
             Biller: sale?.salesPerson,
-            salesType: sale?.salesType
+            salestype: sale?.salesType
           }
         })
       setData(mappedData)
@@ -261,32 +283,27 @@ const Suspended = () => {
       sorter: (a, b) => a.Reference.length - b.Reference.length,
     },
     {
-      title: "Status",
-      dataIndex: "Status",
+      title: "Sales Type",
+      dataIndex: "salestype",
       render: (text, record) => (
         <>
-          {text === "Suspend" && (
-            <span className="badges bg-lightred">{text}</span>
-          )}
-          {text === "Paid" && (
-            <span className="badges bg-lightgreen">{"Complete"}</span>
-          )}
+         <p>{text}</p>
         </>
       ),
-      sorter: (a, b) => a.Status.length - b.Status.length,
+      sorter: (a, b) => a.salestype.length - b.salestype.length,
     },
-    {
-      title: "Payment",
-      dataIndex: "Payment",
-      render: (text, record) => (
-        <>
+    // {
+    //   title: "Payment",
+    //   dataIndex: "Payment",
+    //   render: (text, record) => (
+    //     <>
          
-            <span className="badges bg-lightgreen">{(text)}</span>
+    //         <span className="badges bg-lightgreen">{(text)}</span>
         
-        </>
-      ),
-      sorter: (a, b) => a.Payment.length - b.Payment.length,
-    },
+    //     </>
+    //   ),
+    //   sorter: (a, b) => a.Payment.length - b.Payment.length,
+    // },
     {
       title: "Amt Due (GHS)",
       dataIndex: "Total",
@@ -323,16 +340,7 @@ const Suspended = () => {
       title: "Action",
       render: (text, record) => (
         <>
-          <div className="text-center">
-            <Link
-              className="action-set"
-              to="#"
-              data-bs-toggle="dropdown"
-              aria-expanded="true"
-            >
-              <i className="fa fa-ellipsis-v" aria-hidden="true" />
-            </Link>
-            <ul className="dropdown-menu">
+        
               {/* <li>
                 <Link to="/tinatett-pos/sales/sales-details" className="dropdown-item">
                   <img src={Eye1} className="me-2" alt="img" />
@@ -345,18 +353,20 @@ const Suspended = () => {
                   Edit Sale
                 </Link>
               </li> */}
-              <li>
+            
                 <Link
                   to="#"
-                  className="dropdown-item"
+                  // className="dropdown-item"
                   data-bs-toggle="modal"
                   data-bs-target="#showpayment"
                   onClick={() => setModalData(record)}
+                  title={'Pay'}
                 >
-                  <img src={Dollar1} className="me-2" alt="img" />
-                  Make Payments
+                  {/* <img src={Dollar1} className="me-2" alt="img" /> */}
+                  <span className="badges bg-lightgreen me-2">Pay</span>
+                  {/* Pay */}
                 </Link>
-              </li>
+             
               {/* <li>
                 <Link
                   to="#"
@@ -369,24 +379,29 @@ const Suspended = () => {
                 </Link>
               </li>
               */}
-              <li>
-                <Link to="#" className="dropdown-item">
-                  <img src={Download} className="me-2" alt="img" />
-                  Hold Sale
+        
+                <Link to="#" 
+                title={'Hold'}
+                // className="dropdown-item"
+                >
+                  {/* <img src={pause1} style={{ height:18, width: 18}} className="me-2" alt="img" /> */}
+                  <span className="badges me-2 btn-cancel">Hold</span>
+                  {/* Hold  */}
                 </Link>
-              </li>
-              <li>
+            
+             
                 <Link
                   to="#"
-                  className="dropdown-item confirm-text"
+                  // className="dropdown-item confirm-text"
                   onClick={confirmText}
+                  title={'Remove'}
                 >
-                  <img src={delete1} className="me-2" alt="img" />
-                  Remove Sale
+                  {/* <img src={DeleteIcon} className="me-2" alt="img" /> */}
+                  <span className="badges bg-lightred">Remove</span>
+                  {/* Remove  */}
                 </Link>
-              </li>
-            </ul>
-          </div>
+             
+            
         </>
       ),
     },
@@ -476,7 +491,7 @@ const Suspended = () => {
           <div className="modal-dialog modal-lg modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">Sales Type: {modalData?.salesType}</h5>
+                <h5 className="modal-title">Sales Type: {modalData?.salestype}</h5>
                 <button
                   type="button"
                   className="close"
@@ -515,8 +530,8 @@ const Suspended = () => {
                                   <input
                                     type="text"
                                     placeholder=""
-                                    value={paymentInfo.waybill}
-                                    onChange={(e) => setPaymentInfo({...paymentInfo, waybill: e.target.value})}
+                                    value={paymentInfo.cashWaybill}
+                                    onChange={(e) => setPaymentInfo({...paymentInfo, cashWaybill: e.target.value})}
                                   />
 
                                 </div>
@@ -530,18 +545,13 @@ const Suspended = () => {
                                   <input
                                     type="text"
                                     placeholder=""
-                                    value={paymentInfo.amountPaid}
+                                    value={paymentInfo.cashAmount}
                                     onChange={(e) => {
-                                      ``
                                       if(e.target.value == ''){
-                                        setPaymentInfo({...paymentInfo, amountPaid: ''})
-                                      }
-                                      if(Number(e.target.value) >  commaRemover(modalData?.Total)){
-                                        alertify.set("notifier", "position", "top-right");
-                                        alertify.warning('Amount can not be greater than amount due')
+                                        setPaymentInfo({...paymentInfo, cashAmount: ''})
                                       }
                                       else if(isValidNumber(e.target.value)){
-                                        setPaymentInfo({...paymentInfo, amountPaid: Number(e.target.value)})
+                                        setPaymentInfo({...paymentInfo, cashAmount: Number(e.target.value)})
                                       }
                                      
                                     }}
@@ -558,8 +568,8 @@ const Suspended = () => {
                                   <input
                                     type="text"
                                     placeholder=""
-                                    value={paymentInfo.receiptNo}
-                                    onChange={(e) => setPaymentInfo({...paymentInfo, receiptNo: e.target.value})}
+                                    value={paymentInfo.cashReceiptNo}
+                                    onChange={(e) => setPaymentInfo({...paymentInfo, cashReceiptNo: e.target.value})}
                                   />
 
                                 </div>
@@ -578,8 +588,8 @@ const Suspended = () => {
                                   <input
                                     type="text"
                                     placeholder=""
-                                    value={paymentInfo.waybill}
-                                    onChange={(e) => setPaymentInfo({...paymentInfo, waybill: e.target.value})}
+                                    value={paymentInfo.chequeWaybill}
+                                    onChange={(e) => setPaymentInfo({...paymentInfo, chequeWaybill: e.target.value})}
                                   />
 
                                 </div>
@@ -609,8 +619,8 @@ const Suspended = () => {
                                   <input
                                     type="text"
                                     placeholder=""
-                                    value={paymentInfo.receiptNo}
-                                    onChange={(e) => setPaymentInfo({...paymentInfo, receiptNo: e.target.value})}
+                                    value={paymentInfo.chequeReceiptNo}
+                                    onChange={(e) => setPaymentInfo({...paymentInfo, chequeReceiptNo: e.target.value})}
                                   />
 
                                 </div>
@@ -657,8 +667,8 @@ const Suspended = () => {
                                   <input
                                     type="text"
                                     placeholder=""
-                                    value={paymentInfo.amountPaid}
-                                    onChange={(e) => setPaymentInfo({...paymentInfo, amountPaid: e.target.value})}
+                                    value={paymentInfo.chequeAmount}
+                                    onChange={(e) => setPaymentInfo({...paymentInfo, chequeAmount: e.target.value})}
                                   />
 
                                 </div>
@@ -676,8 +686,8 @@ const Suspended = () => {
                                   <input
                                     type="text"
                                     placeholder=""
-                                    value={paymentInfo.receiptNo}
-                                    onChange={(e) => setPaymentInfo({...paymentInfo, receiptNo: e.target.value})}
+                                    value={paymentInfo.momoReceiptNo}
+                                    onChange={(e) => setPaymentInfo({...paymentInfo, momoReceiptNo: e.target.value})}
                                   />
 
                                 </div>
@@ -707,8 +717,8 @@ const Suspended = () => {
                                   <input
                                     type="text"
                                     placeholder=""
-                                    value={paymentInfo.amountPaid}
-                                    onChange={(e) => setPaymentInfo({...paymentInfo, amountPaid: e.target.value})}
+                                    value={paymentInfo.momoAmount}
+                                    onChange={(e) => setPaymentInfo({...paymentInfo, momoAmount: e.target.value})}
                                   />
 
                                 </div>
@@ -768,7 +778,14 @@ const Suspended = () => {
                     </div>
                   </div>
 
-                  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: 20, fontWeight: 900 }}>GHS {modalData?.Total}</div>
+                
+                  <div style={{ display: 'flex', flexDirection:'column', justifyContent: 'center', alignItems: 'center',  fontWeight: 900 }}>
+                    <div  style={{ display: 'flex', flexDirection:'column', width:'90%', gap:10}}>
+                    <Button  data-bs-dismiss="modal" color="#3085d6">{' Hold '} </Button>
+                    <Button  data-bs-dismiss="modal" color="#252525">Remove</Button>
+                    </div> 
+                    <span style={{fontSize: 20, marginTop:180, marginBottom:180}}>GHS {modalData?.Total}</span>
+                    </div>
                 </div>
 
                 <div className="row mt-2">

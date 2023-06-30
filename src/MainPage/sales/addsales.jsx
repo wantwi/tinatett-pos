@@ -42,6 +42,7 @@ const Addsales = () => {
   const [wholesaleprice, setWholesalePrice] = useState('')
   const [specialprice, setSpecialPrice] = useState('')
   const [formData, setFormData] = useState({quantity:'', amount:'', batchNumber:'', manuDate:'', expDate:''})
+  const [editFormData, setEditFormData] = useState({name:'',quantity:'', amount:'', batchNumber:'', manuDate:'', expDate:''})
   const [salesType, setSalesType] = useState('Retail')
   const [paymentData, setPaymentData] = useState({paymentType:'', accountNo:'', branch: ''})
   const [productGridData, setProductGridData] = useState([])
@@ -51,6 +52,10 @@ const Addsales = () => {
   const retailpriceTypeRef = useRef()
   const specialpriceTypeRef = useRef()
   const wholesalepriceTypeRef = useRef()
+
+  const retailRef = useRef()
+  const wholesaleRef = useRef()
+
   const {
     data: customers,
     isLoading: customersIsLoading,
@@ -62,16 +67,25 @@ const Addsales = () => {
   } = useGet("products", "/product");
   const { isLoading, data, isError, error, mutate } = usePost("/sales/suspend");
 
-  // useEffect(() => {
-  //   if(data?.success){
-  //     setIsSubmitSuccessful(true)
-  //     setProductGridData([])
-  //     setFormData({quantity:0, amount:0, batchNumber:'', manuDate:'', expDate:''})
-  //     setSelectedProduct('')
-  //   }
-  // }, [data])
 
   const axios = useCustomApi()
+
+  const deleteRow = (record) => {
+     console.log(record)
+    // console.log(productGridData)
+    let newGridData = productGridData.filter((item) => item.productId !== record.productId)
+    //console.log(newGridData)
+    setProductGridData(newGridData)
+  };
+
+  const handleUpdate = ()=> {
+    let updated = editFormData
+    let listCopy = [...productGridData]
+    let index = productGridData.findIndex(item => item.productId == updated.productId)
+    listCopy[index] = updated
+    setProductGridData(listCopy)
+    $('.modal').modal('hide')
+  }
 
   const handleInvoice = () =>{
 
@@ -85,13 +99,25 @@ const Addsales = () => {
 
   }
 
+  const handleSalesTypeChange = (e) => {
+    if(e.target.value == "Retail"){
+      setSalesType("Retail")
+    }
+    else if(e.target.value == "Wholesale"){
+      setSalesType("Wholesale")
+    }
+    else{
+      setSalesType('')
+    }
+  }
+
   const handleSuspend = () => {
     let payload = {
       customerId: selectedCustomer.value,
       transDate: transDate,
       totalAmount : productGridData.reduce((total, item) => total + item.amount, 0),
       salesType:salesType,
-      products: productGridData,
+      products: productGridData
     }
 
 
@@ -121,12 +147,14 @@ const Addsales = () => {
 
   const handleAddItem = () => {
     //console.log(productFormData)
-  console.log(selectedCustomer)
+  //console.log(selectedCustomer)
       let obj = {
          name: selectedProduct.label,
          productId:selectedProduct.value,
          batchNumber: formData.batchNumber?.value,
          quantity :formData.quantity,
+         expireDate: formData.expDate.substring(0,10),
+         manufacturingDate:formData.manuDate.substring(0,10),
          unitPrice:price,
          amount:formData.quantity * price
       } 
@@ -144,6 +172,7 @@ const Addsales = () => {
         setWholesalePrice('')
         setSpecialPrice('')
         setRetailPrice('')
+        setPrice(0)
       }
   
    
@@ -154,13 +183,20 @@ const Addsales = () => {
     setRetailPrice('(' + e.retailPrice + 'GHS)')
     setWholesalePrice('(' + e.wholeSalePrice  + 'GHS)')
     setSpecialPrice('(' + e.specialPrice  + 'GHS)')
+    salesType == 'Retail' ? setPrice(e.retailPrice) : salesType == "Wholesale" ? setPrice(e.wholeSalePrice) : setPrice(e.specialPrice)
     //console.log(e)
   }
 
   useEffect(() => {
-    axios.get(`${BASE_URL}/purchase/product/${selectedProduct?.value}`).then((data) => {
-      if(data.data.success){
-        setSelectedProductInfo(data.data.data)
+    axios.get(`${BASE_URL}/purchase/product/${selectedProduct?.value}`).then((res) => {
+      if(res.data.success){
+        setSelectedProductInfo(res.data.data)
+        let x = res.data.data.batchNumber?.map((item) => {
+          return {value:item.batchNumber, label:item?.batchNumber + '-(' + item?.Quantity +')', expireDate:item?.expireDate, manufacturingDate: item?.manufacturingDate}
+        })
+        //console.log(x)
+        setFormData({...formData, batchNumber: x[0], manuDate: x[0].manufacturingDate, expDate: x[0].expireDate})
+        retailpriceTypeRef.current.checked = true
       }
     })
 
@@ -187,24 +223,21 @@ const Addsales = () => {
             retailPrice: product?.retailPrice,
             wholeSalePrice: product?.wholeSalePrice,
             specialPrice: product?.specialPrice,
-            remainingStock: product?.remainingStock,
+            remainingStock: product?.stock_count,
             manuDate: product?.manufacturingDate,
             expDate: product?.expiryDate
           }
         })
         setProductsList(mappedData2)
+        retailRef.current.checked = true
       
     }
   }, [productsIsLoading, customersIsLoading])
 
 
-  // if(productsIsLoading || customersIsLoading){
-  //   return (<LoadingSpinner/>)
-  // }
-
   return (
     <div className="page-wrapper">
-      <div className="content">
+        <div className="content">
         <div className="page-header">
           <div className="page-title">
             <h4>Add Sale</h4>
@@ -247,11 +280,9 @@ const Addsales = () => {
 
                             <div className="input-group">
                               <div className="input-group-text">
-                                <input className="form-check-input" type="radio" name="salesType" checked={true}  value={'Retail'} onChange={(e) => {
-                                 setSalesType(e.target.value)}}
-                                />
+                                <input className="form-check-input" type="radio" ref={retailRef} name="salesType" value={'Retail'} onChange={handleSalesTypeChange}  />
                               </div>
-                              <input type="text" className="form-control" aria-label="Text input with radio button"  placeholder={`Retail`} />
+                              <input type="text" className="form-control" aria-label="Text input with radio button" value={'Retail'} placeholder={`Retail`} />
                             </div>
                           
                           </div>
@@ -259,11 +290,9 @@ const Addsales = () => {
                           <div className="col-lg-6">
                             <div className="input-group">
                               <div className="input-group-text">
-                                <input className="form-check-input" type="radio" name="salesType" value={'Wholesale'} onChange={(e) => {
-                                 setSalesType(e.target.value)}}
-                                />
+                                <input className="form-check-input" type="radio" ref={wholesaleRef} name="salesType" value={'Wholesale'} onChange={handleSalesTypeChange} />
                               </div>
-                              <input type="text" className="form-control" aria-label="Text input with radio button" placeholder={`Wholesale`} />
+                              <input type="text" className="form-control" aria-label="Text input with radio button" value={'Wholesale'} placeholder={`Wholesale`} />
                             </div>
                         </div>
 
@@ -338,7 +367,7 @@ const Addsales = () => {
                       <input
                         className="form-control"
                         type="text"
-                        value={selectedProductInfo?.totalQuantity}
+                        value={selectedProduct?.remainingStock}
                         disabled
                       />
                       
@@ -352,7 +381,7 @@ const Addsales = () => {
                     <div className="input-groupicon">
                       <Select
                         options={selectedProductInfo?.batchNumber?.map((item) => {
-                          return {value:item.batchNumber, label:item?.batchNumber + '-(' + item?.remainingQuantity +')', expireDate:item?.expireDate, manufacturingDate: item?.manufacturingDate}
+                          return {value:item.batchNumber, label:item?.batchNumber + '-(' + item?.Quantity +')', expireDate:item?.expireDate, manufacturingDate: item?.manufacturingDate}
                         })}
                         placeholder=""
                         value={formData.batchNumber}
@@ -408,8 +437,12 @@ const Addsales = () => {
 
                             <div className="input-group">
                               <div className="input-group-text">
-                                <input className="form-check-input" type="radio" ref={retailpriceTypeRef} name="priceType" value={selectedProduct?.retailPrice} onChange={(e) => {
+                                <input className="form-check-input" type="radio" ref={retailpriceTypeRef} name="priceType" value={selectedProduct?.retailPrice} 
+                                onChange={(e) => {
                                   setPrice(e.target.value)
+                                  setSalesType('Retail')
+                                  retailRef.current.checked = true
+                                  wholesaleRef.current.checked =false
                                   setDisableUnselectedPrice({retail:false, wholesale:true, special:true})
                                 }}/>
                               </div>
@@ -421,8 +454,12 @@ const Addsales = () => {
                           <div className="col-lg-4">
                             <div className="input-group">
                               <div className="input-group-text">
-                                <input className="form-check-input" type="radio" ref={wholesalepriceTypeRef} name="priceType" value={selectedProduct?.wholeSalePrice} onChange={(e) => {
+                                <input className="form-check-input" type="radio" ref={wholesalepriceTypeRef} name="priceType" value={selectedProduct?.wholeSalePrice} 
+                                onChange={(e) => {
                                   setPrice(e.target.value)
+                                  setSalesType('Wholesale')
+                                  retailRef.current.checked = false
+                                  wholesaleRef.current.checked =true
                                   setDisableUnselectedPrice({wholesale:false, retail:true, special:true})}
                                  } />
                               </div>
@@ -458,6 +495,10 @@ const Addsales = () => {
                         onChange={(e) => {
                           if(e.target.value == ''){
                             setFormData({...formData, quantity: ''})
+                          }
+                          if(Number(e.target.value) > (selectedProduct?.remainingStock)){
+                            alertify.set("notifier", "position", "top-right");
+                            alertify.warning('Quantity can not be greater than quantity in stock')
                           }
                           else if(isValidNumber(e.target.value)){
                             setFormData({...formData, quantity: Number(e.target.value)})
@@ -764,10 +805,10 @@ const Addsales = () => {
                             <td>{item.amount}</td>
                             
                             <td>
-                            <Link to="#" className="delete-set me-2">
+                            <Link to="#" className="delete-set me-2" data-bs-toggle="modal" data-bs-target="#editproduct" onClick={() => setEditFormData(item)}>
                                 <img src={EditIcon} alt="svg" />
                               </Link>
-                              <Link to="#" className="delete-set">
+                              <Link to="#" className="delete-set" onClick={() => deleteRow(item)}>
                                 <img src={DeleteIcon} alt="svg" />
                               </Link>
                             </td>
@@ -858,6 +899,93 @@ const Addsales = () => {
       </div>
         
         </div>
+
+{/* Modal Edit */}
+        <div
+            className="modal fade"
+            id="editproduct"
+            tabIndex={-1}
+            aria-labelledby="editproduct"
+            aria-hidden="true"
+          >
+            <div className="modal-dialog modal-md modal-dialog-centered">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">Edit Product</h5>
+                  <button
+                    type="button"
+                    className="close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                  >
+                    <span aria-hidden="true">×</span>
+                  </button>
+                </div>
+                <div className="modal-body">
+                  <div className="row">
+                    <div className="col-lg-12 col-sm-12 col-12">
+                      <div className="form-group">
+                        <label>Product Name</label>
+                        <div className="input-groupicon">
+                        <input type="text" value={editFormData?.name} onChange={(e) => setEditFormData({...editFormData, name:e.target.value})} disabled/>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="col-lg-6 col-sm-12 col-12">
+                      <div className="form-group">
+                        <label>Quantity</label>
+                        <input type="text" value={editFormData?.quantity}
+                         onChange={(e) => {
+                          if(e.target.value == ''){
+                            setEditFormData({...editFormData, quantity: ''})
+                          }
+                          else if (isValidNumber(e.target.value)) {
+                            let qty = parseInt(e.target.value) || 0
+                            let unitP = parseInt(editFormData.unitPrice) || 0
+                            setEditFormData({ ...editFormData, quantity: e.target.value, amount: editFormData.quantity ? unitP * qty : unitP * 1 })
+                          }
+                        }
+                        }/>
+                      </div>
+                    </div>
+                 
+                    <div className="col-lg-6 col-sm-12 col-12">
+                      <div className="form-group">
+                        <label>Unit Price</label>
+                        <input type="text" value={editFormData?.unitPrice} 
+                         onChange={(e) => {
+                          let unitP = parseInt(e.target.value) || 0
+                          let qty = parseInt(editFormData.quantity) || 0
+                          setEditFormData({ ...editFormData, unitPrice: e.target.value, amount: editFormData ? unitP * qty : unitP * 1 })
+                        }}
+                        />
+                      </div>
+                    </div>
+                    <div className="col-lg-6 col-sm-12 col-12">
+                      <div className="form-group">
+                        <label>Amount</label>
+                        <input type="text" value={editFormData?.amount} />
+                      </div>
+                    </div>
+                   
+                   
+                  </div>
+                </div>
+                <div className="modal-footer" style={{justifyContent:'flex-end'}}>
+                  <button type="button" className="btn btn-submit" onClick={handleUpdate}>
+                    Update
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-cancel"
+                    data-bs-dismiss="modal"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
       </div>
   
   );

@@ -25,7 +25,7 @@ import "../../../node_modules/alertifyjs/build/css/alertify.css";
 import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
 import { usePost } from "../../hooks/usePost";
 import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
-import FeatherIcon  from "feather-icons-react";
+import FeatherIcon from "feather-icons-react";
 
 const options2 = [
   { id: 1, text: "choose Status", text: "choose Status" },
@@ -34,13 +34,14 @@ const options2 = [
 ];
 
 const AddPurchase = () => {
-  const [purDate, setPurDate] = useState(new Date().toISOString().slice(0,10));
+  const [purDate, setPurDate] = useState(new Date().toISOString().slice(0, 10));
   const [manDate, setManDate] = useState('');
   const [expDate, setExpDate] = useState('');
 
 
   const [productGridData, setProductGridData] = useState([])
-  const [productFormData, setProductFormData] = useState({ unitPrice: '', quantity: '', amount: '', manufacturingDate:'', expireDate:'', batchNumber:''})
+  const [productFormData, setProductFormData] = useState({ unitPrice: '', quantity: '', amount: '', manufacturingDate: '', expireDate: '', batchNumber: '' })
+  const [editFormData, setEditFormData] = useState({ unitPrice: '', quantity: '', amount: '', manufacturingDate: '', expireDate: '', batchNumber: '' })
   const [supplier, setSupplier] = useState('')
   const [selectedProduct, setSelectedProduct] = useState('')
 
@@ -63,9 +64,18 @@ const AddPurchase = () => {
     setProductGridData(newGridData)
   };
 
+  const handleUpdate = ()=> {
+    let updated = editFormData
+    let listCopy = [...productGridData]
+    let index = productGridData.findIndex(item => item.productId == updated.productId)
+    listCopy[index] = updated
+    setProductGridData(listCopy)
+    $('.modal').modal('hide')
+  }
+
 
   useEffect(() => {
-    setProductFormData({...productFormData, amount: productFormData.quantity * productFormData.unitPrice})
+    setProductFormData({ ...productFormData, amount: productFormData.quantity * productFormData.unitPrice })
   }, [productFormData.quantity, productFormData.unitPrice])
 
   const columns = [
@@ -91,30 +101,32 @@ const AddPurchase = () => {
     {
       title: "Unit Price(GHS)",
       dataIndex: "unitPrice",
-      render: (text, record) => <p style={{textAlign:'right'}}>{moneyInTxt(text)}</p>
+      render: (text, record) => <p style={{ textAlign: 'right' }}>{moneyInTxt(text)}</p>
     },
     {
       title: "Amount(GHS)",
       dataIndex: "amount",
-      render: (text, record) => <p style={{textAlign:'right'}}>{moneyInTxt(text)}</p>
+      render: (text, record) => <p style={{ textAlign: 'right' }}>{moneyInTxt(text)}</p>
     },
     {
       title: "Manufacturing Date",
       dataIndex: "manufacturingDate",
-      render: (text, record) => <p key={text} style={{textAlign:'center'}}>{record?.manufacturingDate.substring(0,10) || ''}</p>
+      render: (text, record) => <p key={text} style={{ textAlign: 'center' }}>{record?.manufacturingDate.substring(0, 10) || ''}</p>
     },
     {
       title: "Expiring Date",
       dataIndex: "expireDate",
-      render: (text, record) => <p key={text} style={{textAlign:'center'}}>{record?.expireDate.substring(0,10) || ''}</p>
+      render: (text, record) => <p key={text} style={{ textAlign: 'center' }}>{record?.expireDate.substring(0, 10) || ''}</p>
     },
     {
-      title:"Action",
+      title: "Action",
       render: (text, record) => (
         <>
+          <span className="me-2"> <img src={EditIcon} alt="img" data-bs-toggle="modal" data-bs-target="#editproduct" onClick={() => setEditFormData(record)}/></span>
           <Link className="delete-set" to="#" onClick={() => deleteRow(record)}>
             <img src={DeleteIcon} alt="img" />
           </Link>
+         
         </>
       ),
     },
@@ -122,40 +134,40 @@ const AddPurchase = () => {
 
 
   const handleProductSelect = (e) => {
-      //console.log("Product:", e)
-      setSelectedProduct(e)
-      setProductFormData({ ...productFormData, productName: e.label, productId: e.value, })
+    //console.log("Product:", e)
+    setSelectedProduct(e)
+    setProductFormData({ ...productFormData, productName: e.label, productId: e.value, })
   }
 
   const handleAddItem = () => {
     //console.log(productFormData)
-    if(productFormData.expireDate == '' || productFormData.manufacturingDate == '' || purDate == '' || selectedProduct == '' || supplier == ''){
+    if (productFormData.expireDate == '' || productFormData.manufacturingDate == '' || purDate == '' || selectedProduct == '' || supplier == '') {
       alertify.set("notifier", "position", "top-right");
       alertify.warning("Please make sure all fields are filled.");
     }
-    else{
+    else {
       setManDate('')
       setExpDate('')
       setProductGridData([...productGridData, productFormData])
-      setProductFormData({ unitPrice: '', quantity: '', amount: '', manufacturingDate:'', expireDate:'', batchNumber:''}) 
+      setProductFormData({ unitPrice: '', quantity: '', amount: '', manufacturingDate: '', expireDate: '', batchNumber: '' })
       setSelectedProduct('')
     }
-   
+
   }
 
   const onSubmit = (data) => {
-    if(purDate == '' || supplier == '' || productGridData.length<1){
+    if (purDate == '' || supplier == '' || productGridData.length < 1) {
       alertify.set("notifier", "position", "top-right");
       alertify.warning("Please make sure all fields are filled.");
     }
-    else{
+    else {
       let postBody = {
-        supplierId:supplier.id,
+        supplierId: supplier.id,
         purchaseDate: new Date(purDate).toISOString(),
         products: productGridData
       }
-  
-      console.log(postBody)
+
+      //console.log(postBody)
       mutate(postBody)
       setManDate('')
       setExpDate('')
@@ -165,7 +177,7 @@ const AddPurchase = () => {
       setProductGridData([])
       setIsSubmitSuccessful(true)
     }
-    
+
   };
 
   useEffect(() => {
@@ -176,7 +188,7 @@ const AddPurchase = () => {
           label: item?.name,
           value: item?.id,
           retailPrice: item?.retailPrice,
-          wholeSalePrice : item?.wholeSalePrice,
+          wholeSalePrice: item?.wholeSalePrice,
           specialPrice: item?.wholeSalePrice,
           ownershipType: item?.ownershipType
         }
@@ -198,21 +210,21 @@ const AddPurchase = () => {
   }, [suppliers, products])
 
   useEffect(() => {
-    if (!isError &&  isSubmitSuccessful) {
+    if (!isError && isSubmitSuccessful) {
       console.log("res", data)
       alertify.set("notifier", "position", "top-right");
       alertify.success("Purchase added successfully.");
     }
-    else if(isError){
+    else if (isError) {
       alertify.set("notifier", "position", "top-right");
       alertify.error("Error...Could not save purchase transaction");
     }
-    
-    return () => {};
+
+    return () => { };
   }, [isError, !isSubmitSuccessful]);
 
-  if(isLoading){
-    <LoadingSpinner/>
+  if (isLoading) {
+    <LoadingSpinner />
   }
 
 
@@ -227,8 +239,8 @@ const AddPurchase = () => {
             </div>
           </div>
 
-            <div style={{display:'flex', gap:20}}>
-            <div  style={{width: '30%'}}>
+          <div style={{ display: 'flex', gap: 20 }}>
+            <div style={{ width: '30%' }}>
               <div className="card">
                 <div className="card-body">
 
@@ -251,7 +263,7 @@ const AddPurchase = () => {
                               }}
                             />
                           </div>
-                        
+
                         </div>
                       </div>
                     </div>
@@ -259,7 +271,7 @@ const AddPurchase = () => {
                     <div className="col-lg-5 col-sm-6 col-12">
                       <div className="form-group">
                         <label>Purchase Date </label>
-                        <input type="date" className="form-control" value={purDate} onChange={(e) => {setPurDate(e.target.value)}} />
+                        <input type="date" className="form-control" value={purDate} onChange={(e) => { setPurDate(e.target.value) }} />
                         {/* <div className="input-groupicon">
                           <DatePicker
                             selected={purDate}
@@ -282,34 +294,34 @@ const AddPurchase = () => {
               </div>
 
 
-                <div className="card">
-                  <div className="card-body">
+              <div className="card">
+                <div className="card-body">
 
-                      <div className="row">
+                  <div className="row">
 
-                      
-                        <div className="col-lg-12 col-sm-6 col-12">
-                          <div className="form-group">
-                            <label>Product Name (Designation)</label>
-                            <Select
-                              className="select"
-                              options={productsDropdown}
-                              value={selectedProduct}
-                              isLoading={productsIsLoading}
-                              onChange={(e) => handleProductSelect(e)}
-                            />
-                          </div>
-                        </div>
-                        
-                        <div className="col-lg-6 col-sm-6 col-12">
-                          <div className="form-group">
-                            <label>Manufacturing Date </label>
-                            <div className="input-groupicon">
-                            <input type="date" className="form-control" value={manDate}  onChange={(e) => {
-                                  setManDate(e.target.value)
-                                  setProductFormData({ ...productFormData, manufacturingDate: new Date(e.target.value).toISOString() })
-                                }}/>
-                              {/* <DatePicker
+
+                    <div className="col-lg-12 col-sm-6 col-12">
+                      <div className="form-group">
+                        <label>Product Name (Designation)</label>
+                        <Select
+                          className="select"
+                          options={productsDropdown}
+                          value={selectedProduct}
+                          isLoading={productsIsLoading}
+                          onChange={(e) => handleProductSelect(e)}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="col-lg-6 col-sm-6 col-12">
+                      <div className="form-group">
+                        <label>Manufacturing Date </label>
+                        <div className="input-groupicon">
+                          <input type="date" className="form-control" value={manDate} onChange={(e) => {
+                            setManDate(e.target.value)
+                            setProductFormData({ ...productFormData, manufacturingDate: new Date(e.target.value).toISOString() })
+                          }} />
+                          {/* <DatePicker
                                 selected={manDate}
                                 //value={product?.manufacturingDate}
                                 onChange={(e) => {
@@ -320,19 +332,19 @@ const AddPurchase = () => {
                               <div className="addonset">
                                 <img src={Calendar} alt="img" />
                               </div> */}
-                            </div>
-                          </div>
                         </div>
+                      </div>
+                    </div>
 
-                        <div className="col-lg-6 col-sm-6 col-12">
-                          <div className="form-group">
-                            <label>Expiring Date </label>
-                            <div className="input-groupicon">
-                            <input type="date" className="form-control" value={expDate}  onChange={(e) => {
-                                   setExpDate(e.target.value)
-                                   setProductFormData({ ...productFormData, expireDate: new Date(e.target.value).toISOString() })
-                                }}/>
-                              {/* <DatePicker
+                    <div className="col-lg-6 col-sm-6 col-12">
+                      <div className="form-group">
+                        <label>Expiring Date </label>
+                        <div className="input-groupicon">
+                          <input type="date" className="form-control" value={expDate} onChange={(e) => {
+                            setExpDate(e.target.value)
+                            setProductFormData({ ...productFormData, expireDate: new Date(e.target.value).toISOString() })
+                          }} />
+                          {/* <DatePicker
                                 selected={expDate}
                                 onChange={(e) => {
                                   setExpDate(e)
@@ -342,148 +354,252 @@ const AddPurchase = () => {
                               <div className="addonset">
                                 <img src={Calendar} alt="img" />
                               </div> */}
-                            </div>
-                          </div>
                         </div>
                       </div>
-                  
-                      <div className="row">
-
-                      <div className="col-lg-6 col-sm-6 col-12">
-                          <div className="form-group">
-                            <label>Batch No</label>
-                            <input type="text"  className={`form-control `} disabled = {selectedProduct?.ownershipType == "Tinatett" ? false : true} 
-                              value={productFormData?.batchNumber}
-                              onChange={(e) => {
-                      
-                                  setProductFormData({ ...productFormData, batchNumber: e.target.value })
-                                              
-                              }
-                              } />
-                          </div>
-                        </div>
-
-                        <div className="col-lg-6 col-sm-6 col-12">
-                          <div className="form-group">
-                            <label>Quantity</label>
-                            <input type="text"  className={`form-control `}
-                              value={productFormData?.quantity}
-                              onChange={(e) => {
-                                if(isValidNumber(e.target.value)){
-                                  let qty = parseInt(e.target.value) || 0
-                                  let unitP = parseInt(productFormData.unitPrice) || 0
-                                  setProductFormData({ ...productFormData, quantity: e.target.value, amount: productFormData.quantity ? unitP * qty : unitP * 1  })
-                                }               
-                              }
-                              } />
-                          </div>
-                        </div>
-
-                        <div className="col-lg-6 col-sm-6 col-12">
-                          <div className="form-group">
-                            <label>Unit Price</label>
-                            <input type="text" className={`form-control `}
-                              //step={0.01}
-                              value={productFormData?.unitPrice}
-                              onChange={(e) => {
-                                let unitP = parseInt(e.target.value) || 0
-                                let qty = parseInt(productFormData.quantity) || 0
-                                setProductFormData({ ...productFormData, unitPrice: e.target.value, amount: productFormData ? unitP * qty : unitP * 1  })
-                              }
-                              } />
-                          </div>
-                        </div>
-
-                        <div className="col-lg-6 col-sm-6 col-12">
-                          <div className="form-group">
-                            <label>Amount</label>
-                            <div className="input-groupicon">
-                              <input
-                                type="text" className={`form-control `}
-                               // step={0.01}
-                                placeholder=""
-                                value={productFormData?.amount}
-                                disabled
-                              />
-
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="row" style={{textAlign:'right'}}>
-                        <div className="col-lg-12 col-sm-6 col-12">
-                          <div className="form-group">
-                            <Link to="#" className="btn btn-submit me-2" onClick={handleAddItem} style={{width:'100%'}}>
-                            <FeatherIcon icon="shopping-cart"/> {" Add to Basket"}
-                            </Link>
-                            {/* <Link to="#" className="btn btn-cancel">
-                              Clear
-                            </Link> */}
-                          </div>
-
-                        </div>
-                      </div>
-                    </div>
-                </div>
-              </div>
-             
-
-
-              <div className="card" style={{width:'70%'}}>
-                <div className="card-body">
-                  <div className="row">
-                    <div className="table-responsive">
-                      <Table
-                        columns={columns}
-                        dataSource={productGridData}
-                        pagination={false}
-                      />
                     </div>
                   </div>
-                
 
-                  <div className="row" >
-                    <div className="col-lg-12 float-md-right">
-                      <div className="total-order">
-                        <ul>
-                          {/* <li>
+                  <div className="row">
+
+                    <div className="col-lg-6 col-sm-6 col-12">
+                      <div className="form-group">
+                        <label>Batch No</label>
+                        <input type="text" className={`form-control `} disabled={selectedProduct?.ownershipType == "Tinatett" ? false : false}
+                          value={productFormData?.batchNumber}
+                          onChange={(e) => {
+
+                            setProductFormData({ ...productFormData, batchNumber: e.target.value })
+
+                          }
+                          } />
+                      </div>
+                    </div>
+
+                    <div className="col-lg-6 col-sm-6 col-12">
+                      <div className="form-group">
+                        <label>Quantity</label>
+                        <input type="text" className={`form-control `}
+                          value={productFormData?.quantity}
+                          onChange={(e) => {
+                            if(e.target.value == ''){
+                              setProductFormData({...productFormData, quantity: ''})
+                            }
+                            else if (isValidNumber(e.target.value)) {
+                              let qty = parseInt(e.target.value) || 0
+                              let unitP = parseInt(productFormData.unitPrice) || 0
+                              setProductFormData({ ...productFormData, quantity: e.target.value, amount: productFormData.quantity ? unitP * qty : unitP * 1 })
+                            }
+                          }
+                          } />
+                      </div>
+                    </div>
+
+                    <div className="col-lg-6 col-sm-6 col-12">
+                      <div className="form-group">
+                        <label>Unit Price</label>
+                        <input type="text" className={`form-control `}
+                          //step={0.01}
+                          value={productFormData?.unitPrice}
+                          onChange={(e) => {
+                            let unitP = parseInt(e.target.value) || 0
+                            let qty = parseInt(productFormData.quantity) || 0
+                            setProductFormData({ ...productFormData, unitPrice: e.target.value, amount: productFormData ? unitP * qty : unitP * 1 })
+                          }
+                          } />
+                      </div>
+                    </div>
+
+                    <div className="col-lg-6 col-sm-6 col-12">
+                      <div className="form-group">
+                        <label>Amount</label>
+                        <div className="input-groupicon">
+                          <input
+                            type="text" className={`form-control `}
+                            // step={0.01}
+                            placeholder=""
+                            value={productFormData?.amount}
+                            disabled
+                          />
+
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="row" style={{ textAlign: 'right' }}>
+                    <div className="col-lg-12 col-sm-6 col-12">
+                      <div className="form-group">
+                        <Link to="#" className="btn btn-submit me-2" onClick={handleAddItem} style={{ width: '100%' }}>
+                          <FeatherIcon icon="shopping-cart" /> {" Add to Basket"}
+                        </Link>
+                        {/* <Link to="#" className="btn btn-cancel">
+                              Clear
+                            </Link> */}
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="card" style={{ width: '70%' }}>
+              <div className="card-body">
+                <div className="row">
+                  <div className="table-responsive">
+                    <Table
+                      columns={columns}
+                      dataSource={productGridData}
+                      pagination={false}
+                    />
+                  </div>
+                </div>
+
+
+                <div className="row" >
+                  <div className="col-lg-12 float-md-right">
+                    <div className="total-order">
+                      <ul>
+                        {/* <li>
                             <h4>Order Tax</h4>
                             <h5>$ 0.00 (0.00%)</h5>
                           </li> */}
-                          <li>
-                            <h4>Discount </h4>
-                            <h5>GHS 0.00</h5>
-                          </li>
+                        <li>
+                          <h4>Discount </h4>
+                          <h5>GHS 0.00</h5>
+                        </li>
 
-                          <li className="total">
-                            <h4>Grand Total</h4>
-                            <h5>GHS {moneyInTxt(
-                              productGridData.reduce((total, item) => total + item.amount, 0)
-                            )}</h5>
-                          </li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="row">
-                    
-                    
-                    <div className="col-lg-12" style={{textAlign:'right'}}>
-                      <button className="btn btn-submit me-2" type="submit" onClick={onSubmit}><FeatherIcon icon="save"/>Save</button>
-                      <Link to="/tinatett-pos/purchase/purchaselist" className="btn btn-cancel">
-                        Cancel
-                      </Link>
+                        <li className="total">
+                          <h4>Grand Total</h4>
+                          <h5>GHS {moneyInTxt(
+                            productGridData.reduce((total, item) => total + item.amount, 0)
+                          )}</h5>
+                        </li>
+                      </ul>
                     </div>
                   </div>
                 </div>
-              </div>
 
+                <div className="row">
+
+
+                  <div className="col-lg-12" style={{ textAlign: 'right' }}>
+                    <button className="btn btn-submit me-2" type="submit" onClick={onSubmit}><FeatherIcon icon="save" />Save</button>
+                    <Link to="/tinatett-pos/purchase/purchaselist" className="btn btn-cancel">
+                      Cancel
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div
+            className="modal fade"
+            id="editproduct"
+            tabIndex={-1}
+            aria-labelledby="editproduct"
+            aria-hidden="true"
+          >
+            <div className="modal-dialog modal-md modal-dialog-centered">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">Edit Product</h5>
+                  <button
+                    type="button"
+                    className="close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                  >
+                    <span aria-hidden="true">×</span>
+                  </button>
+                </div>
+                <div className="modal-body">
+                  <div className="row">
+                    <div className="col-lg-12 col-sm-12 col-12">
+                      <div className="form-group">
+                        <label>Product Name</label>
+                        <div className="input-groupicon">
+                        <input type="text" value={editFormData?.productName} onChange={(e) => setEditFormData({...editFormData, productName:e.target.value})} disabled/>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="col-lg-6 col-sm-12 col-12">
+                      <div className="form-group">
+                        <label>Manufacturing Date</label>
+                        <input type="date" className="form-control" value={editFormData?.manufacturingDate.substring(0,10)}  onChange={(e) => setEditFormData({...editFormData, manufacturingDate:e.target.value})}/>
+                      </div>
+                    </div>
+                    <div className="col-lg-6 col-sm-12 col-12">
+                      <div className="form-group">
+                        <label>Expiring Date</label>
+                        <input type="date" className="form-control" value={editFormData?.expireDate.substring(0,10)}  onChange={(e) => setEditFormData({...editFormData, expireDate:e.target.value})}/>
+                      </div>
+                    </div>
+                    <div className="col-lg-6 col-sm-12 col-12">
+                      <div className="form-group">
+                        <label>Quantity</label>
+                        <input type="text" value={editFormData?.quantity}
+                         onChange={(e) => {
+                          if(e.target.value == ''){
+                            setEditFormData({...editFormData, quantity: ''})
+                          }
+                          else if (isValidNumber(e.target.value)) {
+                            let qty = parseInt(e.target.value) || 0
+                            let unitP = parseInt(editFormData.unitPrice) || 0
+                            setEditFormData({ ...editFormData, quantity: e.target.value, amount: editFormData.quantity ? unitP * qty : unitP * 1 })
+                          }
+                        }
+                        }/>
+                      </div>
+                    </div>
+                    <div className="col-lg-6 col-sm-12 col-12">
+                      <div className="form-group">
+                        <label>Batch No.</label>
+                        <input type="text" value={editFormData?.batchNumber} onChange={(e) => setEditFormData({...editFormData, batchNumber:e.target.value})}/>
+                      </div>
+                    </div>
+                    <div className="col-lg-6 col-sm-12 col-12">
+                      <div className="form-group">
+                        <label>Unit Price</label>
+                        <input type="text" value={editFormData?.unitPrice} 
+                         onChange={(e) => {
+                          let unitP = parseInt(e.target.value) || 0
+                          let qty = parseInt(editFormData.quantity) || 0
+                          setEditFormData({ ...editFormData, unitPrice: e.target.value, amount: editFormData ? unitP * qty : unitP * 1 })
+                        }}
+                        />
+                      </div>
+                    </div>
+                    <div className="col-lg-6 col-sm-12 col-12">
+                      <div className="form-group">
+                        <label>Amount</label>
+                        <input type="text" value={editFormData?.amount} />
+                      </div>
+                    </div>
+                   
+                   
+                  </div>
+                </div>
+                <div className="modal-footer" style={{justifyContent:'flex-end'}}>
+                  <button type="button" className="btn btn-submit" onClick={handleUpdate}>
+                    Update
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-cancel"
+                    data-bs-dismiss="modal"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
-          </div>
-         
+        </div>
+      </div>
+
     </>
   );
 };

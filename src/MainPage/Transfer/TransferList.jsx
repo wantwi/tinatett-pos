@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Table from "../../EntryFile/datatable";
 import Tabletop from "../../EntryFile/tabletop";
 import Swal from "sweetalert2";
@@ -17,6 +17,9 @@ import {
   EditIcon,
   DeleteIcon,
 } from "../../EntryFile/imagePath";
+import { useGet } from "../../hooks/useGet";
+import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
+import useCustomApi from "../../hooks/useCustomApi";
 
 const TransferList = () => {
   const [inputfilter, setInputfilter] = useState(false);
@@ -43,7 +46,7 @@ const TransferList = () => {
     { id: 1, text: "Price", text: "Price" },
     { id: 2, text: "150.00", text: "150.00" },
   ];
-
+  const axios = useCustomApi();
   const confirmText = () => {
     Swal.fire({
       title: "Are you sure?",
@@ -56,102 +59,68 @@ const TransferList = () => {
       confirmButtonClass: "btn btn-primary",
       cancelButtonClass: "btn btn-danger ml-1",
       buttonsStyling: !1,
-    }).then(function (t) {
-      t.value &&
+    }) .then( async() => {
+     
+      let data = await axios.delete(`/transfer/${id}`)
+      console.log(data.response.code)
+      if(data.response.data.success){
         Swal.fire({
           type: "success",
           title: "Deleted!",
-          text: "Your file has been deleted.",
+          text: "Your Transfer item has been deleted.",
           confirmButtonClass: "btn btn-success",
+        });
+      }
+      else{
+        Swal.fire({
+          type: "danger",
+          title: "Error!",
+          text: data.response.data.message,
+          confirmButtonClass: "btn btn-danger",
+        });
+      }
+    })
+    .catch( (error) => {
+        Swal.fire({
+          type: "danger",
+          title: "Error!",
+          text: error,
+          confirmButtonClass: "btn btn-danger",
         });
     });
   };
   const togglefilter = (value) => {
     setInputfilter(value);
   };
-  const [data] = useState([
-    {
-      id: 1,
-      date: "19 Nov 2022",
-      reference: "TR0101",
-      from: "Store1",
-      paid: "Store2",
-      items: "10.00",
-      grandTotal: "1550",
-      status: "Completed",
-    },
-    {
-      id: 2,
-      date: "19 Nov 2022",
-      reference: "TR0102",
-      from: "Store1",
-      paid: "Store2",
-      items: "10.00",
-      grandTotal: "4599",
-      status: "Completed",
-    },
-    {
-      id: 3,
-      date: "19 Nov 2022",
-      reference: "TR0103",
-      from: "Store1",
-      paid: "Store2",
-      items: "10.00",
-      grandTotal: "780",
-      status: "Completed",
-    },
-    {
-      id: 4,
-      date: "19 Nov 2022",
-      reference: "TR0104",
-      from: "Store1",
-      paid: "Store2",
-      items: "10.00",
-      grandTotal: "550",
-      status: "Pending",
-    },
-    {
-      id: 5,
-      date: "19 Nov 2022",
-      reference: "TR0105",
-      from: "Store1",
-      paid: "Store2",
-      items: "10.00",
-      grandTotal: "550",
-      status: "Completed",
-    },
-  ]);
+
 
   const columns = [
     {
       title: "Date",
-      dataIndex: "date",
-      sorter: (a, b) => a.date.length - b.date.length,
+      dataIndex: "transferDate",
+      sorter: (a, b) => a.transferDate.length - b.transferDate.length,
     },
     {
       title: "Reference",
-      dataIndex: "reference",
-      sorter: (a, b) => a.reference.length - b.reference.length,
+      dataIndex: "transferRef",
+      sorter: (a, b) => a.transferRef.length - b.transferRef.length,
     },
     {
       title: "From",
-      dataIndex: "from",
-      sorter: (a, b) => a.from.length - b.from.length,
+      dataIndex: "branchName",
+      sorter: (a, b) => a.branchName.length - b.branchName.length,
+      render: (text, record) => (<span>{text}{' Branch'}</span>)
     },
     {
-      title: "Paid",
-      dataIndex: "paid",
-      sorter: (a, b) => a.paid.length - b.paid.length,
+      title: "To",
+      dataIndex: "destinationBranch",
+      sorter: (a, b) => a.destinationBranch.length - b.padestinationBranchid.length,
+      render: (text, record) => (<span>{text}{' Branch'}</span>)
     },
     {
-      title: "Items",
-      dataIndex: "items",
-      sorter: (a, b) => a.items.length - b.items.length,
-    },
-    {
-      title: "Grand Total",
-      dataIndex: "grandTotal",
-      sorter: (a, b) => a.grandTotal.length - b.grandTotal.length,
+      title: "No of Items",
+      dataIndex: "numberOfProduct",
+      sorter: (a, b) => a.numberOfProduct.length - b.numberOfProduct.length,
     },
     {
       title: "Status",
@@ -159,23 +128,23 @@ const TransferList = () => {
       render: (text, record) => (
         <span
           className={
-            text === "Completed"
+            text === "0"
               ? "badges bg-lightgreen"
-              : text == "Pending"
-              ? "badges bg-lightred"
-              : "badges bg-lightyellow"
+              : text == "1"
+              ? "badges bg-lightyellow": ''
+             
           }
         >
-          {text}
+          {text == 0 ? "Complete" : "Pending"}
         </span>
       ),
       sorter: (a, b) => a.status.length - b.status.length,
     },
     {
       title: "Action",
-      render: () => (
+      render: (record) => (
         <>
-          <Link className="me-3" to="/dream-pos/transfer/edittransfer-transfer">
+          <Link className="me-3" to= {{pathname:"/tinatett-pos/transfer/edittransfer-transfer", state: record}}>
             <img src={EditIcon} alt="img" />
           </Link>
           <Link className="confirm-text" to="#" onClick={confirmText}>
@@ -185,6 +154,31 @@ const TransferList = () => {
       ),
     },
   ];
+
+
+  const [data, setData] = useState([])
+
+
+  const {
+    data: transfers,
+    isError,
+    isLoading,
+    isSuccess,
+  } = useGet("transfers", "/transfer");
+
+  useEffect(() => {
+    if (!isLoading) {
+
+      setData(transfers?.data)
+
+    }
+  }, [isLoading])
+
+
+  if(isLoading){
+    return <LoadingSpinner message="Please wait..Getting List.."/>
+  }
+
   return (
     <>
       <div className="page-wrapper">
@@ -196,7 +190,7 @@ const TransferList = () => {
             </div>
             <div className="page-btn">
               <Link
-                to="/dream-pos/transfer/addtransfer-transfer"
+                to="/tinatett-pos/transfer/addtransfer-transfer"
                 className="btn btn-added"
               >
                 <img src={PlusIcon} alt="img" className="me-1" />

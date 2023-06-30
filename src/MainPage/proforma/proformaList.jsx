@@ -31,12 +31,13 @@ import { useGet } from "../../hooks/useGet";
 import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 
 const ProformaList = () => {
-  const [startDate, setStartDate] = useState(new Date());
-  const [startDate1, setStartDate1] = useState(new Date());
+
   const [inputfilter, setInputfilter] = useState(false);
 
   const [data, setData] = useState([])
-
+  const [productGridData, setProductGridData] = useState([])
+  const [loading, setLoading] = useState(true)
+  const axios = useCustomApi()
 
   const {
     data: proformas,
@@ -46,31 +47,31 @@ const ProformaList = () => {
   } = useGet("proformas", "/proforma");
 
   useEffect(() => {
-    if(!isLoading){
-      console.log(proformas)
-      let mappedData =  proformas?.data.map((proforma) => {
-          return {
-            id: proforma?.id,
-            customerName: proforma.customer?.name,
-            customer: proforma?.customer,
-            status: proforma?.status,
-            date:new Date(proforma.createdAt).toISOString().substring(0,10),
-            proformaRef: proforma?.proformaRef,
-            numberOfProduct: proforma?.numberOfProduct,
-            createdBy: proforma?.createdBy || 'N/A',
-          }
-        })
+    if (!isLoading) {
+      // console.log(proformas)
+      let mappedData = proformas?.data.map((proforma) => {
+        return {
+          id: proforma?.id,
+          customerName: proforma.customer?.name,
+          customer: proforma?.customer,
+          status: proforma?.status,
+          date: new Date(proforma.createdAt).toISOString().substring(0, 10),
+          proformaRef: proforma?.proformaRef,
+          numberOfProduct: proforma?.numberOfProduct,
+          createdBy: proforma?.createdBy || 'N/A',
+        }
+      })
       setData(mappedData)
       console.log('loaded..')
     }
-    else{
+    else {
       console.log('loading...')
     }
   }, [isLoading])
 
 
-  if(isLoading){
-    return (<LoadingSpinner message="Loading list.."/>)
+  if (isLoading) {
+    return (<LoadingSpinner message="Loading list.." />)
   }
 
 
@@ -110,18 +111,49 @@ const ProformaList = () => {
     { id: 2, text: "Inprogess", text: "Inprogess" },
   ];
 
+  const handleSell = (id) => {
+    axios.get(`/proforma/products/${id}`)
+    .then((res) => {
+      let x = (res.data?.data)
+      let mapped = x.map((item) => 
+        {
+          return {
+            productName:  item?.product?.name,
+            quantity: item?.quantity,
+            unitPrice: item?.unitPrice,
+            amount: item?.amount
+          }
+      })
+      console.log("Mapped:", mapped)
+      setProductGridData(mapped)
+    }).finally(() => setLoading(false))
+  }
+
+
+  // useEffect(() => {
+  //   console.log("Grid", productGridData)
+  // }, [productGridData])
+
 
 
   const columns = [
     {
       title: "Costumer Name",
       dataIndex: "customerName",
-      sorter: (a, b) => a.customerName.length - b.customerName.length,
+      // sorter: (a, b) => a.customerName.length - b.customerName.length,
+      render: (text, record) =>
+        <>
+          <Link to={{ pathname: "/tinatett-pos/proforma/proforma-details", state: record }} title={'View Details'}>{text}</Link>
+        </>
     },
     {
       title: "Reference",
       dataIndex: "proformaRef",
       sorter: (a, b) => a.proformaRef.length - b.proformaRef.length,
+      render: (text, record) =>
+        <>
+          <Link to={{ pathname: "/tinatett-pos/proforma/proforma-details", state: record }} title={'View Details'}>{text}</Link>
+        </>
     },
     {
       title: "Date",
@@ -133,7 +165,7 @@ const ProformaList = () => {
       dataIndex: "numberOfProduct",
       sorter: (a, b) => a.numberOfProduct.length - b.numberOfProduct.length,
     },
-   
+
     // {
     //   title: "Status",
     //   dataIndex: "status",
@@ -150,19 +182,8 @@ const ProformaList = () => {
     //   sorter: (a, b) => a.status.length - b.status.length,
     // },
     // {
-    //   title: "Payment",
-    //   dataIndex: "Payment",
-    //   render: (text, record) => (
-    //     <>
-    //       {text === "Paid" && (
-    //         <span className="badges bg-lightgreen">{text}</span>
-    //       )}
-    //       {text === "Due" && <span className="badges bg-lightred">{text}</span>}
-    //     </>
-    //   ),
-    //   sorter: (a, b) => a.Payment.length - b.Payment.length,
-    // },
-  
+
+
     // {
     //   title: "Paid",
     //   dataIndex: "Paid",
@@ -193,38 +214,47 @@ const ProformaList = () => {
     {
       title: "Action",
       render: (text, record) => (
-        <>
-          <div className="text-center">
-            <Link
-              className="action-set"
-              to="#"
-              data-bs-toggle="dropdown"
-              aria-expanded="true"
-            >
-              <i className="fa fa-ellipsis-v" aria-hidden="true" />
-            </Link>
-            <ul className="dropdown-menu">
-              <li>
-                <Link className="dropdown-item" to={{pathname:"/tinatett-pos/proforma/proforma-details", state:record}}>
-                  <img src={Eye1} className="me-2" alt="img" />
-                  View Details
-                </Link>
-              </li>
-            
-              <li>
-                <Link
-                  to="#"
-                  className="dropdown-item confirm-text"
-                  onClick={confirmText}
-                >
-                  <img src={delete1} className="me-2" alt="img" />
-                  Delete
-                </Link>
-              </li>
-            </ul>
-          </div>
-        </>
+        <div style={{ width: '10%' }}>
+
+
+          {/* <Link  to={{pathname:"/tinatett-pos/proforma/proforma-details", state:record}} > */}
+          {/* <img src={Eye1} className="me-2" alt="img" /> */}
+          {/* <span className="badges btn-cancel me-2">View</span> */}
+          {/* </Link> */}
+
+          <Link to={{ pathname: "/tinatett-pos/proforma/edit-proforma", state: record }} >
+            {/* <img src={Eye1} className="me-2" alt="img" /> */}
+            <span className="badges btn-cancel me-2">Edit</span>
+          </Link>
+
+          {/* <Link  to={{pathname:"/tinatett-pos/sales/add-sales", state:record}}  > */}
+          {/* <img src={Eye1} className="me-2" alt="img" /> */}
+          <span className="badges bg-lightgreen me-2" style={{ cursor: 'pointer' }} data-bs-target="#editpayment" data-bs-toggle="modal" onClick={() => handleSell(record?.id)}>Sell</span>
+          {/* </Link> */}
+
+          {/* <Link  to={{pathname:"/tinatett-pos/transfer/addtransfer-transfer", state:record}} > */}
+          {/* <img src={Eye1} className="me-2" alt="img" /> */}
+          <span className="badges btn-primary me-2" style={{ cursor: 'pointer' }} data-bs-target="#createpayment" data-bs-toggle="modal">Transfer</span>
+          {/* </Link> */}
+
+
+
+          <Link
+            to="#"
+            // className="dropdown-item confirm-text"
+            onClick={confirmText}
+            title={'Delete'}
+          >
+            {/* <img src={delete1} className="me-2" alt="img" /> */}
+            {/* <img src={DeleteIcon} alt="img" /> */}
+            <span className="badges bg-lightred me-2">Delete</span>
+
+          </Link>
+
+
+        </div>
       ),
+      width: '20%'
     },
   ];
   return (
@@ -246,12 +276,12 @@ const ProformaList = () => {
           {/* /product list */}
           <div className="card">
             <div className="card-body">
-              <Tabletop inputfilter={inputfilter} togglefilter={togglefilter} data={data} title={'Proforma List'}/>
+              <Tabletop inputfilter={inputfilter} togglefilter={togglefilter} data={data} title={'Proforma List'} />
               {/* /Filter */}
               <div
-                className={`card mb-0 ${ inputfilter ? "toggleCls" : ""}`}
+                className={`card mb-0 ${inputfilter ? "toggleCls" : ""}`}
                 id="filter_inputs"
-                style={{ display: inputfilter ? "block" :"none"}}
+                style={{ display: inputfilter ? "block" : "none" }}
               >
                 <div className="card-body pb-0">
                   <div className="row">
@@ -371,7 +401,7 @@ const ProformaList = () => {
           <div className="modal-dialog modal-lg modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">Create Payment</h5>
+                <h5 className="modal-title">Transfer</h5>
                 <button
                   type="button"
                   className="btn-close"
@@ -383,57 +413,48 @@ const ProformaList = () => {
               </div>
               <div className="modal-body">
                 <div className="row">
-                  <div className="col-lg-6 col-sm-12 col-12">
-                    <div className="form-group">
-                      <label>Customer</label>
-                      <div className="input-groupicon">
-                        <DatePicker
-                          selected={startDate}
-                          onChange={(date) => setStartDate(date)}
-                        />
-                        <div className="addonset">
-                          <img src={Calendar} alt="img" />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="col-lg-6 col-sm-12 col-12">
-                    <div className="form-group">
-                      <label>Reference</label>
-                      <input type="text" defaultValue="INV/SL0101" />
-                    </div>
-                  </div>
-                  <div className="col-lg-6 col-sm-12 col-12">
-                    <div className="form-group">
-                      <label>Received Amount</label>
-                      <input type="text" defaultValue={0.0} />
-                    </div>
-                  </div>
-                  <div className="col-lg-6 col-sm-12 col-12">
-                    <div className="form-group">
-                      <label>Paying Amount</label>
-                      <input type="text" defaultValue={0.0} />
-                    </div>
-                  </div>
-                  <div className="col-lg-6 col-sm-12 col-12">
-                    <div className="form-group">
-                      <label>Payment type</label>
-                      <Select2
-                        className="select"
-                        data={options1}
-                        options={{
-                          placeholder: "Choose Suppliers",
-                        }}
-                      />
-                    </div>
-                  </div>
-                  <div className="col-lg-12">
-                    <div className="form-group mb-0">
-                      <label>Note</label>
-                      <textarea className="form-control" defaultValue={""} />
-                    </div>
+                  <div className="table-responsive mb-3">
+                    <table className="table">
+                      <thead>
+                        <tr>
+                          <th>#</th>
+                          <th>Product Name</th>
+                          <th>Quantity</th>
+                          <th>Unit Price</th>
+                          <th>Amount</th>
+                          <th>Action</th>
+                          <th />
+                        </tr>
+                      </thead>
+                      {!loading ?  (<tbody>
+                         {productGridData?.map((item, index) => {
+                          return (
+                            <tr key={item?.id}>
+                              <td>{index + 1}</td>
+                              <td>
+                                <Link to="#">{item?.productName}</Link>
+                              </td>
+                              <td>{item?.quantity}</td>
+                              <td>{item?.unitPrice}</td>
+                              <td>{item?.amount}</td>
+
+                              <td>
+                              <Link to="#" className="me-2">
+                                  <img src={EditIcon} alt="svg" data-bs-toggle="modal" data-bs-target="#editproduct" onClick={() => setEditFormData(item)}/>
+                                </Link>
+                                <Link to="#" className="delete-set" onClick={() => deleteRow(item)}>
+                                  <img src={DeleteIcon} alt="svg" />
+                                </Link>
+                              </td>
+                            </tr>
+                          )
+                        })} 
+
+                      </tbody>) : null}
+                    </table>
                   </div>
                 </div>
+             
               </div>
               <div className="modal-footer">
                 <button type="button" className="btn btn-submit">
@@ -462,7 +483,7 @@ const ProformaList = () => {
           <div className="modal-dialog modal-lg modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">Edit Payment</h5>
+                <h5 className="modal-title">Sell Proforma</h5>
                 <button
                   type="button"
                   className="close"
@@ -474,69 +495,59 @@ const ProformaList = () => {
               </div>
               <div className="modal-body">
                 <div className="row">
-                  <div className="col-lg-6 col-sm-12 col-12">
-                    <div className="form-group">
-                      <label>Customer</label>
-                      <div className="input-groupicon">
-                        <DatePicker
-                          selected={startDate1}
-                          onChange={(date) => setStartDate1(date)}
-                        />
-                        <div className="addonset">
-                          <img src={datepicker} alt="img" />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="col-lg-6 col-sm-12 col-12">
-                    <div className="form-group">
-                      <label>Reference</label>
-                      <input type="text" defaultValue="INV/SL0101" />
-                    </div>
-                  </div>
-                  <div className="col-lg-6 col-sm-12 col-12">
-                    <div className="form-group">
-                      <label>Received Amount</label>
-                      <input type="text" defaultValue={0.0} />
-                    </div>
-                  </div>
-                  <div className="col-lg-6 col-sm-12 col-12">
-                    <div className="form-group">
-                      <label>Paying Amount</label>
-                      <input type="text" defaultValue={0.0} />
-                    </div>
-                  </div>
-                  <div className="col-lg-6 col-sm-12 col-12">
-                    <div className="form-group">
-                      <label>Payment type</label>
-                      <Select2
-                        className="select"
-                        data={options1}
-                        options={{
-                          placeholder: "Choose Suppliers",
-                        }}
-                      />
-                    </div>
-                  </div>
-                  <div className="col-lg-12">
-                    <div className="form-group mb-0">
-                      <label>Note</label>
-                      <textarea className="form-control" defaultValue={""} />
-                    </div>
+                  <div className="table-responsive mb-3">
+                    <table className="table">
+                      <thead>
+                        <tr>
+                          <th>#</th>
+                          <th>Product Name</th>
+                          <th>Quantity</th>
+                          <th>Unit Price</th>
+                          <th>Amount</th>
+                          <th>Action</th>
+                          <th />
+                        </tr>
+                      </thead>
+                      {!loading ?  (<tbody>
+                         {productGridData?.map((item, index) => {
+                          return (
+                            <tr key={item?.id}>
+                              <td>{index + 1}</td>
+                              <td>
+                                <Link to="#">{item?.productName}</Link>
+                              </td>
+                              <td>{item?.quantity}</td>
+                              <td>{item?.unitPrice}</td>
+                              <td>{item?.amount}</td>
+
+                              <td>
+                              <Link to="#" className="me-2">
+                                  <img src={EditIcon} alt="svg" data-bs-toggle="modal" data-bs-target="#editproduct" onClick={() => setEditFormData(item)}/>
+                                </Link>
+                                <Link to="#" className="delete-set" onClick={() => deleteRow(item)}>
+                                  <img src={DeleteIcon} alt="svg" />
+                                </Link>
+                              </td>
+                            </tr>
+                          )
+                        })} 
+
+                      </tbody>) : null}
+                    </table>
                   </div>
                 </div>
-              </div>
-              <div className="modal-footer">
-                <button type="button" className="btn btn-submit">
-                  Submit
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-cancel"
-                  data-bs-dismiss="modal"
-                >
-                  Close
-                </button>
+                <div className="modal-footer">
+                  <button type="button" className="btn btn-submit">
+                    Submit
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-cancel"
+                    data-bs-dismiss="modal"
+                  >
+                    Close
+                  </button>
+                </div>
               </div>
             </div>
           </div>

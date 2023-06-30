@@ -647,7 +647,7 @@ const Sidebar = (props) => {
 
 
             
-              {/* <li className="submenu">
+              <li className="submenu">
                   <a
                     href="#"
                     className={
@@ -667,27 +667,28 @@ const Sidebar = (props) => {
                   </a>
                   {isSideMenu == "expense" ? (
                     <ul>
-                      <li>
+                       <li>
                         <Link
                           className={
-                            pathname.includes("expenselist-") ? "active" : ""
+                            pathname.includes("addexpense") ? "active" : ""
                           }
-                          to="/tinatett-pos/expense/expenselist-expense"
-                        >
-                          Expense List
-                        </Link>
-                      </li>
-                      <li>
-                        <Link
-                          className={
-                            pathname.includes("addexpense-") ? "active" : ""
-                          }
-                          to="/tinatett-pos/expense/addexpense-expense"
+                          to="/tinatett-pos/expense/addexpense"
                         >
                           Add Expense
                         </Link>
                       </li>
                       <li>
+                        <Link
+                          className={
+                            pathname.includes("expenselist") ? "active" : ""
+                          }
+                          to="/tinatett-pos/expense/expenselist"
+                        >
+                          Expense List
+                        </Link>
+                      </li>
+                     
+                      {/* <li>
                         <Link
                           className={
                             pathname.includes("expensecategory-")
@@ -698,13 +699,13 @@ const Sidebar = (props) => {
                         >
                           Expense Category
                         </Link>
-                      </li>
+                      </li> */}
                     </ul>
                   ) : (
                     ""
                   )}
-                </li> */}
-              {/* <li className="submenu">
+                </li>
+               <li className="submenu">
                   <a
                     href="#"
                     className={
@@ -721,21 +722,12 @@ const Sidebar = (props) => {
                     }
                   >
                     {" "}
-                    <img src={Quotation} alt="img" /> <span>Quotation</span>{" "}
+                    <img src={Quotation} alt="img" /> <span>Product Request</span>{" "}
                     <span className="menu-arrow"></span>
                   </a>
                   {isSideMenu == "quotation" ? (
                     <ul>
-                      <li>
-                        <Link
-                          className={
-                            pathname.includes("quotationlist-") ? "active" : ""
-                          }
-                          to="/tinatett-pos/quotation/quotationlist-quotation"
-                        >
-                          Quotation List
-                        </Link>
-                      </li>
+                      
                       <li>
                         <Link
                           className={
@@ -743,14 +735,24 @@ const Sidebar = (props) => {
                           }
                           to="/tinatett-pos/quotation/addquotation-quotation"
                         >
-                          Add Quotation
+                          New Request
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          className={
+                            pathname.includes("quotationlist-") ? "active" : ""
+                          }
+                          to="/tinatett-pos/quotation/quotationlist-quotation"
+                        >
+                          Request List
                         </Link>
                       </li>
                     </ul>
                   ) : (
                     ""
                   )}
-                </li> */}
+                </li> 
             
               {/* <li className="submenu">
                   <a

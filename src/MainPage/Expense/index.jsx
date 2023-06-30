@@ -7,10 +7,10 @@ import ExpenseCategory from './ExpenseCategory.jsx';
 
 const PurchaseRoute = ({ match}) =>(
     <Switch>
-        <Redirect exact from={`${match.url}/`} to={`${match.url}/expenselist-expense`} />
-        <Route path={`${match.url}/expenselist-expense`} component={ExpenseList} />
-        <Route path={`${match.url}/addexpense-expense`} component={AddExpense} />
-        <Route path={`${match.url}/editexpense-expense`} component={EditExpense} />
+        <Redirect exact from={`${match.url}/`} to={`${match.url}/expenselist`} />
+        <Route path={`${match.url}/expenselist`} component={ExpenseList} />
+        <Route path={`${match.url}/addexpense`} component={AddExpense} />
+        <Route path={`${match.url}/editexpense`} component={EditExpense} />
         <Route path={`${match.url}/expensecategory-expense`} component={ExpenseCategory} />
     </Switch>
 )

@@ -1,266 +1,690 @@
-import React, { useState } from "react";
-import Select2 from "react-select2-wrapper";
-import "react-select2-wrapper/css/select2.css";
-import {
-  Calendar,
-  Plus,
-  Scanner,
-  DeleteIcon,
-  EditIcon,
-  MacbookIcon,
-  EarpodIcon,
-  MinusIcon,
-} from "../../EntryFile/imagePath";
+import React, { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { Table } from "antd";
+import {
+  Pdf,
+  Scanner,
+  Product7,
+  DeleteIcon,
+  Calendar,
+  Product8,
+  Product1,
+  Printer,
+  MinusIcon,
+  Plus,
+} from "../../EntryFile/imagePath";
+import Select from "react-select";
+import Select2 from "react-select2-wrapper";
+import "react-select2-wrapper/css/select2.css";
+import { useEffect } from "react";
+import { useGet } from "../../hooks/useGet";
+import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
+import { isValidNumber, moneyInTxt } from "../../utility";
+import { usePost } from "../../hooks/usePost";
+import alertify from "alertifyjs";
+import "../../../node_modules/alertifyjs/build/css/alertify.css";
+import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as Yup from "yup";
+import FeatherIcon from 'feather-icons-react'
+import jsPDF from "jspdf";
+import useCustomApi from "../../hooks/useCustomApi";
+import { BASE_URL } from "../../api/CustomAxios";
+import { useLocation } from "react-router-dom/cjs/react-router-dom.min";
 
-const options1 = [
-  { id: 1, text: "Store 1", text: "Store 1" },
-  { id: 2, text: "Store 2", text: "Store 2" },
-];
-const options2 = [
-  { id: 1, text: "Sent", text: "Sent" },
-  { id: 2, text: "Inprogess", text: "Inprogess" },
-  { id: 3, text: "Completed", text: "Completed" },
-];
-const deleteRow = () => {
-  $(document).on("click", ".delete-set", function () {
-    $(this).parent().parent().hide();
-  });
-};
 
 const EditTransfer = () => {
-  const [count, setCount] = useState(0);
-  const [startDate, setStartDate] = useState(new Date());
+  const {state} = useLocation()
+  console.log("State", state)
+  const [customerOptions, setCustomerOptions] = useState([])
+  const [productOptions, setProductOptions] = useState([])
+  const [startDate, setStartDate] = useState(transfer?.transferDate);
 
-  const [data] = useState([
-    {
-      id: 1,
-      image: EarpodIcon,
-      productName: "Apple Earpods",
-      price: "1500.00",
-      stock: "500.00",
-      discount: "0.00",
-      tax: "2000.00",
-      totalCost: "500.00",
-    },
-  ]);
+  const { data: customers, isError, isLoading: isCustomerLoading, isSuccess } = useGet("branches", "/branch");
+  const {data: products, isLoading: isProductsLoading, } = useGet("products", "/product");
+  const { isLoading, isError: isPostError, error, mutate } = usePost("/transfer");
+  const { data: transfer, isLoading: transferIsLoading } = useGet("transfer-info", `/transfer/${state?.id}`);
+  const { data: transferDetails, isLoading: transferIsLoadingDetails } = useGet("transfer-product-details", `/transfer/product/${state?.id}`);
 
-  const columns = [
+  const [selectedProduct, setSelectedProduct] = useState({})
+  const [selectedProductInfo, setSelectedProductInfo] = useState()
+  const [selectedCustomer, setSelectedCustomer] = useState(state?.destinationBranchId)
+  const [selectedCustomerPrint, setSelectedCustomerPrint] = useState('')
+  const [formData, setFormData] = useState({quantity:'', amount:'', batchNumber:{}, manuDate:'', expDate:''})
+  const [productGridData, setProductGridData] = useState([])
+  const [printGridData, setPrintGridData] = useState([])
+  const [transDate, setTransDate] = useState(new Date().toISOString().slice(0, 10));
+  const [disabledUnselectedPrice,setDisableUnselectedPrice] = useState({retail: false, wholesale:false, special:false})
+  const retailpriceTypeRef = useRef()
+  const specialpriceTypeRef = useRef()
+  const wholesalepriceTypeRef = useRef()
+  const [retailprice, setRetailPrice] = useState('')
+  const [price, setPrice] = useState(0)
+  const [wholesaleprice, setWholesalePrice] = useState('')
+  const [specialprice, setSpecialPrice] = useState('')
+  const [isSubmitSuccessful, setIsSubmitSuccessful] = useState(false)
+
+
+
+
+  useEffect(() => {
+    if (!isProductsLoading && !isCustomerLoading) {
+      let mappedData = customers?.data.map((customer) => {
+        return {
+          id: customer?.id,
+          text: customer?.name,
+          value: customer?.id,
+          location: customer?.location,
+          contact: customer?.contact,
+          email: customer?.email,
+          status: customer?.status,
+          location: customer?.location
+
+        }
+      })
+      setCustomerOptions(mappedData)
+
+      let mappedData2 = products?.data.map((product) => {
+        return {
+          id: product?.id,
+          label: product?.name,
+          value: product?.id,
+          retailPrice: product?.retailPrice,
+          wholeSalePrice: product?.wholeSalePrice,
+          specialPrice: product?.specialPrice,
+          totalQuantity: product?.stock_count
+        }
+      })
+      setProductOptions(mappedData2)
+
+    }
+
+  }, [isCustomerLoading, isProductsLoading])
+
+
+  useEffect(() => {
+    let mappedData = transferDetails?.data.map((item) =>{
+      return {
+        productId: item?.productId,
+        name: item?.productName,
+        batchNumber: item?.batchNumber,
+        manufacturingDate: item?.manufacturingDate,
+        expireDate: item?.expireDate,
+        quantity: item?.quantity,
+        unitPrice:item?.unitPrice,
+        amount:item?.total
+      }
+    })
+    setProductGridData(mappedData)
+  }, [transferDetails])
+
+  const handleProductSelect = (e) => {
+    setSelectedProduct(e)
+    setRetailPrice('(' + e.retailPrice + 'GHS)')
+    setWholesalePrice('(' + e.wholeSalePrice  + 'GHS)')
+    setSpecialPrice('(' + e.specialPrice  + 'GHS)')
+    setPrice(e.retailPrice) 
+    //console.log(e)
+    
+  }
+  const axios = useCustomApi()
+
+  useEffect(() => {
+    axios.get(`${BASE_URL}/purchase/product/${selectedProduct?.value}`).then((res) => {
+      if(res.data.success){
+        setSelectedProductInfo(res.data.data)
+        let x = res.data.data.batchNumber?.map((item) => {
+          return {value:item.batchNumber, label:item?.batchNumber + '-(' + item?.Quantity +')', expireDate:item?.expireDate, manufacturingDate: item?.manufacturingDate}
+        })
+        //console.log(x)
+        setFormData({...formData, batchNumber: x[0], manuDate: x[0].manufacturingDate, expDate: x[0].expireDate})
+        retailpriceTypeRef.current.checked = true
+      }
+    })
+
+  }, [selectedProduct])
+
+  const handleCustomerSelect = (e) => {
+    if (customers && !isCustomerLoading) {
+      // let item = customers?.data.find((customer) => customer.id == e.target.value)
+      setSelectedCustomer(e)
+      console.log(e)
+    }
+  }
+
+  const handleAddItem = () => {
+    let item =
+
     {
-      title: "Product Name",
-      dataIndex: "productName",
-      render: (text, record) => (
-        <div className="productimgname">
-          <Link className="product-img">
-            <img alt="" src={record.image} />
-          </Link>
-          <Link style={{ fontSize: "15px", marginLeft: "10px" }}>
-            {record.productName}
-          </Link>
-        </div>
-      ),
-    },
-    {
-      title: "QTY",
-      dataIndex: "qty",
-      render: () => (
-        <div className="input-group form-group mb-0">
-          <button
-            onClick={() => setCount(count + 1)}
-            className="scanner-set input-group-text"
-          >
-            <img src={Plus} alt="img" />
-          </button>
-          <input type="text" value={count} className="calc-no" />
-          <button
-            onClick={() => setCount(count - 1)}
-            className="scanner-set input-group-text"
-          >
-            <img src={MinusIcon} alt="img" />
-          </button>
-        </div>
-      ),
-    },
-    {
-      title: "Price",
-      dataIndex: "price",
-    },
-    {
-      title: "Stock",
-      dataIndex: "stock",
-    },
-    {
-      title: "Discount",
-      dataIndex: "discount",
-    },
-    {
-      title: "Tax",
-      dataIndex: "tax",
-    },
-    {
-      title: "Total Cost($)",
-      dataIndex: "totalCost",
-    },
-    {
-      render: () => (
-        <>
-          <Link className="confirm-text" to="#" onClick={deleteRow}>
-            <img src={DeleteIcon} alt="img" />
-          </Link>
-        </>
-      ),
-    },
-  ];
+      productId: selectedProduct.id,
+      name: selectedProduct.label,
+      batchNumber: formData.batchNumber?.value,
+      manufacturingDate: formData?.manuDate,
+      expireDate: formData?.expDate,
+      quantity: formData?.quantity,
+      unitPrice:price,
+      amount:formData.quantity * price
+
+    }
+    if (item.amount < 1 || formData.unitPrice == '' || item.productName == '') {
+      alertify.set("notifier", "position", "top-right");
+      alertify.warning("Please make sure all fields are filled.");
+    }
+    else {
+
+
+      setProductGridData([...productGridData, item])
+      setFormData({quantity:'', amount:'', batchNumber:'', manuDate:'', expDate:''})
+      setSelectedProduct({totalQuantity:''})
+      retailpriceTypeRef.current.checked = false
+      wholesalepriceTypeRef.current.checked = false
+      specialpriceTypeRef.current.checked = false
+      setWholesalePrice('')
+      setSpecialPrice('')
+      setRetailPrice('')
+      setPrice(0)
+
+    }
+
+  }
+
+  const onSubmit = () => {
+
+    if (productGridData.length < 1) {
+      alertify.set("notifier", "position", "top-right");
+      alertify.warning("Please add at least one item to list before saving.");
+    }
+    else {
+      let postBody = {
+        destinationBranchId: selectedCustomer,
+        transferDate: transDate,
+        products: productGridData
+      }
+
+      mutate(postBody)
+      setSelectedProduct('')
+      setProductGridData([])
+      setIsSubmitSuccessful(true)
+      
+    }
+  }
+
+
+  useEffect(() => {
+    if (!isPostError && isSubmitSuccessful) {
+      alertify.set("notifier", "position", "top-right");
+      alertify.success("Transfer updated successfully.");
+      $('#create').modal('show');
+    }
+    else if (isPostError) {
+      alertify.set("notifier", "position", "top-right");
+      alertify.error("Error...Could not complete update.");
+    }
+
+    return () => { };
+  }, [isPostError, isSubmitSuccessful]);
+
+
+
+  const printReport = () => {
+    let printContents = document.getElementById('printArea').innerHTML
+    let originalContents = document.body.innerHTML
+    document.body.innerHTML = printContents
+    window.print(printContents)
+
+    document.body.innerHTML = originalContents
+    location.reload()
+  }
+
+
+  useEffect(() => {
+    setFormData({ ...formData, amount: Number(formData.price) * Number(formData.quantity) || '' })
+    if(Number(formData?.quantity) > selectedProduct?.totalQuantity){
+      alertify.set("notifier", "position", "top-right");
+      alertify.warning("You can not transfer more than stock available.");
+      setFormData(({...formData, quantity:''}))
+    }
+  }, [formData.quantity])
+
+
+
+  if (isProductsLoading && isCustomerLoading) {
+    return <LoadingSpinner />
+  }
+
 
   return (
-    <>
-      <div className="page-wrapper">
-        <div className="content">
-          <div className="page-header">
-            <div className="page-title">
-              <h4>Edit Transfer</h4>
-              <h6>Transfer your stocks to one another store</h6>
-            </div>
+    <div className="page-wrapper">
+      <div className="content">
+        <div className="page-header">
+          <div className="page-title">
+            <h4>Edit Transfer</h4>
+            <h6>Transfer products to other branches</h6>
           </div>
-          <div className="card">
-            <div className="card-body">
-              <div className="row">
-                <div className="col-lg-3 col-sm-6 col-12">
-                  <div className="form-group">
-                    <label>Date </label>
-                    <div className="input-groupicon">
-                      <DatePicker
-                        selected={startDate}
-                        onChange={(date) => setStartDate(date)}
-                      />
-                      <div className="addonset">
-                        <img src={Calendar} alt="img" />
+        </div>
+
+        <div style={{ display: 'flex', gap: 20 }}>
+
+          <div style={{ display: 'flex', flexDirection: 'column', width: '50%', }}>
+            <div className="card">
+              {/* <form onSubmit={handleSubmit(onSubmit)}> */}
+              <div className="card-body">
+                <div className="row">
+                  <div className="col-lg-8 col-sm-6 col-12">
+                    <div className="form-group">
+                      <label>Branch Name</label>
+                      <div className="row">
+                        <div className="col-lg-12 col-sm-12 col-12">
+                        <Select2
+                              className="select"
+                              data={customerOptions}
+                              value={selectedCustomer}      
+                              disabled      
+                            />
+                        </div>
+
                       </div>
                     </div>
                   </div>
-                </div>
-                <div className="col-lg-3 col-sm-6 col-12">
-                  <div className="form-group">
-                    <label>From</label>
-                    <Select2
-                      className="select"
-                      data={options1}
-                      options={{
-                        placeholder: "Store 1",
-                      }}
-                    />
+                  <div className="col-lg-4 col-sm-6 col-12">
+                    <div className="form-group">
+                      <label> Date</label>
+                      <input type="date" className="form-control" value={transDate} onChange={(e) => setTransDate(e.target.value)} disabled />                      {/* <div className="input-groupicon">
+                       
+                       
+                     */}
+                    </div>
                   </div>
                 </div>
-                <div className="col-lg-3 col-sm-6 col-12">
-                  <div className="form-group">
-                    <label>To</label>
-                    <Select2
-                      className="select"
-                      data={options1}
-                      options={{
-                        placeholder: "Store 2",
-                      }}
-                    />
-                  </div>
-                </div>
-                <div className="col-lg-12 col-sm-6 col-12">
+              </div>
+            </div>
+
+            <div className="card">
+              <div className="card-body">
+
+                <div className="col-12">
                   <div className="form-group">
                     <label>Product Name</label>
                     <div className="input-groupicon">
-                      <input
-                        type="text"
-                        placeholder="Scan/Search Product by code and select..."
-                      />
-                      <div className="addonset">
-                        <img src={Scanner} alt="img" />
+                      <Select style={{width:'100%'}}
+                          options={productOptions}
+                          placeholder={'Select product'}
+                          value={selectedProduct}
+                          onChange={handleProductSelect}
+                          isSearchable= {true}
+                          isLoading={isProductsLoading}
+                          
+                       />
+                      
+                    </div>
+                  </div>
+                </div>
+
+                <div className="row">
+                    <div className="col-6">
+                      <div className="form-group">
+                        <label>Quantity Left</label>
+                        <div className="input-groupicon">
+                          <input
+                            className="form-control"
+                            type="text"
+                            value={selectedProduct?.totalQuantity}
+                            disabled
+                          />
+                          
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="col-6">
+                      <div className="form-group">
+                        <label>Batch No.</label>
+                        <div className="input-groupicon">
+                          <Select
+                            options={selectedProductInfo?.batchNumber?.map((item) => {
+                              return {value:item.batchNumber, label:item?.batchNumber + '-(' + item?.Quantity +')', expireDate:item?.expireDate, manufacturingDate: item?.manufacturingDate}
+                            })}
+                            placeholder=""
+                            value={formData.batchNumber}
+                            onChange={(e) => setFormData({...formData, batchNumber: (e), manuDate: e.manufacturingDate, expDate: e.expireDate})}
+                            //onChange={(e) => console.log(e)}
+                          />
+                          
+                        </div>
+                      </div>
+                    </div>
+                </div>
+                
+                <div className="row">
+                  <div className="col-6">
+                    <div className="form-group">
+                      <label>Manufacturing Date</label>
+                      <div className="input-groupicon">
+                        <DatePicker
+                          selected={startDate}
+                          value={formData?.manuDate.substring(0,10)}
+                          disabled
+
+                        />
+                        <Link className="addonset">
+                          <img src={Calendar} alt="img" />
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="col-6">
+                    <div className="form-group">
+                      <label>Exp. Date</label>
+                      <div className="input-groupicon">
+                      <DatePicker
+                          selected={startDate}
+                          value={formData?.expDate.substring(0,10)}
+                          disabled
+
+                        />
+                        <Link className="addonset">
+                          <img src={Calendar} alt="img" />
+                        </Link>
                       </div>
                     </div>
                   </div>
                 </div>
+
+                <div className="col-12">
+                  <div className="form-group">
+                    <label>Unit Price</label>
+                    <div className="row">
+                        
+
+                          <div className="col-lg-4">
+
+                            <div className="input-group">
+                              <div className="input-group-text">
+                                <input className="form-check-input" type="radio" ref={retailpriceTypeRef} name="priceType" value={selectedProduct?.retailPrice} onChange={(e) => {
+                                  setPrice(e.target.value)
+                                  setDisableUnselectedPrice({retail:false, wholesale:true, special:true})
+                                }}/>
+                              </div>
+                              <input type="text" className="form-control" aria-label="Text input with radio button"  placeholder={`Retail ${retailprice}`} disabled={disabledUnselectedPrice.retail}/>
+                            </div>
+                          
+                          </div>
+
+                          <div className="col-lg-4">
+                            <div className="input-group">
+                              <div className="input-group-text">
+                                <input className="form-check-input" type="radio" ref={wholesalepriceTypeRef} name="priceType" value={selectedProduct?.wholeSalePrice} onChange={(e) => {
+                                  setPrice(e.target.value)
+                                  setDisableUnselectedPrice({wholesale:false, retail:true, special:true})}
+                                 } />
+                              </div>
+                              <input type="text" className="form-control" aria-label="Text input with radio button" placeholder={`Wholesale ${wholesaleprice}`} disabled={disabledUnselectedPrice.wholesale}/>
+                            </div>
+                        </div>
+
+                          <div className="col-lg-4">
+
+                            <div className="input-group">
+                              <div className="input-group-text">
+                                <input className="form-check-input" type="radio" ref={specialpriceTypeRef} name="priceType" value={selectedProduct?.specialPrice} onChange={(e) => {
+                                  setPrice(e.target.value)
+                                  setDisableUnselectedPrice({special:false, wholesale:true, retail:true})
+                                } }/>
+                              </div>
+                              <input type="text" className="form-control" aria-label="Text input with radio button" placeholder={`Special ${specialprice}`} disabled={disabledUnselectedPrice.special} />
+                            </div>
+                          
+                          </div>
+                      </div>
+                  </div>
+                </div>
+
+                <div className="row">
+                  <div className="col-6">
+                    <div className="form-group">
+                      <label>Quantity</label>
+                      <div className="input-groupicon">
+                        <input
+                        className="form-control"
+                          type="text"
+                          value={formData?.quantity}
+                          onChange={(e) => {
+                            if(e.target.value == ''){
+                              setFormData({...formData, quantity: ''})
+                            }
+                            else if(isValidNumber(e.target.value)){
+                              setFormData({...formData, quantity: Number(e.target.value)})
+                            }
+                          }}
+                        />
+                        
+                      </div>
+                    </div>
+                  </div>
+              
+                  <div className="col-6">
+                    <div className="form-group">
+                      <label>Amount</label>
+                      <div className="input-groupicon">
+                        <input
+                          className="form-control"
+                          type="text"
+                          value={formData.quantity ? formData.quantity * price : price * 1}  
+                        />
+                        
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+
+                <div className="col-lg-12 col-sm-6 col-12">
+                  <div className="form-group">
+                    <Link to="#" className="btn btn-submit me-2" onClick={handleAddItem} style={{ width: '100%' }}><FeatherIcon icon="shopping-cart" />
+                      {" Add to Basket"}
+                    </Link>
+                    {/* <Link to="#" className="btn btn-cancel">
+                        Clear
+                      </Link> */}
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+          <div className="card" style={{ width: '50%' }} >
+            <div className="card-body">
+              <div className="row">
+                <div className="table-responsive mb-3">
+                  <table className="table">
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>Product Name</th>
+                        <th>Quantity</th>
+                        <th>Unit Price</th>
+                        <th>Amount</th>
+                        <th>Action</th>
+                        <th />
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {productGridData?.map((item, index) => {
+                        return (
+                          <tr key={index}>
+                            <td>{index + 1}</td>
+                            <td>
+                              <Link to="#">{item?.name}</Link>
+                            </td>
+                            <td>{item?.quantity}</td>
+                            <td>{item?.unitPrice}</td>
+                            <td>{item?.amount}</td>
+
+                            <td>
+                              <Link to="#" className="delete-set">
+                                <img src={DeleteIcon} alt="svg" />
+                              </Link>
+                            </td>
+                          </tr>
+                        )
+                      })}
+
+                    </tbody>
+                  </table>
+                </div>
               </div>
               <div className="row">
-                <div className="table-responsive">
-                  <Table
-                    columns={columns}
-                    dataSource={data}
-                    pagination={false}
-                  />
+                <div className="row">
+                  <div className="col-lg-6 ">
+                    <div className="total-order w-100 max-widthauto m-auto mb-4">
+                      {/* <ul>
+                          <li>
+                            <h4>Order Tax</h4>
+                            <h5>$ 0.00 (0.00%)</h5>
+                          </li>
+                          <li>
+                            <h4>Discount </h4>
+                            <h5>$ 0.00</h5>
+                          </li>
+                        </ul> */}
+                    </div>
+                  </div>
+                  <div className="col-lg-6 ">
+                    <div className="total-order w-100 max-widthauto m-auto mb-4">
+                      <ul>
+
+                        <li className="total">
+                          <h4>Grand Total</h4>
+                          <h5>GHS {moneyInTxt(
+                            productGridData?.reduce((total, item) => total + item.amount, 0)
+                          )}</h5>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+                <div className="col-lg-12" style={{ textAlign: 'right' }}>
+                  <button type="submit" className="btn btn-submit me-2" onClick={onSubmit}><FeatherIcon icon="save" />
+                    {" Update"}
+                  </button>
+                  {/* <Link id="printModalClick" to="#" className="btn btn-cancel me-2" style={{ backgroundColor: '#FF9F43' }} data-bs-toggle="modal"
+                    data-bs-target="#create" >
+                    Refresh
+                  </Link> */}
+                 
                 </div>
               </div>
-              <div className="row">
-                <div className="col-lg-12 float-md-right">
-                  <div className="total-order">
-                    <ul>
-                      <li>
-                        <h4>Order Tax</h4>
-                        <h5>$ 0.00 (0.00%)</h5>
-                      </li>
-                      <li>
-                        <h4>Discount </h4>$
-                        <h5>$ 0.00</h5>
-                      </li>
-                      <li>
-                        <h4>Shipping</h4>
-                        <h5>$ 0.00</h5>
-                      </li>
-                      <li className="total">
-                        <h4>Grand Total</h4>
-                        <h5>$ 2000.00</h5>
-                      </li>
-                    </ul>
+            </div>
+            {/* </form> */}
+          </div>
+        </div>
+
+
+      </div>
+
+
+      <div
+        className="modal fade"
+        id="create"
+        tabIndex={-1}
+        aria-labelledby="create"
+        aria-hidden="true"
+      >
+        <div
+          className="modal-dialog modal-lg modal-dialog-centered"
+          role="document"
+        >
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title">Print Preview</h5>
+              <button
+                type="button"
+                className="close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">×</span>
+              </button>
+            </div>
+            <div className="modal-body">
+
+              <div id="printArea">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  <h5 style={{ textAlign: 'center', fontWeight: 900 }}>TINATETT HERBAL MANUFACTURING AND MARKKETING COMPANY LIMITED</h5>
+                  <span style={{ textAlign: 'center' }}>P.O. BOC CO 2699, TEMA-ACCRA, WHOLESALE AND RETAIL OF HERBAL MEDICINE </span>
+                  <span style={{ textAlign: 'center' }}>KOTOBABI SPINTEX - FACTORY WEARHOUSE, 02081660807, tinatettonline@gmail.com</span>
+                  <h5 style={{ textAlign: 'center', textDecoration: 'underline', fontWeight: 700 }}>PROFORMA INVOICE</h5>
+                  <h6 style={{ fontWeight: 700 }}>Customer Info: </h6>
+                  <span>Customer Name : {selectedCustomerPrint?.label}</span>
+                  <span>Email: {selectedCustomerPrint?.email}</span>
+                  <span>Contact: {selectedCustomerPrint?.contact}</span>
+                  <span>Address: {selectedCustomerPrint?.location}</span>
+                </div>
+                <div className="row mt-3">
+                  <div class="table-responsive mb-3">
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th>#</th><th>Product Name</th><th>Quantity</th><th>Unit Price</th><th>Amount</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {printGridData?.map((item, index) => {
+                          return (
+                            <tr key={index}>
+                              <td>{index + 1}</td>
+                              <td>
+                                <Link to="#">{item?.productName}</Link>
+                              </td>
+                              <td>{item?.quantity}</td>
+                              <td>{item?.unitPrice}</td>
+                              <td>{item?.amount}</td>
+                            </tr>
+                          )
+                        })}
+                      </tbody>
+                    </table>
                   </div>
                 </div>
+
+
+                <div className="row mt-3">
+                  <div className="col-lg-6" style={{ textAlign: 'right' }}></div>
+                  <div className="col-lg-6 " style={{ textAlign: 'right' }}>
+                    <div className="total-order w-100 max-widthauto m-auto mb-4">
+                      <ul>
+
+                        <li className="total" >
+                          <h4>Grand Total</h4>
+                          <h5>GHS {moneyInTxt(
+                            printGridData.reduce((total, item) => total + item.amount, 0)
+                          )}</h5>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
               </div>
-              <div className="row">
-                <div className="col-lg-3 col-sm-6 col-12">
-                  <div className="form-group">
-                    <label>Order Tax</label>
-                    <input type="text" />
-                  </div>
-                </div>
-                <div className="col-lg-3 col-sm-6 col-12">
-                  <div className="form-group">
-                    <label>Discount</label>
-                    <input type="text" />
-                  </div>
-                </div>
-                <div className="col-lg-3 col-sm-6 col-12">
-                  <div className="form-group">
-                    <label>Shipping</label>
-                    <input type="text" />
-                  </div>
-                </div>
-                <div className="col-lg-3 col-sm-6 col-12">
-                  <div className="form-group">
-                    <label>Status</label>
-                    <Select2
-                      className="select"
-                      data={options2}
-                      options={{
-                        placeholder: "Sent",
-                      }}
-                    />
-                  </div>
-                </div>
-                <div className="col-lg-12">
-                  <div className="form-group">
-                    <label>Description</label>
-                    <textarea className="form-control" defaultValue={""} />
-                  </div>
-                </div>
-                <div className="col-lg-12">
-                  <button className="btn btn-submit me-2">Submit</button>
-                  <button className="btn btn-cancel">Cancel</button>
-                </div>
+
+              <div className="col-lg-12" style={{ textAlign: 'right' }}>
+                <Link to="#" className="btn btn-submit me-2" data-bs-dismiss="modal" onClick={() => printReport()}>
+                  <FeatherIcon icon="printer" /> Print
+                </Link>
+                <Link to="#" className="btn btn-cancel" data-bs-dismiss="modal">
+                  Cancel
+                </Link>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

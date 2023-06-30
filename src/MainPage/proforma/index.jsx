@@ -6,6 +6,7 @@ import Editsales from './editsales'
 import SalesReturnList from '../Return/SalesReturnList'
 import AddSalesReturn from '../Return/AddSalesReturn'
 import ProformaDetail from './proformaDetails';
+import EditProforma from './editproforma';
 
 
 
@@ -18,7 +19,7 @@ const ProformaIndex = ({ match}) =>(
         <Redirect exact from={`${match.url}/`} to={`${match.url}/generalsettings`} />
         <Route path={`${match.url}/proformalist`} component={ProformaList} />                                                                                                                                                                                        
         <Route path={`${match.url}/add-proforma`} component={AddProforma} />                                                                                                                                                                                        
-        <Route path={`${match.url}/edit-proforma`} component={Editsales} />                                                                                                                                                                                        
+        <Route path={`${match.url}/edit-proforma`} component={EditProforma} />                                                                                                                                                                                        
         <Route path={`${match.url}/proforma-details`} component={ProformaDetail} />                                                                                               
     </Switch>
 )

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   AvocatImage,
   Dash1,
@@ -25,6 +25,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useGet } from "../hooks/useGet";
 import { moneyInTxt } from "../utility";
 import useAuth from "../hooks/useAuth";
+import LoadingSpinner from "../InitialPage/Sidebar/LoadingSpinner";
 
 const state = {
   series: [
@@ -255,23 +256,27 @@ const Dashboard = (props) => {
       sorter: (a, b) => a.price - b.price,
     },
   ];
+  const [data, setData] = useState(null)
+  
+  const {
+    data: dashboardSummary,
+    isError,
+    isLoading,
+    isSuccess,
+  } = useGet("dashboardSummary", "/dashboard/summary");
 
-  // const {
-  //   data: catData,
-  //   isLoading,
-  //   isError,
-  //   refetch,
-  // } = useGet("cat-facts", `/menu`);
 
-  // if (isError) {
-  //   return <h2>Sorry there was an error </h2>;
-  // }
 
-  // if (isLoading) {
-  //   return <h2>Loading..</h2>;
-  // }
+  useEffect(() => {
+    if (!isLoading) {
+      setData(dashboardSummary?.data[0])
+    }
+  
+  }, [isLoading])
 
-  //console.log({ dashboard: auth });
+  if(isLoading){
+    return <LoadingSpinner/>
+  }
 
   return (
     <>
@@ -294,10 +299,10 @@ const Dashboard = (props) => {
                   <h5>
                     GHS {' '} 
                     <span className="counters">
-                      <CountUp end={307144} />
+                      <CountUp end={data?.total_purchase_amount} />
                     </span>
                   </h5>
-                  <h6>Total Purchase Due</h6>
+                  <h6>Total Purchase Amount</h6>
                 </div>
               </div>
             </div>
@@ -312,10 +317,10 @@ const Dashboard = (props) => {
                   <h5>
                     GHS {' '} 
                     <span className="counters">
-                      <CountUp end={4385} />
+                      <CountUp end={data?.total_sales_amount} />
                     </span>
                   </h5>
-                  <h6>Total Sales Due</h6>
+                  <h6>Total Sales Amount</h6>
                 </div>
               </div>
             </div>
@@ -328,12 +333,12 @@ const Dashboard = (props) => {
                 </div>
                 <div className="dash-widgetcontent">
                   <h5>
-                    GHS {' '} 
+                    
                     <span className="counters">
-                      <CountUp end={385656.5} />
+                      <CountUp end={data?.numberofPurchase} />
                     </span>
                   </h5>
-                  <h6>Total Sale Amount</h6>
+                  <h6>Total Purchases</h6>
                 </div>
               </div>
             </div>
@@ -346,19 +351,19 @@ const Dashboard = (props) => {
                 </div>
                 <div className="dash-widgetcontent">
                   <h5>
-                    GHS {' '} 
+                   
                     <span className="counters">
-                      <CountUp end={40000} />
+                      <CountUp end={data?.numberofSales} />
                     </span>
                   </h5>
-                  <h6>Total Sale Amount</h6>
+                  <h6>Total Sales</h6>
                 </div>
               </div>
             </div>
             <div className="col-lg-3 col-sm-6 col-12 d-flex">
               <div className="dash-count">
                 <div className="dash-counts">
-                  <h4>100</h4>
+                  <h4>{data?.total_customers}</h4>
                   <h5>Customers</h5>
                 </div>
                 <div className="dash-imgs">
@@ -369,7 +374,7 @@ const Dashboard = (props) => {
             <div className="col-lg-3 col-sm-6 col-12 d-flex">
               <div className="dash-count das1">
                 <div className="dash-counts">
-                  <h4>100</h4>
+                  <h4>{data?.total_suppliers}</h4>
                   <h5>Suppliers</h5>
                 </div>
                 <div className="dash-imgs">
@@ -380,7 +385,7 @@ const Dashboard = (props) => {
             <div className="col-lg-3 col-sm-6 col-12 d-flex">
               <div className="dash-count das2">
                 <div className="dash-counts">
-                  <h4>100</h4>
+                  <h4>{data?.pruchase_invoice}</h4>
                   <h5>Purchase Invoice</h5>
                 </div>
                 <div className="dash-imgs">
@@ -391,7 +396,7 @@ const Dashboard = (props) => {
             <div className="col-lg-3 col-sm-6 col-12 d-flex">
               <div className="dash-count das3">
                 <div className="dash-counts">
-                  <h4>105</h4>
+                <h4>{data?.sales_invoice}</h4>
                   <h5>Sales Invoice</h5>
                 </div>
                 <div className="dash-imgs">

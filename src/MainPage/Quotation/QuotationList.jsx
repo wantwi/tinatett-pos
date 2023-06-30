@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Table from "../../EntryFile/datatable";
 import Tabletop from "../../EntryFile/tabletop"
 import { Link } from "react-router-dom";
@@ -7,20 +7,23 @@ import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
 import {
   PlusIcon,  
-  MacbookIcon,
-  IphoneIcon,
   search_whites,
-  EarpodIcon,
-  OrangeImage,
-  StawberryImage,
-  AvocatImage,
   EditIcon,
   DeleteIcon,
   UnpaidGray,
 } from "../../EntryFile/imagePath";
+import { useGet } from "../../hooks/useGet";
+import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 
 const QuotationList = () => {
   const [inputfilter, setInputfilter] = useState(false);
+  const {
+    data: productRequests,
+    isError,
+    isLoading,
+    isSuccess,
+  } = useGet("productRequests", "/productRequest");
+  const [data, setData] = useState([])
 
   const options = [
     { id: 1, text: "Choose Product", text: "Choose Product" },
@@ -71,97 +74,44 @@ const QuotationList = () => {
     setInputfilter(value);
   };
 
-  const [data] = useState([
-    {
-      id: 1,
-      image: MacbookIcon,
-      productName: "Macbook Pro",
-      reference: "PT001",
-      customerName: "Thomas",
-      status: "Sent",
-      grandTotal: "550",
-    },
-    {
-      id: 2,
-      image: OrangeImage,
-      productName: "Orange",
-      reference: "PT002",
-      customerName: "Raina",
-      status: "Orderded",
-      grandTotal: "789",
-    },
-    {
-      id: 3,
-      image: StawberryImage,
-      productName: "Stawberry",
-      reference: "PT003",
-      customerName: "Dhoni",
-      status: "Pending",
-      grandTotal: "765",
-    },
-    {
-      id: 4,
-      image: IphoneIcon,
-      productName: "iPhone 11",
-      reference: "PT004",
-      customerName: "Rohit",
-      status: "Sent",
-      grandTotal: "909",
-    },
-    {
-      id: 5,
-      image: AvocatImage,
-      productName: "Avocat",
-      reference: "PT005",
-      customerName: "Rahul",
-      status: "Orderded",
-      grandTotal: "879",
-    },
-    {
-      id: 6,
-      image: EarpodIcon,
-      productName: "Apple Earpods",
-      reference: "PT006",
-      customerName: "Conway",
-      status: "Pending",
-      grandTotal: "887",
-    },
-    {
-      id: 7,
-      image: UnpaidGray,
-      productName: "Unpaired gray",
-      reference: "PT007",
-      customerName: "Boult",
-      status: "Sent",
-      grandTotal: "980",
-    },
-  ]);
+ 
+
+
+  useEffect(() => {
+    if (!isLoading) {
+      let mappedData = productRequests?.data?.map((productRequest) => {
+        return {
+          id: productRequest?.id,
+          reference: productRequest?.reference,
+          status: productRequest?.status,
+          requestDate: new Date(productRequest.requestDate).toISOString().substring(0, 10),
+          numberOfItems: productRequest?.numberOfItems,
+          createdBy: productRequest?.user.firstName + ' ' + productRequest?.user.lastName || 'N/A',
+        }
+      })
+
+      setData(mappedData)
+
+    }
+  }, [isLoading])
+
+
+  if (isLoading) {
+    return (<LoadingSpinner message="Loading list.." />)
+  }
+
 
   const columns = [
-    {
-      title: "Product Name",
-      dataIndex: "productName",
-      render: (text, record) => (
-        <div className="productimgname">
-          <Link className="product-img">
-            <img alt="" src={record.image} />
-          </Link>
-          <Link style={{ fontSize: "15px", marginLeft: "10px" }}>
-            {record.productName}
-          </Link>
-        </div>
-      ),
-      sorter: (a, b) => a.productName.length - b.productName.length,
-    },
+ 
     {
       title: "Reference",
       dataIndex: "reference",
       sorter: (a, b) => a.reference.length - b.reference.length,
     },
     {
-      title: "Customer Name",
-      dataIndex: "customerName",
-      sorter: (a, b) => a.customerName.length - b.customerName.length,
+      title: "Request Date",
+      dataIndex: "requestDate",
+      sorter: (a, b) => a.requestDate.length - b.requestDate.length,
     },
     {
       title: "Status",
@@ -169,28 +119,27 @@ const QuotationList = () => {
       render: (text, record) => (
         <span
           className={
-            text === "Sent"
+            text == "1"
               ? "badges bg-lightgreen"
-              : text == "Pending"
-              ? "badges bg-lightred"
-              : "badges bg-lightyellow"
+              : text == "0"
+              ? "badges bg-lightyellow" : ''
           }
         >
-          {text}
+          {text == 0 ? 'Pending Approval' : 'Approved'}
         </span>
       ),
       sorter: (a, b) => a.status.length - b.status.length,
     },
     {
-      title: "Grand Total",
-      dataIndex: "grandTotal",
-      sorter: (a, b) => a.grandTotal.length - b.grandTotal.length,
+      title: "No of Items",
+      dataIndex: "numberOfItems",
+      sorter: (a, b) => a.numberOfItems.length - b.numberOfItems.length,
     },
     {
       title: "Action",
-      render: () => (
+      render: (record) => (
         <>
-          <Link className="me-3" to="/dream-pos/quotation/editquotation-quotation">
+          <Link className="me-3" to= {{pathname:"/tinatett-pos/quotation/editquotation-quotation", state: record}}>
             <img src={EditIcon} alt="img" />
           </Link>
           <Link className="confirm-text" to="#" onClick={confirmText}>
@@ -206,8 +155,8 @@ const QuotationList = () => {
         <div className="content">
           <div className="page-header">
             <div className="page-title">
-              <h4>Quotation List</h4>
-              <h6>Manage your Quotations</h6>
+              <h4>Request List</h4>
+              <h6>Manage your Product Requests</h6>
             </div>
             <div className="page-btn">
               <Link

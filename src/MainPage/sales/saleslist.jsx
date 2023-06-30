@@ -167,17 +167,17 @@ const SalesList = () => {
       ),
       sorter: (a, b) => a.Paid.length - b.Paid.length,
     },
-    {
-      title: "Due (GHS)",
-      dataIndex: "Due",
-      render: (text, record) => (
-        <>
-          {<div className="text-red">{moneyInTxt(text)}</div>}
-          {/* {text === 0 && <div>{moneyInTxt(text)}</div>} */}
-        </>
-      ),
-      sorter: (a, b) => a.Due.length - b.Due.length,
-    },
+    // {
+    //   title: "Due (GHS)",
+    //   dataIndex: "Due",
+    //   render: (text, record) => (
+    //     <>
+    //       {<div className="text-red">{moneyInTxt(text)}</div>}
+    //       {/* {text === 0 && <div>{moneyInTxt(text)}</div>} */}
+    //     </>
+    //   ),
+    //   sorter: (a, b) => a.Due.length - b.Due.length,
+    // },
     // {
     //   title: "Biller",
     //   dataIndex: "Biller",
@@ -187,16 +187,7 @@ const SalesList = () => {
       title: "Action",
       render: (text, record) => (
         <>
-          <div className="text-center">
-            <Link
-              className="action-set"
-              to="#"
-              data-bs-toggle="dropdown"
-              aria-expanded="true"
-            >
-              <i className="fa fa-ellipsis-v" aria-hidden="true" />
-            </Link>
-            <ul className="dropdown-menu">
+         
               {/* <li>
                 <Link to="/tinatett-pos/sales/sales-details" className="dropdown-item">
                   <img src={Eye1} className="me-2" alt="img" />
@@ -231,24 +222,26 @@ const SalesList = () => {
                   Create Payment
                 </Link>
               </li> */}
-              <li>
-                <a href="javascript:void(0);"  className="dropdown-item" onClick={() =>getInvoiceReceipt(record?.Reference)}>
+           
+                <a href="javascript:void(0);"  
+                title="Download Invoice"
+                 onClick={() =>getInvoiceReceipt(record?.Reference)}>
                   <img src={Download} className="me-2" alt="img"  />
-                  Download Invoice
+                
                 </a>
-              </li>
-              <li>
+             
+            
                 <Link
                   to="#"
-                  className="dropdown-item confirm-text"
+                  className="confirm-text"
                   onClick={confirmText}
+                  title=" Delete Sale"
                 >
-                  <img src={delete1} className="me-2" alt="img" />
-                  Delete Sale
+                  <img src={DeleteIcon} alt="img" />
+                 
                 </Link>
-              </li>
-            </ul>
-          </div>
+             
+           
         </>
       ),
     },

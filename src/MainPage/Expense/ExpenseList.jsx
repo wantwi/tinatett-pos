@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Table from "../../EntryFile/datatable";
 import { Link } from "react-router-dom";
 import Tabletop from "../../EntryFile/tabletop"
@@ -17,9 +17,27 @@ import {
   DeleteIcon,
 } from "../../EntryFile/imagePath";
 import Swal from "sweetalert2";
+import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
+import { useGet } from "../../hooks/useGet";
+import useCustomApi from "../../hooks/useCustomApi";
 
 const ExpenseList = () => {
   const [inputfilter, setInputfilter] = useState(false);
+  const [data, setData] = useState([])
+  const {data: expenses, isError, isLoading, isSuccess} = useGet("expenses", "/expense");
+
+
+  useEffect(() => {
+    if(!isLoading){
+      let mappedData =  expenses?.data.map((expense) => {
+          return {
+            ...expense, expenseDate: expense.expenseDate.substring(0,10)
+          }
+        })
+      setData(mappedData)
+    }
+ 
+  }, [isLoading])
 
   const options = [
     { id: 1, text: "Choose Product", text: "Choose Product" },
@@ -27,24 +45,16 @@ const ExpenseList = () => {
     { id: 3, text: "Orange", text: "Orange" },
   ];
   const options2 = [
-    { id: 1, text: "Choose Category", text: "Choose Category" },
-    { id: 2, text: "Computers", text: "Computers" },
-    { id: 3, text: "Fruits", text: "Fruits" },
-  ];
-  const options3 = [
-    { id: 1, text: "Choose Sub Category", text: "Choose Sub Category" },
-    { id: 2, text: "Computers", text: "Computers" },
-  ];
-  const options4 = [
-    { id: 1, text: "Brand", text: "Brand" },
-    { id: 2, text: "N/D", text: "N/D" },
-  ];
-  const options5 = [
-    { id: 1, text: "Price", text: "Price" },
-    { id: 2, text: "150.00", text: "150.00" },
+    { id: 1, text: "Choose Category", value: "Choose Category" },
+    { id: 2, text: "Food", value: "Food" },
+    { id: 3, text: "Office Supply", value: "Office Supply" },
+    { id: 4, text: "Entertainment", value: "Entertainment" },
+    { id: 5, text: "Miscellaneous", value: "Miscellaneous" },
   ];
 
-  const confirmText = () => {
+  const axios = useCustomApi()
+
+  const confirmText = (id) => {
     Swal.fire({
       title: "Are you sure?",
       text: "You won't be able to revert this!",
@@ -57,120 +67,50 @@ const ExpenseList = () => {
       cancelButtonClass: "btn btn-danger ml-1",
       buttonsStyling: !1,
     }).then(function (t) {
-      t.value &&
+     // t.value &&
+
+     axios.delete(`/expense/${id}`)
+     .then((res) => {
+      console.log(res)
+      if(res.status < 205){
         Swal.fire({
           type: "success",
           title: "Deleted!",
-          text: "Your file has been deleted.",
+          text: "Your record has been deleted.",
           confirmButtonClass: "btn btn-success",
         });
+        setTimeout(() => {
+          window.location.reload()
+        }, 1000)
+      }
+      else{
+        Swal.fire({
+          type: "error",
+          title: "Error!",
+          text: "Your record could not be deleted.",
+          confirmButtonClass: "btn btn-danger",
+        });
+      }
+     })
+
+       
     });
   };
   const togglefilter = (value) => {
     setInputfilter(value);
   };
 
-  const [data] = useState([
-    {
-      id: 1,
-      categoryName: "Employee Benefits",
-      reference: "PT001",
-      date: "19 Nov 2022",
-      status: "Active",
-      amount: "550",
-      description: "Employee Vechicle",
-    },
-    {
-      id: 2,
-      categoryName: "Foods & Snacks",
-      reference: "PT002",
-      date: "19 Nov 2022",
-      status: "In Active",
-      amount: "127",
-      description: "Employee Foods",
-    },
-    {
-      id: 3,
-      categoryName: "Entertainment",
-      reference: "PT003",
-      date: "20 Nov 2022",
-      status: "Active",
-      amount: "765",
-      description: "Office Vechicle",
-    },
-    {
-      id: 4,
-      categoryName: "Office Expenses & Postage",
-      reference: "PT004",
-      date: "19 Nov 2022",
-      status: "Active",
-      amount: "890",
-      description: "Employee Foods",
-    },
-    {
-      id: 5,
-      categoryName: "Entertainment",
-      reference: "PT005",
-      date: "20 Nov 2022",
-      status: "Active",
-      amount: "654",
-      description: "Office Vechicle",
-    },
-    {
-      id: 6,
-      categoryName: "Foods & Snacks",
-      reference: "PT006",
-      date: "19 Nov 2022",
-      status: "In Active",
-      amount: "987",
-      description: "Employee Foods",
-    },
-    {
-      id: 7,
-      categoryName: "Entertainment",
-      reference: "PT007",
-      date: "19 Nov 2022",
-      status: "Active",
-      amount: "878",
-      description: "Office Vechicle",
-    },
-  ]);
 
   const columns = [
     {
       title: "Category Name",
-      dataIndex: "categoryName",
-      sorter: (a, b) => a.categoryName.length - b.categoryName.length,
+      dataIndex: "category",
+      sorter: (a, b) => a.category.length - b.category.length,
     },
     {
-      title: "Reference",
-      dataIndex: "reference",
-      sorter: (a, b) => a.reference.length - b.reference.length,
-    },
-    {
-      title: "Date",
-      dataIndex: "date",
-      sorter: (a, b) => a.date.length - b.date.length,
-    },
-    {
-      title: "Status",
-      dataIndex: "status",
-      render: (text, record) => (
-        <span
-          className={
-            text === "Active" ? "badges bg-lightgreen" : "badges bg-lightred"
-          }
-        >
-          {text}
-        </span>
-      ),
-      sorter: (a, b) => a.status.length - b.status.length,
-    },
-    {
-      title: "Amount",
-      dataIndex: "amount",
-      sorter: (a, b) => a.amount.length - b.amount.length,
-      width: "125px",
+      title: "Expense For",
+      dataIndex: "expenseFor",
+      sorter: (a, b) => a.expenseFor.length - b.expenseFor.length,
     },
     {
       title: "Description",
@@ -178,19 +118,44 @@ const ExpenseList = () => {
       sorter: (a, b) => a.description.length - b.description.length,
     },
     {
+      title: "Date",
+      dataIndex: "expenseDate",
+      sorter: (a, b) => a.expenseDate.length - b.expenseDate.length,
+    },
+    // {
+    //   title: "Amount",
+    //   dataIndex: "amount",
+    //   render: (text, record) => (
+    //     <span className={"badges bg-lightgreen"}>
+    //       {text}
+    //     </span>
+    //   ),
+    //   sorter: (a, b) => a.amount.length - b.amount.length,
+    // },
+    {
+      title: "Amount",
+      dataIndex: "amount",
+      sorter: (a, b) => a.amount.length - b.amount.length,
+      width: "125px",
+    },
+    {
       title: "Action",
-      render: () => (
+      render: (a,record) => (
         <>
-          <Link className="me-3" to="/dream-pos/expense/editexpense-expense">
+          <Link className="me-3"  to={{pathname:"/tinatett-pos/expense/editexpense", state:record}} >
             <img src={EditIcon} alt="img" />
           </Link>
-          <Link className="confirm-text" to="#" onClick={confirmText}>
+          <Link className="confirm-text" to="#" onClick={() => confirmText(record.id)}>
             <img src={DeleteIcon} alt="img" />
           </Link>
         </>
       ),
     },
   ];
+
+  if(isLoading){
+    return <LoadingSpinner/>
+  }
 
   return (
     <>
@@ -225,17 +190,7 @@ const ExpenseList = () => {
                   <div className="row">
                     <div className="col-lg-12 col-sm-12">
                       <div className="row">
-                        <div className="col-lg col-sm-6 col-12">
-                          <div className="form-group">
-                            <Select2
-                              className="select"
-                              data={options}
-                              options={{
-                                placeholder: "Choose Product",
-                              }}
-                            />
-                          </div>
-                        </div>
+                   
                         <div className="col-lg col-sm-6 col-12">
                           <div className="form-group">
                             <Select2
@@ -247,39 +202,7 @@ const ExpenseList = () => {
                             />
                           </div>
                         </div>
-                        <div className="col-lg col-sm-6 col-12">
-                          <div className="form-group">
-                            <Select2
-                              className="select"
-                              data={options3}
-                              options={{
-                                placeholder: "Choose Sub Category",
-                              }}
-                            />
-                          </div>
-                        </div>
-                        <div className="col-lg col-sm-6 col-12">
-                          <div className="form-group">
-                            <Select2
-                              className="select"
-                              data={options4}
-                              options={{
-                                placeholder: "Brand",
-                              }}
-                            />
-                          </div>
-                        </div>
-                        <div className="col-lg col-sm-6 col-12 ">
-                          <div className="form-group">
-                            <Select2
-                              className="select"
-                              data={options5}
-                              options={{
-                                placeholder: "Price",
-                              }}
-                            />
-                          </div>
-                        </div>
+                        
                         <div className="col-lg-1 col-sm-6 col-12">
                           <div className="form-group">
                             <a className="btn btn-filters ms-auto">

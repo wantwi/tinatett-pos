@@ -23,14 +23,11 @@ import { usePost } from "../../hooks/usePost";
 import alertify from "alertifyjs";
 import "../../../node_modules/alertifyjs/build/css/alertify.css";
 import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as Yup from "yup";
 import FeatherIcon from 'feather-icons-react'
 import jsPDF from "jspdf";
 
 
-const AddProforma = () => {
+const EditProforma = () => {
   const [customerOptions, setCustomerOptions] = useState([])
   const [productOptions, setProductOptions] = useState([])
 
@@ -239,8 +236,8 @@ const AddProforma = () => {
       <div className="content">
         <div className="page-header">
           <div className="page-title">
-            <h4>Add Proforma</h4>
-            <h6>Add your new proforma</h6>
+            <h4>Edit Proforma</h4>
+            <h6>Edit your existing proforma</h6>
           </div>
         </div>
 
@@ -725,4 +722,4 @@ const AddProforma = () => {
   );
 };
 
-export default AddProforma;
+export default EditProforma;

@@ -52,7 +52,9 @@ const AddSupplier = () => {
       type: 0,
       creditPeriod:"",
       othercontact:"",
-      details:""
+      bankDetails:"",
+      cashDetails:"",
+      momoDetails:""
 
     },
     resolver: yupResolver(validationSchema),
@@ -75,7 +77,22 @@ const AddSupplier = () => {
           "gpsAddress":data.gpsAddress,
           "creditPeriod":data.creditPeriod,
           "product":data.product,
-          paymentInfo: {"type":paymentType.label, "accountNumber":data.accountNumber,"branch":data.branch,"serviceProvider":data.serviceProvider} 
+          paymentInfo: [
+            {
+              type: 'cash',
+              details: data.cashDetails
+            },
+            {
+              type: 'momo',
+              details: data.momoDetails
+            },
+            {
+              type: 'bank',
+              details: data.bankDetails
+            },
+
+          ]
+          //paymentInfo: {"type":paymentType.label, "accountNumber":data.accountNumber,"branch":data.branch,"serviceProvider":data.serviceProvider} 
       }
     
    mutate(payload)
@@ -92,9 +109,6 @@ const AddSupplier = () => {
   }, [isSubmitSuccessful, isError]);
 
 
-  useEffect(() => {
-    console.log(paymentType)
-  }, [paymentType])
 
 
   if(isLoading){
@@ -253,7 +267,7 @@ const AddSupplier = () => {
                     </div> */}
 
                     <div className="row">
-                      <div className="col-lg-4 col-sm-6 col-12">
+                      {/* <div className="col-lg-4 col-sm-6 col-12">
                         <div className="form-group">
                           <label>Payment Type</label>
                           <Select
@@ -261,20 +275,37 @@ const AddSupplier = () => {
                             options={options}
                             onChange={(e) => selectedPaymentType(e)}
                           />
-                          {/* <input className={`form-control ${errors.name ? "is-invalid" : ""
-                            }`}
-                            type="text"
-                            {...register("type")} /> */}
+                          
                         </div>
-                      </div>
+                      </div> */}
 
-                     <div className="col-lg-4 col-sm-6 col-12">
+                      <div className="col-lg-4 col-sm-6 col-12">
                         <div className="form-group">
-                          <label>{paymentType?.label || 'Ass'} Details</label>
+                          <label>Cash Details</label>
                           <textarea className={`form-control ${errors.name ? "is-invalid" : ""
                             }`}
                             type="text"
-                            {...register("details")} ></textarea>
+                            {...register("cashDetails")} ></textarea>
+                        </div>
+                      </div>
+
+                      <div className="col-lg-4 col-sm-6 col-12">
+                        <div className="form-group">
+                          <label>Bank Details</label>
+                          <textarea className={`form-control ${errors.name ? "is-invalid" : ""
+                            }`}
+                            type="text"
+                            {...register("bankDetails")} ></textarea>
+                        </div>
+                      </div>
+
+                      <div className="col-lg-4 col-sm-6 col-12">
+                        <div className="form-group">
+                          <label>Momo Details</label>
+                          <textarea className={`form-control ${errors.name ? "is-invalid" : ""
+                            }`}
+                            type="text"
+                            {...register("momoDetails")} ></textarea>
                         </div>
                       </div>
 
