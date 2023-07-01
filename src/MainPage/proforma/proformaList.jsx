@@ -25,10 +25,14 @@ import {
   datepicker,
 } from "../../EntryFile/imagePath";
 import Select2 from "react-select2-wrapper";
+import Select from "react-select";
 import "react-select2-wrapper/css/select2.css";
 import useCustomApi from "../../hooks/useCustomApi";
 import { useGet } from "../../hooks/useGet";
 import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
+import alertify from "alertifyjs";
+import "../../../node_modules/alertifyjs/build/css/alertify.css";
+import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
 
 const ProformaList = () => {
 
@@ -37,14 +41,63 @@ const ProformaList = () => {
   const [data, setData] = useState([])
   const [productGridData, setProductGridData] = useState([])
   const [loading, setLoading] = useState(true)
+  const [branches, setBranches] = useState([])
+  const { data: customers, isLoading: isCustomerLoading, } = useGet("branches", "/branch");
+  const [selectedCustomer, setSelectedCustomer] = useState('')
+  const [transDate, setTransDate] = useState(new Date().toISOString().slice(0, 10));
+  const [loadingTransfer, setLoadingTransfer] = useState(false)
   const axios = useCustomApi()
-
   const {
     data: proformas,
     isError,
     isLoading,
     isSuccess,
   } = useGet("proformas", "/proforma");
+
+  const handleCustomerSelect = (e) => {
+    if (customers && !isCustomerLoading) {
+      // let item = customers?.data.find((customer) => customer.id == e.target.value)
+      setSelectedCustomer(e)
+    }
+  }
+
+  const deleteRow = (record) => {
+    let newGridData = productGridData.filter((item) => item.productId !== record.productId)
+    setProductGridData(newGridData)
+  };
+
+  const handleTransfer = () => {
+    setLoadingTransfer(true)
+    let postBody = {
+      destinationBranchId: selectedCustomer.id,
+      transferDate: transDate,
+      products: productGridData
+    }
+
+    console.log(postBody)
+    axios.post(`/transfer`, postBody)
+    .then((res) => {
+      console.log(res.data)
+      if(res.data.success){
+        alertify.set("notifier", "position", "top-right");
+        alertify.success("Transfer sent successfully.");
+//$('#transfer').modal('hide');
+      }
+      else{
+        alertify.set("notifier", "position", "top-right");
+        alertify.error("Transfer failed. Please try again");
+      }
+    })
+    .catch((error) => {
+      alertify.set("notifier", "position", "top-right");
+      alertify.error("Transfer failed. Please try again");
+      //$('#transfer').modal('hide');
+    })
+    .finally(() => setLoadingTransfer(false))
+  }
+
+
+
 
   useEffect(() => {
     if (!isLoading) {
@@ -62,7 +115,23 @@ const ProformaList = () => {
         }
       })
       setData(mappedData)
-      console.log('loaded..')
+
+
+      let branchList = customers?.data.map((customer) => {
+        return {
+          id: customer?.id,
+          label: customer?.name,
+          value: customer?.id,
+          location: customer?.location,
+          contact: customer?.contact,
+          email: customer?.email,
+          status: customer?.status,
+          location: customer?.location
+
+        }
+      })
+      setBranches(branchList)
+     
     }
     else {
       console.log('loading...')
@@ -72,6 +141,10 @@ const ProformaList = () => {
 
   if (isLoading) {
     return (<LoadingSpinner message="Loading list.." />)
+  }
+
+  if (loadingTransfer) {
+    return (<LoadingSpinner message="Processing Transfer.." />)
   }
 
 
@@ -111,20 +184,20 @@ const ProformaList = () => {
     { id: 2, text: "Inprogess", text: "Inprogess" },
   ];
 
-  const handleSell = (id) => {
+  const getProformaProducts = (id) => {
     axios.get(`/proforma/products/${id}`)
     .then((res) => {
       let x = (res.data?.data)
       let mapped = x.map((item) => 
         {
           return {
-            productName:  item?.product?.name,
+            name:  item?.product?.name,
+            productId: item?.id,
             quantity: item?.quantity,
             unitPrice: item?.unitPrice,
             amount: item?.amount
           }
       })
-      console.log("Mapped:", mapped)
       setProductGridData(mapped)
     }).finally(() => setLoading(false))
   }
@@ -229,12 +302,12 @@ const ProformaList = () => {
 
           {/* <Link  to={{pathname:"/tinatett-pos/sales/add-sales", state:record}}  > */}
           {/* <img src={Eye1} className="me-2" alt="img" /> */}
-          <span className="badges bg-lightgreen me-2" style={{ cursor: 'pointer' }} data-bs-target="#editpayment" data-bs-toggle="modal" onClick={() => handleSell(record?.id)}>Sell</span>
+          <span className="badges bg-lightgreen me-2" style={{ cursor: 'pointer' }} data-bs-target="#editpayment" data-bs-toggle="modal" onClick={() => getProformaProducts(record?.id)}>Sell</span>
           {/* </Link> */}
 
           {/* <Link  to={{pathname:"/tinatett-pos/transfer/addtransfer-transfer", state:record}} > */}
           {/* <img src={Eye1} className="me-2" alt="img" /> */}
-          <span className="badges btn-primary me-2" style={{ cursor: 'pointer' }} data-bs-target="#createpayment" data-bs-toggle="modal">Transfer</span>
+          <span className="badges btn-primary me-2" style={{ cursor: 'pointer' }} data-bs-target="#transfer" data-bs-toggle="modal" onClick={() => getProformaProducts(record?.id)}>Transfer</span>
           {/* </Link> */}
 
 
@@ -393,9 +466,9 @@ const ProformaList = () => {
         {/* show payment Modal */}
         <div
           className="modal fade"
-          id="createpayment"
+          id="transfer"
           tabIndex={-1}
-          aria-labelledby="createpayment"
+          aria-labelledby="transfer"
           aria-hidden="true"
         >
           <div className="modal-dialog modal-lg modal-dialog-centered">
@@ -412,6 +485,40 @@ const ProformaList = () => {
                 </button>
               </div>
               <div className="modal-body">
+                <div className="row">
+                  <div >
+                    <div className="card-body">
+                      <div className="row">
+                        <div className="col-lg-8 col-sm-6 col-12">
+                          <div className="form-group">
+                            <label>Branch Name</label>
+                            <div className="row">
+                              <div className="col-lg-12 col-sm-12 col-12">
+                                <Select
+                                  className="select"
+                                  options={branches}
+                                  onChange={handleCustomerSelect}
+                                  value={selectedCustomer}
+
+                                />
+                              </div>
+
+                            </div>
+                          </div>
+                        </div>
+                        <div className="col-lg-4 col-sm-6 col-12">
+                          <div className="form-group">
+                            <label> Date</label>
+                            <input type="date" className="form-control" value={transDate} onChange={(e) => setTransDate(e.target.value)} />                      {/* <div className="input-groupicon">
+                            
+                            
+                          */}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
                 <div className="row">
                   <div className="table-responsive mb-3">
                     <table className="table">
@@ -432,16 +539,13 @@ const ProformaList = () => {
                             <tr key={item?.id}>
                               <td>{index + 1}</td>
                               <td>
-                                <Link to="#">{item?.productName}</Link>
+                                <Link to="#">{item?.name}</Link>
                               </td>
                               <td>{item?.quantity}</td>
                               <td>{item?.unitPrice}</td>
                               <td>{item?.amount}</td>
 
                               <td>
-                              <Link to="#" className="me-2">
-                                  <img src={EditIcon} alt="svg" data-bs-toggle="modal" data-bs-target="#editproduct" onClick={() => setEditFormData(item)}/>
-                                </Link>
                                 <Link to="#" className="delete-set" onClick={() => deleteRow(item)}>
                                   <img src={DeleteIcon} alt="svg" />
                                 </Link>
@@ -456,9 +560,10 @@ const ProformaList = () => {
                 </div>
              
               </div>
-              <div className="modal-footer">
-                <button type="button" className="btn btn-submit">
-                  Submit
+              <div className="modal-footer" style={{display:'flex', justifyContent:'right'}}>
+                <button type="button" className="btn btn-submit"
+                  data-bs-dismiss="modal" onClick={handleTransfer}>
+                  Submit Transfer
                 </button>
                 <button
                   type="button"

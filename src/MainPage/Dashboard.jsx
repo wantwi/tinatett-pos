@@ -426,7 +426,7 @@ const Dashboard = (props) => {
                     >
                       <li>
                         <Link
-                          to="/dream-pos/people/customerlist"
+                          to="/tinatett-pos/people/customerlist"
                           className="dropdown-item"
                         >
                           Customer List
@@ -434,7 +434,7 @@ const Dashboard = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/people/addcustomer"
+                          to="/tinatett-pos/people/addcustomer"
                           className="dropdown-item"
                         >
                           Customer Add
@@ -475,7 +475,7 @@ const Dashboard = (props) => {
                     >
                       <li>
                         <Link
-                          to="/dream-pos/product/productlist-product"
+                          to="/tinatett-pos/product/productlist-product"
                           className="dropdown-item"
                         >
                           Product List
@@ -483,7 +483,7 @@ const Dashboard = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/dream-pos/product/addproduct-product"
+                          to="/tinatett-pos/product/addproduct-product"
                           className="dropdown-item"
                         >
                           Product Add
