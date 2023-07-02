@@ -33,6 +33,8 @@ import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 import alertify from "alertifyjs";
 import "../../../node_modules/alertifyjs/build/css/alertify.css";
 import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
+import { moneyInTxt } from "../../utility";
+import FeatherIcon from 'feather-icons-react'
 
 const ProformaList = () => {
 
@@ -462,8 +464,8 @@ const ProformaList = () => {
             </div>
           </div>
         </div>
-        {/* show payment Modal */}
-        {/* show payment Modal */}
+        
+        {/* show transfer Modal */}
         <div
           className="modal fade"
           id="transfer"
@@ -576,8 +578,8 @@ const ProformaList = () => {
             </div>
           </div>
         </div>
-        {/* show payment Modal */}
-        {/* edit payment Modal */}
+        
+        {/* sell proforma Modal */}
         <div
           className="modal fade"
           id="editpayment"
@@ -619,16 +621,13 @@ const ProformaList = () => {
                             <tr key={item?.id}>
                               <td>{index + 1}</td>
                               <td>
-                                <Link to="#">{item?.productName}</Link>
+                                <Link to="#">{item?.name}</Link>
                               </td>
                               <td>{item?.quantity}</td>
                               <td>{item?.unitPrice}</td>
                               <td>{item?.amount}</td>
 
                               <td>
-                              <Link to="#" className="me-2">
-                                  <img src={EditIcon} alt="svg" data-bs-toggle="modal" data-bs-target="#editproduct" onClick={() => setEditFormData(item)}/>
-                                </Link>
                                 <Link to="#" className="delete-set" onClick={() => deleteRow(item)}>
                                   <img src={DeleteIcon} alt="svg" />
                                 </Link>
@@ -641,17 +640,70 @@ const ProformaList = () => {
                     </table>
                   </div>
                 </div>
-                <div className="modal-footer">
-                  <button type="button" className="btn btn-submit">
-                    Submit
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-cancel"
-                    data-bs-dismiss="modal"
-                  >
-                    Close
-                  </button>
+                <div className="modal-footer" >
+                <div className="card" style={{width:'100%'}}>
+                    <div className="card-body">
+                        <div className="row">
+                          <div className="col-lg-6 ">
+                            <div className="total-order w-100 max-widthauto m-auto mb-4">
+                              <ul>
+                                <li>
+                                  <h4>Amount Given</h4>
+                                  <h5>GHS 0.00 </h5>
+                                </li>
+                                <li>
+                                  <h4>Discount </h4>
+                                  <h5>GHS 0.00</h5>
+                                </li>
+                              </ul>
+                            </div>
+                          </div>
+                          <div className="col-lg-6 ">
+                            <div className="total-order w-100 max-widthauto m-auto mb-4">
+                              <ul>
+                              <li className="total">
+                                  <h4>Grand Total</h4>
+                                  <h5>GHS {moneyInTxt(productGridData.reduce((total, item) => total + Number(item.amount), 0))}</h5>
+                                </li>
+                                <li>
+                                  <h4>Balance</h4>
+                                  <h5>GHS 0.00</h5>
+                                </li>
+                              
+                              </ul>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="row">
+                          <div className="col-lg-12" >
+                            <Link to="#" className="btn btn-submit me-2" style={{width:'100%'}}>
+                            <FeatherIcon icon="pause"/>
+                              Suspend Sale
+                            </Link>                
+                          </div>
+                        </div>
+
+                        <div className="row mt-2">
+                          <div className="col-lg-12" style={{display:'flex', justifyContent:'space-between'}} >
+                            <button className="btn btn-info me-2"  style={{width:'20%'}}>
+                              Sell and Print
+                            </button>
+                            <button className="btn btn-warning me-2"  style={{width:'20%'}}>
+                              Sell Only
+                            </button>
+                            <button className="btn btn-danger me-2" style={{width:'20%'}}  >
+                              Credit and Print
+                            </button>
+                            <button  className="btn btn-cancel" style={{width:'20%'}} >
+                              Credit Only
+                            </button>
+                            
+                          </div>
+                        </div>
+                        
+                      </div>
+                  </div>
                 </div>
               </div>
             </div>

@@ -91,44 +91,6 @@ const state = {
 
 const Dashboard = (props) => {
   const { auth } = useAuth();
-  const [expiredData] = useState([
-    {
-      key: 1,
-      code: "IT001",
-      image: OrangeImage,
-      productName: "Orange",
-      brandName: "N/D",
-      categoryName: "Fruits",
-      expiryDate: "12-12-2022",
-    },
-    {
-      key: 2,
-      code: "IT002",
-      image: PineappleImage,
-      productName: "Pineapple",
-      brandName: "N/D",
-      categoryName: "Fruits",
-      expiryDate: "10-12-2022",
-    },
-    {
-      key: 3,
-      code: "IT003",
-      image: StawberryImage,
-      productName: "Stawberry",
-      brandName: "N/D",
-      categoryName: "Fruits",
-      expiryDate: "27-06-2022",
-    },
-    {
-      key: 4,
-      code: "IT004",
-      image: AvocatImage,
-      productName: "Avocat",
-      brandName: "N/D",
-      categoryName: "Fruits",
-      expiryDate: "20-05-2022",
-    },
-  ]);
 
   const [recentData] = useState([
     { key: 1, image: EarpodIcon, products: "Apple Earpods", price: "GHS 891.2" },
@@ -146,52 +108,38 @@ const Dashboard = (props) => {
 
   const expiredProductColumns = [
     {
-      title: "SNo",
-      dataIndex: "key",
-      sorter: (a, b) => a.key.length - b.key.length,
+      title: "Batch No.",
+      dataIndex: "batchNumber",
+      sorter: (a, b) => a.batchNumber.length - b.batchNumber.length,
     },
     {
-      title: "Product Code",
-      dataIndex: "code",
+      title: "Product",
+      dataIndex: "productName",
       render: (text, record) => (
         <Link to="#" style={{ fontSize: "14px" }}>
           {text}
         </Link>
       ),
-      sorter: (a, b) => a.code.length - b.code.length,
-    },
-    {
-      title: "Product Name",
-      dataIndex: "productName",
-      render: (text, record) => (
-        <div className="productimgname">
-          <Link to="#" className="product-img">
-            <img alt="" src={record.image} />
-          </Link>
-          <Link to="#" style={{ fontSize: "14px" }}>
-            {record.productName}
-          </Link>
-        </div>
-      ),
       sorter: (a, b) => a.productName.length - b.productName.length,
     },
+   
     {
-      title: "Brand Name",
-      dataIndex: "brandName",
-      render: (text, record) => <div style={{ fontSize: "14px" }}>{text}</div>,
-      sorter: (a, b) => a.brandName.length - b.brandName.length,
-    },
-    {
-      title: "Category Name",
-      dataIndex: "categoryName",
-      render: (text, record) => <div style={{ fontSize: "14px" }}>{text}</div>,
-      sorter: (a, b) => a.categoryName.length - b.categoryName.length,
+      title: "Manufacturing Date",
+      dataIndex: "manufacturingDate",
+      render: (text, record) => <div style={{ fontSize: "14px" }}>{text.substring(0,10)}</div>,
+      sorter: (a, b) => a.manufacturingDate.length - b.manufacturingDate.length,
     },
     {
       title: "Expiry Date",
-      dataIndex: "expiryDate",
+      dataIndex: "expireDate",
+      render: (text, record) => <div style={{ fontSize: "14px" }}>{text.substring(0,10)}</div>,
+      sorter: (a, b) => a.expireDate.length - b.expireDate.length,
+    },
+    {
+      title: "Days Left",
+      dataIndex: "expirationStatus",
       render: (text, record) => <div style={{ fontSize: "14px" }}>{text}</div>,
-      sorter: (a, b) => a.expiryDate.length - b.expiryDate.length,
+      sorter: (a, b) => a.expirationStatus.length - b.expirationStatus.length,
     },
   ];
 
@@ -257,22 +205,20 @@ const Dashboard = (props) => {
     },
   ];
   const [data, setData] = useState(null)
+  const [expiredData, setExpiredData] = useState([])
   
-  const {
-    data: dashboardSummary,
-    isError,
-    isLoading,
-    isSuccess,
-  } = useGet("dashboardSummary", "/dashboard/summary");
+  const {data: dashboardSummary,isLoading} = useGet("dashboardSummary", "/dashboard/summary");
+  const {data: expiring, isLoading: expLoading} = useGet("expiring", "/dashboard/productExpirationStatus");
 
 
 
   useEffect(() => {
-    if (!isLoading) {
+    if (!isLoading && !expLoading) {
       setData(dashboardSummary?.data[0])
+      setExpiredData(expiring?.data)
     }
   
-  }, [isLoading])
+  }, [isLoading, expLoading])
 
   if(isLoading){
     return <LoadingSpinner/>
@@ -508,7 +454,7 @@ const Dashboard = (props) => {
           </div>
           <div className="card mb-0">
             <div className="card-body">
-              <h4 className="card-title">Expired Products</h4>
+              <h4 className="card-title">Expiring Products</h4>
               <div className="table-responsive dataview">
                 <Table
                   className="table datatable"

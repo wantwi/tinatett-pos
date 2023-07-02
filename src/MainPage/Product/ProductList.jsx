@@ -36,8 +36,6 @@ const ProductList = () => {
   } = useGet("products", "/product");
 
 
-  console.log("Response:", isLoading, isError, products)
-
   useEffect(() => {
     if(!isLoading){
       let mappedData =  products?.data.map((product) => {
@@ -50,16 +48,16 @@ const ProductList = () => {
             retailPrice: product?.retailPrice,
             wholeSalePrice: product?.wholeSalePrice,
             specialPrice: product?.specialPrice,
-            remainingStock: product?.remainingStock || 0,
+            remainingStock: product?.stock_count || 0,
             ownershipType: product?.ownershipType,
             createdBy: product?.createdBy
           }
         })
       setData([...mappedData])
-      console.log('loaded..')
+      //console.log('loaded..')
     }
     else{
-      console.log('loading...')
+     // console.log('loading...')
     }
   }, [isLoading])
 

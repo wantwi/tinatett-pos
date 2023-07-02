@@ -21,7 +21,7 @@ import { useEffect } from "react";
 import { useGet } from "../../hooks/useGet";
 import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 import { isValidNumber, moneyInTxt } from "../../utility";
-import { usePost } from "../../hooks/usePost";
+import { usePut } from "../../hooks/usePut";
 import alertify from "alertifyjs";
 import "../../../node_modules/alertifyjs/build/css/alertify.css";
 import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
@@ -44,9 +44,11 @@ const EditTransfer = () => {
 
   const { data: customers, isError, isLoading: isCustomerLoading, isSuccess } = useGet("branches", "/branch");
   const {data: products, isLoading: isProductsLoading, } = useGet("products", "/product");
-  const { isLoading, isError: isPostError, error, mutate } = usePost("/transfer");
-  const { data: transfer, isLoading: transferIsLoading } = useGet("transfer-info", `/transfer/${state?.id}`);
-  const { data: transferDetails, isLoading: transferIsLoadingDetails } = useGet("transfer-product-details", `/transfer/product/${state?.id}`);
+  const [stateId] = useState(state?.id)
+  const { isLoading, isError: isPostError, error, mutate } = usePut(`/transfer/${stateId}`);
+  const { data: transferDetails, isLoading: transferIsLoadingDetails } = useGet("transfer-product-details", `/transfer/product/${stateId}`);
+  const { data: transfer, isLoading: transferIsLoading } = useGet("transfer-info", `/transfer/${stateId}`);
+
 
   const [selectedProduct, setSelectedProduct] = useState({})
   const [selectedProductInfo, setSelectedProductInfo] = useState()
@@ -216,7 +218,7 @@ const EditTransfer = () => {
     if (!isPostError && isSubmitSuccessful) {
       alertify.set("notifier", "position", "top-right");
       alertify.success("Transfer updated successfully.");
-      $('#create').modal('show');
+      // $('#create').modal('show');
     }
     else if (isPostError) {
       alertify.set("notifier", "position", "top-right");

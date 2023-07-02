@@ -128,6 +128,7 @@ const AddTransfer = () => {
     if (customers && !isCustomerLoading) {
       // let item = customers?.data.find((customer) => customer.id == e.target.value)
       setSelectedCustomer(e)
+      setSelectedCustomerPrint(e)
     }
   }
 
@@ -153,6 +154,7 @@ const AddTransfer = () => {
 
 
       setProductGridData([...productGridData, item])
+      setPrintGridData([...printGridData, item])
       setFormData({quantity:'', amount:'', batchNumber:'', manuDate:'', expDate:''})
       setSelectedProduct({totalQuantity:''})
       retailpriceTypeRef.current.checked = false
@@ -167,7 +169,7 @@ const AddTransfer = () => {
 
   }
 
-  const onSubmit = () => {
+  const onSubmit = (hasInvoice) => {
 
     if (productGridData.length < 1) {
       alertify.set("notifier", "position", "top-right");
@@ -184,6 +186,10 @@ const AddTransfer = () => {
       setSelectedProduct('')
       setProductGridData([])
       setIsSubmitSuccessful(true)
+      if(hasInvoice){
+        $('#invoice').modal('show');
+      }
+   
     }
   }
 
@@ -192,7 +198,7 @@ const AddTransfer = () => {
     if (!isPostError && isSubmitSuccessful) {
       alertify.set("notifier", "position", "top-right");
       alertify.success("Transfer sent successfully.");
-      $('#create').modal('show');
+  
     }
     else if (isPostError) {
       alertify.set("notifier", "position", "top-right");
@@ -549,14 +555,14 @@ const AddTransfer = () => {
                   </div>
                 </div>
                 <div className="col-lg-12" style={{ textAlign: 'right' }}>
-                  <button type="submit" className="btn btn-submit me-2" onClick={onSubmit}><FeatherIcon icon="save" />
+                  <button type="submit" className="btn btn-submit me-2" onClick={() => onSubmit(true)}><FeatherIcon icon="save" />
                     {" Invoice"}
                   </button>
                   {/* <Link id="printModalClick" to="#" className="btn btn-cancel me-2" style={{ backgroundColor: '#FF9F43' }} data-bs-toggle="modal"
                     data-bs-target="#create" >
                     Refresh
                   </Link> */}
-                  <button type="submit" className="btn btn-cancel me-2" onClick={onSubmit}><FeatherIcon icon="" />
+                  <button type="submit" className="btn btn-cancel me-2" onClick={() => onSubmit(false)}><FeatherIcon icon="" />
                     {"No Invoice"}
                   </button>
                 </div>
@@ -572,9 +578,9 @@ const AddTransfer = () => {
 
       <div
         className="modal fade"
-        id="create"
+        id="invoice"
         tabIndex={-1}
-        aria-labelledby="create"
+        aria-labelledby="invoice"
         aria-hidden="true"
       >
         <div
@@ -603,8 +609,8 @@ const AddTransfer = () => {
                   <h5 style={{ textAlign: 'center', textDecoration: 'underline', fontWeight: 700 }}>PROFORMA INVOICE</h5>
                   <h6 style={{ fontWeight: 700 }}>Customer Info: </h6>
                   <span>Customer Name : {selectedCustomerPrint?.label}</span>
-                  <span>Email: {selectedCustomerPrint?.email}</span>
-                  <span>Contact: {selectedCustomerPrint?.contact}</span>
+                  {/* <span>Email: {selectedCustomerPrint?.email}</span>
+                  <span>Contact: {selectedCustomerPrint?.contact}</span> */}
                   <span>Address: {selectedCustomerPrint?.location}</span>
                 </div>
                 <div className="row mt-3">
@@ -644,7 +650,7 @@ const AddTransfer = () => {
                         <li className="total" >
                           <h4>Grand Total</h4>
                           <h5>GHS {moneyInTxt(
-                            printGridData.reduce((total, item) => total + item.amount, 0)
+                            printGridData.reduce((total, item) => total + Number(item.amount), 0)
                           )}</h5>
                         </li>
                       </ul>

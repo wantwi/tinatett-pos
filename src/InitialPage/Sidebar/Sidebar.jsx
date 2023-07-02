@@ -537,11 +537,21 @@ const Sidebar = (props) => {
                     <li>
                       <Link
                         className={
-                          pathname.includes("suspended") ? "active" : ""
+                          pathname.includes("sales/suspended") ? "active" : ""
                         }
                         to="/tinatett-pos/sales/suspended"
                       >
-                        Suspended Sales
+                        Suspended
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        className={
+                          pathname.includes("cashier") ? "active" : ""
+                        }
+                        to="/tinatett-pos/sales/cashier/suspended"
+                      >
+                        Cashier
                       </Link>
                     </li>
                     <li>

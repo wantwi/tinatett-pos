@@ -168,8 +168,8 @@ const TransferList = () => {
 
   useEffect(() => {
     if (!isLoading) {
-
-      setData(transfers?.data)
+      let sortedData = transfers?.data?.sort((a,b) => new Date(b.transferDate) - new Date(a.transferDate))
+      setData(sortedData)
 
     }
   }, [isLoading])

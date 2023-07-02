@@ -52,20 +52,16 @@ const Addsales = () => {
   const retailpriceTypeRef = useRef()
   const specialpriceTypeRef = useRef()
   const wholesalepriceTypeRef = useRef()
+  const [referenceData, setReferenceData] = useState({data:[], reference:'', amountToPay:''})
+  const [isSaving, setIsSaving] = useState(false)
+  
 
   const retailRef = useRef()
   const wholesaleRef = useRef()
 
-  const {
-    data: customers,
-    isLoading: customersIsLoading,
-  } = useGet("customers", "/customer");
-
-  const {
-    data: products,
-    isLoading: productsIsLoading,
-  } = useGet("products", "/product");
-  const { isLoading, data, isError, error, mutate } = usePost("/sales/suspend");
+  const {data: customers, isLoading: customersIsLoading} = useGet("customers", "/customer");
+  const {data: products, isLoading: productsIsLoading} = useGet("products", "/product");
+  // const { isLoading, data, isError, error, mutate } = usePost("/sales/suspend");
 
 
   const axios = useCustomApi()
@@ -88,15 +84,12 @@ const Addsales = () => {
   }
 
   const handleInvoice = () =>{
-
   }
 
   const handleNoInvoice = () => {
-
   }
 
   const handleCredit = () => {
-
   }
 
   const handleSalesTypeChange = (e) => {
@@ -112,6 +105,7 @@ const Addsales = () => {
   }
 
   const handleSuspend = () => {
+    setIsSaving(true)
     let payload = {
       customerId: selectedCustomer.value,
       transDate: transDate,
@@ -120,31 +114,35 @@ const Addsales = () => {
       products: productGridData
     }
 
-
-
-    //console.log(payload)
-    mutate(payload)
-    setProductGridData([])
-    setFormData({quantity:'', amount:'', batchNumber:'', manuDate:'', expDate:''})
-    setSelectedProduct('')
-    setInvoiceNo('')
-    setIsSubmitSuccessful(true)
-  }
-
-  useEffect(() => {
-    if (!isError && !isLoading && isSubmitSuccessful) {
-      console.log("res", data)
+    axios.post(`/sales/suspend`, payload)
+    .then((res) => {
+      if(res.data.success){
+        setProductGridData([])
+        setFormData({quantity:'', amount:'', batchNumber:'', manuDate:'', expDate:''})
+        setSelectedProduct('')
+        setInvoiceNo('')
+        
+        alertify.set("notifier", "position", "top-right");
+        alertify.success("Suspended successfully");
+        setReferenceData(res.data)
+       
+      }
+      else{
+        alertify.set("notifier", "position", "top-right");
+        alertify.warning("Suspend unsuccessful");
+      }
+    })
+    .catch((error) => {
       alertify.set("notifier", "position", "top-right");
-      alertify.success("Sales suspended successfully.");
-    }
-    else if(isError){
-      alertify.set("notifier", "position", "top-right");
-      alertify.error("Error...Could not suspend transaction");
-    }
+      alertify.error("Some error occured. Please contact admin");
+    })
+    .finally(() => {
+      setIsSaving(false)
+      $('#reference').modal('show')
+     }
+      )
     
-    return () => {};
-  }, [isError, isLoading, isSubmitSuccessful]);
-
+  }
   const handleAddItem = () => {
     //console.log(productFormData)
   //console.log(selectedCustomer)
@@ -233,6 +231,15 @@ const Addsales = () => {
       
     }
   }, [productsIsLoading, customersIsLoading])
+
+
+  if(productsIsLoading && customersIsLoading){
+    return <LoadingSpinner message="Loading...please wait"/>
+  }
+
+  if(isSaving){
+    return <LoadingSpinner message="Processing...please wait"/>
+  }
 
 
   return (
@@ -766,13 +773,13 @@ const Addsales = () => {
 
 
 
-        <div style={{width:'50%'}}>
+        <div style={{width:'50%', height: 'auto'}}>
         <div className="card" >
           <div className="card-body">
               <div className="row">
                 <div className="col-lg-12">
                 <div className="row" >
-                <div className="table-responsive mb-3" style={{height:720, maxHeight:720, overflow:'auto'}}>
+                <div className="table-responsive mb-3" style={{height:300, maxHeight:720, overflow:'auto'}}>
                   <table className="table">
                     <thead>
                       <tr>
@@ -901,7 +908,7 @@ const Addsales = () => {
         </div>
 
 {/* Modal Edit */}
-        <div
+           <div
             className="modal fade"
             id="editproduct"
             tabIndex={-1}
@@ -986,6 +993,38 @@ const Addsales = () => {
               </div>
             </div>
           </div>
+
+
+          {/* Reference Modal */}
+          <div
+          className="modal fade"
+          id="reference"
+          tabIndex={-1}
+          aria-labelledby="reference"
+          aria-hidden="true"
+        >
+          <div className="modal-dialog modal-lg modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Reference Number - {referenceData?.reference}</h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                >
+                  <span aria-hidden="true">×</span>
+                </button>
+              </div>
+              <div className="modal-body">
+               
+                <h2>Amount to Pay:  GHS {referenceData?.amountToPay}</h2>
+             
+              </div>
+            
+            </div>
+          </div>
+        </div>
       </div>
   
   );

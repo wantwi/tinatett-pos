@@ -30,6 +30,7 @@ const AddExpense = () => {
   const [formData, setFormData] = useState(state)
   const [startDate, setStartDate] = useState(state?.expenseDate);
   const [isLoading, setIsLoading] = useState(false)
+  const [otherCategory, setOtherCategory] = useState('')
 
   
   const options = [
@@ -37,7 +38,10 @@ const AddExpense = () => {
     { id: 2, text: "Food", value: "Food" },
     { id: 3, text: "Office Supply", value: "Office Supply" },
     { id: 4, text: "Entertainment", value: "Entertainment" },
-    { id: 5, text: "Miscellaneous", value: "Miscellaneous" },
+    { id: 5, text: "Fuel", value: "Fuel" },
+    { id: 6, text: "Water", value: "Water" },
+    { id: 7, text: "Light", value: "Light" },
+    { id: 8, text: "Other", value: "Other" },
   ];
 
   const axios = useCustomApi()
@@ -48,7 +52,8 @@ const AddExpense = () => {
       amount: formData.amount,
       description: formData.description,
       expenseFor: formData.expenseFor, 
-      category: formData.category,
+      category: formData?.category,
+      specifyOther: otherCategory,
       expenseDate: startDate,
     }
 
@@ -148,7 +153,7 @@ const AddExpense = () => {
                     />
                   </div>
                 </div> */}
-                <div className="col-lg-12 col-sm-6 col-12">
+                <div className="col">
                   <div className="form-group">
                     <label>Expense for</label>
                     <div className="input-groupicon">
@@ -159,6 +164,17 @@ const AddExpense = () => {
                     </div>
                   </div>
                 </div>
+                {formData.category == 'Other' && (<div className="col">
+                  <div className="form-group">
+                    <label>If Other Specify</label>
+                    <div className="input-groupicon">
+                      <input type="text" 
+                      value={otherCategory}
+                      onChange={(e) => setOtherCategory( e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </div>)}
               </div>
               <div className="row">
                 <div className="col-lg-12">

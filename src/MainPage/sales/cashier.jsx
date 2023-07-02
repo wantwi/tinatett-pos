@@ -6,11 +6,7 @@ import Tabletop from "../../EntryFile/tabletop";
 import Swal from "sweetalert2";
 import "react-datepicker/dist/react-datepicker.css";
 import {
-  // ClosesIcon,
-  // Excel,
-  // Filter,
-  // Pdf,
-  // Eye1,
+
   Calendar,
   Printer,
   search_whites,
@@ -18,7 +14,6 @@ import {
   PlusIcon,
   //EditIcon,
   Dollar1,
- // plusCircle,
   Download,
   pause1,
   delete1,
@@ -39,10 +34,10 @@ import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
 import { Button } from "antd";
 
 
-const Suspended = () => {
+const Cashier = () => {
   const [startDate, setStartDate] = useState(new Date());
   const [startDate1, setStartDate1] = useState(new Date());
-  const [inputfilter, setInputfilter] = useState(false);
+  const [inputfilter, setInputfilter] = useState(true);
   const [activeTab, setActiveTab] = useState('Cash')
   const [modalData, setModalData] = useState(null)
   const [paymentInfo, setPaymentInfo] = useState({
@@ -63,6 +58,7 @@ const Suspended = () => {
     amountPaid:''
      
   })
+  const [filter, setFilter] = useState('All')
 
 
   useEffect(() => {
@@ -230,8 +226,9 @@ const Suspended = () => {
 
 
   const options = [
-    { id: 1, text: "Completed", text: "Completed" },
-    { id: 2, text: "Paid", text: "Paid" },
+    { id: 'Retail', text: "Retail", text: "Retail" },
+    { id: 'Wholesale', text: "Wholesale", text: "Wholesale" },
+    { id: 'All', text: "All", text: "All" },
   ];
   const options1 = [
     { id: 1, text: "Cash", text: "Cash" },
@@ -266,6 +263,37 @@ const Suspended = () => {
     }
   }, [isLoading])
 
+
+
+  useEffect(() => {
+    if(!isLoading){
+    let mappedData =  sales?.data.map((sale) => {
+      return {
+        id: sale?.id,
+        Date: sale?.transDate,
+        Name: sale?.customer?.name || 'N/A',
+        Status: sale?.status,
+        Reference: sale?.salesRef,
+        Payment: sale?.paymentType,
+        Total: moneyInTxt(sale?.totalAmount),
+        Paid: sale?.changeAmt,
+        Due: sale?.balance,
+        Biller: sale?.salesPerson,
+        salestype: sale?.salesType
+      }
+    })
+    if(filter == 'All'){
+      setData(mappedData)
+    }
+    else{
+      setData(mappedData?.filter((item) => item?.salestype == filter))
+    }
+   
+  }
+  }, [filter])
+
+
+
   const columns = [
     {
       title: "Costumer name",
@@ -287,50 +315,18 @@ const Suspended = () => {
       dataIndex: "salestype",
       render: (text, record) => (
         <>
-         <p>{text}</p>
+         <span className={text == "Retail" ? "badges bg-lightgreen me-2": "badges me-2 btn-primary"}>{text}</span>
+        
         </>
       ),
       sorter: (a, b) => a.salestype.length - b.salestype.length,
     },
-    // {
-    //   title: "Payment",
-    //   dataIndex: "Payment",
-    //   render: (text, record) => (
-    //     <>
-         
-    //         <span className="badges bg-lightgreen">{(text)}</span>
-        
-    //     </>
-    //   ),
-    //   sorter: (a, b) => a.Payment.length - b.Payment.length,
-    // },
     {
       title: "Amt Due (GHS)",
       dataIndex: "Total",
       sorter: (a, b) => a.Total.length - b.Total.length,
     },
-    //{
-    //   title: "Paid (GHS)",
-    //   dataIndex: "Paid",
-    //   render: (text, record) => (
-    //     <>
-    //       {text === 100 && <div className="text-green">{moneyInTxt(text)}</div>}
-    //       {text === 0 && <div>{moneyInTxt(text)}</div>}
-    //     </>
-    //   ),
-    //   sorter: (a, b) => a.Paid.length - b.Paid.length,
-    // },
-    // {
-    //   title: "Due (GHS)",
-    //   dataIndex: "Due",
-    //   render: (text, record) => (
-    //     <>
-    //       {text === 100 && <div className="text-red">{moneyInTxt(text)}</div>}
-    //       {text === 0 && <div>{moneyInTxt(text)}</div>}
-    //     </>
-    //   ),
-    //   sorter: (a, b) => a.Due.length - b.Due.length,
-    // },
+
     {
       title: "Biller",
       dataIndex: "Biller",
@@ -339,21 +335,19 @@ const Suspended = () => {
     {
       title: "Action",
       render: (text, record) => (
-        <>
-        
-              {/* <li>
-                <Link to="/tinatett-pos/sales/sales-details" className="dropdown-item">
-                  <img src={Eye1} className="me-2" alt="img" />
-                  Sale Detail
-                </Link>
-              </li>
-              <li>
-                <Link to="/tinatett-pos/sales/edit-sales" className="dropdown-item">
-                  <img src={EditIcon} className="me-2" alt="img" />
-                  Edit Sale
-                </Link>
-              </li> */}
-            
+        <>  
+          <Link
+                  to="#"
+                  // className="dropdown-item"
+                  data-bs-toggle="modal"
+                  data-bs-target="#showpayment"
+                  onClick={() => setModalData(record)}
+                  title={'View'}
+                >
+                  {/* <img src={Dollar1} className="me-2" alt="img" /> */}
+                  <span className="badges bg-lightgreen me-2">View</span>
+                  {/* Pay */}
+          </Link>
                 <Link
                   to="#"
                   // className="dropdown-item"
@@ -366,42 +360,7 @@ const Suspended = () => {
                   <span className="badges bg-lightgreen me-2">Pay</span>
                   {/* Pay */}
                 </Link>
-             
-              {/* <li>
-                <Link
-                  to="#"
-                  className="dropdown-item"
-                  data-bs-toggle="modal"
-                  data-bs-target="#createpayment"
-                >
-                  <img src={plusCircle} className="me-2" alt="img" />
-                  Create Payment
-                </Link>
-              </li>
-              */}
-        
-                <Link to="#" 
-                title={'Hold'}
-                // className="dropdown-item"
-                >
-                  {/* <img src={pause1} style={{ height:18, width: 18}} className="me-2" alt="img" /> */}
-                  <span className="badges me-2 btn-cancel">Hold</span>
-                  {/* Hold  */}
-                </Link>
-            
-             
-                <Link
-                  to="#"
-                  // className="dropdown-item confirm-text"
-                  onClick={confirmText}
-                  title={'Remove'}
-                >
-                  {/* <img src={DeleteIcon} className="me-2" alt="img" /> */}
-                  <span className="badges bg-lightred">Remove</span>
-                  {/* Remove  */}
-                </Link>
-             
-            
+              
         </>
       ),
     },
@@ -418,8 +377,8 @@ const Suspended = () => {
         <div className="content">
           <div className="page-header">
             <div className="page-title">
-              <h4>Suspended List</h4>
-              <h6>Cashiers Window </h6>
+              <h4>Cashier's Window</h4>
+              <h6>Complete Suspend </h6>
             </div>
             <div className="page-btn">
               <Link to="/tinatett-pos/sales/add-sales" className="btn btn-added">
@@ -440,34 +399,27 @@ const Suspended = () => {
               >
                 <div className="card-body pb-0">
                   <div className="row">
-                    <div className="col-lg-3 col-sm-6 col-12">
-                      <div className="form-group">
-                        <input type="text" placeholder="Enter Name" />
-                      </div>
-                    </div>
-                    <div className="col-lg-3 col-sm-6 col-12">
-                      <div className="form-group">
-                        <input type="text" placeholder="Enter Reference No" />
-                      </div>
-                    </div>
+                    
                     <div className="col-lg-3 col-sm-6 col-12">
                       <div className="form-group">
                         <Select2
                           className="select"
                           data={options}
                           options={{
-                            placeholder: "Choose Suppliers",
+                            placeholder: "Filter by Sales Type",
                           }}
+                          value={filter}
+                          onChange={(e) => setFilter(e.target.value)}
                         />
                       </div>
                     </div>
-                    <div className="col-lg-3 col-sm-6 col-12">
+                    {/* <div className="col-lg-3 col-sm-6 col-12">
                       <div className="form-group">
                         <Link className="btn btn-filters ms-auto">
                           <img src={search_whites} alt="img" />
                         </Link>
                       </div>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </div>
@@ -996,4 +948,4 @@ const Suspended = () => {
   );
 };
 
-export default Suspended;
+export default Cashier;

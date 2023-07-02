@@ -14,36 +14,42 @@ import {
   EditIcon,
 } from "../../EntryFile/imagePath";
 import Select from "react-select";
+import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
 import { useEffect } from "react";
 import { useGet } from "../../hooks/useGet";
 import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 import { isValidNumber, moneyInTxt } from "../../utility";
-import { usePost } from "../../hooks/usePost";
+import { usePut } from "../../hooks/usePut";
 import alertify from "alertifyjs";
 import "../../../node_modules/alertifyjs/build/css/alertify.css";
 import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
 import FeatherIcon from 'feather-icons-react'
 import jsPDF from "jspdf";
+import { useLocation } from "react-router-dom/cjs/react-router-dom.min";
 
 
 const EditProforma = () => {
   const [customerOptions, setCustomerOptions] = useState([])
   const [productOptions, setProductOptions] = useState([])
 
+  const {state} = useLocation()
+  console.log("Proforma State", state)
 
   const { data: customers, isError, isLoading: isCustomerLoading, isSuccess } = useGet("customers", "/customer");
   const { data: products, isLoading: isProductLoading } = useGet("products", "/product");
-  const { isLoading, isError: isPostError, error, mutate } = usePost("/proforma");
+  const [proformaId] = useState(state?.id)
+  const { isLoading, isError: isPostError, error, mutate } = usePut(`/proforma/${proformaId}`);
+  const { data: proformaDetails } = useGet("proforma-product-details", `/proforma/products/${state?.id}`);
 
   const [selectedProduct, setSelectedProduct] = useState('')
-  const [selectedCustomer, setSelectedCustomer] = useState('')
+  const [selectedCustomer, setSelectedCustomer] = useState(state?.customer.id)
   const [selectedCustomerPrint, setSelectedCustomerPrint] = useState('')
   const [formData, setFormData] = useState({ amount: '', quantity: '', price: '' })
   const [editFormData, setEditFormData] = useState({ amount: '', quantity: '', price: '' })
   const [productGridData, setProductGridData] = useState([])
   const [printGridData, setPrintGridData] = useState([])
-  const [transDate, setTransDate] = useState(new Date().toISOString().slice(0, 10));
+  const [transDate, setTransDate] = useState(state?.date);
   const retailpriceTypeRef = useRef()
   const specialpriceTypeRef = useRef()
   const wholesalepriceTypeRef = useRef()
@@ -55,11 +61,13 @@ const EditProforma = () => {
       let mappedData = customers?.data.map((customer) => {
         return {
           id: customer?.id,
-          label: customer?.name,
+          text: customer?.name,
           value: customer?.id,
           location: customer?.location,
           contact: customer?.contact,
-          email: customer?.email
+          email: customer?.email,
+          status: customer?.status,
+          location: customer?.location
 
         }
       })
@@ -80,6 +88,23 @@ const EditProforma = () => {
     }
    
   }, [isCustomerLoading, isProductLoading])
+
+
+  useEffect(() => {
+    let mappedData = proformaDetails?.data.map((item) =>{
+      return {
+        productId: item?.productId,
+        productName: item?.product.name,
+        batchNumber: item?.batchNumber,
+        manufacturingDate: item?.manufacturingDate,
+        expireDate: item?.expireDate,
+        quantity: item?.quantity,
+        unitPrice:item?.unitPrice,
+        amount: item?.amount
+      }
+    })
+    setProductGridData(mappedData)
+  }, [proformaDetails])
 
   useEffect(() => {
     if (!isPostError && isSubmitSuccessful) {
@@ -164,7 +189,7 @@ const EditProforma = () => {
     }
     else {
       let postBody = {
-        customerId: selectedCustomer.id,
+        customerId: selectedCustomer,
         transDate: transDate,
         products: productGridData
       }
@@ -183,7 +208,7 @@ const EditProforma = () => {
       }
       else {
         alertify.set("notifier", "position", "top-right");
-        alertify.success("Proforma preview saved successfully.");
+        alertify.success("Proforma updated successfully.");
       }
 
 
@@ -253,13 +278,12 @@ const EditProforma = () => {
                       <label>Customer Name</label>
                       <div className="row">
                         <div className="col-lg-12 col-sm-12 col-12">
-                          <Select
-                            className="select"
-                            options={customerOptions}
-                            onChange={handleCustomerSelect}
-                            value={selectedCustomer}
-
-                          />
+                        <Select2
+                              className="select"
+                              data={customerOptions}
+                              value={selectedCustomer}      
+                              disabled      
+                            />
                         </div>
 
                       </div>
@@ -268,7 +292,7 @@ const EditProforma = () => {
                   <div className="col-lg-4 col-sm-6 col-12">
                     <div className="form-group">
                       <label> Date</label>
-                      <input type="date" className="form-control" value={transDate} onChange={(e) => setTransDate(e.target.value)} />                      {/* <div className="input-groupicon">
+                      <input type="date" className="form-control" disabled value={transDate} onChange={(e) => setTransDate(e.target.value)} />                      {/* <div className="input-groupicon">
                         <DatePicker
                           selected={transDate}
                             onChange={(e) => {
@@ -506,7 +530,7 @@ const EditProforma = () => {
                         <li className="total">
                           <h4>Grand Total</h4>
                           <h5>GHS {moneyInTxt(
-                            productGridData.reduce((total, item) => total + item.amount, 0)
+                            productGridData?.reduce((total, item) => total + item.amount, 0)
                           )}</h5>
                         </li>
                       </ul>
@@ -515,7 +539,7 @@ const EditProforma = () => {
                 </div>
                 <div className="col-lg-12" style={{ textAlign: 'right' }}>
                   <button type="submit" className="btn btn-submit me-2" onClick={onSubmit}><FeatherIcon icon="save" />
-                    {" Generate Proforma"}
+                    {" Update Proforma"}
                   </button>
                   {/* <Link id="printModalClick" to="#" className="btn btn-cancel me-2" style={{ backgroundColor: '#FF9F43' }} data-bs-toggle="modal"
                     data-bs-target="#create" >
@@ -609,7 +633,7 @@ const EditProforma = () => {
                             <li className="total" >
                               <h4>Grand Total</h4>
                               <h5>GHS {moneyInTxt(
-                                printGridData.reduce((total, item) => total + item.amount, 0)
+                                // printGridData.reduce((total, item) => total + item.amount, 0)
                               )}</h5>
                             </li>
                           </ul>

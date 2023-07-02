@@ -7,6 +7,7 @@ import Saledetails from './saledetails'
 import SalesReturnList from '../Return/SalesReturnList'
 import AddSalesReturn from '../Return/AddSalesReturn'
 import Suspended from './suspended';
+import Cashier from './cashier';
 
 
 
@@ -18,7 +19,8 @@ const SalesIndex = ({ match}) =>(
     <Switch>
         <Redirect exact from={`${match.url}/`} to={`${match.url}/generalsettings`} />
         <Route path={`${match.url}/saleslist`} component={Saleslist} />     
-        <Route path={`${match.url}/suspended`} component={Suspended} />                                                                                                                                                                                      
+        <Route path={`${match.url}/suspended`} component={Suspended} />      
+        <Route path={`${match.url}/cashier/suspended`} component={Cashier} />                                                                                                                                                                                  
         <Route path={`${match.url}/add-sales`} component={Addsales} />                                                                                                                                                                                        
         <Route path={`${match.url}/edit-sales`} component={Editsales} />                                                                                                                                                                                        
         <Route path={`${match.url}/sales-details`} component={Saledetails} />     

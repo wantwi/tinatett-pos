@@ -14,7 +14,7 @@ import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
 import { Table } from "antd";
 import { useLocation } from "react-router-dom/cjs/react-router-dom";
-import { moneyInTxt } from "../../utility";
+import { isValidNumber, moneyInTxt } from "../../utility";
 import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 import { useGet } from "../../hooks/useGet";
 import { usePut } from "../../hooks/usePut";
@@ -48,6 +48,7 @@ const EditPurchase = () => {
 
 
   const [productFormData, setProductFormData] = useState({ id:'', unitPrice: '', quantity: '', amount: '', manufacturingDate:'', expireDate:''})
+  const [editFormData, setEditFormData] = useState({ id:'', unitPrice: '', quantity: '', amount: '', manufacturingDate:'', expireDate:''})
   const [productList, setProductList] = useState([])
 
   const productRef = useRef()
@@ -85,6 +86,10 @@ const EditPurchase = () => {
    
   }
 
+  const handleUpdate = () => {
+
+  }
+
   
 const deleteRow = (row) => {
   console.log(row)
@@ -92,8 +97,10 @@ const deleteRow = (row) => {
  
 
   const handleEdit = (record) => {
-    setProductFormData({
+    console.log(record)
+    setEditFormData({
       id: record?.id,
+      productName: record?.productName,
       productId: record.productId,
       unitPrice: record.unitPrice,
       quantity:record.quantity,
@@ -102,8 +109,7 @@ const deleteRow = (row) => {
       expireDate: record?.expireDate,
       batchNumber: record?.batchNumber
     })
-    setExpDate(new Date(record?.expireDate))
-    setManDate(new Date(record?.manufacturingDate))
+
   }
 
   const onSubmit = () => {
@@ -236,7 +242,7 @@ const deleteRow = (row) => {
       title:"Action",
       render: (text, record) => (
         <>
-         <span className="me-3" to="#" onClick={() => handleEdit(record)} style={{cursor:'pointer'}}>
+         <span className="me-3" to="#" data-bs-target="#editproduct" data-bs-toggle="modal"  onClick={() => handleEdit(record)} style={{cursor:'pointer'}}>
             <img src={EditIcon} alt="img" />
           </span>
           <span className="delete-set" to="#" onClick={() => deleteRow(record)} style={{cursor:'pointer'}}>
@@ -529,8 +535,132 @@ const deleteRow = (row) => {
 
         </div>
       </div>
+
+
+      {/* Edit Modal */}
+      <div
+            className="modal fade"
+            id="editproduct"
+            tabIndex={-1}
+            aria-labelledby="editproduct"
+            aria-hidden="true"
+          >
+            <div className="modal-dialog modal-md modal-dialog-centered">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">Edit Product</h5>
+                  <button
+                    type="button"
+                    className="close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                  >
+                    <span aria-hidden="true">×</span>
+                  </button>
+                </div>
+                <div className="modal-body">
+                  <div className="row">
+                    <div className="col-lg-12 col-sm-12 col-12">
+                      <div className="form-group">
+                        <label>Product Name</label>
+                        <div className="input-groupicon">
+                        <input type="text" value={editFormData?.productName} onChange={(e) => setEditFormData({...editFormData, productName:e.target.value})} disabled/>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="col-lg-6 col-sm-6 col-12">
+                          <div className="form-group">
+                            <label>Manufacturing Date </label>
+                            <div className="input-groupicon">
+                            <input type="date" className="form-control" value={(editFormData?.manufacturingDate).substring(0,10)} onChange={(e) => {
+                                  setEditFormData({ ...editFormData, manufacturingDate: e.target.value })
+                                }}/>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="col-lg-6 col-sm-6 col-12">
+                          <div className="form-group">
+                            <label>Expiring Date </label>
+                            <div className="input-groupicon">
+                            <input type="date" className="form-control" value={(editFormData?.expireDate).substring(0,10)} onChange={(e) => {
+                                  setProductFormData({ ...editFormData, expireDate: e.target.value })
+                                }}/>
+                            </div>
+                          </div>
+                        </div>
+
+                    <div className="col-lg-6 col-sm-12 col-12">
+                      <div className="form-group">
+                        <label>Quantity</label>
+                        <input type="text" value={editFormData?.quantity}
+                         onChange={(e) => {
+                          if(e.target.value == ''){
+                            setEditFormData({...editFormData, quantity: ''})
+                          }
+                          else if (isValidNumber(e.target.value)) {
+                            let qty = parseInt(e.target.value) || 0
+                            let unitP = parseInt(editFormData.unitPrice) || 0
+                            setEditFormData({ ...editFormData, quantity: e.target.value, amount: editFormData.quantity ? unitP * qty : unitP * 1 })
+                          }
+                        }
+                        }/>
+                      </div>
+                    </div>
+                 
+                    <div className="col-lg-6 col-sm-12 col-12">
+                      <div className="form-group">
+                        <label>Unit Price</label>
+                        <input type="text" value={editFormData?.unitPrice} 
+                         onChange={(e) => {
+                          let unitP = parseInt(e.target.value) || 0
+                          let qty = parseInt(editFormData.quantity) || 0
+                          setEditFormData({ ...editFormData, unitPrice: e.target.value, amount: editFormData ? unitP * qty : unitP * 1 })
+                        }}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="col-lg-6 col-sm-12 col-12">
+                      <div className="form-group">
+                        <label>Amount</label>
+                        <input type="text" value={editFormData?.amount} />
+                      </div>
+                    </div>
+                   
+                   
+                  </div>
+                </div>
+                <div className="modal-footer" style={{justifyContent:'flex-end'}}>
+                  <button type="button" className="btn btn-submit" onClick={handleUpdate}>
+                    Update
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-cancel"
+                    data-bs-dismiss="modal"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
     </>
   );
 };
 
 export default EditPurchase;
+
+
+// setEditFormData({
+//   id: record?.id,
+//   productId: record.productId,
+//   unitPrice: record.unitPrice,
+//   quantity:record.quantity,
+//   amount: record.quantity * record.unitPrice,
+//   manufacturingDate: record?.manufacturingDate,
+//   expireDate: record?.expireDate,
+//   batchNumber: record?.batchNumber
+// })
