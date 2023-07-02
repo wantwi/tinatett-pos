@@ -107,7 +107,7 @@ const Addsales = () => {
   const handleSuspend = () => {
     setIsSaving(true)
     let payload = {
-      customerId: selectedCustomer.value,
+      customerId: selectedCustomer?.value,
       transDate: transDate,
       totalAmount : productGridData.reduce((total, item) => total + item.amount, 0),
       salesType:salesType,
@@ -873,10 +873,10 @@ const Addsales = () => {
 
               <div className="row">
                 <div className="col-lg-12" >
-                  <Link to="#" className="btn btn-submit me-2" onClick={handleSuspend} style={{width:'100%'}}>
+                  <span className="btn btn-submit me-2" onClick={handleSuspend} style={{width:'100%'}}>
                   <FeatherIcon icon="pause"/>
                     Suspend Sale
-                  </Link>                
+                  </span>                
                 </div>
               </div>
 
@@ -1003,7 +1003,7 @@ const Addsales = () => {
           aria-labelledby="reference"
           aria-hidden="true"
         >
-          <div className="modal-dialog modal-lg modal-dialog-centered">
+          <div className="modal-dialog modal-md modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title">Reference Number - {referenceData?.reference}</h5>
@@ -1018,7 +1018,7 @@ const Addsales = () => {
               </div>
               <div className="modal-body">
                
-                <h2>Amount to Pay:  GHS {referenceData?.amountToPay}</h2>
+                <span>Amount to Pay:</span> <span style={{fontSize:40}}> GHS {referenceData?.amountToPay}</span>
              
               </div>
             

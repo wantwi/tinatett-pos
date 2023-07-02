@@ -103,12 +103,16 @@ const Cashier = () => {
 
   const axios = useCustomApi()
 
-  const handleSellAndPrint = () =>{
+  const processPayment = (type, print) =>{
     let payload = {
-      status:"Paid",
+      status: type,
       salesRef:modalData.Reference,
       amount:modalData?.Total,
-      paymentInfo: {...paymentInfo}
+      paymentInfo: [
+        {"type":"Cash", waybill:paymentInfo.cashWaybill, amountPaid: paymentInfo.cashAmount },
+        {"type":"Momo", name: paymentInfo.momoName,  receiptNo: paymentInfo.momoReceiptNo, amountPaid: paymentInfo.momoAmount},
+        {"type":"Cheque", waybill: paymentInfo.chequeWaybill,  chequeNo: paymentInfo.chequeNo, chequeReceiptNo: paymentInfo.chequeReceiptNo, amountPaid: paymentInfo.chequeAmount, waybill: paymentInfo.chequeWaybill}
+      ]
     }
 
     console.log(payload)
@@ -116,7 +120,9 @@ const Cashier = () => {
     .then((res) => {
       console.log(res.data.success)
       if(res.data.success){
-        getInvoiceReceipt(modalData.Reference)
+        if(print){
+          getInvoiceReceipt(modalData.Reference)
+        }
         alertify.set("notifier", "position", "top-right");
         alertify.success("Sale completed.");
        
@@ -150,54 +156,6 @@ const Cashier = () => {
       //
     })
 
-  }
-
-  const handleSellOnly = () => {
-    let payload = {
-      status:"Paid",
-      salesRef:modalData.Reference,
-      amount:modalData?.Total,
-      paymentInfo: {...paymentInfo, type:activeTab}
-    }
-
-    //console.log(payload)
-    axios.post('/sales',payload)
-    .then((res) => {
-      console.log(res.data.success)
-      if(res.data.success){
-        alertify.set("notifier", "position", "top-right");
-        alertify.success("Sale completed.");
-       
-      }
-    })
-    .catch((error) => {
-      alertify.set("notifier", "position", "top-right");
-      alertify.error("Error...Could not complete transaction");
-    })
-    .finally(() => {
-      setPaymentInfo({type:'',
-      waybill:'',
-      chequeNo:'',
-      receiptNo:'',
-      dueDate:'',
-      bank:'',
-      momoName:'',
-      transactionID:'',
-      amountPaid:'' })
-      setTimeout(() => {
-        $('.modal').modal('hide')
-        window.location.reload()
-      }, 1500)
-      //
-    })
-  }
-
-  const handleCreditAndPrint = () => {
-    getInvoiceReceipt(modalData.Reference)
-  }
-
-  const handleCreditOnly = () => {
-    getInvoiceReceipt(modalData.Reference)
   }
 
   const getInvoiceReceipt = (salesref) => {
@@ -345,7 +303,7 @@ const Cashier = () => {
                   title={'View'}
                 >
                   {/* <img src={Dollar1} className="me-2" alt="img" /> */}
-                  <span className="badges bg-lightgreen me-2">View</span>
+                  <span className="badges btn-cancel me-2">View</span>
                   {/* Pay */}
           </Link>
                 <Link
@@ -742,16 +700,16 @@ const Cashier = () => {
 
                 <div className="row mt-2">
                   <div className="col-lg-12" style={{ display: 'flex', justifyContent: 'space-between' }} >
-                    <button className="btn btn-info me-2" onClick={handleSellAndPrint} style={{ width: '20%' }}>
+                    <button className="btn btn-info me-2" onClick={() => processPayment("Paid", true)} style={{ width: '20%' }}>
                       Sell and Print
                     </button>
-                    <button className="btn btn-warning me-2" onClick={handleSellOnly} style={{ width: '20%' }}>
+                    <button className="btn btn-warning me-2" onClick={() => processPayment("Paid", false)} style={{ width: '20%' }}>
                       Sell Only
                     </button>
-                    <button className="btn btn-danger me-2" style={{ width: '20%' }} onClick={handleCreditAndPrint} >
+                    <button className="btn btn-danger me-2" style={{ width: '20%' }} onClick={() => processPayment("Credit", true)} >
                       Credit and Print
                     </button>
-                    <button className="btn btn-cancel" style={{ width: '20%' }} onClick={handleCreditOnly}>
+                    <button className="btn btn-cancel" style={{ width: '20%' }} onClick={() => processPayment("Credit", false)}>
                       Credit Only
                     </button>
 
