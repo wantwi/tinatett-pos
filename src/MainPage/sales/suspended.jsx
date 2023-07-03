@@ -37,6 +37,7 @@ import alertify from "alertifyjs";
 import "../../../node_modules/alertifyjs/build/css/alertify.css";
 import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
 import { Button } from "antd";
+import FeatherIcon from 'feather-icons-react'
 
 
 const Suspended = () => {
@@ -108,10 +109,22 @@ const Suspended = () => {
   const axios = useCustomApi()
 
   const processPayment = (type, print) =>{
+    let pType = ''
+    if(paymentInfo.cashAmount > 0){
+      pType = pType.concat('Cash,')
+    }
+    if(paymentInfo.momoAmount > 0){
+      pType = 
+      pType.concat('Momo,')
+    }
+    if(paymentInfo.chequeAmount > 0){
+      pType = pType.concat('Cheque,')
+    }
     let payload = {
       status: type,
       salesRef:modalData.Reference,
       amount:modalData?.Total,
+      paymentType: pType,
       paymentInfo: [
         {"type":"Cash", waybill:paymentInfo.cashWaybill, amountPaid: paymentInfo.cashAmount },
         {"type":"Momo", name: paymentInfo.momoName,  receiptNo: paymentInfo.momoReceiptNo, amountPaid: paymentInfo.momoAmount},
@@ -155,7 +168,7 @@ const Suspended = () => {
      })
       setTimeout(() => {
         $('.modal').modal('hide')
-        window.location.reload()
+        // window.location.reload()
       }, 1500)
       //
     })
@@ -321,41 +334,19 @@ const Suspended = () => {
                   title={'Pay'}
                 >
                   {/* <img src={Dollar1} className="me-2" alt="img" /> */}
-                  <span className="badges bg-lightgreen me-2">Pay</span>
+                  <span className="badges bg-lightgreen me-2"><FeatherIcon icon="credit-card"/> Pay</span>
                   {/* Pay */}
                 </Link>
              
-              {/* <li>
-                <Link
-                  to="#"
-                  className="dropdown-item"
-                  data-bs-toggle="modal"
-                  data-bs-target="#createpayment"
-                >
-                  <img src={plusCircle} className="me-2" alt="img" />
-                  Create Payment
-                </Link>
-              </li>
-              */}
-        
-                <Link to="#" 
-                title={'Hold'}
-                // className="dropdown-item"
-                >
-                  {/* <img src={pause1} style={{ height:18, width: 18}} className="me-2" alt="img" /> */}
-                  <span className="badges me-2 btn-cancel">Hold</span>
-                  {/* Hold  */}
-                </Link>
-            
-             
+      
                 <Link
                   to="#"
                   // className="dropdown-item confirm-text"
                   onClick={confirmText}
                   title={'Remove'}
                 >
-                  {/* <img src={DeleteIcon} className="me-2" alt="img" /> */}
-                  <span className="badges bg-lightred">Remove</span>
+                  
+                  <span className="badges bg-lightred"><FeatherIcon icon="trash"/> Remove</span>
                   {/* Remove  */}
                 </Link>
              
@@ -626,7 +617,15 @@ const Suspended = () => {
                                     type="text"
                                     placeholder=""
                                     value={paymentInfo.chequeAmount}
-                                    onChange={(e) => setPaymentInfo({...paymentInfo, chequeAmount: e.target.value})}
+                                    onChange={(e) => {
+                                      if(e.target.value == ''){
+                                        setPaymentInfo({...paymentInfo, chequeAmount: ''})
+                                      }
+                                      else if(isValidNumber(e.target.value)){
+                                        setPaymentInfo({...paymentInfo, chequeAmount: Number(e.target.value)})
+                                      }
+                              
+                                    }}
                                   />
 
                                 </div>
@@ -676,7 +675,15 @@ const Suspended = () => {
                                     type="text"
                                     placeholder=""
                                     value={paymentInfo.momoAmount}
-                                    onChange={(e) => setPaymentInfo({...paymentInfo, momoAmount: e.target.value})}
+                                    onChange={(e) => {
+                                      if(e.target.value == ''){
+                                        setPaymentInfo({...paymentInfo, momoAmount: ''})
+                                      }
+                                      else if(isValidNumber(e.target.value)){
+                                        setPaymentInfo({...paymentInfo, momoAmount: Number(e.target.value)})
+                                      }
+                              
+                                    }}
                                   />
 
                                 </div>
@@ -726,7 +733,7 @@ const Suspended = () => {
                               </li>
                               <li>
                                 <h4>Balance</h4>
-                                <h5>GHS {moneyInTxt(Number(modalData?.Total) - Number(paymentInfo.amountPaid))}</h5>
+                                <h5>GHS {moneyInTxt(Math.abs(Number(modalData?.Total) - Number(paymentInfo.amountPaid)))}</h5>
                               </li>
 
                             </ul>

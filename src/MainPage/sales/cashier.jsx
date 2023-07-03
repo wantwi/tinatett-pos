@@ -32,7 +32,7 @@ import alertify from "alertifyjs";
 import "../../../node_modules/alertifyjs/build/css/alertify.css";
 import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
 import { Button } from "antd";
-
+import FeatherIcon from 'feather-icons-react'
 
 const Cashier = () => {
   const [startDate, setStartDate] = useState(new Date());
@@ -59,6 +59,7 @@ const Cashier = () => {
      
   })
   const [filter, setFilter] = useState('All')
+  const [productGridData, setProductGridData] = useState([])
 
 
   useEffect(() => {
@@ -104,10 +105,22 @@ const Cashier = () => {
   const axios = useCustomApi()
 
   const processPayment = (type, print) =>{
+    let pType = ''
+    if(paymentInfo.cashAmount > 0){
+      pType = pType.concat('Cash,')
+    }
+    if(paymentInfo.momoAmount > 0){
+      pType = 
+      pType.concat('Momo,')
+    }
+    if(paymentInfo.chequeAmount > 0){
+      pType = pType.concat('Cheque,')
+    }
     let payload = {
       status: type,
       salesRef:modalData.Reference,
       amount:modalData?.Total,
+      paymentType: pType,
       paymentInfo: [
         {"type":"Cash", waybill:paymentInfo.cashWaybill, amountPaid: paymentInfo.cashAmount },
         {"type":"Momo", name: paymentInfo.momoName,  receiptNo: paymentInfo.momoReceiptNo, amountPaid: paymentInfo.momoAmount},
@@ -151,7 +164,7 @@ const Cashier = () => {
      })
       setTimeout(() => {
         $('.modal').modal('hide')
-        window.location.reload()
+        //window.location.reload()
       }, 1500)
       //
     })
@@ -251,6 +264,26 @@ const Cashier = () => {
   }, [filter])
 
 
+  const getSalesProductById = (id) => {
+    axios.get(`/sales/suspend/items/${id}`)
+    .then((res) => {
+      let x = (res.data?.data)
+      console.log("Items", x)
+      let mapped = x.map((item) => 
+        {
+          return {
+            salesRef: item?.salesRef,
+            name:  item?.product?.name,
+            productId: item?.id,
+            quantity: item?.quantity,
+            unitPrice: item?.unitPrice,
+            amount: item?.amount
+          }
+      })
+     setProductGridData(mapped)
+    })//.finally(() => setLoading(false))
+  }
+
 
   const columns = [
     {
@@ -298,12 +331,12 @@ const Cashier = () => {
                   to="#"
                   // className="dropdown-item"
                   data-bs-toggle="modal"
-                  data-bs-target="#showpayment"
-                  onClick={() => setModalData(record)}
+                  data-bs-target="#showproducts"
+                  onClick={() => getSalesProductById(record?.id)}
                   title={'View'}
                 >
                   {/* <img src={Dollar1} className="me-2" alt="img" /> */}
-                  <span className="badges btn-cancel me-2">View</span>
+                  <span className="badges btn-cancel me-2"><FeatherIcon icon="eye" /> View</span>
                   {/* Pay */}
           </Link>
                 <Link
@@ -315,7 +348,7 @@ const Cashier = () => {
                   title={'Pay'}
                 >
                   {/* <img src={Dollar1} className="me-2" alt="img" /> */}
-                  <span className="badges bg-lightgreen me-2">Pay</span>
+                  <span className="badges bg-lightgreen me-2"><FeatherIcon icon="credit-card" /> Pay</span>
                   {/* Pay */}
                 </Link>
               
@@ -578,7 +611,16 @@ const Cashier = () => {
                                     type="text"
                                     placeholder=""
                                     value={paymentInfo.chequeAmount}
-                                    onChange={(e) => setPaymentInfo({...paymentInfo, chequeAmount: e.target.value})}
+                                    
+                                    onChange={(e) => {
+                                      if(e.target.value == ''){
+                                        setPaymentInfo({...paymentInfo, chequeAmount: ''})
+                                      }
+                                      else if(isValidNumber(e.target.value)){
+                                        setPaymentInfo({...paymentInfo, chequeAmount: Number(e.target.value)})
+                                      }
+                              
+                                    }}
                                   />
 
                                 </div>
@@ -628,7 +670,16 @@ const Cashier = () => {
                                     type="text"
                                     placeholder=""
                                     value={paymentInfo.momoAmount}
-                                    onChange={(e) => setPaymentInfo({...paymentInfo, momoAmount: e.target.value})}
+                                    onChange={(e) => {
+                                      if(e.target.value == ''){
+                                        setPaymentInfo({...paymentInfo, momoAmount: ''})
+                                      }
+                                      else if(isValidNumber(e.target.value)){
+                                        setPaymentInfo({...paymentInfo, momoAmount: Number(e.target.value)})
+                                      }
+                              
+                                    }}
+                                  
                                   />
 
                                 </div>
@@ -678,7 +729,7 @@ const Cashier = () => {
                               </li>
                               <li>
                                 <h4>Balance</h4>
-                                <h5>GHS {moneyInTxt(Number(modalData?.Total) - Number(paymentInfo.amountPaid))}</h5>
+                                <h5>GHS {moneyInTxt(Math.abs(Number(modalData?.Total) - Number(paymentInfo.amountPaid)))}</h5>
                               </li>
 
                             </ul>
@@ -897,6 +948,67 @@ const Cashier = () => {
                 >
                   Close
                 </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        {/* View Products Modal */}
+        <div
+          className="modal fade"
+          id="showproducts"
+          tabIndex={-1}
+          aria-labelledby=""
+          aria-hidden="true"
+        >
+          <div className="modal-dialog modal-lg modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Sales Ref - {productGridData[0]?.salesRef}</h5>
+                <button
+                  type="button"
+                  className="close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                >
+                  <span aria-hidden="true">×</span>
+                </button>
+              </div>
+              <div className="modal-body">
+                <div className="row">
+                  <div className="table-responsive mb-3">
+                    <table className="table">
+                      <thead>
+                        <tr>
+                          <th>#</th>
+                          <th>Product Name</th>
+                          <th>Quantity</th>
+                          <th>Unit Price</th>
+                          <th>Amount</th>
+                         
+                        </tr>
+                      </thead>
+                      <tbody>
+                         {productGridData?.map((item, index) => {
+                          return (
+                            <tr key={item?.id}>
+                              <td>{index + 1}</td>
+                              <td>
+                                <Link to="#">{item?.name}</Link>
+                              </td>
+                              <td>{item?.quantity}</td>
+                              <td>{item?.unitPrice}</td>
+                              <td>{item?.amount}</td>
+
+                             
+                            </tr>
+                          )
+                        })} 
+
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                
               </div>
             </div>
           </div>
