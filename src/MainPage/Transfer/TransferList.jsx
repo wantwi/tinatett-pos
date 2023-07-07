@@ -47,7 +47,7 @@ const TransferList = () => {
     { id: 2, text: "150.00", text: "150.00" },
   ];
   const axios = useCustomApi();
-  const confirmText = () => {
+  const confirmText = (id) => {
     Swal.fire({
       title: "Are you sure?",
       text: "You won't be able to revert this!",
@@ -62,14 +62,14 @@ const TransferList = () => {
     }) .then( async() => {
      
       let data = await axios.delete(`/transfer/${id}`)
-      console.log(data.response.code)
-      if(data.response.data.success){
+      if(data.status < 205){
         Swal.fire({
           type: "success",
           title: "Deleted!",
           text: "Your Transfer item has been deleted.",
           confirmButtonClass: "btn btn-success",
         });
+        //window.location.reload()
       }
       else{
         Swal.fire({
@@ -131,11 +131,11 @@ const TransferList = () => {
             text === "0"
               ? "badges bg-lightgreen"
               : text == "1"
-              ? "badges bg-lightyellow": ''
+              ? "badges bg-lightgreen": ''
              
           }
         >
-          {text == 0 ? "Complete" : "Pending"}
+          {text == 0 ? "Completed" : "Completed"}
         </span>
       ),
       sorter: (a, b) => a.status.length - b.status.length,
@@ -147,7 +147,7 @@ const TransferList = () => {
           <Link className="me-3" to= {{pathname:"/tinatett-pos/transfer/edittransfer-transfer", state: record}}>
             <img src={EditIcon} alt="img" />
           </Link>
-          <Link className="confirm-text" to="#" onClick={confirmText}>
+          <Link className="confirm-text" to="#" onClick={() => confirmText(record.id)}>
             <img src={DeleteIcon} alt="img" />
           </Link>
         </>

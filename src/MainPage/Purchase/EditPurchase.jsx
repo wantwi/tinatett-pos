@@ -22,6 +22,8 @@ import alertify from "alertifyjs";
 import "../../../node_modules/alertifyjs/build/css/alertify.css";
 import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
 import Select from "react-select";
+import Swal from "sweetalert2";
+import useCustomApi from "../../hooks/useCustomApi";
 
 
 const EditPurchase = () => {
@@ -51,7 +53,7 @@ const EditPurchase = () => {
   const [editFormData, setEditFormData] = useState({ id:'', unitPrice: '', quantity: '', amount: '', manufacturingDate:'', expireDate:''})
   const [productList, setProductList] = useState([])
 
-  const productRef = useRef()
+  const axios = useCustomApi()
 
   const handleProductSelect = (e) => {
     console.log("Product:", e)
@@ -87,17 +89,16 @@ const EditPurchase = () => {
   }
 
   const handleUpdate = () => {
-
+    let updated = editFormData
+    let listCopy = [...productList]
+    let index = productList.findIndex(item => item.productId == updated.productId)
+    listCopy[index] = updated
+    setProductList(listCopy)
+    $('.modal').modal('hide')
   }
-
-  
-const deleteRow = (row) => {
-  console.log(row)
- };
  
 
   const handleEdit = (record) => {
-    console.log(record)
     setEditFormData({
       id: record?.id,
       productName: record?.productName,
@@ -141,7 +142,8 @@ const deleteRow = (row) => {
       return {
         ...item,
         productName: item?.product?.name,
-        quantity: item?.initialquantity
+        quantity: item?.quantity,
+        amount: item?.total
       }
     })
     setProductList(mappedData)
@@ -214,27 +216,28 @@ const deleteRow = (row) => {
       render: (text, record) => <p style={{textAlign:'center'}}>{(record.quantity) || 0}</p>
     },
     {
-      title: "Unit Price(GHS)",
+      title: "Unit Price",
       dataIndex: "unitPrice",
-      render: (text, record) => <p style={{textAlign:'right'}}>{moneyInTxt(text)}</p>
+      render: (text, record) => <p style={{textAlign:'center'}}>{moneyInTxt(text)}</p>
     },
     {
-      title: "Amount(GHS)",
+      title: "Amount",
       dataIndex: "amount",
-      render: (text, record) => <p style={{textAlign:'right'}}>{moneyInTxt(text)}</p>
+      render: (text, record) => <p style={{textAlign:'center'}}>{moneyInTxt(text)}</p>
     },
-    // {
-    //   title: "Batch Number",
-    //   dataIndex: "batchNumber",
-    //   // render: (text, record) => <p style={{textAlign:'center'}}>{text || ''}</p>
-    // },
     {
-      title: "Manufacturing Date",
+      title: "Batch #",
+      dataIndex: "batchNumber",
+      width: "150px"
+      // render: (text, record) => <p style={{textAlign:'center'}}>{text || ''}</p>
+    },
+    {
+      title: "Manufacturing",
       dataIndex: "manufacturingDate",
       render: (text, record) => <p style={{textAlign:'center'}}>{record.manufacturingDate.substring(0,10) || ''}</p>
     },
     {
-      title: "Expiring Date",
+      title: "Expiring",
       dataIndex: "expireDate",
       render: (text, record) => <p style={{textAlign:'center'}}>{record.expireDate.substring(0,10) || ''}</p>
     },
@@ -245,13 +248,66 @@ const deleteRow = (row) => {
          <span className="me-3" to="#" data-bs-target="#editproduct" data-bs-toggle="modal"  onClick={() => handleEdit(record)} style={{cursor:'pointer'}}>
             <img src={EditIcon} alt="img" />
           </span>
-          <span className="delete-set" to="#" onClick={() => deleteRow(record)} style={{cursor:'pointer'}}>
+          <span className="delete-set" to="#" onClick={() => confirmText(record)} style={{cursor:'pointer'}}>
             <img src={DeleteIcon} alt="img" />
           </span>
         </>
       ),
     },
   ];
+
+
+  const deleteRow = (record) => {
+    let newGridData = productList.filter((item) => item.productId !== record.productId)
+    //console.log(newGridData)
+    setProductList(newGridData)
+   };
+
+  const confirmText = (record) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      type: "warning",
+      showCancelButton: !0,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+      confirmButtonClass: "btn btn-primary",
+      cancelButtonClass: "btn btn-danger ml-1",
+      buttonsStyling: !1,
+    })
+    .then( async() => {
+      //console.log('deleting...')
+      let data = await axios.delete(`/purchase/item/${record.id}`)
+      console.log(data)
+      if(data.status == 204){
+        deleteRow(record)
+        Swal.fire({
+          type: "success",
+          title: "Deleted!",
+          text: "Your purchase item has been deleted.",
+          confirmButtonClass: "btn btn-success",
+        });
+      }
+      else{
+        Swal.fire({
+          type: "danger",
+          title: "Error!",
+          text: data.response.data.error,
+          confirmButtonClass: "btn btn-danger",
+        });
+      }
+    })
+    .catch( (error) => {
+        Swal.fire({
+          type: "danger",
+          title: "Error!",
+          text: error,
+          confirmButtonClass: "btn btn-danger",
+        });
+    });
+  };
+
 
   if(purchaseIsLoading){
     return <LoadingSpinner/>

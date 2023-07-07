@@ -32,4 +32,16 @@ const SalesIndex = ({ match}) =>(
     </Switch>
 )
 
+
+export const CashierIndex = ({ match}) =>(
+    <Switch>
+        <Redirect exact from={`${match.url}/`} to={`${match.url}/generalsettings`} />    
+        <Route path={`${match.url}/cashier/suspended`} component={Cashier} />                                                                                                                                                                                  
+                                                                                                                                                                                                                                                                                                                                                                      
+                                                                                           
+                                                                                                  
+        
+    </Switch>
+)
+
 export default SalesIndex

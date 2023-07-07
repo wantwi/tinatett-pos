@@ -127,40 +127,57 @@ const EditQuotation = () => {
   }
 
   const handleAddItem = () => {
-     setProductGridData([...productGridData, productFormData])
-     //console.log(productGridData)
-     setProductFormData({remainingStock: '', qty:''})
-      setSelectedProduct('')
+    if(selectedProduct == null || selectedProduct == ''){
+      alertify.set("notifier", "position", "top-right");
+      alertify.warning("Please select a product first");
+    }
+    if(productFormData?.qty == ''){
+      alertify.set("notifier", "position", "top-right");
+      alertify.warning("Please provide a quantity first");
+    }
+    else{
+      setProductGridData([...productGridData, productFormData])
+      //console.log(productGridData)
+      setProductFormData({remainingStock: '', qty:''})
+       setSelectedProduct('')
+    }
+   
   }
 
 
   const handleSubmit = () => {
-    setLoading(true)
-    const payload = {
-      requestDate: startDate,
-      products: productGridData.map((item) => {
-        return {
-          "productId": item.productId,
-           "quantity": item.qty,
-           "currentStock": item.remainingStock
+    if(productGridData.length <1){
+      alertify.set("notifier", "position", "top-right");
+      alertify.warning("Please add at least one product to the list");
+    }else{
+      setLoading(true)
+      const payload = {
+        requestDate: startDate,
+        products: productGridData.map((item) => {
+          return {
+            "productId": item.productId,
+             "quantity": item.qty,
+             "currentStock": item.remainingStock
+          }
+        })
+      }
+  
+      //console.log(payload)
+      axios.put(`/productRequest/${id}`, payload)
+      .then((res) => {
+        if(res.data.success){
+          alertify.set("notifier", "position", "top-right");
+          alertify.success("Request updated.");
+          setProductGridData([])
         }
       })
-    }
-
-    //console.log(payload)
-    axios.put(`/productRequest/${id}`, payload)
-    .then((res) => {
-      if(res.data.success){
+      .catch((err) => {
         alertify.set("notifier", "position", "top-right");
-        alertify.success("Request updated.");
-        setProductGridData([])
-      }
-    })
-    .catch((err) => {
-      alertify.set("notifier", "position", "top-right");
-      alertify.error("Error. Failed to update request");
-    })
-    .finally(() => setLoading(false))
+        alertify.error("Error. Failed to update request");
+      })
+      .finally(() => setLoading(false))
+    }
+    
 
   }
 
@@ -185,8 +202,8 @@ const EditQuotation = () => {
 
   }, [products])
 
-  if(loading){
-    return <LoadingSpinner message="Processing Request"/>
+  if(loading || productRequestLoading){
+    return <LoadingSpinner message="Loading ..."/>
   }
 
   return (

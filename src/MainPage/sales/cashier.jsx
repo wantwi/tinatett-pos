@@ -40,6 +40,7 @@ const Cashier = () => {
   const [inputfilter, setInputfilter] = useState(true);
   const [activeTab, setActiveTab] = useState('Cash')
   const [modalData, setModalData] = useState(null)
+  const [isCredit, setIsCredit] = useState(false)
   const [paymentInfo, setPaymentInfo] = useState({
     type:'',
     cashWaybill:'',
@@ -105,69 +106,76 @@ const Cashier = () => {
   const axios = useCustomApi()
 
   const processPayment = (type, print) =>{
-    let pType = ''
-    if(paymentInfo.cashAmount > 0){
-      pType = pType.concat('Cash,')
-    }
-    if(paymentInfo.momoAmount > 0){
-      pType = 
-      pType.concat('Momo,')
-    }
-    if(paymentInfo.chequeAmount > 0){
-      pType = pType.concat('Cheque,')
-    }
-    let payload = {
-      status: type,
-      salesRef:modalData.Reference,
-      amount:modalData?.Total,
-      paymentType: pType,
-      paymentInfo: [
-        {"type":"Cash", waybill:paymentInfo.cashWaybill, amountPaid: paymentInfo.cashAmount },
-        {"type":"Momo", name: paymentInfo.momoName,  receiptNo: paymentInfo.momoReceiptNo, amountPaid: paymentInfo.momoAmount},
-        {"type":"Cheque", waybill: paymentInfo.chequeWaybill,  chequeNo: paymentInfo.chequeNo, chequeReceiptNo: paymentInfo.chequeReceiptNo, amountPaid: paymentInfo.chequeAmount, waybill: paymentInfo.chequeWaybill}
-      ]
-    }
-
-    console.log(payload)
-    axios.post('/sales',payload)
-    .then((res) => {
-      console.log(res.data.success)
-      if(res.data.success){
-        if(print){
-          getInvoiceReceipt(modalData.Reference)
-        }
-        alertify.set("notifier", "position", "top-right");
-        alertify.success("Sale completed.");
-       
+    if(Number(paymentInfo.cashAmount) + Number(paymentInfo.cashAmount) + Number(paymentInfo.cashAmount) > 0){
+      let pType = ''
+      if(paymentInfo.cashAmount > 0){
+        pType = pType.concat('Cash,')
       }
-    })
-    .catch((error) => {
+      if(paymentInfo.momoAmount > 0){
+        pType = 
+        pType.concat('Momo,')
+      }
+      if(paymentInfo.chequeAmount > 0){
+        pType = pType.concat('Cheque,')
+      }
+      let payload = {
+        status: type,
+        salesRef:modalData.Reference,
+        amount:modalData?.Total,
+        paymentType: pType,
+        paymentInfo: [
+          {"type":"Cash", waybill:paymentInfo.cashWaybill, amountPaid: paymentInfo.cashAmount },
+          {"type":"Momo", name: paymentInfo.momoName,  receiptNo: paymentInfo.momoReceiptNo, amountPaid: paymentInfo.momoAmount},
+          {"type":"Cheque", waybill: paymentInfo.chequeWaybill,  chequeNo: paymentInfo.chequeNo, chequeReceiptNo: paymentInfo.chequeReceiptNo, amountPaid: paymentInfo.chequeAmount, waybill: paymentInfo.chequeWaybill}
+        ]
+      }
+  
+     // console.log(payload)
+      axios.post('/sales',payload)
+      .then((res) => {
+        console.log(res.data.success)
+        if(res.data.success){
+          if(print){
+            getInvoiceReceipt(modalData.Reference)
+          }
+          alertify.set("notifier", "position", "top-right");
+          alertify.success("Sale completed.");
+         
+        }
+      })
+      .catch((error) => {
+        alertify.set("notifier", "position", "top-right");
+        alertify.error("Error...Could not complete transaction");
+      })
+      .finally(() => {
+        setPaymentInfo({type:'',
+        cashWaybill:'',
+        cashReceiptNo:'',
+        cashAmount:'',
+        chequeNo:'',
+        chequeReceiptNo:'',
+        chequeAmount:'',
+        chequeWaybill:'',
+        dueDate:'',
+        bank:'',
+        momoName:'',
+        momoReceiptNo:'',
+        momoAmount:'' ,
+        transactionID:'',
+        amountPaid:''
+       })
+        setTimeout(() => {
+          $('.modal').modal('hide')
+          //window.location.reload()
+        }, 1500)
+        //
+      })
+    }
+    else{
       alertify.set("notifier", "position", "top-right");
-      alertify.error("Error...Could not complete transaction");
-    })
-    .finally(() => {
-      setPaymentInfo({type:'',
-      cashWaybill:'',
-      cashReceiptNo:'',
-      cashAmount:'',
-      chequeNo:'',
-      chequeReceiptNo:'',
-      chequeAmount:'',
-      chequeWaybill:'',
-      dueDate:'',
-      bank:'',
-      momoName:'',
-      momoReceiptNo:'',
-      momoAmount:'' ,
-      transactionID:'',
-      amountPaid:''
-     })
-      setTimeout(() => {
-        $('.modal').modal('hide')
-        //window.location.reload()
-      }, 1500)
-      //
-    })
+      alertify.warning("Please enter an amount first");
+    }
+    
 
   }
 
@@ -287,37 +295,37 @@ const Cashier = () => {
 
   const columns = [
     {
-      title: "Costumer name",
-      dataIndex: "Name",
-      sorter: (a, b) => a.Name.length - b.Name.length,
-    },
-    {
       title: "Date",
       dataIndex: "Date",
       sorter: (a, b) => a.Date.length - b.Date.length,
     },
     {
+      title: "Customer name",
+      dataIndex: "Name",
+      sorter: (a, b) => a.Name.length - b.Name.length,
+    },
+   
+    {
       title: "Reference",
       dataIndex: "Reference",
       sorter: (a, b) => a.Reference.length - b.Reference.length,
+    },
+   
+    {
+      title: "Amt Due (GHS)",
+      dataIndex: "Total",
+      sorter: (a, b) => a.Total.length - b.Total.length,
     },
     {
       title: "Sales Type",
       dataIndex: "salestype",
       render: (text, record) => (
         <>
-         <span className={text == "Retail" ? "badges bg-lightgreen me-2": "badges me-2 btn-primary"}>{text}</span>
-        
+         <p>{text}</p>
         </>
       ),
       sorter: (a, b) => a.salestype.length - b.salestype.length,
     },
-    {
-      title: "Amt Due (GHS)",
-      dataIndex: "Total",
-      sorter: (a, b) => a.Total.length - b.Total.length,
-    },
-
     {
       title: "Biller",
       dataIndex: "Biller",
@@ -326,19 +334,25 @@ const Cashier = () => {
     {
       title: "Action",
       render: (text, record) => (
-        <>  
-          <Link
-                  to="#"
-                  // className="dropdown-item"
-                  data-bs-toggle="modal"
-                  data-bs-target="#showproducts"
-                  onClick={() => getSalesProductById(record?.id)}
-                  title={'View'}
-                >
-                  {/* <img src={Dollar1} className="me-2" alt="img" /> */}
-                  <span className="badges btn-cancel me-2"><FeatherIcon icon="eye" /> View</span>
-                  {/* Pay */}
-          </Link>
+        <>
+        
+              {/* <li>
+                <Link to="/tinatett-pos/sales/sales-details" className="dropdown-item">
+                  <img src={Eye1} className="me-2" alt="img" />
+                  Sale Detail
+                </Link>
+              </li>
+              <li>
+                <Link to="/tinatett-pos/sales/edit-sales" className="dropdown-item">
+                  <img src={EditIcon} className="me-2" alt="img" />
+                  Edit Sale
+                </Link>
+              </li> */}
+                 <Link
+                  to="#" data-bs-toggle="modal" data-bs-target="#showproducts" title="View"  onClick={() => getSalesProductById(record.id)}>
+                    <span class="badges btn-cancel me-2"><FeatherIcon icon="eye"/> View</span>
+                  </Link>
+            
                 <Link
                   to="#"
                   // className="dropdown-item"
@@ -348,10 +362,37 @@ const Cashier = () => {
                   title={'Pay'}
                 >
                   {/* <img src={Dollar1} className="me-2" alt="img" /> */}
-                  <span className="badges bg-lightgreen me-2"><FeatherIcon icon="credit-card" /> Pay</span>
+                  <span className="badges bg-lightgreen me-2"><FeatherIcon icon="credit-card"/> Pay</span>
                   {/* Pay */}
                 </Link>
-              
+
+
+                <Link
+                  to="#"
+                  // className="dropdown-item"
+                  data-bs-toggle="modal"
+                  data-bs-target="#showpayment"
+                  onClick={() => {setModalData(record), setIsCredit(true)}}
+                  title={'Pay'}
+                >
+                  {/* <img src={Dollar1} className="me-2" alt="img" /> */}
+                  <span className="badges btn-primary me-2"><FeatherIcon icon="credit-card"/> Credit</span>
+                  {/* Pay */}
+                </Link>
+             
+      
+                <Link
+                  to="#"
+                  // className="dropdown-item confirm-text"
+                  onClick={confirmText}
+                  title={'Remove'}
+                >
+                  
+                  <span className="badges bg-lightred"><FeatherIcon icon="trash"/> Remove</span>
+                  {/* Remove  */}
+                </Link>
+             
+            
         </>
       ),
     },
@@ -440,6 +481,7 @@ const Cashier = () => {
                   className="close"
                   data-bs-dismiss="modal"
                   aria-label="Close"
+                  onClick={() => setIsCredit(false)}
                 >
                   <span aria-hidden="true">×</span>
                 </button>
@@ -750,13 +792,13 @@ const Cashier = () => {
                 </div>
 
                 <div className="row mt-2">
-                  <div className="col-lg-12" style={{ display: 'flex', justifyContent: 'space-between' }} >
-                    <button className="btn btn-info me-2" onClick={() => processPayment("Paid", true)} style={{ width: '20%' }}>
+                  <div className="col-lg-12" style={{ display: 'flex', justifyContent: 'flex-start' }} >
+                    {!isCredit && (<button className="btn btn-info me-2" onClick={() => processPayment("Paid", true)} style={{ width: '20%' }}>
                       Sell and Print
-                    </button>
-                    <button className="btn btn-warning me-2" onClick={() => processPayment("Paid", false)} style={{ width: '20%' }}>
+                    </button>)}
+                    {!isCredit && (<button className="btn btn-warning me-2" onClick={() => processPayment("Paid", false)} style={{ width: '20%' }}>
                       Sell Only
-                    </button>
+                    </button>)}
                     <button className="btn btn-danger me-2" style={{ width: '20%' }} onClick={() => processPayment("Credit", true)} >
                       Credit and Print
                     </button>

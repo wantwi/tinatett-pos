@@ -26,6 +26,7 @@ import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
 import { usePost } from "../../hooks/usePost";
 import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 import FeatherIcon from "feather-icons-react";
+import useCustomApi from "../../hooks/useCustomApi";
 
 const options2 = [
   { id: 1, text: "choose Status", text: "choose Status" },
@@ -52,8 +53,10 @@ const AddPurchase = () => {
   const { data: suppliers, isLoading: suppliersIsLoading } = useGet("suppliers", "/supplier");
   const { isLoading, data, isError, error, mutate } = usePost("/purchase");
   const [isSubmitSuccessful, setIsSubmitSuccessful] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   const dateRef = useRef()
+  const axios = useCustomApi()
 
 
   const deleteRow = (record) => {
@@ -71,6 +74,20 @@ const AddPurchase = () => {
     listCopy[index] = updated
     setProductGridData(listCopy)
     $('.modal').modal('hide')
+  }
+
+
+  const checkIfBatchNoExists = (batchNumber, productId) => {
+    setLoading(true)
+    axios.get(`/purchase/product/${productId}/${batchNumber}`)
+    .then((res) => {
+      if(res.data.status == true){
+        alertify.set("notifier", "position", "top-right");
+        alertify.warning("Batch number already exists. Please enter a new one");
+        setProductFormData({ ...productFormData, batchNumber:'' })
+      }
+    })
+    .finally(() => setLoading(false))
   }
 
 
@@ -99,22 +116,30 @@ const AddPurchase = () => {
       // render: (text, record) => <p style={{textAlign:'center'}}>{text || 0}</p>
     },
     {
-      title: "Unit Price(GHS)",
+      title: "Unit Price",
       dataIndex: "unitPrice",
-      render: (text, record) => <p style={{ textAlign: 'right' }}>{moneyInTxt(text)}</p>
+      render: (text, record) => <p style={{ textAlign: 'center' }}>{moneyInTxt(text)}</p>
     },
     {
-      title: "Amount(GHS)",
+      title: "Amount",
       dataIndex: "amount",
-      render: (text, record) => <p style={{ textAlign: 'right' }}>{moneyInTxt(text)}</p>
+      render: (text, record) => <p style={{ textAlign: 'center' }}>{moneyInTxt(text)}</p>
     },
     {
-      title: "Manufacturing Date",
+      title: "Batch #",
+      dataIndex: "batchNumber",
+      width: "150px"
+      // render: (text, record) => <p style={{textAlign:'center'}}>{text || 0}</p>
+    },
+    
+   
+    {
+      title: "Manufacturing",
       dataIndex: "manufacturingDate",
       render: (text, record) => <p key={text} style={{ textAlign: 'center' }}>{record?.manufacturingDate.substring(0, 10) || ''}</p>
     },
     {
-      title: "Expiring Date",
+      title: "Expiring",
       dataIndex: "expireDate",
       render: (text, record) => <p key={text} style={{ textAlign: 'center' }}>{record?.expireDate.substring(0, 10) || ''}</p>
     },
@@ -367,9 +392,8 @@ const AddPurchase = () => {
                         <input type="text" className={`form-control `} disabled={selectedProduct?.ownershipType == "Tinatett" ? false : false}
                           value={productFormData?.batchNumber}
                           onChange={(e) => {
-
                             setProductFormData({ ...productFormData, batchNumber: e.target.value })
-
+                            checkIfBatchNoExists(e.target.value,selectedProduct.id, )
                           }
                           } />
                       </div>

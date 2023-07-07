@@ -27,84 +27,8 @@ import { moneyInTxt } from "../utility";
 import useAuth from "../hooks/useAuth";
 import LoadingSpinner from "../InitialPage/Sidebar/LoadingSpinner";
 
-const state = {
-  series: [
-    {
-      name: "Sales",
-      data: [50, 45, 60, 70, 50, 45, 60, 70],
-    },
-    {
-      name: "Purchase",
-      data: [-21, -54, -45, -35, -21, -54, -45, -35],
-    },
-  ],
-  options: {
-    colors: ["#28C76F", "#EA5455"],
-    chart: {
-      type: "bar",
-      height: 300,
-      stacked: true,
-
-      zoom: {
-        enabled: true,
-      },
-    },
-    responsive: [
-      {
-        breakpoint: 280,
-        options: {
-          legend: {
-            position: "bottom",
-            offsetY: 0,
-          },
-        },
-      },
-    ],
-    plotOptions: {
-      bar: {
-        horizontal: false,
-        columnWidth: "20%",
-        borderRadius: 5,
-        borderRadiusTop: 5,
-      },
-    },
-    xaxis: {
-      categories: [
-        " Jan ",
-        "feb",
-        "march",
-        "april",
-        "may",
-        "june",
-        "july",
-        "auguest",
-      ],
-    },
-    legend: {
-      position: "top",
-    },
-    fill: {
-      opacity: 1,
-    },
-  },
-};
 
 const Dashboard = (props) => {
-  const { auth } = useAuth();
-
-  const [recentData] = useState([
-    { key: 1, image: EarpodIcon, products: "Apple Earpods", price: "GHS 891.2" },
-    { key: 2, image: IphoneIcon, products: "iPhone 11", price: "GHS 91.2" },
-    { key: 3, image: SamsungIcon, products: "Samsung", price: "GHS 561.2" },
-    { key: 4, image: MacbookIcon, products: "Macbook Pro", price: "GHS 1009.2" },
-  ]);
-
-  const [customerData] = useState([
-    { key: 1, image: EarpodIcon, products: "Kinapharma", price: 8955001.2 },
-    { key: 2, image: IphoneIcon, products: "Ernest Chemist", price: 7000001.2 },
-    { key: 3, image: SamsungIcon, products: "Tobinco", price: 5600001.2 },
-    { key: 4, image: MacbookIcon, products: "Pro Pharma", price: 1000909.2 },
-  ]);
 
   const expiredProductColumns = [
     {
@@ -145,82 +69,102 @@ const Dashboard = (props) => {
 
   const recentDataColumns = [
     {
-      title: "SNo",
-      dataIndex: "key",
-      sorter: (a, b) => a.key.length - b.key.length,
+      title: "Product",
+      dataIndex: "productName",
+      sorter: (a, b) => a.productName.length - b.productName.length,
+      
     },
     {
-      title: "Products",
-      dataIndex: "products",
+      title: "QTY Sold",
+      dataIndex: "QTY",
       render: (text, record) => (
         <div className="productimgname">
-          <Link to="#" className="product-img">
-            <img alt="" src={record.image} />
-          </Link>
           <Link to="#" style={{ fontSize: "14px" }}>
-            {record.products}
+            {text}
           </Link>
         </div>
       ),
-      sorter: (a, b) => a.products.length - b.products.length,
-      width: "250px",
+     
     },
     {
-      title: "Price",
-      dataIndex: "price",
-      render: (text, record) => <div style={{ fontSize: "14px" }}>{text}</div>,
-      sorter: (a, b) => a.price.length - b.price.length,
+      title: "Amount Sold",
+      dataIndex: "Amount",
+      render: (text, record) => <div style={{ fontSize: "14px" }}>{moneyInTxt(text)}</div>,
     },
+  ];
+
+  const alertDataColumns = [
+    {
+      title: "Product",
+      dataIndex: "productName",
+      sorter: (a, b) => a.productName.length - b.productName.length,
+     
+    },
+    {
+      title: "Avail. Stock",
+      dataIndex: "stock",
+      render: (text, record) => (
+        <div className="productimgname">
+          <Link to="#" style={{ fontSize: "14px" }}>
+            {text}
+          </Link>
+        </div>
+      ),
+     
+    },
+   
   ];
 
   const customerDataColumns = [
     {
-      title: "SNo",
-      dataIndex: "key",
-      sorter: (a, b) => a.key.length - b.key.length,
+      title: "Name",
+      dataIndex: "name",
+      // sorter: (a, b) => a.key.length - b.key.length,
     },
     {
-      title: "Name",
-      dataIndex: "products",
+      title: "Contact",
+      dataIndex: "contact",
       render: (text, record) => (
         <div className="productimgname">
-          <Link to="#" className="product-img">
-            <img alt="" src={record.image} />
-          </Link>
           <Link to="#" style={{ fontSize: "14px" }}>
-            {record.products}
+            {record.contact}
           </Link>
         </div>
       ),
       sorter: (a, b) => a.products.length - b.products.length,
-      width: "250px",
     },
     {
-      title: "Amount Spent (GHS)",
-      dataIndex: "price",
+      title: "No. Of Trans.",
+      dataIndex: "transactionCount",
       render: (text, record) => (
-        <div style={{ fontSize: "14px" }}>{moneyInTxt(text)}</div>
+        <div style={{ fontSize: "14px" }}>{(text)}</div>
       ),
       sorter: (a, b) => a.price - b.price,
     },
   ];
   const [data, setData] = useState(null)
   const [expiredData, setExpiredData] = useState([])
+  const [topProductsData, settopProductsData] = useState([])
+  const [topcustomersData, settopcustomersData] = useState([])
   
-  const {data: dashboardSummary,isLoading} = useGet("dashboardSummary", "/dashboard/summary");
+  const {data: dashboardSummary,isLoading} = useGet("dashboardSummary", "/dashboard/salesAndpurchase");
   const {data: expiring, isLoading: expLoading} = useGet("expiring", "/dashboard/productExpirationStatus");
-
+  const {data: topproducts, isLoading: topproductsLoading} = useGet("topproducts", "/dashboard/topproducts");
+  const {data: topcustomers, isLoading: topcustomersLoading} = useGet("topcustomers", "/dashboard/topcustomers");
+  const {data: alertList} = useGet("productalert", "/dashboard/productAlert");
 
 
   useEffect(() => {
-    if (!isLoading && !expLoading) {
+    if (!isLoading && !expLoading && !topcustomersLoading && !topproductsLoading) {
       setData(dashboardSummary?.data[0])
       setExpiredData(expiring?.data)
+      settopProductsData(topproducts?.data)
+      settopcustomersData(topcustomers?.data)
     }
   
-  }, [isLoading, expLoading])
+  }, [isLoading, expLoading, topproductsLoading, topcustomersLoading])
 
-  if(isLoading){
+  if(isLoading || topproductsLoading || topcustomersLoading){
     return <LoadingSpinner/>
   }
 
@@ -245,10 +189,28 @@ const Dashboard = (props) => {
                   <h5>
                     GHS {' '} 
                     <span className="counters">
-                      <CountUp end={data?.total_purchase_amount} />
+                      <CountUp end={data?.monthlySales || 0} />
                     </span>
                   </h5>
-                  <h6>Total Purchase Amount</h6>
+                  <h6>Total Monthly Sales</h6>
+                </div>
+              </div>
+            </div>
+            <div className="col-lg-3 col-sm-6 col-12">
+              <div className="dash-widget dash3">
+                <div className="dash-widgetimg">
+                  <span>
+                    <img src={Dash4} alt="img" />
+                  </span>
+                </div>
+                <div className="dash-widgetcontent">
+                  <h5>
+                  GHS {' '} 
+                    <span className="counters">
+                      <CountUp end={data?.dailySales} />
+                    </span>
+                  </h5>
+                  <h6>Daily Sales Amount</h6>
                 </div>
               </div>
             </div>
@@ -263,28 +225,10 @@ const Dashboard = (props) => {
                   <h5>
                     GHS {' '} 
                     <span className="counters">
-                      <CountUp end={data?.total_sales_amount} />
+                      <CountUp end={data?.monthlyPurchase || 0} />
                     </span>
                   </h5>
-                  <h6>Total Sales Amount</h6>
-                </div>
-              </div>
-            </div>
-            <div className="col-lg-3 col-sm-6 col-12">
-              <div className="dash-widget dash2">
-                <div className="dash-widgetimg">
-                  <span>
-                    <img src={Dash3} alt="img" />
-                  </span>
-                </div>
-                <div className="dash-widgetcontent">
-                  <h5>
-                    
-                    <span className="counters">
-                      <CountUp end={data?.numberofPurchase} />
-                    </span>
-                  </h5>
-                  <h6>Total Purchases</h6>
+                  <h6>Total Monthly Purchase</h6>
                 </div>
               </div>
             </div>
@@ -297,16 +241,163 @@ const Dashboard = (props) => {
                 </div>
                 <div className="dash-widgetcontent">
                   <h5>
-                   
+                  GHS {' '} 
                     <span className="counters">
                       <CountUp end={data?.numberofSales} />
                     </span>
                   </h5>
-                  <h6>Total Sales</h6>
+                  <h6>Daily Purchase Amount</h6>
                 </div>
               </div>
             </div>
-            <div className="col-lg-3 col-sm-6 col-12 d-flex">
+
+            <div className="col-lg-3 col-sm-6 col-12">
+              <div className="dash-widget dash2">
+                <div className="dash-widgetimg">
+                  <span>
+                    <img src={Dash3} alt="img" />
+                  </span>
+                </div>
+                <div className="dash-widgetcontent">
+                  <h5>
+                  GHS {' '} 
+                    <span className="counters">
+                      <CountUp end={data?.numberofPurchase} />
+                    </span>
+                  </h5>
+                  <h6>Total Stock Value</h6>
+                </div>
+              </div>
+            </div>
+            <div className="col-lg-3 col-sm-6 col-12">
+              <div className="dash-widget dash3">
+                <div className="dash-widgetimg">
+                  <span>
+                    <img src={Dash4} alt="img" />
+                  </span>
+                </div>
+                <div className="dash-widgetcontent">
+                  <h5>
+                  
+                    <span className="counters">
+                      <CountUp end={data?.numberofSales} />
+                    </span>
+                  </h5>
+                  <h6>No of Invoices</h6>
+                </div>
+              </div>
+            </div>
+            <div className="col-lg-3 col-sm-6 col-12">
+              <div className="dash-widget dash3">
+                <div className="dash-widgetimg">
+                  <span>
+                    <img src={Dash4} alt="img" />
+                  </span>
+                </div>
+                <div className="dash-widgetcontent">
+                  <h5>
+                  
+                    <span className="counters">
+                      <CountUp end={data?.dailyNumberOfProductSold || 0} />
+                    </span>
+                  </h5>
+                  <h6>Total Quantity of Products Sold (Daily)</h6>
+                </div>
+              </div>
+            </div>
+            <div className="col-lg-3 col-sm-6 col-12">
+              <div className="dash-widget dash3">
+                <div className="dash-widgetimg">
+                  <span>
+                    <img src={Dash4} alt="img" />
+                  </span>
+                </div>
+                <div className="dash-widgetcontent">
+                  <h5>
+                  
+                    <span className="counters">
+                      <CountUp end={data?.monthlyNumberOfProductSold} />
+                    </span>
+                  </h5>
+                  <h6>Total Quantity of Products Sold (Monthly)</h6>
+                </div>
+              </div>
+            </div>
+            <div className="col-lg-3 col-sm-6 col-12">
+              <div className="dash-widget dash3">
+                <div className="dash-widgetimg">
+                  <span>
+                    <img src={Dash4} alt="img" />
+                  </span>
+                </div>
+                <div className="dash-widgetcontent">
+                  <h5>
+                   GHS {' '}
+                    <span className="counters">
+                      <CountUp end={data?.numberofSales} />
+                    </span>
+                  </h5>
+                  <h6>Total Profit Margin (Daily)</h6>
+                </div>
+              </div>
+            </div>
+            <div className="col-lg-3 col-sm-6 col-12">
+              <div className="dash-widget dash3">
+                <div className="dash-widgetimg">
+                  <span>
+                    <img src={Dash4} alt="img" />
+                  </span>
+                </div>
+                <div className="dash-widgetcontent">
+                  <h5>
+                    GHS {' '}
+                    <span className="counters">
+                      <CountUp end={data?.numberofSales} />
+                    </span>
+                  </h5>
+                  <h6>Total Profit Margin (Monthly)</h6>
+                </div>
+              </div>
+            </div>
+         
+           
+            <div className="col-lg-3 col-sm-6 col-12">
+              <div className="dash-widget dash3">
+                <div className="dash-widgetimg">
+                  <span>
+                    <img src={Dash4} alt="img" />
+                  </span>
+                </div>
+                <div className="dash-widgetcontent">
+                  <h5>
+                  GHS {' '} 
+                    <span className="counters">
+                      <CountUp end={data?.dailyExpenses || 0} />
+                    </span>
+                  </h5>
+                  <h6>Total Expenses (Daily)</h6>
+                </div>
+              </div>
+            </div>
+            <div className="col-lg-3 col-sm-6 col-12">
+              <div className="dash-widget dash3">
+                <div className="dash-widgetimg">
+                  <span>
+                    <img src={Dash4} alt="img" />
+                  </span>
+                </div>
+                <div className="dash-widgetcontent">
+                  <h5>
+                  GHS {' '} 
+                    <span className="counters">
+                      <CountUp end={data?.monthlyExpenses || 0} />
+                    </span>
+                  </h5>
+                  <h6>Total Expenses (Monthly)</h6>
+                </div>
+              </div>
+            </div>
+            {/* <div className="col-lg-3 col-sm-6 col-12 d-flex">
               <div className="dash-count">
                 <div className="dash-counts">
                   <h4>{data?.total_customers}</h4>
@@ -349,11 +440,11 @@ const Dashboard = (props) => {
                   <FeatherIcon icon="file" />
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
 
           <div className="row">
-            <div className="col-lg-7 col-sm-12 col-12 d-flex">
+            <div className="col-lg-4 col-sm-12 col-12 d-flex">
               <div className="card flex-fill">
                 <div className="card-header pb-0 d-flex justify-content-between align-items-center">
                   <h4 className="card-title mb-0">Top 20 Customers</h4>
@@ -395,14 +486,14 @@ const Dashboard = (props) => {
                       className="table datatable"
                       key={props}
                       columns={customerDataColumns}
-                      dataSource={customerData}
+                      dataSource={topcustomersData}
                       pagination={false}
                     />
                   </div>
                 </div>
               </div>
             </div>
-            <div className="col-lg-5 col-sm-12 col-12 d-flex">
+            <div className="col-lg-4 col-sm-12 col-12 d-flex">
               <div className="card flex-fill">
                 <div className="card-header pb-0 d-flex justify-content-between align-items-center">
                   <h4 className="card-title mb-0">Top 20 Selling Items</h4>
@@ -421,7 +512,7 @@ const Dashboard = (props) => {
                     >
                       <li>
                         <Link
-                          to="/tinatett-pos/product/productlist-product"
+                          to="/tinatett-pos/product/productlist"
                           className="dropdown-item"
                         >
                           Product List
@@ -429,7 +520,7 @@ const Dashboard = (props) => {
                       </li>
                       <li>
                         <Link
-                          to="/tinatett-pos/product/addproduct-product"
+                          to="/tinatett-pos/product/addproduct"
                           className="dropdown-item"
                         >
                           Product Add
@@ -444,7 +535,56 @@ const Dashboard = (props) => {
                       className="table datatable"
                       key={props}
                       columns={recentDataColumns}
-                      dataSource={recentData}
+                      dataSource={topProductsData}
+                      pagination={false}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="col-lg-4 col-sm-12 col-12 d-flex">
+              <div className="card flex-fill">
+                <div className="card-header pb-0 d-flex justify-content-between align-items-center">
+                  <h4 className="card-title mb-0">Product Alert</h4>
+                  <div className="dropdown dropdown-action profile-action">
+                    <Link
+                      to="#"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false"
+                      className="dropset"
+                    >
+                      <i className="fa fa-ellipsis-v" />
+                    </Link>
+                    <ul
+                      className="dropdown-menu"
+                      aria-labelledby="dropdownMenuButton"
+                    >
+                      <li>
+                        <Link
+                          to="/tinatett-pos/product/productlist"
+                          className="dropdown-item"
+                        >
+                          Product List
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          to="/tinatett-pos/product/addproduct"
+                          className="dropdown-item"
+                        >
+                          Product Add
+                        </Link>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div className="card-body">
+                  <div className="table-responsive dataview">
+                    <Table
+                      className="table datatable"
+                      key={props}
+                      columns={alertDataColumns}
+                      dataSource={alertList}
                       pagination={false}
                     />
                   </div>

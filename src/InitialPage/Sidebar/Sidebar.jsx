@@ -14,6 +14,8 @@ import {
   Return,
   Transfer,
   Sales1,
+  cash,
+  debitcard,
 } from "../../EntryFile/imagePath";
 import { Link } from "react-router-dom";
 import { Scrollbars } from "react-custom-scrollbars";
@@ -504,6 +506,8 @@ const Sidebar = (props) => {
                 )}
               </li>
 
+            
+
                {/* Sales */}
             <li className="submenu">
                 <a
@@ -544,7 +548,7 @@ const Sidebar = (props) => {
                         Suspended
                       </Link>
                     </li>
-                    <li>
+                    {/* <li>
                       <Link
                         className={
                           pathname.includes("cashier") ? "active" : ""
@@ -553,7 +557,7 @@ const Sidebar = (props) => {
                       >
                         Cashier
                       </Link>
-                    </li>
+                    </li> */}
                     <li>
                       <Link
                         className={
@@ -592,7 +596,21 @@ const Sidebar = (props) => {
                 ) : (
                   ""
                 )}
-              </li> 
+            </li> 
+
+
+              {/* Cashier Window */}
+
+
+              <li className={pathname.includes("/tinatett-pos/cashier/suspended") ? "active" : ""}>
+                <Link
+                  to="/tinatett-pos/cashier/suspended"
+                  onClick={() => toggleSidebar(isSideMenu == "cashier" ? "" : "")}
+                >
+                  <img src={debitcard} alt="img" />
+                  <span>Cashier </span>
+                </Link>
+              </li>
 
               {/* Transfer */}
               <li className="submenu">

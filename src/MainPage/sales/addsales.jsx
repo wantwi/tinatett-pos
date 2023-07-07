@@ -30,7 +30,7 @@ import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
 
 const Addsales = () => {
   const [startDate, setStartDate] = useState(new Date());
-  const [activeTab, setActiveTab] = useState('cash')
+  const [activeTab, setActiveTab] = useState('Cash')
   const [disabledUnselectedPrice,setDisableUnselectedPrice] = useState({retail: false, wholesale:false, special:false})
   const [customerList, setCustomerList] = useState([])
   const [productsList, setProductsList] = useState([])
@@ -44,16 +44,33 @@ const Addsales = () => {
   const [formData, setFormData] = useState({quantity:'', amount:'', batchNumber:'', manuDate:'', expDate:''})
   const [editFormData, setEditFormData] = useState({name:'',quantity:'', amount:'', batchNumber:'', manuDate:'', expDate:''})
   const [salesType, setSalesType] = useState('Retail')
-  const [paymentData, setPaymentData] = useState({paymentType:'', accountNo:'', branch: ''})
   const [productGridData, setProductGridData] = useState([])
   const [transDate, setTransDate] = useState(new Date().toISOString().substring(0,10))
   const [invoiceNo, setInvoiceNo] = useState('')
-  const [isSubmitSuccessful, setIsSubmitSuccessful] = useState(false)
   const retailpriceTypeRef = useRef()
   const specialpriceTypeRef = useRef()
   const wholesalepriceTypeRef = useRef()
   const [referenceData, setReferenceData] = useState({data:[], reference:'', amountToPay:''})
   const [isSaving, setIsSaving] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [paymentInfo, setPaymentInfo] = useState({
+    type:'',
+    cashWaybill:'',
+    cashReceiptNo:'',
+    cashAmount:'',
+    chequeNo:'',
+    chequeReceiptNo:'',
+    chequeAmount:'',
+    chequeWaybill:'',
+    dueDate:'',
+    bank:'',
+    momoName:'',
+    momoReceiptNo:'',
+    momoAmount:'' ,
+    transactionID:'',
+    amountPaid:''
+     
+  })
   
 
   const retailRef = useRef()
@@ -83,13 +100,131 @@ const Addsales = () => {
     $('.modal').modal('hide')
   }
 
-  const handleInvoice = () =>{
+  const processPayment = (type, print) =>{
+
+    //handle the suspend first and then use the reference to process payment
+    setIsSaving(true)
+    let payload = {
+      customerId: selectedCustomer?.value,
+      transDate: transDate,
+      totalAmount : productGridData.reduce((total, item) => total + item.amount, 0),
+      salesType:salesType,
+      products: productGridData
+    }
+
+    axios.post(`/sales/suspend`, payload)
+    .then((res) => {
+      if(res.data.success){
+        setProductGridData([])
+        setFormData({quantity:'', amount:'', batchNumber:'', manuDate:'', expDate:''})
+        setSelectedProduct('')
+        setInvoiceNo('')
+        setReferenceData(res.data)
+
+
+        //call payment api
+        let pType = ''
+          if(paymentInfo.cashAmount > 0){
+            pType = pType.concat('Cash,')
+          }
+          if(paymentInfo.momoAmount > 0){
+            pType = 
+            pType.concat('Momo,')
+          }
+          if(paymentInfo.chequeAmount > 0){
+            pType = pType.concat('Cheque,')
+          }
+          let payload = {
+            status: type,
+            salesRef: res.data.reference,
+            amount: productGridData.reduce((total, item) => total + item.amount, 0),
+            paymentType: pType,
+            paymentInfo: [
+              {"type":"Cash", waybill:paymentInfo.cashWaybill, amountPaid: paymentInfo.cashAmount },
+              {"type":"Momo", name: paymentInfo.momoName,  receiptNo: paymentInfo.momoReceiptNo, amountPaid: paymentInfo.momoAmount},
+              {"type":"Cheque", waybill: paymentInfo.chequeWaybill,  chequeNo: paymentInfo.chequeNo, chequeReceiptNo: paymentInfo.chequeReceiptNo, amountPaid: paymentInfo.chequeAmount, waybill: paymentInfo.chequeWaybill}
+            ]
+          }
+
+          
+          axios.post('/sales',payload)
+          .then((res) => {
+            if(res.data.success){
+              if(print){
+                getInvoiceReceipt(payload.salesRef)
+              }
+              alertify.set("notifier", "position", "top-right");
+              alertify.success("Sale completed.");
+            
+            }
+          })
+          .catch((error) => {
+            alertify.set("notifier", "position", "top-right");
+            alertify.error("Error...Could not complete transaction");
+          })
+          .finally(() => {
+            setPaymentInfo({type:'',
+            cashWaybill:'',
+            cashReceiptNo:'',
+            cashAmount:'',
+            chequeNo:'',
+            chequeReceiptNo:'',
+            chequeAmount:'',
+            chequeWaybill:'',
+            dueDate:'',
+            bank:'',
+            momoName:'',
+            momoReceiptNo:'',
+            momoAmount:'' ,
+            transactionID:'',
+            amountPaid:''
+          })
+            setTimeout(() => {
+              $('.modal').modal('hide')
+            }, 1500)
+            //
+          })
+       
+      }
+      else{
+        alertify.set("notifier", "position", "top-right");
+        alertify.warning("Unsuccessful, please try again");
+      }
+    })
+    .catch((error) => {
+      alertify.set("notifier", "position", "top-right");
+      alertify.error("Some error occured. Please contact admin");
+    })
+    .finally(() => {
+      setIsSaving(false)
+      $('#reference').modal('show')
+     }
+      )
+
+    
+
   }
 
-  const handleNoInvoice = () => {
-  }
-
-  const handleCredit = () => {
+  const getInvoiceReceipt = (salesref) => {
+    axios.get('/sales/getSaleReceipt/'+ salesref)
+    .then((res) =>{
+    console.log(res.data)
+    var base64 = res.data.base64
+    const blob = base64ToBlob( base64, 'application/pdf' );
+    const url = URL.createObjectURL( blob );
+    const pdfWindow = window.open("");
+    pdfWindow.document.write("<iframe width='100%' height='100%' src='" + url + "'></iframe>");
+    })
+    
+    function base64ToBlob( base64, type = "application/octet-stream" ) {
+      const binStr = atob( base64 );
+      const len = binStr.length;
+      const arr = new Uint8Array(len);
+      for (let i = 0; i < len; i++) {
+        arr[ i ] = binStr.charCodeAt( i );
+      }
+      return new Blob( [ arr ], { type: type } );
+    }
   }
 
   const handleSalesTypeChange = (e) => {
@@ -187,7 +322,9 @@ const Addsales = () => {
 
   useEffect(() => {
     axios.get(`${BASE_URL}/purchase/product/${selectedProduct?.value}`).then((res) => {
+      setIsLoading(true)
       if(res.data.success){
+        setIsLoading(false)
         setSelectedProductInfo(res.data.data)
         let x = res.data.data.batchNumber?.map((item) => {
           return {value:item.batchNumber, label:item?.batchNumber + '-(' + item?.Quantity +')', expireDate:item?.expireDate, manufacturingDate: item?.manufacturingDate}
@@ -200,6 +337,10 @@ const Addsales = () => {
 
   }, [selectedProduct])
 
+  useEffect(() => {
+    setPaymentInfo({...paymentInfo, amountPaid: Number(paymentInfo.cashAmount) + Number(paymentInfo.chequeAmount) + Number(paymentInfo.momoAmount)})
+   }, [paymentInfo.cashAmount, paymentInfo.chequeAmount, paymentInfo.momoAmount])
+ 
 
   useEffect(() => {
     if (!productsIsLoading && !customersIsLoading) {
@@ -228,6 +369,7 @@ const Addsales = () => {
         })
         setProductsList(mappedData2)
         retailRef.current.checked = true
+        //retailpriceTypeRef.current.checked = true
       
     }
   }, [productsIsLoading, customersIsLoading])
@@ -241,6 +383,8 @@ const Addsales = () => {
     return <LoadingSpinner message="Processing...please wait"/>
   }
 
+ 
+
 
   return (
     <div className="page-wrapper">
@@ -253,7 +397,7 @@ const Addsales = () => {
         </div>
 
       <div style={{display:'flex', gap:20}}>
-        <div style={{width: '50%'}}>
+        <div style={{width: '40%'}}>
           <div className="card" >
             <div className="card-body">
                 <div className="row">
@@ -387,6 +531,7 @@ const Addsales = () => {
                     <label>Batch No.</label>
                     <div className="input-groupicon">
                       <Select
+                        isLoading={isLoading}
                         options={selectedProductInfo?.batchNumber?.map((item) => {
                           return {value:item.batchNumber, label:item?.batchNumber + '-(' + item?.Quantity +')', expireDate:item?.expireDate, manufacturingDate: item?.manufacturingDate}
                         })}
@@ -447,9 +592,9 @@ const Addsales = () => {
                                 <input className="form-check-input" type="radio" ref={retailpriceTypeRef} name="priceType" value={selectedProduct?.retailPrice} 
                                 onChange={(e) => {
                                   setPrice(e.target.value)
-                                  setSalesType('Retail')
-                                  retailRef.current.checked = true
-                                  wholesaleRef.current.checked =false
+                                  //setSalesType('Retail')
+                                  //retailRef.current.checked = true
+                                  //wholesaleRef.current.checked =false
                                   setDisableUnselectedPrice({retail:false, wholesale:true, special:true})
                                 }}/>
                               </div>
@@ -464,9 +609,9 @@ const Addsales = () => {
                                 <input className="form-check-input" type="radio" ref={wholesalepriceTypeRef} name="priceType" value={selectedProduct?.wholeSalePrice} 
                                 onChange={(e) => {
                                   setPrice(e.target.value)
-                                  setSalesType('Wholesale')
-                                  retailRef.current.checked = false
-                                  wholesaleRef.current.checked =true
+                                  //setSalesType('Wholesale')
+                                  //retailRef.current.checked = false
+                                  //wholesaleRef.current.checked =true
                                   setDisableUnselectedPrice({wholesale:false, retail:true, special:true})}
                                  } />
                               </div>
@@ -563,223 +708,273 @@ const Addsales = () => {
 
           <div className="card">
             <div className="card-body">
-                <div className="payment-div">
-                  <ul className="nav nav-tabs">
-                      <li className="nav-item" onClick={()=>setActiveTab('cash')}>
-                        <a className={activeTab == 'cash' ? `nav-link active`: `nav-link`} href="javascript:void(0);">Cash</a>
-                      </li>
+            <div className="payment-div" >
+                        <ul className="nav nav-tabs">
+                          <li className="nav-item" onClick={() => setActiveTab('Cash')}>
+                            <a className={activeTab == 'Cash' ? `nav-link active` : `nav-link`} href="javascript:void(0);">Cash</a>
+                          </li>
 
-                      <li className="nav-item" onClick={()=>setActiveTab('cheque')}>
-                        <a className={activeTab == 'cheque' ? `nav-link active`: `nav-link`} href="javascript:void(0);">Cheque</a>
-                      </li>
+                          <li className="nav-item" onClick={() => setActiveTab('Cheque')}>
+                            <a className={activeTab == 'Cheque' ? `nav-link active` : `nav-link`} href="javascript:void(0);">Cheque</a>
+                          </li>
 
-                      <li className="nav-item" onClick={()=>setActiveTab('momo')}>
-                        <a className={activeTab == 'momo' ? `nav-link active`: `nav-link`} href="javascript:void(0);">Mobile Money</a>
-                      </li>
-                      
-                  </ul>
+                          <li className="nav-item" onClick={() => setActiveTab('Momo')}>
+                            <a className={activeTab == 'Momo' ? `nav-link active` : `nav-link`} href="javascript:void(0);">Mobile Money</a>
+                          </li>
 
-                  {activeTab == 'cash' ? <div id="cash-tab" style={{marginTop:20}}>
-                  <div className="row">
-                    <div className="col-6">
-                      <div className="form-group">
-                        <label>Waybill</label>
-                        <div className="input-groupicon">
-                          <input
-                            type="text"
-                            placeholder=""
-                          />
-                          
-                        </div>
-                      </div>
-                    </div>
+                        </ul>
 
-                    <div className="col-6">
-                      <div className="form-group">
-                        <label>Amount </label>
-                        <div className="input-groupicon">
-                          <input
-                            type="text"
-                            placeholder=""
-                          />
-                          
-                        </div>
-                      </div>
-                    </div>
+                        {activeTab == 'Cash' ? <div id="cash-tab" style={{ marginTop: 20 }}>
+                          <div className="row">
+                            <div className="col-6">
+                              <div className="form-group">
+                                <label>Waybill</label>
+                                <div className="input-groupicon">
+                                  <input
+                                    type="text"
+                                    placeholder=""
+                                    value={paymentInfo.cashWaybill}
+                                    onChange={(e) => setPaymentInfo({...paymentInfo, cashWaybill: e.target.value})}
+                                  />
 
-                    <div className="col-6">
-                      <div className="form-group">
-                        <label>Receipt No </label>
-                        <div className="input-groupicon">
-                          <input
-                            type="text"
-                            placeholder=""
-                          />
-                          
-                        </div>
-                      </div>
-                    </div>
+                                </div>
+                              </div>
+                            </div>
 
-                  </div>
-                </div> : null}
-                {activeTab == 'cheque' ? <div id="cheque-tab" style={{marginTop:20}}>
-                  <div className="row">
+                            <div className="col-6">
+                              <div className="form-group">
+                                <label>Amount </label>
+                                <div className="input-groupicon">
+                                  <input
+                                    type="text"
+                                    placeholder=""
+                                    value={paymentInfo.cashAmount}
+                                    onChange={(e) => {
+                                      if(e.target.value == ''){
+                                        setPaymentInfo({...paymentInfo, cashAmount: ''})
+                                      }
+                                      else if(isValidNumber(e.target.value)){
+                                        setPaymentInfo({...paymentInfo, cashAmount: Number(e.target.value)})
+                                      }
+                                     
+                                    }}
+                                  />
 
-                  <div className="col-6">
-                      <div className="form-group">
-                        <label>Waybill</label>
-                        <div className="input-groupicon">
-                          <input
-                            type="text"
-                            placeholder=""
-                          />
-                          
-                        </div>
-                      </div>
-                    </div>
+                                </div>
+                              </div>
+                            </div>
 
-                    <div className="col-6">
-                        <div className="form-group">
-                          <label>Cheque No</label>
-                          <div className="input-groupicon">
-                            <input
-                              type="text"
-                              placeholder=""
-                            />
-                            
+                            <div className="col-6">
+                              <div className="form-group">
+                                <label>Receipt No </label>
+                                <div className="input-groupicon">
+                                  <input
+                                    type="text"
+                                    placeholder=""
+                                    value={paymentInfo.cashReceiptNo}
+                                    onChange={(e) => setPaymentInfo({...paymentInfo, cashReceiptNo: e.target.value})}
+                                  />
+
+                                </div>
+                              </div>
+                            </div>
+
                           </div>
-                        </div>
-                      </div>
+                        </div> : null}
+                        {activeTab == 'Cheque' ? <div id="cheque-tab" style={{ marginTop: 20 }}>
+                          <div className="row">
+
+                            <div className="col-6">
+                              <div className="form-group">
+                                <label>Waybill</label>
+                                <div className="input-groupicon">
+                                  <input
+                                    type="text"
+                                    placeholder=""
+                                    value={paymentInfo.chequeWaybill}
+                                    onChange={(e) => setPaymentInfo({...paymentInfo, chequeWaybill: e.target.value})}
+                                  />
+
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="col-6">
+                              <div className="form-group">
+                                <label>Cheque No</label>
+                                <div className="input-groupicon">
+                                  <input
+                                    type="text"
+                                    placeholder=""
+                                    value={paymentInfo.chequeNo}
+                                    onChange={(e) => setPaymentInfo({...paymentInfo, chequeNo: e.target.value})}
+                                  />
+
+                                </div>
+                              </div>
+                            </div>
 
 
-                      <div className="col-6">
-                      <div className="form-group">
-                        <label>Receipt No</label>
-                        <div className="input-groupicon">
-                          <input
-                            type="text"
-                            placeholder=""
-                          />
-                          
-                        </div>
-                      </div>
-                    </div>
+                            <div className="col-6">
+                              <div className="form-group">
+                                <label>Receipt No</label>
+                                <div className="input-groupicon">
+                                  <input
+                                    type="text"
+                                    placeholder=""
+                                    value={paymentInfo.chequeReceiptNo}
+                                    onChange={(e) => setPaymentInfo({...paymentInfo, chequeReceiptNo: e.target.value})}
+                                  />
 
-                      <div className="col-6">
-                      <div className="form-group">
-                        <label>Due Date</label>
-                        <div className="input-groupicon">
-                          <input
-                            type="date"
-                            placeholder=""
-                            className="form-control"
-                          />
-                          
-                        </div>
-                      </div>
-                    </div>
+                                </div>
+                              </div>
+                            </div>
 
-                    <div className="col-6">
-                      <div className="form-group">
-                        <label>Bank</label>
-                        <div className="input-groupicon">
-                          <input
-                            type="text"
-                            placeholder=""
-                          />
-                          
-                        </div>
-                      </div>
-                    </div>
+                            <div className="col-6">
+                              <div className="form-group">
+                                <label>Due Date</label>
+                                <div className="input-groupicon">
+                                  <input
+                                    type="date"
+                                    placeholder=""
+                                    className="form-control"
+                                    value={paymentInfo.dueDate}
+                                    onChange={(e) => setPaymentInfo({...paymentInfo, dueDate: e.target.value})}
+                                  />
 
-                      
+                                </div>
+                              </div>
+                            </div>
 
-                      <div className="col-6">
-                        <div className="form-group">
-                          <label>Amount</label>
-                          <div className="input-groupicon">
-                            <input
-                              type="text"
-                              placeholder=""
-                            />
-                            
+                            <div className="col-6">
+                              <div className="form-group">
+                                <label>Bank</label>
+                                <div className="input-groupicon">
+                                  <input
+                                    type="text"
+                                    placeholder=""
+                                    value={paymentInfo.bank}
+                                    onChange={(e) => setPaymentInfo({...paymentInfo, bank: e.target.value})}
+                                  />
+
+                                </div>
+                              </div>
+                            </div>
+
+
+
+                            <div className="col-6">
+                              <div className="form-group">
+                                <label>Amount</label>
+                                <div className="input-groupicon">
+                                  <input
+                                    type="text"
+                                    placeholder=""
+                                    value={paymentInfo.chequeAmount}
+                                    onChange={(e) => {
+                                      if(e.target.value == ''){
+                                        setPaymentInfo({...paymentInfo, chequeAmount: ''})
+                                      }
+                                      else if(isValidNumber(e.target.value)){
+                                        setPaymentInfo({...paymentInfo, chequeAmount: Number(e.target.value)})
+                                      }
+                              
+                                    }}
+                                  />
+
+                                </div>
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      </div>
-                  </div>
-                   
-                </div> : null}
-                {activeTab == 'momo' ? <div id="momo-tab" style={{marginTop:20}}>
-                  <div className="row">
-                  <div className="col-6">
-                      <div className="form-group">
-                        <label>Receipt No</label>
-                        <div className="input-groupicon">
-                          <input
-                            type="text"
-                            placeholder=""
-                          />
-                          
-                        </div>
-                      </div>
-                    </div>
+
+                        </div> : null}
+                        {activeTab == 'Momo' ? <div id="momo-tab" style={{ marginTop: 20 }}>
+                          <div className="row">
+                            <div className="col-6">
+                              <div className="form-group">
+                                <label>Receipt No</label>
+                                <div className="input-groupicon">
+                                  <input
+                                    type="text"
+                                    placeholder=""
+                                    value={paymentInfo.momoReceiptNo}
+                                    onChange={(e) => setPaymentInfo({...paymentInfo, momoReceiptNo: e.target.value})}
+                                  />
+
+                                </div>
+                              </div>
+                            </div>
 
 
-                    <div className="col-6">
-                      <div className="form-group">
-                        <label>Name</label>
-                        <div className="input-groupicon">
-                          <input
-                            type="text"
-                            placeholder=""
-                          />
-                          
-                        </div>
-                      </div>
-                    </div>
+                            <div className="col-6">
+                              <div className="form-group">
+                                <label>Name</label>
+                                <div className="input-groupicon">
+                                  <input
+                                    type="text"
+                                    placeholder=""
+                                    value={paymentInfo.momoName}
+                                    onChange={(e) => setPaymentInfo({...paymentInfo, momoName: e.target.value})}
+                                  />
 
-                    <div className="col-6">
-                      <div className="form-group">
-                        <label>Amount</label>
-                        <div className="input-groupicon">
-                          <input
-                            type="text"
-                            placeholder=""
-                          />
-                          
-                        </div>
-                      </div>
-                    </div>
+                                </div>
+                              </div>
+                            </div>
 
-                    <div className="col-6">
-                      <div className="form-group">
-                        <label>Transaction ID</label>
-                        <div className="input-groupicon">
-                          <input
-                            type="text"
-                            placeholder=""
-                          />
-                          
-                        </div>
+                            <div className="col-6">
+                              <div className="form-group">
+                                <label>Amount</label>
+                                <div className="input-groupicon">
+                                  <input
+                                    type="text"
+                                    placeholder=""
+                                    value={paymentInfo.momoAmount}
+                                    onChange={(e) => {
+                                      if(e.target.value == ''){
+                                        setPaymentInfo({...paymentInfo, momoAmount: ''})
+                                      }
+                                      else if(isValidNumber(e.target.value)){
+                                        setPaymentInfo({...paymentInfo, momoAmount: Number(e.target.value)})
+                                      }
+                              
+                                    }}
+                                  />
+
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="col-6">
+                              <div className="form-group">
+                                <label>Transaction ID</label>
+                                <div className="input-groupicon">
+                                  <input
+                                    type="text"
+                                    placeholder=""
+                                    value={paymentInfo.transactionID}
+                                    onChange={(e) => setPaymentInfo({...paymentInfo, transactionID: e.target.value})}
+                                  />
+
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                        </div> : null}
                       </div>
-                    </div>
-                  </div>
-                   
-                </div> :null}
-                </div>
             </div>
           </div>
         </div>
 
 
 
-        <div style={{width:'50%', height: 'auto'}}>
+        <div style={{width:'60%', height: 'auto'}}>
         <div className="card" >
           <div className="card-body">
               <div className="row">
                 <div className="col-lg-12">
                 <div className="row" >
-                <div className="table-responsive mb-3" style={{height:300, maxHeight:720, overflow:'auto'}}>
+                <div className="table-responsive mb-3" style={{height:830, maxHeight:900, overflow:'auto'}}>
                   <table className="table">
                     <thead>
                       <tr>
@@ -800,13 +995,9 @@ const Addsales = () => {
                             <tr>
                             <td>{i+1}</td>
                             <td>
-                            {/* <td className="productimgname"> */}
-                              {/* <Link className="product-img">
-                                <img src={Product7} alt="product" />
-                              </Link> */}
                               <Link to="#">{item.name}</Link>
                             </td>
-                            <td>{item?.expDate}</td>
+                            <td>{item?.expireDate}</td>
                             <td>{item.quantity}</td>
                             <td>{item.unitPrice}</td>
                             <td>{item.amount}</td>
@@ -845,7 +1036,7 @@ const Addsales = () => {
                     <ul>
                       <li>
                         <h4>Amount Given</h4>
-                        <h5>GHS 0.00 </h5>
+                        <h5>GHS {moneyInTxt(paymentInfo?.amountPaid)} </h5>
                       </li>
                       <li>
                         <h4>Discount </h4>
@@ -863,7 +1054,7 @@ const Addsales = () => {
                       </li>
                       <li>
                         <h4>Balance</h4>
-                        <h5>GHS 0.00</h5>
+                        <h5>GHS {moneyInTxt(Math.abs(Number(productGridData.reduce((total, item) => total + item.amount, 0)) - Number(paymentInfo.amountPaid)))}</h5>
                       </li>
                      
                     </ul>
@@ -882,16 +1073,16 @@ const Addsales = () => {
 
               <div className="row mt-2">
                 <div className="col-lg-12" style={{display:'flex', justifyContent:'space-between'}} >
-                  <button className="btn btn-info me-2" onClick={handleInvoice} style={{width:'20%'}}>
+                  <button className="btn btn-info me-2" onClick={() => processPayment("Paid", true)} style={{width:'20%'}}>
                     Sell and Print
                   </button>
-                  <button className="btn btn-warning me-2" onClick={handleNoInvoice} style={{width:'20%'}}>
+                  <button className="btn btn-warning me-2" onClick={() => processPayment("Paid", false)} style={{width:'20%'}}>
                     Sell Only
                   </button>
-                  <button className="btn btn-danger me-2" style={{width:'20%'}} onClick={handleCredit} >
+                  <button className="btn btn-danger me-2" style={{width:'20%'}} onClick={() => processPayment("Credit", true)} >
                     Credit and Print
                   </button>
-                  <button  className="btn btn-cancel" style={{width:'20%'}} onClick={handleCredit}>
+                  <button  className="btn btn-cancel" style={{width:'20%'}} onClick={() => processPayment("Credit", false)}>
                      Credit Only
                   </button>
                   
@@ -907,7 +1098,7 @@ const Addsales = () => {
         
         </div>
 
-{/* Modal Edit */}
+          {/* Modal Edit */}
            <div
             className="modal fade"
             id="editproduct"
@@ -1006,7 +1197,7 @@ const Addsales = () => {
           <div className="modal-dialog modal-md modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">Reference Number - {referenceData?.reference}</h5>
+                <h5 className="modal-title">Reference Number - <span style={{fontSize:40}}>{referenceData?.reference}</span> </h5>
                 <button
                   type="button"
                   className="btn-close"

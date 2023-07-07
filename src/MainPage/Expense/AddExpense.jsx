@@ -21,7 +21,7 @@ import "../../../node_modules/alertifyjs/build/css/alertify.css";
 import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
 
 const AddExpense = () => {
-  const [startDate, setStartDate] = useState(new Date());
+  const [startDate, setStartDate] = useState(new Date().toISOString().substring(0,10));
   const [otherCategory, setOtherCategory] = useState('')
   const [formData, setFormData] = useState({amount:'', description:'', expenseFor:'', category:''})
   const [isLoading, setIsLoading] = useState(false)
@@ -65,7 +65,7 @@ const AddExpense = () => {
     })
     .finally(() => {
       setFormData({amount:'', description:'', expenseFor:'', category:''})
-      setStartDate(new Date())
+      setStartDate(new Date().toISOString().substring(0,10))
       setIsLoading(false)
     })
   }

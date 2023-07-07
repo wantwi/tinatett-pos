@@ -140,9 +140,9 @@ const ProductList = () => {
             <Link className="me-3" to={{ pathname:`/tinatett-pos/product/editproduct`, state:record}} title="Edit Product">
               <img src={EditIcon} alt="img" />
             </Link>
-            <Link className="confirm-text" to="#" onClick={confirmText} title="Delete Product">
+            {/* <Link className="confirm-text" to="#" onClick={confirmText} title="Delete Product">
               <img src={DeleteIcon} alt="img" />
-            </Link>
+            </Link> */}
           </>
         </>
       ),

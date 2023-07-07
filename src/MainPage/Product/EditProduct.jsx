@@ -104,7 +104,7 @@ const EditProduct = () => {
                 <div className="col-lg-6 col-sm-6 col-12">
                   <div className="form-group">
                     <label>Product Name</label>
-                    <input type="text"  {...register("name")} />
+                    <input type="text"  {...register("name")} disabled/>
                   </div>
                 </div>
                 <div className="col-lg-6 col-sm-6 col-12">

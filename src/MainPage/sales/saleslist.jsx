@@ -110,15 +110,16 @@ const SalesList = () => {
 
   const columns = [
     {
-      title: "Costumer name",
-      dataIndex: "Name",
-      sorter: (a, b) => a.Name.length - b.Name.length,
-    },
-    {
       title: "Date",
       dataIndex: "Date",
       sorter: (a, b) => a.Date.length - b.Date.length,
     },
+    {
+      title: "Customer name",
+      dataIndex: "Name",
+      sorter: (a, b) => a.Name.length - b.Name.length,
+    },
+   
     {
       title: "Reference",
       dataIndex: "Reference",
@@ -156,17 +157,7 @@ const SalesList = () => {
       dataIndex: "Total",
       sorter: (a, b) => a.Total.length - b.Total.length,
     },
-    {
-      title: "Paid (GHS)",
-      dataIndex: "Paid",
-      render: (text, record) => (
-        <>
-          { <div className="text-green">{moneyInTxt(text)}</div>}
-          {/* {text === 0 && <div>{moneyInTxt(text)}</div>} */}
-        </>
-      ),
-      sorter: (a, b) => a.Paid.length - b.Paid.length,
-    },
+   
     // {
     //   title: "Due (GHS)",
     //   dataIndex: "Due",

@@ -18,13 +18,14 @@ import {
   PlusIcon,
   //EditIcon,
   Dollar1,
- // plusCircle,
+  // plusCircle,
   Download,
   pause1,
   delete1,
   //DeleteIcon,
   datepicker,
   DeleteIcon,
+  EditIcon,
 } from "../../EntryFile/imagePath";
 import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
@@ -47,27 +48,27 @@ const Suspended = () => {
   const [activeTab, setActiveTab] = useState('Cash')
   const [modalData, setModalData] = useState(null)
   const [paymentInfo, setPaymentInfo] = useState({
-    type:'',
-    cashWaybill:'',
-    cashReceiptNo:'',
-    cashAmount:'',
-    chequeNo:'',
-    chequeReceiptNo:'',
-    chequeAmount:'',
-    chequeWaybill:'',
-    dueDate:'',
-    bank:'',
-    momoName:'',
-    momoReceiptNo:'',
-    momoAmount:'' ,
-    transactionID:'',
-    amountPaid:''
-     
+    type: '',
+    cashWaybill: '',
+    cashReceiptNo: '',
+    cashAmount: '',
+    chequeNo: '',
+    chequeReceiptNo: '',
+    chequeAmount: '',
+    chequeWaybill: '',
+    dueDate: '',
+    bank: '',
+    momoName: '',
+    momoReceiptNo: '',
+    momoAmount: '',
+    transactionID: '',
+    amountPaid: ''
+
   })
 
 
   useEffect(() => {
-   setPaymentInfo({...paymentInfo, amountPaid: Number(paymentInfo.cashAmount) + Number(paymentInfo.chequeAmount) + Number(paymentInfo.momoAmount)})
+    setPaymentInfo({ ...paymentInfo, amountPaid: Number(paymentInfo.cashAmount) + Number(paymentInfo.chequeAmount) + Number(paymentInfo.momoAmount) })
   }, [paymentInfo.cashAmount, paymentInfo.chequeAmount, paymentInfo.momoAmount])
 
   const {
@@ -108,96 +109,104 @@ const Suspended = () => {
 
   const axios = useCustomApi()
 
-  const processPayment = (type, print) =>{
-    let pType = ''
-    if(paymentInfo.cashAmount > 0){
-      pType = pType.concat('Cash,')
+  const processPayment = (type, print) => {
+    if (Number(paymentInfo.cashAmount) + Number(paymentInfo.cashAmount) + Number(paymentInfo.cashAmount) > 0) {
+      let pType = ''
+      if (paymentInfo.cashAmount > 0) {
+        pType = pType.concat('Cash,')
+      }
+      if (paymentInfo.momoAmount > 0) {
+        pType =
+          pType.concat('Momo,')
+      }
+      if (paymentInfo.chequeAmount > 0) {
+        pType = pType.concat('Cheque,')
+      }
+      let payload = {
+        status: type,
+        salesRef: modalData.Reference,
+        amount: modalData?.Total,
+        paymentType: pType,
+        paymentInfo: [
+          { "type": "Cash", waybill: paymentInfo.cashWaybill, amountPaid: paymentInfo.cashAmount },
+          { "type": "Momo", name: paymentInfo.momoName, receiptNo: paymentInfo.momoReceiptNo, amountPaid: paymentInfo.momoAmount },
+          { "type": "Cheque", waybill: paymentInfo.chequeWaybill, chequeNo: paymentInfo.chequeNo, chequeReceiptNo: paymentInfo.chequeReceiptNo, amountPaid: paymentInfo.chequeAmount, waybill: paymentInfo.chequeWaybill }
+        ]
+      }
+
+      // console.log(payload)
+      axios.post('/sales', payload)
+        .then((res) => {
+          console.log(res.data.success)
+          if (res.data.success) {
+            if (print) {
+              getInvoiceReceipt(modalData.Reference)
+            }
+            alertify.set("notifier", "position", "top-right");
+            alertify.success("Sale completed.");
+
+          }
+        })
+        .catch((error) => {
+          alertify.set("notifier", "position", "top-right");
+          alertify.error("Error...Could not complete transaction");
+        })
+        .finally(() => {
+          setPaymentInfo({
+            type: '',
+            cashWaybill: '',
+            cashReceiptNo: '',
+            cashAmount: '',
+            chequeNo: '',
+            chequeReceiptNo: '',
+            chequeAmount: '',
+            chequeWaybill: '',
+            dueDate: '',
+            bank: '',
+            momoName: '',
+            momoReceiptNo: '',
+            momoAmount: '',
+            transactionID: '',
+            amountPaid: ''
+          })
+          setTimeout(() => {
+            $('.modal').modal('hide')
+            //window.location.reload()
+          }, 1500)
+          //
+        })
     }
-    if(paymentInfo.momoAmount > 0){
-      pType = 
-      pType.concat('Momo,')
-    }
-    if(paymentInfo.chequeAmount > 0){
-      pType = pType.concat('Cheque,')
-    }
-    let payload = {
-      status: type,
-      salesRef:modalData.Reference,
-      amount:modalData?.Total,
-      paymentType: pType,
-      paymentInfo: [
-        {"type":"Cash", waybill:paymentInfo.cashWaybill, amountPaid: paymentInfo.cashAmount },
-        {"type":"Momo", name: paymentInfo.momoName,  receiptNo: paymentInfo.momoReceiptNo, amountPaid: paymentInfo.momoAmount},
-        {"type":"Cheque", waybill: paymentInfo.chequeWaybill,  chequeNo: paymentInfo.chequeNo, chequeReceiptNo: paymentInfo.chequeReceiptNo, amountPaid: paymentInfo.chequeAmount, waybill: paymentInfo.chequeWaybill}
-      ]
+    else {
+      alertify.set("notifier", "position", "top-right");
+      alertify.warning("Please enter an amount first");
     }
 
-    console.log(payload)
-    axios.post('/sales',payload)
-    .then((res) => {
-      console.log(res.data.success)
-      if(res.data.success){
-        if(print){
-          getInvoiceReceipt(modalData.Reference)
-        }
-        alertify.set("notifier", "position", "top-right");
-        alertify.success("Sale completed.");
-       
-      }
-    })
-    .catch((error) => {
-      alertify.set("notifier", "position", "top-right");
-      alertify.error("Error...Could not complete transaction");
-    })
-    .finally(() => {
-      setPaymentInfo({type:'',
-      cashWaybill:'',
-      cashReceiptNo:'',
-      cashAmount:'',
-      chequeNo:'',
-      chequeReceiptNo:'',
-      chequeAmount:'',
-      chequeWaybill:'',
-      dueDate:'',
-      bank:'',
-      momoName:'',
-      momoReceiptNo:'',
-      momoAmount:'' ,
-      transactionID:'',
-      amountPaid:''
-     })
-      setTimeout(() => {
-        $('.modal').modal('hide')
-        // window.location.reload()
-      }, 1500)
-      //
-    })
 
   }
 
   const getInvoiceReceipt = (salesref) => {
-    axios.get('/sales/getSaleReceipt/'+ salesref)
-    .then((res) =>{
-    console.log(res.data)
-    var base64 = res.data.base64
-    const blob = base64ToBlob( base64, 'application/pdf' );
-    const url = URL.createObjectURL( blob );
-    const pdfWindow = window.open("");
-    pdfWindow.document.write("<iframe width='100%' height='100%' src='" + url + "'></iframe>");
-    })
-    
-    function base64ToBlob( base64, type = "application/octet-stream" ) {
-      const binStr = atob( base64 );
+    axios.get('/sales/getSaleReceipt/' + salesref)
+      .then((res) => {
+        console.log(res.data)
+        var base64 = res.data.base64
+        const blob = base64ToBlob(base64, 'application/pdf');
+        const url = URL.createObjectURL(blob);
+        const pdfWindow = window.open("");
+        pdfWindow.document.write("<iframe width='100%' height='100%' src='" + url + "'></iframe>");
+      })
+
+    function base64ToBlob(base64, type = "application/octet-stream") {
+      const binStr = atob(base64);
       const len = binStr.length;
       const arr = new Uint8Array(len);
       for (let i = 0; i < len; i++) {
-        arr[ i ] = binStr.charCodeAt( i );
+        arr[i] = binStr.charCodeAt(i);
       }
-      return new Blob( [ arr ], { type: type } );
+      return new Blob([arr], { type: type });
     }
   }
 
- 
+
 
 
   const options = [
@@ -213,95 +222,63 @@ const Suspended = () => {
 
 
   useEffect(() => {
-    if(!isLoading){
-      let mappedData =  sales?.data.map((sale) => {
-          return {
-            id: sale?.id,
-            Date: sale?.transDate,
-            Name: sale?.customer?.name || 'N/A',
-            Status: sale?.status,
-            Reference: sale?.salesRef,
-            Payment: sale?.paymentType,
-            Total: moneyInTxt(sale?.totalAmount),
-            Paid: sale?.changeAmt,
-            Due: sale?.balance,
-            Biller: sale?.salesPerson,
-            salestype: sale?.salesType
-          }
-        })
+    if (!isLoading) {
+      let mappedData = sales?.data.map((sale) => {
+        return {
+          id: sale?.id,
+          Date: sale?.transDate,
+          Name: sale?.customer?.name || 'N/A',
+          Status: sale?.status,
+          Reference: sale?.salesRef,
+          Payment: sale?.paymentType,
+          Total: moneyInTxt(sale?.totalAmount),
+          Paid: sale?.changeAmt,
+          Due: sale?.balance,
+          Biller: sale?.salesPerson,
+          salestype: sale?.salesType
+        }
+      })
       setData(mappedData)
       console.log('loaded..')
     }
-    else{
+    else {
       console.log('loading...')
     }
   }, [isLoading])
 
   const columns = [
     {
-      title: "Costumer name",
-      dataIndex: "Name",
-      sorter: (a, b) => a.Name.length - b.Name.length,
-    },
-    {
       title: "Date",
       dataIndex: "Date",
       sorter: (a, b) => a.Date.length - b.Date.length,
     },
     {
+      title: "Customer name",
+      dataIndex: "Name",
+      sorter: (a, b) => a.Name.length - b.Name.length,
+    },
+
+    {
       title: "Reference",
       dataIndex: "Reference",
       sorter: (a, b) => a.Reference.length - b.Reference.length,
+    },
+
+    {
+      title: "Amt Due (GHS)",
+      dataIndex: "Total",
+      sorter: (a, b) => a.Total.length - b.Total.length,
     },
     {
       title: "Sales Type",
       dataIndex: "salestype",
       render: (text, record) => (
         <>
-         <p>{text}</p>
+          <p>{text}</p>
         </>
       ),
       sorter: (a, b) => a.salestype.length - b.salestype.length,
     },
-    // {
-    //   title: "Payment",
-    //   dataIndex: "Payment",
-    //   render: (text, record) => (
-    //     <>
-         
-    //         <span className="badges bg-lightgreen">{(text)}</span>
-        
-    //     </>
-    //   ),
-    //   sorter: (a, b) => a.Payment.length - b.Payment.length,
-    // },
-    {
-      title: "Amt Due (GHS)",
-      dataIndex: "Total",
-      sorter: (a, b) => a.Total.length - b.Total.length,
-    },
-    //{
-    //   title: "Paid (GHS)",
-    //   dataIndex: "Paid",
-    //   render: (text, record) => (
-    //     <>
-    //       {text === 100 && <div className="text-green">{moneyInTxt(text)}</div>}
-    //       {text === 0 && <div>{moneyInTxt(text)}</div>}
-    //     </>
-    //   ),
-    //   sorter: (a, b) => a.Paid.length - b.Paid.length,
-    // },
-    // {
-    //   title: "Due (GHS)",
-    //   dataIndex: "Due",
-    //   render: (text, record) => (
-    //     <>
-    //       {text === 100 && <div className="text-red">{moneyInTxt(text)}</div>}
-    //       {text === 0 && <div>{moneyInTxt(text)}</div>}
-    //     </>
-    //   ),
-    //   sorter: (a, b) => a.Due.length - b.Due.length,
-    // },
     {
       title: "Biller",
       dataIndex: "Biller",
@@ -311,46 +288,37 @@ const Suspended = () => {
       title: "Action",
       render: (text, record) => (
         <>
-        
-              {/* <li>
+
+          {/* <li>
                 <Link to="/tinatett-pos/sales/sales-details" className="dropdown-item">
                   <img src={Eye1} className="me-2" alt="img" />
                   Sale Detail
                 </Link>
               </li>
-              <li>
-                <Link to="/tinatett-pos/sales/edit-sales" className="dropdown-item">
-                  <img src={EditIcon} className="me-2" alt="img" />
-                  Edit Sale
-                </Link>
-              </li> */}
-            
-                <Link
+              */}
+
+          {/* <Link
                   to="#"
-                  // className="dropdown-item"
                   data-bs-toggle="modal"
                   data-bs-target="#showpayment"
                   onClick={() => setModalData(record)}
                   title={'Pay'}
                 >
-                  {/* <img src={Dollar1} className="me-2" alt="img" /> */}
+                
                   <span className="badges bg-lightgreen me-2"><FeatherIcon icon="credit-card"/> Pay</span>
-                  {/* Pay */}
-                </Link>
-             
-      
-                <Link
-                  to="#"
-                  // className="dropdown-item confirm-text"
-                  onClick={confirmText}
-                  title={'Remove'}
-                >
-                  
-                  <span className="badges bg-lightred"><FeatherIcon icon="trash"/> Remove</span>
-                  {/* Remove  */}
-                </Link>
-             
-            
+                 
+                </Link> */}
+
+          <Link to="/tinatett-pos/sales/edit-sales" title={'Edit'}>
+            <span className="badges btn-cancel me-2"><FeatherIcon icon="edit" />  Edit</span>
+          </Link>
+
+
+          <Link to="#" onClick={confirmText} title={'Remove'}>
+            <span className="badges bg-lightred"><FeatherIcon icon="trash" /> Remove</span>
+          </Link>
+
+
         </>
       ),
     },
@@ -480,7 +448,7 @@ const Suspended = () => {
                                     type="text"
                                     placeholder=""
                                     value={paymentInfo.cashWaybill}
-                                    onChange={(e) => setPaymentInfo({...paymentInfo, cashWaybill: e.target.value})}
+                                    onChange={(e) => setPaymentInfo({ ...paymentInfo, cashWaybill: e.target.value })}
                                   />
 
                                 </div>
@@ -496,13 +464,13 @@ const Suspended = () => {
                                     placeholder=""
                                     value={paymentInfo.cashAmount}
                                     onChange={(e) => {
-                                      if(e.target.value == ''){
-                                        setPaymentInfo({...paymentInfo, cashAmount: ''})
+                                      if (e.target.value == '') {
+                                        setPaymentInfo({ ...paymentInfo, cashAmount: '' })
                                       }
-                                      else if(isValidNumber(e.target.value)){
-                                        setPaymentInfo({...paymentInfo, cashAmount: Number(e.target.value)})
+                                      else if (isValidNumber(e.target.value)) {
+                                        setPaymentInfo({ ...paymentInfo, cashAmount: Number(e.target.value) })
                                       }
-                                     
+
                                     }}
                                   />
 
@@ -518,7 +486,7 @@ const Suspended = () => {
                                     type="text"
                                     placeholder=""
                                     value={paymentInfo.cashReceiptNo}
-                                    onChange={(e) => setPaymentInfo({...paymentInfo, cashReceiptNo: e.target.value})}
+                                    onChange={(e) => setPaymentInfo({ ...paymentInfo, cashReceiptNo: e.target.value })}
                                   />
 
                                 </div>
@@ -538,7 +506,7 @@ const Suspended = () => {
                                     type="text"
                                     placeholder=""
                                     value={paymentInfo.chequeWaybill}
-                                    onChange={(e) => setPaymentInfo({...paymentInfo, chequeWaybill: e.target.value})}
+                                    onChange={(e) => setPaymentInfo({ ...paymentInfo, chequeWaybill: e.target.value })}
                                   />
 
                                 </div>
@@ -553,7 +521,7 @@ const Suspended = () => {
                                     type="text"
                                     placeholder=""
                                     value={paymentInfo.chequeNo}
-                                    onChange={(e) => setPaymentInfo({...paymentInfo, chequeNo: e.target.value})}
+                                    onChange={(e) => setPaymentInfo({ ...paymentInfo, chequeNo: e.target.value })}
                                   />
 
                                 </div>
@@ -569,7 +537,7 @@ const Suspended = () => {
                                     type="text"
                                     placeholder=""
                                     value={paymentInfo.chequeReceiptNo}
-                                    onChange={(e) => setPaymentInfo({...paymentInfo, chequeReceiptNo: e.target.value})}
+                                    onChange={(e) => setPaymentInfo({ ...paymentInfo, chequeReceiptNo: e.target.value })}
                                   />
 
                                 </div>
@@ -585,7 +553,7 @@ const Suspended = () => {
                                     placeholder=""
                                     className="form-control"
                                     value={paymentInfo.dueDate}
-                                    onChange={(e) => setPaymentInfo({...paymentInfo, dueDate: e.target.value})}
+                                    onChange={(e) => setPaymentInfo({ ...paymentInfo, dueDate: e.target.value })}
                                   />
 
                                 </div>
@@ -600,7 +568,7 @@ const Suspended = () => {
                                     type="text"
                                     placeholder=""
                                     value={paymentInfo.bank}
-                                    onChange={(e) => setPaymentInfo({...paymentInfo, bank: e.target.value})}
+                                    onChange={(e) => setPaymentInfo({ ...paymentInfo, bank: e.target.value })}
                                   />
 
                                 </div>
@@ -618,13 +586,13 @@ const Suspended = () => {
                                     placeholder=""
                                     value={paymentInfo.chequeAmount}
                                     onChange={(e) => {
-                                      if(e.target.value == ''){
-                                        setPaymentInfo({...paymentInfo, chequeAmount: ''})
+                                      if (e.target.value == '') {
+                                        setPaymentInfo({ ...paymentInfo, chequeAmount: '' })
                                       }
-                                      else if(isValidNumber(e.target.value)){
-                                        setPaymentInfo({...paymentInfo, chequeAmount: Number(e.target.value)})
+                                      else if (isValidNumber(e.target.value)) {
+                                        setPaymentInfo({ ...paymentInfo, chequeAmount: Number(e.target.value) })
                                       }
-                              
+
                                     }}
                                   />
 
@@ -644,7 +612,7 @@ const Suspended = () => {
                                     type="text"
                                     placeholder=""
                                     value={paymentInfo.momoReceiptNo}
-                                    onChange={(e) => setPaymentInfo({...paymentInfo, momoReceiptNo: e.target.value})}
+                                    onChange={(e) => setPaymentInfo({ ...paymentInfo, momoReceiptNo: e.target.value })}
                                   />
 
                                 </div>
@@ -660,7 +628,7 @@ const Suspended = () => {
                                     type="text"
                                     placeholder=""
                                     value={paymentInfo.momoName}
-                                    onChange={(e) => setPaymentInfo({...paymentInfo, momoName: e.target.value})}
+                                    onChange={(e) => setPaymentInfo({ ...paymentInfo, momoName: e.target.value })}
                                   />
 
                                 </div>
@@ -676,13 +644,13 @@ const Suspended = () => {
                                     placeholder=""
                                     value={paymentInfo.momoAmount}
                                     onChange={(e) => {
-                                      if(e.target.value == ''){
-                                        setPaymentInfo({...paymentInfo, momoAmount: ''})
+                                      if (e.target.value == '') {
+                                        setPaymentInfo({ ...paymentInfo, momoAmount: '' })
                                       }
-                                      else if(isValidNumber(e.target.value)){
-                                        setPaymentInfo({...paymentInfo, momoAmount: Number(e.target.value)})
+                                      else if (isValidNumber(e.target.value)) {
+                                        setPaymentInfo({ ...paymentInfo, momoAmount: Number(e.target.value) })
                                       }
-                              
+
                                     }}
                                   />
 
@@ -698,7 +666,7 @@ const Suspended = () => {
                                     type="text"
                                     placeholder=""
                                     value={paymentInfo.transactionID}
-                                    onChange={(e) => setPaymentInfo({...paymentInfo, transactionID: e.target.value})}
+                                    onChange={(e) => setPaymentInfo({ ...paymentInfo, transactionID: e.target.value })}
                                   />
 
                                 </div>
@@ -743,19 +711,19 @@ const Suspended = () => {
                     </div>
                   </div>
 
-                
-                  <div style={{ display: 'flex', flexDirection:'column', justifyContent: 'center', alignItems: 'center',  fontWeight: 900 }}>
-                    <div  style={{ display: 'flex', flexDirection:'column', width:'90%', gap:10}}>
-                    <Button  data-bs-dismiss="modal" color="#3085d6">{' Hold '} </Button>
-                    <Button  data-bs-dismiss="modal" color="#252525">Remove</Button>
-                    </div> 
-                    <span style={{fontSize: 20, marginTop:180, marginBottom:180}}>GHS {modalData?.Total}</span>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', fontWeight: 900 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', width: '90%', gap: 10 }}>
+                      <Button data-bs-dismiss="modal" color="#3085d6">{' Hold '} </Button>
+                      <Button data-bs-dismiss="modal" color="#252525">Remove</Button>
                     </div>
+                    <span style={{ fontSize: 20, marginTop: 180, marginBottom: 180 }}>GHS {modalData?.Total}</span>
+                  </div>
                 </div>
 
                 <div className="row mt-2">
                   <div className="col-lg-12" style={{ display: 'flex', justifyContent: 'space-between' }} >
-                  <button className="btn btn-info me-2" onClick={() => processPayment("Paid", true)} style={{ width: '20%' }}>
+                    <button className="btn btn-info me-2" onClick={() => processPayment("Paid", true)} style={{ width: '20%' }}>
                       Sell and Print
                     </button>
                     <button className="btn btn-warning me-2" onClick={() => processPayment("Paid", false)} style={{ width: '20%' }}>

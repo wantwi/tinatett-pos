@@ -198,7 +198,7 @@ const EditProforma = () => {
       if (!isError) {
         setTimeout(() => {
           setIsSubmitSuccessful(true)
-          $('#create').modal('show');
+          //$('#create').modal('show');
         }, 1500)
         setSelectedCustomer({})
         setSelectedProduct({})

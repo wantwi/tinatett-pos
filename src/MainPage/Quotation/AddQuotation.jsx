@@ -92,10 +92,21 @@ const AddQuotation = () => {
   }
 
   const handleAddItem = () => {
+    if(selectedProduct == null || selectedProduct == ''){
+      alertify.set("notifier", "position", "top-right");
+      alertify.warning("Please select a product first");
+    }
+    if(productFormData?.qty == ''){
+      alertify.set("notifier", "position", "top-right");
+      alertify.warning("Please provide a quantity first");
+    }
+    else{
       setProductGridData([...productGridData, productFormData])
       console.log(productGridData)
       setProductFormData({remainingStock: '', qty:''})
       setSelectedProduct('')
+    }
+      
   }
 
   const deleteRow = (record) => {
@@ -118,29 +129,37 @@ const AddQuotation = () => {
 
 
   const handleSubmit = () => {
-    setLoading(true)
-    const payload = {
-      requestDate: startDate,
-      products: productGridData.map((item) => {
-        return {
-          "productId": item.productId,
-           "quantity": item.qty,
-           "currentStock": item.remainingStock
+
+      if(productGridData.length <1){
+        alertify.set("notifier", "position", "top-right");
+        alertify.warning("Please add at least one product to the list");
+      }
+    else{
+      setLoading(true)
+      const payload = {
+        requestDate: startDate,
+        products: productGridData.map((item) => {
+          return {
+            "productId": item.productId,
+             "quantity": item.qty,
+             "currentStock": item.remainingStock
+          }
+        })
+      }
+  
+      //console.log(payload)
+      axios.post('/productRequest', payload)
+      .then((res) => {
+        if(res.data.success){
+          alertify.set("notifier", "position", "top-right");
+          alertify.success("Request successfully sent.");
+          setProductGridData([])
         }
       })
+      .catch((err) => alert(err))
+      .finally(() => setLoading(false))
     }
 
-    //console.log(payload)
-    axios.post('/productRequest', payload)
-    .then((res) => {
-      if(res.data.success){
-        alertify.set("notifier", "position", "top-right");
-        alertify.success("Request successfully sent.");
-        setProductGridData([])
-      }
-    })
-    .catch((err) => alert(err))
-    .finally(() => setLoading(false))
 
   }
 
@@ -229,10 +248,7 @@ const AddQuotation = () => {
                             if(e.target.value == ''){
                               setProductFormData({...productFormData, qty: ''})
                             }
-                            if(Number(e.target.value) > (productFormData?.remainingStock)){
-                              alertify.set("notifier", "position", "top-right");
-                              alertify.warning('Amount can not be greater than amount due')
-                            }
+                          
                             else{
                               let qty = parseInt(e.target.value) || 0
                               setProductFormData({ ...productFormData, qty: qty })

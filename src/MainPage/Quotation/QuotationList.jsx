@@ -14,6 +14,7 @@ import {
 } from "../../EntryFile/imagePath";
 import { useGet } from "../../hooks/useGet";
 import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
+import useCustomApi from "../../hooks/useCustomApi";
 
 const QuotationList = () => {
   const [inputfilter, setInputfilter] = useState(false);
@@ -24,6 +25,7 @@ const QuotationList = () => {
     isSuccess,
   } = useGet("productRequests", "/productRequest");
   const [data, setData] = useState([])
+
 
   const options = [
     { id: 1, text: "Choose Product", text: "Choose Product" },
@@ -48,7 +50,9 @@ const QuotationList = () => {
     { id: 2, text: "150.00", text: "150.00" },
   ];
 
-  const confirmText = () => {
+  const axios = useCustomApi()
+
+  const confirmText = (id) => {
     Swal.fire({
       title: "Are you sure?",
       text: "You won't be able to revert this!",
@@ -61,15 +65,35 @@ const QuotationList = () => {
       cancelButtonClass: "btn btn-danger ml-1",
       buttonsStyling: !1,
     }).then(function (t) {
-      t.value &&
+     // t.value &&
+
+     axios.delete(`/productRequest/${id}`)
+     .then((res) => {
+      if(res.status < 205){
         Swal.fire({
           type: "success",
           title: "Deleted!",
-          text: "Your file has been deleted.",
+          text: "Your record has been deleted.",
           confirmButtonClass: "btn btn-success",
         });
+        setTimeout(() => {
+          window.location.reload()
+        }, 1000)
+      }
+      else{
+        Swal.fire({
+          type: "error",
+          title: "Error!",
+          text: "Your record could not be deleted.",
+          confirmButtonClass: "btn btn-danger",
+        });
+      }
+     })
+
+       
     });
   };
+
   const togglefilter = (value) => {
     setInputfilter(value);
   };
@@ -142,7 +166,7 @@ const QuotationList = () => {
           <Link className="me-3" to= {{pathname:"/tinatett-pos/quotation/editquotation-quotation", state: record}}>
             <img src={EditIcon} alt="img" />
           </Link>
-          <Link className="confirm-text" to="#" onClick={confirmText}>
+          <Link className="confirm-text" to="#" onClick={() => confirmText(record?.id)}>
             <img src={DeleteIcon} alt="img" />
           </Link>
         </>
@@ -164,7 +188,7 @@ const QuotationList = () => {
                 className="btn btn-added"
               >
                 <img src={PlusIcon} alt="img" className="me-1" />
-                Add New Quoation
+                Add New Request
               </Link>
             </div>
           </div>

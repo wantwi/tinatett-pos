@@ -13,6 +13,7 @@ import {
   Printer,
   MinusIcon,
   Plus,
+  EditIcon,
 } from "../../EntryFile/imagePath";
 import Select from "react-select";
 import "react-select2-wrapper/css/select2.css";
@@ -47,6 +48,7 @@ const AddTransfer = () => {
   const [selectedCustomer, setSelectedCustomer] = useState('')
   const [selectedCustomerPrint, setSelectedCustomerPrint] = useState('')
   const [formData, setFormData] = useState({quantity:'', amount:'', batchNumber:{}, manuDate:'', expDate:''})
+  const [editFormData, setEditFormData] = useState({quantity:'', amount:'', batchNumber:{}, manuDate:'', expDate:''})
   const [productGridData, setProductGridData] = useState([])
   const [printGridData, setPrintGridData] = useState([])
   const [transDate, setTransDate] = useState(new Date().toISOString().slice(0, 10));
@@ -220,6 +222,23 @@ const AddTransfer = () => {
     location.reload()
   }
 
+  const deleteRow = (record) => {
+    console.log(record)
+    // console.log(productGridData)
+    let newGridData = productGridData.filter((item) => item.productId !== record.productId)
+    //console.log(newGridData)
+    setProductGridData(newGridData)
+  };
+
+  const handleUpdate = ()=> {
+    let updated = editFormData
+    let listCopy = [...productGridData]
+    let index = productGridData.findIndex(item => item.productId == updated.productId)
+    listCopy[index] = updated
+    setProductGridData(listCopy)
+    $('.modal').modal('hide')
+  }
+
 
   useEffect(() => {
     setFormData({ ...formData, amount: Number(formData.price) * Number(formData.quantity) || '' })
@@ -252,7 +271,7 @@ const AddTransfer = () => {
 
         <div style={{ display: 'flex', gap: 20 }}>
 
-          <div style={{ display: 'flex', flexDirection: 'column', width: '50%', }}>
+          <div style={{ display: 'flex', flexDirection: 'column', width: '40%', }}>
             <div className="card">
               {/* <form onSubmit={handleSubmit(onSubmit)}> */}
               <div className="card-body">
@@ -483,7 +502,7 @@ const AddTransfer = () => {
           </div>
 
 
-          <div className="card" style={{ width: '50%' }} >
+          <div className="card" style={{ width: '60%' }} >
             <div className="card-body">
               <div className="row">
                 <div className="table-responsive mb-3">
@@ -495,6 +514,7 @@ const AddTransfer = () => {
                         <th>Quantity</th>
                         <th>Unit Price</th>
                         <th>Amount</th>
+                        <th>Batch #</th>
                         <th>Action</th>
                         <th />
                       </tr>
@@ -510,9 +530,13 @@ const AddTransfer = () => {
                             <td>{item?.quantity}</td>
                             <td>{item?.unitPrice}</td>
                             <td>{item?.amount}</td>
+                            <td>{item?.batchNumber}</td>
 
                             <td>
-                              <Link to="#" className="delete-set">
+                              <Link to="#" className="delete-set me-2" data-bs-toggle="modal" data-bs-target="#editproduct" onClick={() => {setEditFormData(item)}}>
+                                <img src={EditIcon} alt="svg" />
+                              </Link>
+                              <Link to="#" className="delete-set" onClick={() => deleteRow(item)}>
                                 <img src={DeleteIcon} alt="svg" />
                               </Link>
                             </td>
@@ -555,14 +579,14 @@ const AddTransfer = () => {
                   </div>
                 </div>
                 <div className="col-lg-12" style={{ textAlign: 'right' }}>
-                  <button type="submit" className="btn btn-submit me-2" onClick={() => onSubmit(true)}><FeatherIcon icon="save" />
+                  <button type="submit" className="btn btn-submit me-2" data-bs-toggle="modal" data-bs-target="#confirm"><FeatherIcon icon="save" />
                     {" Invoice"}
                   </button>
                   {/* <Link id="printModalClick" to="#" className="btn btn-cancel me-2" style={{ backgroundColor: '#FF9F43' }} data-bs-toggle="modal"
                     data-bs-target="#create" >
                     Refresh
                   </Link> */}
-                  <button type="submit" className="btn btn-cancel me-2" onClick={() => onSubmit(false)}><FeatherIcon icon="" />
+                  <button type="submit" className="btn btn-cancel me-2" ><FeatherIcon icon="" />
                     {"No Invoice"}
                   </button>
                 </div>
@@ -575,6 +599,132 @@ const AddTransfer = () => {
 
       </div>
 
+
+        {/* Confirm Modal */}
+        <div
+        className="modal fade"
+        id="confirm"
+        tabIndex={-1}
+        aria-labelledby="confirm"
+        aria-hidden="true">
+
+          <div className="modal-dialog modal-md modal-dialog-centered" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                    <h5 className="modal-title">Confirm</h5>
+                    <button
+                    type="button"
+                    className="close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                    >
+                    <span aria-hidden="true">×</span>
+                </button>
+              </div>
+              <div className="modal-body">
+                Are you sure you want to complete this transfer?
+              </div>
+              <div className="modal-footer">
+                  <Link to="#" className="btn btn-submit me-2" data-bs-dismiss="modal" onClick={() =>onSubmit(false)}>
+                    Yes
+                  </Link>
+                  <Link to="#" className="btn btn-cancel" data-bs-dismiss="modal">
+                    No
+                </Link>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+
+        {/* Edit Modal */}
+  
+          <div
+            className="modal fade"
+            id="editproduct"
+            tabIndex={-1}
+            aria-labelledby="editproduct"
+            aria-hidden="true"
+          >
+            <div className="modal-dialog modal-md modal-dialog-centered">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">Edit Product</h5>
+                  <button
+                    type="button"
+                    className="close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                  >
+                    <span aria-hidden="true">×</span>
+                  </button>
+                </div>
+                <div className="modal-body">
+                  <div className="row">
+                    <div className="col-lg-12 col-sm-12 col-12">
+                      <div className="form-group">
+                        <label>Product Name</label>
+                        <div className="input-groupicon">
+                        <input type="text" value={editFormData?.name} onChange={(e) => setEditFormData({...editFormData, name:e.target.value})} disabled/>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="col-lg-6 col-sm-12 col-12">
+                      <div className="form-group">
+                        <label>Quantity</label>
+                        <input type="text" value={editFormData?.quantity}
+                         onChange={(e) => {
+                          if(e.target.value == ''){
+                            setEditFormData({...editFormData, quantity: ''})
+                          }
+                          else if (isValidNumber(e.target.value)) {
+                            let qty = parseInt(e.target.value) || 0
+                            let unitP = parseInt(editFormData.unitPrice) || 0
+                            setEditFormData({ ...editFormData, quantity: e.target.value, amount: editFormData.quantity ? unitP * qty : unitP * 1 })
+                          }
+                        }
+                        }/>
+                      </div>
+                    </div>
+                 
+                    <div className="col-lg-6 col-sm-12 col-12">
+                      <div className="form-group">
+                        <label>Unit Price</label>
+                        <input type="text" value={editFormData?.unitPrice} 
+                         onChange={(e) => {
+                          let unitP = parseInt(e.target.value) || 0
+                          let qty = parseInt(editFormData.quantity) || 0
+                          setEditFormData({ ...editFormData, unitPrice: e.target.value, amount: editFormData ? unitP * qty : unitP * 1 })
+                        }}
+                        />
+                      </div>
+                    </div>
+                    <div className="col-lg-6 col-sm-12 col-12">
+                      <div className="form-group">
+                        <label>Amount</label>
+                        <input type="text" value={editFormData?.amount} />
+                      </div>
+                    </div>
+                   
+                   
+                  </div>
+                </div>
+                <div className="modal-footer" style={{justifyContent:'flex-end'}}>
+                  <button type="button" className="btn btn-submit" onClick={handleUpdate}>
+                    Update
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-cancel"
+                    data-bs-dismiss="modal"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
 
       <div
         className="modal fade"

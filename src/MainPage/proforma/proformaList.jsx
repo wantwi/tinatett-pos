@@ -312,16 +312,12 @@ const ProformaList = () => {
           <span className="badges btn-primary me-2" style={{ cursor: 'pointer' }} data-bs-target="#transfer" data-bs-toggle="modal" onClick={() => getProformaProducts(record?.id)}>Transfer</span>
           {/* </Link> */}
 
-
-
           <Link
             to="#"
             // className="dropdown-item confirm-text"
             onClick={confirmText}
             title={'Delete'}
           >
-            {/* <img src={delete1} className="me-2" alt="img" /> */}
-            {/* <img src={DeleteIcon} alt="img" /> */}
             <span className="badges bg-lightred me-2">Delete</span>
 
           </Link>

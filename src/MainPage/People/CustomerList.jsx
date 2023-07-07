@@ -139,9 +139,9 @@ const CustomerList = () => {
           <Link className="me-3" to={{pathname:"/tinatett-pos/people/editcustomer", state:record}}>
             <img src={EditIcon} alt="img" />
           </Link>
-          <Link className="confirm-text" to="#" onClick={confirmText}>
+          {/* <Link className="confirm-text" to="#" onClick={confirmText}>
             <img src={DeleteIcon} alt="img" />
-          </Link>
+          </Link> */}
         </>
       ),
     },

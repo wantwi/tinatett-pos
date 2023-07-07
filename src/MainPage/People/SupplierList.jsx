@@ -72,12 +72,10 @@ const SupplierList = () => {
           gpsAddress: supplier.gpsAddress,
           creditPeriod: supplier.creditPeriod,
           product: supplier.product,
-          paymentInfo: {
-            type: supplier.paymentInfo.type,
-            accountNumber: supplier.paymentInfo.accountNumber,
-            branch: supplier.paymentInfo.branch,
-            serviceProvider: supplier.paymentInfo.serviceProvider
-          },
+          paymentInfo: supplier.paymentInfo,
+          cashDetails: supplier?.paymentInfo[0]?.details,
+          bankDetails: supplier?.paymentInfo[2]?.details,
+          momoDetails: supplier?.paymentInfo[1]?.details,
           createdBy: supplier.user.firstName + ' ' + supplier.user.lastName
         }
       })
@@ -135,9 +133,9 @@ const SupplierList = () => {
           <Link className="me-3" to={{pathname:"/tinatett-pos/people/editsupplier", state:record}}>
             <img src={EditIcon} alt="img" />
           </Link>
-          <Link className="confirm-text" to="#" onClick={confirmText}>
+          {/* <Link className="confirm-text" to="#" onClick={confirmText}>
             <img src={DeleteIcon} alt="img" />
-          </Link>
+          </Link> */}
         </>
       ),
     },

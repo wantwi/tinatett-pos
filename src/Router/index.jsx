@@ -22,6 +22,7 @@ import Users from '../MainPage/users'
 import Settings from '../MainPage/settings'
 import BlankPage from "../MainPage/BlankPage";
 import ProformaIndex from "../MainPage/proforma";
+import Cashier from "../MainPage/sales/cashier";
 
 export default [
     {
@@ -115,6 +116,10 @@ export default [
     {
         path:'Sales',
         component: Sales
+    },
+    {
+        path:'Cashier',
+        component: Cashier
     },
     {
         path:'Proforma',

@@ -22,20 +22,12 @@ const options = [
 ];
 
 const EditSupplier = () => {
-  const {state} = useLocation()
-  //console.log(state)
+  const { state } = useLocation()
+  console.log(state)
   const [formData, setFormData] = useState(state)
 
   const [customerType, setCustomerType] = useState(formData?.customerType)
 
-  const selectedPaymentt = options.find((item) => item.label.toLocaleLowerCase() == (formData.paymentInfo.type).toLowerCase())
-  const [paymentType, selectedPaymentType] = useState(selectedPaymentt)
-
-  const history = useHistory()
-
-  useEffect(() => {
-    console.log("Payment Type:", paymentType)
-  }, [paymentType])
 
 
   const validationSchema = Yup.object().shape({
@@ -57,7 +49,7 @@ const EditSupplier = () => {
     formState: { errors, isSubmitSuccessful },
   } = useForm({
     defaultValues: {
-      id:formData.id,
+      id: formData.id,
       name: formData.name,
       email: formData.email,
       contact: formData.contact,
@@ -70,32 +62,50 @@ const EditSupplier = () => {
       branch: formData.paymentInfo.branch,
       accountNumber: formData.paymentInfo.accountNumber,
       serviceProvider: formData.paymentInfo.serviceProvider,
-      customerType: customerType
+      customerType: customerType,
+      bankDetails:formData?.bankDetails,
+      cashDetails:formData?.cashDetails,
+      momoDetails: formData?.momoDetails
 
     },
     resolver: yupResolver(validationSchema),
   });
 
-  
-  const {isLoading, isError, mutate: updateMutate} = usePut(`/supplier/${getValues()?.id}`);
+
+  const { isLoading, isError, mutate: updateMutate } = usePut(`/supplier/${getValues()?.id}`);
 
 
 
   const onSubmit = (data) => {
     //console.log({ ...data, customerType: supplierType, paymentInfo: {"type": data.type, "accountNumber":data.accountNumber,"branch":data.branch,"serviceProvider":null} })
     let payload = {
-          "name":data.name,
-          "contact": data.contact,
-          "othercontact": data.othercontact,
-          "location": data.location,
-          "customerType": customerType,
-          "email":data.email,
-          "gpsAddress":data.gpsAddress,
-          "creditPeriod":data.creditPeriod,
-          "product":data.product,
-          paymentInfo: {"type": data.type, "accountNumber":data.accountNumber,"branch":data.branch,"serviceProvider":data.serviceProvider} 
-      }
-    
+      "name": data.name,
+      "contact": data.contact,
+      "othercontact": data.othercontact,
+      "location": data.location,
+      "customerType": customerType,
+      "email": data.email,
+      "gpsAddress": data.gpsAddress,
+      "creditPeriod": data.creditPeriod,
+      "product": data.product,
+      paymentInfo: [
+        {
+          type: 'cash',
+          details: data.cashDetails
+        },
+        {
+          type: 'momo',
+          details: data.momoDetails
+        },
+        {
+          type: 'bank',
+          details: data.bankDetails
+        },
+
+      ]
+      //paymentInfo: {"type": data.type, "accountNumber":data.accountNumber,"branch":data.branch,"serviceProvider":data.serviceProvider} 
+    }
+
     console.log(payload)
     updateMutate(payload)
   };
@@ -107,17 +117,17 @@ const EditSupplier = () => {
       alertify.success("Supplier updated successfully.");
       setTimeout(() => {
         history.push('/tinatett-pos/people/supplierlist')
-      })
+      }, 100)
     }
-    else if(isError){
+    else if (isError) {
       alertify.set("notifier", "position", "top-right");
       alertify.warning("Failed to update");
     }
     return () => { };
   }, [isSubmitSuccessful, isError, isLoading]);
 
-  if(isLoading){
-    return <LoadingSpinner message={'Please wait, updating..'}/>
+  if (isLoading) {
+    return <LoadingSpinner message={'Please wait, updating..'} />
   }
 
   return (
@@ -141,7 +151,7 @@ const EditSupplier = () => {
                       <input className={`form-control ${errors.name ? "is-invalid" : ""
                         }`}
                         type="text"
-                        {...register("name")} />
+                        {...register("name")} disabled />
                     </div>
                   </div>
 
@@ -152,7 +162,7 @@ const EditSupplier = () => {
                         <div class="col-lg-6">
                           <div class="input-group">
                             <div class="input-group-text">
-                              <input className="form-check-input" type="radio" name="customerType" value="0" checked={customerType == 0} onChange = {(e) => setCustomerType(e.target.value)} />
+                              <input className="form-check-input" type="radio" name="customerType" value="0" checked={customerType == 0} onChange={(e) => setCustomerType(e.target.value)} />
                             </div>
                             <input type="text" className="form-control" aria-label="Text input with radio button" value={'Company'} />
                           </div>
@@ -162,7 +172,7 @@ const EditSupplier = () => {
 
                           <div class="input-group">
                             <div class="input-group-text">
-                              <input className="form-check-input" type="radio" name="customerType" value="1" checked={customerType == 1} onChange = {(e) => setCustomerType(e.target.value)} />
+                              <input className="form-check-input" type="radio" name="customerType" value="1" checked={customerType == 1} onChange={(e) => setCustomerType(e.target.value)} />
                             </div>
                             <input type="text" className="form-control" aria-label="Text input with radio button" value={'Individual'} />
                           </div>
@@ -248,14 +258,46 @@ const EditSupplier = () => {
 
 
                   <fieldset>
-                   
-                    {/* <div className="col-lg-12">
+
+
+                    <div className="row">
+                    <div className="col-lg-4 col-sm-6 col-12">
+                        <div className="form-group">
+                          <label>Cash Details</label>
+                          <textarea className={`form-control ${errors.name ? "is-invalid" : ""
+                            }`}
+                            type="text"
+                            {...register("cashDetails")} ></textarea>
+                        </div>
+                      </div>
+
+                      <div className="col-lg-4 col-sm-6 col-12">
+                        <div className="form-group">
+                          <label>Bank Details</label>
+                          <textarea className={`form-control ${errors.name ? "is-invalid" : ""
+                            }`}
+                            type="text"
+                            {...register("bankDetails")} ></textarea>
+                        </div>
+                      </div>
+
+                      <div className="col-lg-4 col-sm-6 col-12">
+                        <div className="form-group">
+                          <label>Momo Details</label>
+                          <textarea className={`form-control ${errors.name ? "is-invalid" : ""
+                            }`}
+                            type="text"
+                            {...register("momoDetails")} ></textarea>
+                        </div>
+                      </div>
+
+                      {/* <div className="col-lg-12">
                       <div className="form-group">
                         <label>Description</label>
                         <textarea className="form-control" defaultValue={""} />
                       </div>
                     </div>  */}
-                    {/* <div className="col-lg-12">
+                      {/* <div className="col-lg-12">
                       <div className="form-group">
                         <label> Avatar</label>
                         <div className="image-upload">
@@ -268,72 +310,6 @@ const EditSupplier = () => {
                       </div>
                     </div> */}
 
-                    <div className="row">
-                      <div className="col-lg-4 col-sm-6 col-12">
-                        <div className="form-group">
-                          <label>Payment Type</label>
-                          <Select
-                            className="select"
-                            options={options}
-                            value={paymentType}
-                            onChange={(e) => selectedPaymentType(e)}
-                          />
-                          {/* <input className={`form-control ${errors.name ? "is-invalid" : ""
-                            }`}
-                            type="text"
-                            {...register("type")} /> */}
-                        </div>
-                      </div>
-
-                      {paymentType.label == "Cheque" ?(<div className="col-lg-4 col-sm-6 col-12">
-                        <div className="form-group">
-                          <label>Account Number</label>
-                          <input className={`form-control ${errors.name ? "is-invalid" : ""
-                            }`}
-                            type="text"
-                            {...register("accountNumber")} />
-                        </div>
-                      </div>) : null}
-
-                      { paymentType.label == "Momo" ? (<div className="col-lg-4 col-sm-6 col-12">
-                        <div className="form-group">
-                          <label>Momo Number</label>
-                          <input className={`form-control ${errors.name ? "is-invalid" : ""
-                            }`}
-                            type="text"
-                            {...register("accountNumber")} />
-                        </div>
-                      </div>) : null}
-
-                      {paymentType.label == "Cash" ? (<div className="col-lg-4 col-sm-6 col-12">
-                        <div className="form-group">
-                          <label>Waybill Number</label>
-                          <input className={`form-control ${errors.name ? "is-invalid" : ""
-                            }`}
-                            type="text"
-                            {...register("accountNumber")} />
-                        </div>
-                      </div>) : null}
-
-                      {paymentType.label == "Cheque" ? (<div className="col-lg-4 col-sm-6 col-12">
-                        <div className="form-group">
-                          <label>Branch</label>
-                          <input className={`form-control ${errors.name ? "is-invalid" : ""
-                            }`}
-                            type="text"
-                            {...register("branch")} />
-                        </div>
-                      </div>) : null}
-
-                      {paymentType.label == "Momo" ? (<div className="col-lg-4 col-sm-6 col-12">
-                        <div className="form-group">
-                          <label>Service Provider</label>
-                          <input className={`form-control ${errors.name ? "is-invalid" : ""
-                            }`}
-                            type="text"
-                            {...register("serviceProvider")} />
-                        </div>
-                      </div>) : null}
                     </div>
                   </fieldset>
 
@@ -341,8 +317,8 @@ const EditSupplier = () => {
                   <div className="col-lg-12" style={{ textAlign: 'right' }}>
                     <button type="submit" className="btn btn-submit me-2">Update</button>
                     <Link to="/tinatett-pos/people/supplierlist" className="btn btn-cancel">
-                    Cancel
-                  </Link>
+                      Cancel
+                    </Link>
                   </div>
                 </div>
               </form>
