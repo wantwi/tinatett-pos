@@ -148,6 +148,7 @@ const Cashier = () => {
         alertify.error("Error...Could not complete transaction");
       })
       .finally(() => {
+        setIsCredit(false)
         setPaymentInfo({type:'',
         cashWaybill:'',
         cashReceiptNo:'',
