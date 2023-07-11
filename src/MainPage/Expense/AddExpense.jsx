@@ -110,7 +110,15 @@ const AddExpense = () => {
 
   const handleSubmit = () => {
     let payload = {
-      expenseList: listData
+      expenseList: listData.map((item) => {
+        return {
+            "category": item.category,
+            "expenseDate": item.expenseDate,
+            "amount": item.amount,
+            "expenseFor":item.expenseFor,
+            "description": item.description
+        }
+      })
     }
 
     console.log(payload)
@@ -121,12 +129,14 @@ const AddExpense = () => {
       if(res.data.success){
         alertify.set("notifier", "position", "top-right");
         alertify.success("Expense successfully added.");
-       
+        setIsLoading(false)
+        setProductGridData([])
       }
     })
     .catch((error) => {
       alertify.set("notifier", "position", "top-right");
       alertify.error("Error...Could not complete transaction");
+      setIsLoading(false)
     })
     .finally(() => {
       setFormData({amount:'', description:'', expenseFor:'', category:''})

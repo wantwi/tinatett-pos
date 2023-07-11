@@ -23,9 +23,14 @@ export class ErrorBoundary extends Component {
     if (this.state.hasError) {
       return (
       <div style={{display:'flex', flexDirection:'column', height: '100vh', justifyContent:'center', alignItems:'center'}}>
-        <span>Ooops....Something went wrong. Click button below to return to home</span>
+        <span>Ooops....Something went wrong. Click button below to go back</span>
         <code>{this.state.error}</code>
-        <a className="btn btn-submit me-2" href="javascript: history.go(-1)">Back</a>
+        <a className="btn btn-submit me-2" href="#" onClick={() => {
+          history.go(-1); 
+          setTimeout(() => {
+            window.location.reload()
+          }, 100)
+        }}>Back</a>
         {/* <Link to="#" onClick={() => window.location.href = '/tinatett-pos/dashboard'} className="btn btn-submit me-2">Back to Home</Link> */}
      </div>)
     }

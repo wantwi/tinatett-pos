@@ -20,6 +20,7 @@ import Swal from "sweetalert2";
 import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 import { useGet } from "../../hooks/useGet";
 import useCustomApi from "../../hooks/useCustomApi";
+import { moneyInTxt } from "../../utility";
 
 const ExpenseList = () => {
   const [inputfilter, setInputfilter] = useState(false);
@@ -31,7 +32,7 @@ const ExpenseList = () => {
     if(!isLoading){
       let mappedData =  expenses?.data.map((expense) => {
           return {
-            ...expense, expenseDate: expense.expenseDate.substring(0,10)
+            ...expense, expenseDate: expense?.expenseDate.substring(0,10) || expense.expenseDate
           }
         })
       setData(mappedData)
@@ -136,6 +137,7 @@ const ExpenseList = () => {
       title: "Amount",
       dataIndex: "amount",
       sorter: (a, b) => a.amount.length - b.amount.length,
+      render: (text) => <span>{moneyInTxt(text)}</span>,
       width: "125px",
     },
     {
