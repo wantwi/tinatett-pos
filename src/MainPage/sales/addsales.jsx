@@ -289,6 +289,7 @@ const Addsales = () => {
          expireDate: formData.expDate.substring(0,10),
          manufacturingDate:formData.manuDate.substring(0,10),
          unitPrice:price,
+         priceType: salesType,
          amount:formData.quantity * price
       } 
       if (obj.amount < 1 || obj.unitPrice == '' || obj.name == '' || selectedCustomer == null) {
@@ -592,9 +593,6 @@ const Addsales = () => {
                                 <input className="form-check-input" type="radio" ref={retailpriceTypeRef} name="priceType" value={selectedProduct?.retailPrice} 
                                 onChange={(e) => {
                                   setPrice(e.target.value)
-                                  //setSalesType('Retail')
-                                  //retailRef.current.checked = true
-                                  //wholesaleRef.current.checked =false
                                   setDisableUnselectedPrice({retail:false, wholesale:true, special:true})
                                 }}/>
                               </div>

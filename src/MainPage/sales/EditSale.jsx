@@ -293,6 +293,7 @@ const EditSales = () => {
          expireDate: formData.expDate.substring(0,10),
          manufacturingDate:formData.manuDate.substring(0,10),
          unitPrice:price,
+         priceType: salesType,
          amount:formData.quantity * price
       } 
       if (obj.amount < 1 || obj.unitPrice == '' || obj.name == '' || selectedCustomer == null) {
@@ -696,20 +697,6 @@ const EditSales = () => {
                   </div>
                 </div>
 
-               
-
-                {/* <div className="col-6">
-                  <div className="form-group">
-                    <label>Balance</label>
-                    <div className="input-groupicon">
-                      <input
-                        className="form-control"
-                        type="number"
-                      />
-                      
-                    </div>
-                  </div>
-                </div> */}
 
                 <div className="col-12" style={{display:'flex', justifyContent:'flex-end'}}>
                 <div className="form-group">
