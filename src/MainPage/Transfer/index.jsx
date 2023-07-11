@@ -4,6 +4,7 @@ import AddTransfer from './AddTransfer';
 import ImportTransfer from './ImportTransfer';
 import TransferList from './TransferList';
 import EditTransfer from './EditTransfer';
+import TransferProformaItems from './TransferProformaItems';
 
 
 const TransferRoute = ({ match}) =>(
@@ -13,6 +14,7 @@ const TransferRoute = ({ match}) =>(
         <Route path={`${match.url}/addtransfer-transfer`} component={AddTransfer} />
         <Route path={`${match.url}/importtransfer-transfer`} component={ImportTransfer} />
         <Route path={`${match.url}/edittransfer-transfer`} component={EditTransfer} />
+        <Route path={`${match.url}/proforma-transfer`} component={TransferProformaItems} />
 
     </Switch>
 )

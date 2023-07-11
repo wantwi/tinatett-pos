@@ -25,7 +25,8 @@ export class ErrorBoundary extends Component {
       <div style={{display:'flex', flexDirection:'column', height: '100vh', justifyContent:'center', alignItems:'center'}}>
         <span>Ooops....Something went wrong. Click button below to return to home</span>
         <code>{this.state.error}</code>
-        <Link to="#" onClick={() => window.location.href = '/tinatett-pos/dashboard'} className="btn btn-submit me-2">Back to Home</Link>
+        <a className="btn btn-submit me-2" href="javascript: history.go(-1)">Back</a>
+        {/* <Link to="#" onClick={() => window.location.href = '/tinatett-pos/dashboard'} className="btn btn-submit me-2">Back to Home</Link> */}
      </div>)
     }
     return this.props.children

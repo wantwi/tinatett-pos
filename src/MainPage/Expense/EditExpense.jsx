@@ -185,7 +185,9 @@ const AddExpense = () => {
                 </div>
                 <div className="col-lg-12">
                   <button className="btn btn-submit me-2" onClick={handleUpdate}>Update</button>
-                  <button className="btn btn-cancel">Cancel</button>
+                  <Link to="/tinatett-pos/expense/expenselist" className="btn btn-cancel">
+                    Cancel
+                  </Link>
                 </div>
               </div>
             </div>

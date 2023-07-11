@@ -81,9 +81,12 @@ const AddPurchase = () => {
     setLoading(true)
     axios.get(`/purchase/product/${productId}/${batchNumber}`)
     .then((res) => {
-      if(res.data.status == true){
+      if(res.data.statusText == 'Allow Purchase'){
+        
+      }
+      else if(res.data.statusText == 'Deny Purchase'){
         alertify.set("notifier", "position", "top-right");
-        alertify.warning("Batch number already exists. Please enter a new one");
+        alertify.warning(res.data.message);
         setProductFormData({ ...productFormData, batchNumber:'' })
       }
     })
@@ -391,9 +394,9 @@ const AddPurchase = () => {
                         <label>Batch No</label>
                         <input type="text" className={`form-control `} disabled={selectedProduct?.ownershipType == "Tinatett" ? false : false}
                           value={productFormData?.batchNumber}
+                          onBlur={(e) => checkIfBatchNoExists(e.target.value,selectedProduct.id, )}
                           onChange={(e) => {
                             setProductFormData({ ...productFormData, batchNumber: e.target.value })
-                            checkIfBatchNoExists(e.target.value,selectedProduct.id, )
                           }
                           } />
                       </div>

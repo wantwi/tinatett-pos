@@ -33,7 +33,7 @@ const EditPurchase = () => {
   const [expDate, setExpDate] = useState('');
   const [purchaseId] = useState(state?.id)
 
-
+  const [loading, setLoading] = useState(false)
 
 
   const [productsDropdown, setProductsDropdown] = useState([]);
@@ -95,6 +95,19 @@ const EditPurchase = () => {
     listCopy[index] = updated
     setProductList(listCopy)
     $('.modal').modal('hide')
+  }
+
+  const checkIfBatchNoExists = (batchNumber, productId) => {
+    setLoading(true)
+    axios.get(`/purchase/product/${productId}/${batchNumber}`)
+    .then((res) => {
+      if(res.data.status == false){
+        alertify.set("notifier", "position", "top-right");
+        alertify.warning("Batch number already exists. Please enter a new one");
+        setProductFormData({ ...productFormData, batchNumber:'' })
+      }
+    })
+    .finally(() => setLoading(false))
   }
  
 
@@ -446,6 +459,19 @@ const EditPurchase = () => {
                       </div>
                   
                       <div className="row">
+                      <div className="col-lg-6 col-sm-6 col-12">
+                      <div className="form-group">
+                        <label>Batch No</label>
+                        <input type="text" className={`form-control `} disabled={selectedProduct?.ownershipType == "Tinatett" ? false : false}
+                          value={productFormData?.batchNumber}
+                          onBlur={(e) => checkIfBatchNoExists(e.target.value,selectedProduct.id, )}
+                          onChange={(e) => {
+                            setProductFormData({ ...productFormData, batchNumber: e.target.value })
+                          }
+                          } />
+                      </div>
+                    </div>
+
                         <div className="col-lg-6 col-sm-6 col-12">
                           <div className="form-group">
                             <label>Quantity</label>

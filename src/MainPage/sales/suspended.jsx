@@ -225,6 +225,7 @@ const Suspended = () => {
     if (!isLoading) {
       let mappedData = sales?.data.map((sale) => {
         return {
+          ...sale,
           id: sale?.id,
           Date: sale?.transDate,
           Name: sale?.customer?.name || 'N/A',
@@ -309,7 +310,7 @@ const Suspended = () => {
                  
                 </Link> */}
 
-          <Link to="/tinatett-pos/sales/edit-sales" title={'Edit'}>
+          <Link  to={{pathname:"/tinatett-pos/sales/edit-sales" , state:record}}  title={'Edit'}>
             <span className="badges btn-cancel me-2"><FeatherIcon icon="edit" />  Edit</span>
           </Link>
 

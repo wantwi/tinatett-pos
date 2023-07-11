@@ -96,13 +96,19 @@ const Dashboard = (props) => {
   const alertDataColumns = [
     {
       title: "Product",
-      dataIndex: "productName",
-      sorter: (a, b) => a.productName.length - b.productName.length,
+      dataIndex: "name",
+      sorter: (a, b) => a.name.length - b.name.length,
      
     },
     {
-      title: "Avail. Stock",
-      dataIndex: "stock",
+      title: "Alert",
+      dataIndex: "alert",
+      sorter: (a, b) => a.alert.length - b.alert.length,
+     
+    },
+    {
+      title: "Stock",
+      dataIndex: "current_stock",
       render: (text, record) => (
         <div className="productimgname">
           <Link to="#" style={{ fontSize: "14px" }}>
@@ -146,20 +152,25 @@ const Dashboard = (props) => {
   const [expiredData, setExpiredData] = useState([])
   const [topProductsData, settopProductsData] = useState([])
   const [topcustomersData, settopcustomersData] = useState([])
+  const [alertListData, setAlerListData] = useState([])
+  const [profitMarginData, setprofitMarginData] = useState([])
   
   const {data: dashboardSummary,isLoading} = useGet("dashboardSummary", "/dashboard/salesAndpurchase");
   const {data: expiring, isLoading: expLoading} = useGet("expiring", "/dashboard/productExpirationStatus");
   const {data: topproducts, isLoading: topproductsLoading} = useGet("topproducts", "/dashboard/topproducts");
   const {data: topcustomers, isLoading: topcustomersLoading} = useGet("topcustomers", "/dashboard/topcustomers");
-  const {data: alertList} = useGet("productalert", "/dashboard/productAlert");
+  const {data: profitmargin, isLoading: profitmarginLoading} = useGet("profitmargin", "/dashboard/product/profitmargin");
+  const {data: alertList, isLoading: alertListLoading} = useGet("productalert", "/dashboard/product/alert");
 
 
   useEffect(() => {
-    if (!isLoading && !expLoading && !topcustomersLoading && !topproductsLoading) {
+    if (!isLoading && !expLoading && !topcustomersLoading && !topproductsLoading && !profitmarginLoading && !alertListLoading) {
       setData(dashboardSummary?.data[0])
       setExpiredData(expiring?.data)
       settopProductsData(topproducts?.data)
       settopcustomersData(topcustomers?.data)
+      setprofitMarginData(profitmargin?.data)
+      setAlerListData(alertList?.data)
     }
   
   }, [isLoading, expLoading, topproductsLoading, topcustomersLoading])
@@ -334,7 +345,7 @@ const Dashboard = (props) => {
                   <h5>
                    GHS {' '}
                     <span className="counters">
-                      <CountUp end={data?.numberofSales} />
+                      <CountUp end={data?.total_daily_profit_margin || 0} />
                     </span>
                   </h5>
                   <h6>Total Profit Margin (Daily)</h6>
@@ -352,7 +363,7 @@ const Dashboard = (props) => {
                   <h5>
                     GHS {' '}
                     <span className="counters">
-                      <CountUp end={data?.numberofSales} />
+                      <CountUp end={data?.total_current_month_profit_margin || 0} />
                     </span>
                   </h5>
                   <h6>Total Profit Margin (Monthly)</h6>
@@ -481,7 +492,7 @@ const Dashboard = (props) => {
                   </div>
                 </div>
                 <div className="card-body">
-                  <div className="table-responsive dataview">
+                  <div className="table-responsive dataview" style={{height:400}}>
                     <Table
                       className="table datatable"
                       key={props}
@@ -530,7 +541,7 @@ const Dashboard = (props) => {
                   </div>
                 </div>
                 <div className="card-body">
-                  <div className="table-responsive dataview">
+                  <div className="table-responsive dataview" style={{height:400}}>
                     <Table
                       className="table datatable"
                       key={props}
@@ -579,12 +590,12 @@ const Dashboard = (props) => {
                   </div>
                 </div>
                 <div className="card-body">
-                  <div className="table-responsive dataview">
+                  <div className="table-responsive dataview" style={{height:400}}>
                     <Table
                       className="table datatable"
                       key={props}
                       columns={alertDataColumns}
-                      dataSource={alertList}
+                      dataSource={alertListData}
                       pagination={false}
                     />
                   </div>

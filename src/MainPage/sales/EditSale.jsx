@@ -26,9 +26,12 @@ import { usePost } from "../../hooks/usePost";
 import alertify from "alertifyjs";
 import "../../../node_modules/alertifyjs/build/css/alertify.css";
 import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
+import { useLocation } from "react-router-dom/cjs/react-router-dom.min";
 
 
-const Addsales = () => {
+const EditSales = () => {
+  const {state} = useLocation()
+  console.log(state)
   const [startDate, setStartDate] = useState(new Date());
   const [activeTab, setActiveTab] = useState('Cash')
   const [disabledUnselectedPrice,setDisableUnselectedPrice] = useState({retail: false, wholesale:false, special:false})
@@ -78,7 +81,7 @@ const Addsales = () => {
 
   const {data: customers, isLoading: customersIsLoading} = useGet("customers", "/customer");
   const {data: products, isLoading: productsIsLoading} = useGet("products", "/product");
-  // const { isLoading, data, isError, error, mutate } = usePost("/sales/suspend");
+  const { data: suspendedItems, isLoading: suspendedItemsLoading} = useGet('suspendedItems', `/sales/suspend/items/${state?.id}`);
 
 
   const axios = useCustomApi()
@@ -278,6 +281,7 @@ const Addsales = () => {
       )
     
   }
+
   const handleAddItem = () => {
     //console.log(productFormData)
   //console.log(selectedCustomer)
@@ -343,7 +347,7 @@ const Addsales = () => {
  
 
   useEffect(() => {
-    if (!productsIsLoading && !customersIsLoading) {
+    if (!productsIsLoading && !customersIsLoading && !suspendedItemsLoading) {
 
       let mappedData =  customers?.data.map((customer) => {
           return {
@@ -353,6 +357,9 @@ const Addsales = () => {
           }
         })
       setCustomerList(mappedData)
+      let customer = mappedData.find((item) => item.value == state?.customerId)
+      //console.log(customer)
+      setSelectedCustomer(customer)
 
           
       let mappedData2 =  products?.data.map((product) => {
@@ -370,9 +377,22 @@ const Addsales = () => {
         setProductsList(mappedData2)
         retailRef.current.checked = true
         //retailpriceTypeRef.current.checked = true
+
+      let mappedData3 = suspendedItems?.data.map((item) => 
+      {
+        return {
+          salesRef: item?.salesRef,
+          name:  item?.product?.name,
+          productId: item?.id,
+          quantity: item?.quantity,
+          unitPrice: item?.unitPrice,
+          amount: item?.amount
+        }
+    })
+   setProductGridData(mappedData3)
       
     }
-  }, [productsIsLoading, customersIsLoading])
+  }, [productsIsLoading, customersIsLoading, suspendedItemsLoading])
 
 
   if(productsIsLoading && customersIsLoading){
@@ -391,8 +411,8 @@ const Addsales = () => {
         <div className="content">
         <div className="page-header">
           <div className="page-title">
-            <h4>Add Sale</h4>
-            <h6>Add your new sale</h6>
+            <h4>Edit Sale</h4>
+            <h6>Edit your selected sale item</h6>
           </div>
         </div>
 
@@ -1221,4 +1241,4 @@ const Addsales = () => {
   );
 };
 
-export default Addsales;
+export default EditSales;

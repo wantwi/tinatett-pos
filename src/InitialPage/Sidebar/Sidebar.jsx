@@ -442,6 +442,7 @@ const Sidebar = (props) => {
               <li className="submenu">
                 <a
                   href="#"
+                  id="proform-submenu"
                   className={
                     pathname.includes("/tinatett-pos/proforma")
                       ? "active subdrop"

@@ -8,6 +8,8 @@ import SalesReturnList from '../Return/SalesReturnList'
 import AddSalesReturn from '../Return/AddSalesReturn'
 import Suspended from './suspended';
 import Cashier from './cashier';
+import ProformaSales from './proformasales';
+import EditSales from './EditSale';
 
 
 
@@ -21,8 +23,9 @@ const SalesIndex = ({ match}) =>(
         <Route path={`${match.url}/saleslist`} component={Saleslist} />     
         <Route path={`${match.url}/suspended`} component={Suspended} />      
         <Route path={`${match.url}/cashier/suspended`} component={Cashier} />                                                                                                                                                                                  
-        <Route path={`${match.url}/add-sales`} component={Addsales} />                                                                                                                                                                                        
-        <Route path={`${match.url}/edit-sales`} component={Editsales} />                                                                                                                                                                                        
+        <Route path={`${match.url}/add-sales`} component={Addsales} />    
+        <Route path={`${match.url}/proforma-sales`} component={ProformaSales} />                                                                                                                                                                                        
+        <Route path={`${match.url}/edit-sales`} component={EditSales} />                                                                                                                                                                                        
         <Route path={`${match.url}/sales-details`} component={Saledetails} />     
         <Route path={`${match.url}/salesreturnlist-return`} component={SalesReturnList} />
         <Route path={`${match.url}/addsalesreturn-return`} component={AddSalesReturn} />                                                                                                                                                                                                                                                                                                                                                                   

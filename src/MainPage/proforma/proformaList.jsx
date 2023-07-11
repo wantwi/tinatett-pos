@@ -302,15 +302,20 @@ const ProformaList = () => {
             <span className="badges btn-cancel me-2">Edit</span>
           </Link>
 
-          {/* <Link  to={{pathname:"/tinatett-pos/sales/add-sales", state:record}}  > */}
+          <a href={`/tinatett-pos/sales/proforma-sales?id=${record.id}`} >
+            {/* <Link  to={{pathname:"/tinatett-pos/sales/proforma-sales", state:record}}  > */}
+                      <span className="badges bg-lightgreen me-2">Sell</span>
+              {/* </Link> */}
+          </a>
+         
           {/* <img src={Eye1} className="me-2" alt="img" /> */}
-          <span className="badges bg-lightgreen me-2" style={{ cursor: 'pointer' }} data-bs-target="#editpayment" data-bs-toggle="modal" onClick={() => getProformaProducts(record?.id)}>Sell</span>
+          {/* <span className="badges bg-lightgreen me-2" style={{ cursor: 'pointer' }} data-bs-target="#editpayment" data-bs-toggle="modal" onClick={() => getProformaProducts(record?.id)}>Sell</span> */}
           {/* </Link> */}
 
-          {/* <Link  to={{pathname:"/tinatett-pos/transfer/addtransfer-transfer", state:record}} > */}
-          {/* <img src={Eye1} className="me-2" alt="img" /> */}
-          <span className="badges btn-primary me-2" style={{ cursor: 'pointer' }} data-bs-target="#transfer" data-bs-toggle="modal" onClick={() => getProformaProducts(record?.id)}>Transfer</span>
-          {/* </Link> */}
+          <a href= {`/tinatett-pos/transfer/proforma-transfer?id=${record.id}`} >
+          <span className="badges btn-primary me-2">Transfer</span>
+          {/* <span className="badges btn-primary me-2" style={{ cursor: 'pointer' }} data-bs-target="#transfer" data-bs-toggle="modal" onClick={() => getProformaProducts(record?.id)}>Transfer</span> */}
+          </a>
 
           <Link
             to="#"

@@ -69,7 +69,10 @@ const TransferList = () => {
           text: "Your Transfer item has been deleted.",
           confirmButtonClass: "btn btn-success",
         });
-        //window.location.reload()
+        setTimeout(() => {
+          window.location.reload()
+        },1000)
+   
       }
       else{
         Swal.fire({
