@@ -22,19 +22,13 @@ import { useEffect } from "react";
 import { useGet } from "../../hooks/useGet";
 import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 import { isValidNumber, moneyInTxt } from "../../utility";
-import { usePut } from "../../hooks/usePut";
 import alertify from "alertifyjs";
 import "../../../node_modules/alertifyjs/build/css/alertify.css";
 import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as Yup from "yup";
 import FeatherIcon from 'feather-icons-react'
 import jsPDF from "jspdf";
 import useCustomApi from "../../hooks/useCustomApi";
 import { BASE_URL } from "../../api/CustomAxios";
-import { useLocation } from "react-router-dom/cjs/react-router-dom.min";
-import { useSearchParams } from "react-router-dom";
 import { usePost } from "../../hooks/usePost";
 
 
@@ -51,8 +45,7 @@ const TransferProformaItems = () => {
 
   const { data: customers, isError, isLoading: isCustomerLoading, isSuccess } = useGet("branches", "/branch");
   const {data: products, isLoading: isProductsLoading, } = useGet("products", "/product");
-  const [stateId] = useState(id)
-  const { isLoading, isError: isPostError, error, mutate } = usePost(`/transfer`);
+  const [stateId] = useState(id);
   const { data: proformaItems, isLoading: proformaIsLoading } = useGet("transfer-product-details", `/proforma/products/${stateId}`);
   const { data: transfer, isLoading: transferIsLoading } = useGet("transfer-info", `/transfer/${stateId}`);
 
@@ -76,7 +69,6 @@ const TransferProformaItems = () => {
   const [price, setPrice] = useState(0)
   const [wholesaleprice, setWholesalePrice] = useState('')
   const [specialprice, setSpecialPrice] = useState('')
-  const [isSubmitSuccessful, setIsSubmitSuccessful] = useState(false)
 
 
   useEffect(() => {
@@ -239,6 +231,15 @@ const TransferProformaItems = () => {
 
   }
 
+  const deleteRow = (record) => {
+    console.log(record)
+   // console.log(productGridData)
+   let newGridData = productGridData.filter((item) => item.productId !== record.productId)
+   //console.log(newGridData)
+   setProductGridData(newGridData)
+ };
+
+
   const onSubmit = (hasInvoice) => {
     productGridData.forEach((item) => {
       if(item.batchNumber == undefined || item.batchNumber == 'undefined' || item.batchNumber == ''){
@@ -266,34 +267,33 @@ const TransferProformaItems = () => {
       }
 
       console.log(postBody)
-      mutate(postBody)
-      setTimeout(() => {
-        setSelectedProduct('')
-        setProductGridData([])
-        setIsSubmitSuccessful(true)
-        if(hasInvoice){
-          $('#invoice').modal('show');
+      //mutate(postBody)
+      axios.post('/transfer', postBody)
+      .then((res) => {
+        if(res.data.success){
+          alertify.set("notifier", "position", "top-right");
+          alertify.success("Transfer completed successfully.");
+          setTimeout(() => {
+            setSelectedProduct('')
+            setProductGridData([])
+            if(hasInvoice){
+              $('#invoice').modal('show');
+            }
+          }, 500)
         }
-      }, 500)
-     
+        else{
+          alertify.set("notifier", "position", "top-right");
+          alertify.error("Error...Could not complete transfer.");
+        }
+      })
+      .catch((error) => {
+        console.log(error)
+        alertify.set("notifier", "position", "top-right");
+        alertify.error("Error...Could not complete transfer.");
+      })
       
     }
   }
-
-
-  useEffect(() => {
-    if (!isPostError && isSubmitSuccessful) {
-      alertify.set("notifier", "position", "top-right");
-      alertify.success("Transfer completed successfully.");
-      // $('#create').modal('show');
-    }
-    else if (isPostError) {
-      alertify.set("notifier", "position", "top-right");
-      alertify.error("Error...Could not complete transfer.");
-    }
-
-    return () => { };
-  }, [isPostError, isSubmitSuccessful]);
 
 
 
