@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Route, withRouter } from "react-router-dom";
 
 import routerService from "../../Router";
@@ -7,6 +7,13 @@ import Sidebar from "./Sidebar";
 
 const DefaultLayout =(props)=> {
     const { match } = props;
+    
+    useEffect(() => {
+      const loggedInUser = sessionStorage.getItem('auth')
+      if(!loggedInUser){
+        window.location.href = '/'
+      }
+    }, [])
     return (
       <>
         <div className="main-wrapper">

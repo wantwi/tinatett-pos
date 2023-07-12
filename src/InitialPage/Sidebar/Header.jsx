@@ -163,7 +163,7 @@ const Header = (props) => {
           </li>
           {/* /Flag */}
           {/* Notifications */}
-          <li className="nav-item dropdown">
+          {/* <li className="nav-item dropdown">
             <Link
               to="#"
               className="dropdown-toggle nav-link"
@@ -306,7 +306,7 @@ const Header = (props) => {
                 <Link to="/tinatett-pos/activities">View all Notifications</Link>
               </div>
             </div>
-          </li>
+          </li> */}
           {/* /Notifications */}
           <li className="nav-item dropdown has-arrow main-drop">
             <Link
@@ -332,18 +332,18 @@ const Header = (props) => {
                   </div>
                 </div>
                 <hr className="m-0" />
-                <Link className="dropdown-item" to="/tinatett-pos/profile/user-profile">
+                {/* <Link className="dropdown-item" to="/tinatett-pos/profile/user-profile">
                   <i className="me-2" data-feather="user" /> My Profile
-                </Link>
-                <Link
+                </Link> */}
+                {/* <Link
                   className="dropdown-item"
                   to="/tinatett-pos/settings/generalsettings"
                 >
                   <i className="me-2" data-feather="settings" />
                   Settings
-                </Link>
+                </Link> */}
                 <hr className="m-0" />
-                <Link className="dropdown-item logout pb-0" to="/signIn">
+                <Link className="dropdown-item logout pb-0" to="/signIn" onClick={() => sessionStorage.clear()}>
                   <img src={Logout} className="me-2" alt="img" />
                   Logout
                 </Link>

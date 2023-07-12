@@ -154,7 +154,7 @@ const ProformaList = () => {
     setInputfilter(value);
   };
 
-  const confirmText = () => {
+  const confirmText = (id) => {
     Swal.fire({
       title: "Are you sure?",
       text: "You won't be able to revert this!",
@@ -166,13 +166,36 @@ const ProformaList = () => {
       confirmButtonClass: "btn btn-primary",
       cancelButtonClass: "btn btn-danger ml-1",
       buttonsStyling: !1,
-    }).then(function (t) {
-      t.value &&
+    }) .then( async() => {
+     
+      let data = await axios.delete(`/proforma/${id}`)
+      if(data.status < 205){
         Swal.fire({
           type: "success",
           title: "Deleted!",
-          text: "Your file has been deleted.",
+          text: "Your Proforma item has been deleted.",
           confirmButtonClass: "btn btn-success",
+        });
+        setTimeout(() => {
+          window.location.reload()
+        },1000)
+   
+      }
+      else{
+        Swal.fire({
+          type: "danger",
+          title: "Error!",
+          text: data.response.data.message,
+          confirmButtonClass: "btn btn-danger",
+        });
+      }
+    })
+    .catch( (error) => {
+        Swal.fire({
+          type: "danger",
+          title: "Error!",
+          text: error,
+          confirmButtonClass: "btn btn-danger",
         });
     });
   };
@@ -320,7 +343,7 @@ const ProformaList = () => {
           <Link
             to="#"
             // className="dropdown-item confirm-text"
-            onClick={confirmText}
+            onClick={() => confirmText(record.id)}
             title={'Delete'}
           >
             <span className="badges bg-lightred me-2">Delete</span>

@@ -52,17 +52,19 @@ const TransferProformaItems = () => {
   const { data: customers, isError, isLoading: isCustomerLoading, isSuccess } = useGet("branches", "/branch");
   const {data: products, isLoading: isProductsLoading, } = useGet("products", "/product");
   const [stateId] = useState(id)
-  const { isLoading, isError: isPostError, error, mutate } = usePost(`/transfer/${stateId}`);
+  const { isLoading, isError: isPostError, error, mutate } = usePost(`/transfer`);
   const { data: proformaItems, isLoading: proformaIsLoading } = useGet("transfer-product-details", `/proforma/products/${stateId}`);
   const { data: transfer, isLoading: transferIsLoading } = useGet("transfer-info", `/transfer/${stateId}`);
 
 
   const [selectedProduct, setSelectedProduct] = useState({})
+  const [selectedProductEditMode, setSelectedProductEditMode] = useState({})
   const [selectedProductInfo, setSelectedProductInfo] = useState()
+  const [selectedProductInfoEditMode, setSelectedProductInfoEditMode] = useState()
   const [selectedCustomer, setSelectedCustomer] = useState('')
   const [selectedCustomerPrint, setSelectedCustomerPrint] = useState('')
   const [formData, setFormData] = useState({quantity:'', amount:'', batchNumber:{}, manuDate:'', expDate:''})
-  const [editFormData, setEditFormData] = useState({quantity:'', amount:'', batchNumber:{}, manuDate:'', expDate:''})
+  const [editFormData, setEditFormData] = useState({quantity:'', amount:'', batchNumber:{}, manufacturingDate:'', expireDate:''})
   const [productGridData, setProductGridData] = useState([])
   const [printGridData, setPrintGridData] = useState([])
   const [transDate, setTransDate] = useState(new Date().toISOString().slice(0, 10));
@@ -77,15 +79,13 @@ const TransferProformaItems = () => {
   const [isSubmitSuccessful, setIsSubmitSuccessful] = useState(false)
 
 
-  console.log("Transfer", transfer)
-
-
   useEffect(() => {
     if (!isProductsLoading && !isCustomerLoading && !proformaIsLoading) {
       let mappedData = customers?.data.map((customer) => {
         return {
           id: customer?.id,
           text: customer?.name,
+          label: customer?.name,
           value: customer?.id,
           location: customer?.location,
           contact: customer?.contact,
@@ -142,12 +142,40 @@ const TransferProformaItems = () => {
     
   }
 
+  const handleProductSelectEditMode = (e) => {
+    setSelectedProductEditMode(e)
+  }
+
+  const handleEdit = (item) => {
+    //console.log("Item", item)
+    //console.log("Options:", productOptions)
+    let product = productOptions.find((product) => product.id == item.productId)
+    //console.log("Product", product)
+    setSelectedProductEditMode(product)
+  
+
+    //get batch number
+    axios.get(`${BASE_URL}/purchase/product/${item.productId}`).then((res) => {
+      if(res.data.success){
+        setSelectedProductInfoEditMode(res.data.data)
+        let x = res.data.data.batchNumber?.map((item) => {
+          return {value:item.batchNumber, label:item?.batchNumber + '-(' + item?.Quantity +')', expireDate:item?.expireDate, manufacturingDate: item?.manufacturingDate}
+        })
+        //console.log(x)
+        setEditFormData({...editFormData, ...item, batchNumber: x[0],  manufacturingDate: x[0].manufacturingDate, expireDate: x[0].expireDate})
+      }
+    })
+    
+  }
+
   const handleUpdate = ()=> {
-    let updated = editFormData
+    //console.log("Updated", editFormData)
+    let updated = {...editFormData, batchNumber: editFormData?.batchNumber?.value}
     let listCopy = [...productGridData]
     let index = productGridData.findIndex(item => item.productId == updated.productId)
     listCopy[index] = updated
     setProductGridData(listCopy)
+    setEditFormData({quantity:'', amount:'', batchNumber:{}, manufacturingDate:'', expireDate:''})
     $('.modal').modal('hide')
   }
   const axios = useCustomApi()
@@ -211,23 +239,43 @@ const TransferProformaItems = () => {
 
   }
 
-  const onSubmit = () => {
+  const onSubmit = (hasInvoice) => {
+    productGridData.forEach((item) => {
+      if(item.batchNumber == undefined || item.batchNumber == 'undefined' || item.batchNumber == ''){
+        alertify.set("notifier", "position", "top-right");
+        alertify.warning("Please provide a batch number before saving.");
+
+        return
+      }
+    })
 
     if (productGridData.length < 1) {
       alertify.set("notifier", "position", "top-right");
       alertify.warning("Please add at least one item to list before saving.");
     }
+    if(selectedCustomer == ''){
+      alertify.set("notifier", "position", "top-right");
+      alertify.warning("Please select a branch before saving.");
+    }
+    
     else {
       let postBody = {
-        destinationBranchId: selectedCustomer,
+        destinationBranchId: selectedCustomer.id,
         transferDate: transDate,
         products: productGridData
       }
 
+      console.log(postBody)
       mutate(postBody)
-      setSelectedProduct('')
-      setProductGridData([])
-      setIsSubmitSuccessful(true)
+      setTimeout(() => {
+        setSelectedProduct('')
+        setProductGridData([])
+        setIsSubmitSuccessful(true)
+        if(hasInvoice){
+          $('#invoice').modal('show');
+        }
+      }, 500)
+     
       
     }
   }
@@ -236,12 +284,12 @@ const TransferProformaItems = () => {
   useEffect(() => {
     if (!isPostError && isSubmitSuccessful) {
       alertify.set("notifier", "position", "top-right");
-      alertify.success("Transfer updated successfully.");
+      alertify.success("Transfer completed successfully.");
       // $('#create').modal('show');
     }
     else if (isPostError) {
       alertify.set("notifier", "position", "top-right");
-      alertify.error("Error...Could not complete update.");
+      alertify.error("Error...Could not complete transfer.");
     }
 
     return () => { };
@@ -260,6 +308,9 @@ const TransferProformaItems = () => {
   }
 
 
+ 
+
+
   useEffect(() => {
     setFormData({ ...formData, amount: Number(formData.price) * Number(formData.quantity) || '' })
     if(Number(formData?.quantity) > selectedProduct?.totalQuantity){
@@ -267,6 +318,7 @@ const TransferProformaItems = () => {
       alertify.warning("You can not transfer more than stock available.");
       setFormData(({...formData, quantity:''}))
     }
+
   }, [formData.quantity])
 
 
@@ -298,12 +350,12 @@ const TransferProformaItems = () => {
                       <label>Branch Name</label>
                       <div className="row">
                         <div className="col-lg-12 col-sm-12 col-12">
-                        <Select2
-                              className="select"
-                              data={customerOptions}
-                              value={selectedCustomer}      
-                              disabled      
-                            />
+                        <Select
+                            className="select"
+                            options={customerOptions}
+                            onChange={handleCustomerSelect}
+                            value={selectedCustomer}
+                          />
                         </div>
 
                       </div>
@@ -312,7 +364,7 @@ const TransferProformaItems = () => {
                   <div className="col-lg-4 col-sm-6 col-12">
                     <div className="form-group">
                       <label> Date</label>
-                      <input type="date" className="form-control" value={transDate} onChange={(e) => setTransDate(e.target.value)} disabled />                      {/* <div className="input-groupicon">
+                      <input type="date" className="form-control" value={transDate} onChange={(e) => setTransDate(e.target.value)} />                      {/* <div className="input-groupicon">
                        
                        
                      */}
@@ -549,7 +601,7 @@ const TransferProformaItems = () => {
                             <td>{item?.batchNumber}</td>
 
                             <td>
-                              <Link to="#" className="delete-set me-2" data-bs-toggle="modal" data-bs-target="#editproduct" onClick={() => {setEditFormData(item)}}>
+                              <Link to="#" className="delete-set me-2" data-bs-toggle="modal" data-bs-target="#editproduct" onClick={() => handleEdit(item)}>
                                 <img src={EditIcon} alt="svg" />
                               </Link>
                               <Link to="#" className="delete-set" onClick={() => deleteRow(item)}>
@@ -682,9 +734,47 @@ const TransferProformaItems = () => {
                   <div className="row">
                     <div className="col-lg-12 col-sm-12 col-12">
                       <div className="form-group">
-                        <label>Product Name</label>
+                      <label>Product Name</label>
+                      <div className="input-groupicon">
+                        <Select style={{width:'100%'}}
+                            options={productOptions}
+                            placeholder={'Select product'}
+                            value={selectedProductEditMode}
+                            onChange={handleProductSelectEditMode}
+                            isSearchable= {true}
+                            isLoading={isProductsLoading}
+                            
+                        />
+                        
+                      </div>
+                        {/* <label>Product Name</label>
                         <div className="input-groupicon">
                         <input type="text" value={editFormData?.name} onChange={(e) => setEditFormData({...editFormData, name:e.target.value})} disabled/>
+                        </div> */}
+                      </div>
+                    </div>
+                    {/* <div className="col-lg-12 col-sm-12 col-12">
+                      <div className="form-group">
+                        <label>Batch</label>
+                        <div className="input-groupicon">
+                        <input type="text" value={editFormData?.batchNumber} onChange={(e) => setEditFormData({...editFormData, batchNumber:e.target.value})} disabled/>
+                        </div>
+                      </div>
+                    </div> */}
+                    <div className="col-12">
+                      <div className="form-group">
+                        <label>Batch No.</label>
+                        <div className="input-groupicon">
+                          <Select
+                            options={selectedProductInfoEditMode?.batchNumber?.map((item) => {
+                              return {value:item.batchNumber, label:item?.batchNumber + '-(' + item?.Quantity +')', expireDate:item?.expireDate, manufacturingDate: item?.manufacturingDate}
+                            })}
+                            placeholder=""
+                            value={editFormData.batchNumber}
+                            onChange={(e) => setEditFormData({...editFormData, batchNumber: (e), manuDate: e.manufacturingDate, expDate: e.expireDate})}
+                            //onChange={(e) => console.log(e)}
+                          />
+                          
                         </div>
                       </div>
                     </div>

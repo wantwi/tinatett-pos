@@ -1691,7 +1691,7 @@ const Sidebar = (props) => {
               </li>
 
               {/* Users */}
-              <li className="submenu">
+              {/* <li className="submenu">
                 <Link
                   to="#"
                   className={
@@ -1734,7 +1734,10 @@ const Sidebar = (props) => {
                 ) : (
                   ""
                 )}
-              </li>
+              </li> */}
+
+
+              {/* Settings */}
               {/* <li className="submenu">
                   <Link
                     to="#"

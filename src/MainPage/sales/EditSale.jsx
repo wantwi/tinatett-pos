@@ -387,7 +387,10 @@ const EditSales = () => {
           productId: item?.id,
           quantity: item?.quantity,
           unitPrice: item?.unitPrice,
-          amount: item?.amount
+          amount: item?.amount,
+          batchNumber: item.batchNumber,
+          expireDate: item.expireDate.substring(0,10),
+          manufacturingDate:item.manufacturingDate.substring(0,10),
         }
     })
    setProductGridData(mappedData3)
