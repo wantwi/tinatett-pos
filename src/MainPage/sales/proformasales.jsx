@@ -45,13 +45,15 @@ const ProformaSales = () => {
   const [productsList, setProductsList] = useState([])
   const [selectedCustomer, setSelectedCustomer] = useState(null)
   const [selectedProduct, setSelectedProduct] = useState({})
+  const [selectedProductEditMode, setSelectedProductEditMode] = useState({})
   const [selectedProductInfo, setSelectedProductInfo] = useState()
+  const [selectedProductInfoEditMode, setSelectedProductInfoEditMode] = useState()
   const [price, setPrice] = useState(0)
   const [retailprice, setRetailPrice] = useState('')
   const [wholesaleprice, setWholesalePrice] = useState('')
   const [specialprice, setSpecialPrice] = useState('')
   const [formData, setFormData] = useState({quantity:'', amount:'', batchNumber:'', manuDate:'', expDate:''})
-  const [editFormData, setEditFormData] = useState({name:'',quantity:'', amount:'', batchNumber:'', manuDate:'', expDate:''})
+  const [editFormData, setEditFormData] = useState({name:'',quantity:'', amount:'', batchNumber:'', manufacturingDate:'', expireDate:''})
   const [salesType, setSalesType] = useState('Retail')
   const [productGridData, setProductGridData] = useState([])
   const [transDate, setTransDate] = useState(new Date().toISOString().substring(0,10))
@@ -98,12 +100,35 @@ const ProformaSales = () => {
     setProductGridData(newGridData)
   };
 
+  const handleEdit = (item) => {
+    console.log("Item", item)
+    //console.log("Options:", productOptions)
+    let product = productsList.find((product) => product.id == item.productId)
+    console.log("Product", product)
+    setSelectedProductEditMode(product)
+  
+
+    //get batch number
+    axios.get(`${BASE_URL}/purchase/product/${item.productId}`).then((res) => {
+      if(res.data.success){
+        setSelectedProductInfoEditMode(res.data.data)
+        let x = res.data.data.batchNumber?.map((item) => {
+          return {value:item.batchNumber, label:item?.batchNumber + '-(' + item?.Quantity +')', expireDate:item?.expireDate, manufacturingDate: item?.manufacturingDate}
+        })
+        //console.log(x)
+        setEditFormData({...editFormData, ...item, batchNumber: x[0],  manufacturingDate: x[0].manufacturingDate.substring(0,10), expireDate: x[0].expireDate.substring(0,10)})
+      }
+    })
+    
+  }
+
   const handleUpdate = ()=> {
-    let updated = editFormData
+    let updated = {...editFormData, batchNumber: editFormData?.batchNumber?.value}
     let listCopy = [...productGridData]
     let index = productGridData.findIndex(item => item.productId == updated.productId)
     listCopy[index] = updated
     setProductGridData(listCopy)
+    setEditFormData({quantity:'', amount:'', batchNumber:{}, manufacturingDate:'', expireDate:''})
     $('.modal').modal('hide')
   }
 
@@ -256,6 +281,8 @@ const ProformaSales = () => {
       products: productGridData
     }
 
+    //console.log(payload)
+
     axios.post(`/sales/suspend`, payload)
     .then((res) => {
       if(res.data.success){
@@ -327,6 +354,12 @@ const ProformaSales = () => {
     //console.log(e)
   }
 
+  const handleProductSelectEditMode = (e) => {
+    setSelectedProductEditMode(e)
+  }
+
+  
+
   useEffect(() => {
     axios.get(`${BASE_URL}/purchase/product/${selectedProduct?.value}`).then((res) => {
       setIsLoading(true)
@@ -367,6 +400,7 @@ const ProformaSales = () => {
           
       let mappedData2 =  products?.data.map((product) => {
           return {
+            id: product?.id,
             value: product?.id,
             label: product?.name,
             retailPrice: product?.retailPrice,
@@ -1029,7 +1063,7 @@ const ProformaSales = () => {
                             <td>{item.amount}</td>
                             
                             <td>
-                            <Link to="#" className="delete-set me-2" data-bs-toggle="modal" data-bs-target="#editproduct" onClick={() => setEditFormData(item)}>
+                            <Link to="#" className="delete-set me-2" data-bs-toggle="modal" data-bs-target="#editproduct" onClick={() => handleEdit(item)}>
                                 <img src={EditIcon} alt="svg" />
                               </Link>
                               <Link to="#" className="delete-set" onClick={() => deleteRow(item)}>
@@ -1147,11 +1181,45 @@ const ProformaSales = () => {
                 </div>
                 <div className="modal-body">
                   <div className="row">
-                    <div className="col-lg-12 col-sm-12 col-12">
+                    {/* <div className="col-lg-12 col-sm-12 col-12">
                       <div className="form-group">
                         <label>Product Name</label>
                         <div className="input-groupicon">
                         <input type="text" value={editFormData?.name} onChange={(e) => setEditFormData({...editFormData, name:e.target.value})} disabled/>
+                        </div>
+                      </div>
+                    </div> */}
+                    <div className="col-12">
+                      <div className="form-group">
+                        <label>Product Name</label>
+                        <div className="input-groupicon">
+                          <Select style={{width:'100%'}}
+                              options={productsList}
+                              placeholder={'Select product'}
+                              value={selectedProductEditMode}
+                              onChange={handleProductSelectEditMode}
+                              isSearchable= {true}
+                              isLoading={productsIsLoading}
+                              
+                          />
+                          
+                        </div>
+                      </div>
+                    </div>
+                    <div className="col-12">
+                      <div className="form-group">
+                        <label>Batch No.</label>
+                        <div className="input-groupicon">
+                          <Select
+                            options={selectedProductInfoEditMode?.batchNumber?.map((item) => {
+                              return {value:item.batchNumber, label:item?.batchNumber + '-(' + item?.Quantity +')', expireDate:item?.expireDate, manufacturingDate: item?.manufacturingDate}
+                            })}
+                            placeholder=""
+                            value={editFormData.batchNumber}
+                            onChange={(e) => setEditFormData({...editFormData, batchNumber: (e), manufacturingDate: e.manufacturingDate, expireDate: e.expireDate})}
+                            //onChange={(e) => console.log(e)}
+                          />
+                          
                         </div>
                       </div>
                     </div>

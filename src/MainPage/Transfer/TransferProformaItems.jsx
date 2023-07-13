@@ -771,7 +771,7 @@ const TransferProformaItems = () => {
                             })}
                             placeholder=""
                             value={editFormData.batchNumber}
-                            onChange={(e) => setEditFormData({...editFormData, batchNumber: (e), manuDate: e.manufacturingDate, expDate: e.expireDate})}
+                            onChange={(e) => setEditFormData({...editFormData, batchNumber: (e), manufacturingDate: e.manufacturingDate, expireDate: e.expireDate})}
                             //onChange={(e) => console.log(e)}
                           />
                           
