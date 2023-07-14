@@ -254,7 +254,7 @@ const Dashboard = (props) => {
                   <h5>
                   GHS {' '} 
                     <span className="counters">
-                      <CountUp end={data?.numberofSales} />
+                      <CountUp end={data?.dailyPurchase} />
                     </span>
                   </h5>
                   <h6>Daily Purchase Amount</h6>

@@ -27,6 +27,7 @@ import alertify from "alertifyjs";
 import "../../../node_modules/alertifyjs/build/css/alertify.css";
 import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
 import { useLocation } from "react-router-dom/cjs/react-router-dom.min";
+import { LoadingOutlined } from "@ant-design/icons";
 
 
 const ProformaSales = () => {
@@ -64,6 +65,7 @@ const ProformaSales = () => {
   const [referenceData, setReferenceData] = useState({data:[], reference:'', amountToPay:''})
   const [isSaving, setIsSaving] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [isLoadingDetails, setIsLoadingDetails] = useState(false)
   const [paymentInfo, setPaymentInfo] = useState({
     type:'',
     cashWaybill:'',
@@ -101,7 +103,7 @@ const ProformaSales = () => {
   };
 
   const handleEdit = (item) => {
-    console.log("Item", item)
+    setIsLoadingDetails(true)
     //console.log("Options:", productOptions)
     let product = productsList.find((product) => product.id == item.productId)
     console.log("Product", product)
@@ -118,7 +120,7 @@ const ProformaSales = () => {
         //console.log(x)
         setEditFormData({...editFormData, ...item, batchNumber: x[0],  manufacturingDate: x[0].manufacturingDate.substring(0,10), expireDate: x[0].expireDate.substring(0,10)})
       }
-    })
+    }).finally(() => setIsLoadingDetails(false))
     
   }
 
@@ -622,6 +624,8 @@ const ProformaSales = () => {
                   </div>
                 </div>
 
+               
+
                 <div className="col-4">
                   <div className="form-group">
                     <label>Exp. Date</label>
@@ -1121,7 +1125,7 @@ const ProformaSales = () => {
                   </div>
                 </div>
               </div>
-
+             
               <div className="row">
                 <div className="col-lg-12" >
                   <span className="btn btn-submit me-2" onClick={handleSuspend} style={{width:'100%'}}>
@@ -1179,16 +1183,11 @@ const ProformaSales = () => {
                     <span aria-hidden="true">×</span>
                   </button>
                 </div>
-                <div className="modal-body">
+
+                {isLoadingDetails ? <LoadingOutlined  style={{color: "green", margin:50}}/> :
+                (<div className="modal-body">
                   <div className="row">
-                    {/* <div className="col-lg-12 col-sm-12 col-12">
-                      <div className="form-group">
-                        <label>Product Name</label>
-                        <div className="input-groupicon">
-                        <input type="text" value={editFormData?.name} onChange={(e) => setEditFormData({...editFormData, name:e.target.value})} disabled/>
-                        </div>
-                      </div>
-                    </div> */}
+                 
                     <div className="col-12">
                       <div className="form-group">
                         <label>Product Name</label>
@@ -1262,7 +1261,7 @@ const ProformaSales = () => {
                    
                    
                   </div>
-                </div>
+                </div>)}
                 <div className="modal-footer" style={{justifyContent:'flex-end'}}>
                   <button type="button" className="btn btn-submit" onClick={handleUpdate}>
                     Update

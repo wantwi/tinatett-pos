@@ -30,6 +30,7 @@ import jsPDF from "jspdf";
 import useCustomApi from "../../hooks/useCustomApi";
 import { BASE_URL } from "../../api/CustomAxios";
 import { usePost } from "../../hooks/usePost";
+import { LoadingOutlined } from "@ant-design/icons";
 
 
 const TransferProformaItems = () => {
@@ -48,6 +49,7 @@ const TransferProformaItems = () => {
   const [stateId] = useState(id);
   const { data: proformaItems, isLoading: proformaIsLoading } = useGet("transfer-product-details", `/proforma/products/${stateId}`);
   const { data: transfer, isLoading: transferIsLoading } = useGet("transfer-info", `/transfer/${stateId}`);
+  const [isLoadingDetails, setIsLoadingDetails] = useState(false)
 
 
   const [selectedProduct, setSelectedProduct] = useState({})
@@ -139,6 +141,7 @@ const TransferProformaItems = () => {
   }
 
   const handleEdit = (item) => {
+    setIsLoadingDetails(true)
     //console.log("Item", item)
     //console.log("Options:", productOptions)
     let product = productOptions.find((product) => product.id == item.productId)
@@ -156,7 +159,7 @@ const TransferProformaItems = () => {
         //console.log(x)
         setEditFormData({...editFormData, ...item, batchNumber: x[0],  manufacturingDate: x[0].manufacturingDate, expireDate: x[0].expireDate})
       }
-    })
+    }).finally(() => setIsLoadingDetails(false))
     
   }
 
@@ -730,7 +733,7 @@ const TransferProformaItems = () => {
                     <span aria-hidden="true">×</span>
                   </button>
                 </div>
-                <div className="modal-body">
+                {isLoadingDetails ?  <LoadingOutlined  style={{color: "green", margin:50}}/> : (<div className="modal-body">
                   <div className="row">
                     <div className="col-lg-12 col-sm-12 col-12">
                       <div className="form-group">
@@ -747,20 +750,10 @@ const TransferProformaItems = () => {
                         />
                         
                       </div>
-                        {/* <label>Product Name</label>
-                        <div className="input-groupicon">
-                        <input type="text" value={editFormData?.name} onChange={(e) => setEditFormData({...editFormData, name:e.target.value})} disabled/>
-                        </div> */}
+                       
                       </div>
                     </div>
-                    {/* <div className="col-lg-12 col-sm-12 col-12">
-                      <div className="form-group">
-                        <label>Batch</label>
-                        <div className="input-groupicon">
-                        <input type="text" value={editFormData?.batchNumber} onChange={(e) => setEditFormData({...editFormData, batchNumber:e.target.value})} disabled/>
-                        </div>
-                      </div>
-                    </div> */}
+                   
                     <div className="col-12">
                       <div className="form-group">
                         <label>Batch No.</label>
@@ -772,7 +765,7 @@ const TransferProformaItems = () => {
                             placeholder=""
                             value={editFormData.batchNumber}
                             onChange={(e) => setEditFormData({...editFormData, batchNumber: (e), manufacturingDate: e.manufacturingDate, expireDate: e.expireDate})}
-                            //onChange={(e) => console.log(e)}
+                          
                           />
                           
                         </div>
@@ -817,7 +810,7 @@ const TransferProformaItems = () => {
                    
                    
                   </div>
-                </div>
+                </div>)}
                 <div className="modal-footer" style={{justifyContent:'flex-end'}}>
                   <button type="button" className="btn btn-submit" onClick={handleUpdate}>
                     Update

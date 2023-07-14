@@ -72,8 +72,8 @@ const EditProduct = () => {
       alertify.set("notifier", "position", "top-right");
       alertify.success("Product updated successfully.");
       setTimeout(() => {
-        history.push('/tinatett-pos/product/productlist')
-      })
+        window.location = '/tinatett-pos/product/productlist'
+      },1500)
     }
     else if(isError){
       alertify.set("notifier", "position", "top-right");
