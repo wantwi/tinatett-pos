@@ -47,6 +47,7 @@ const EditPurchase = () => {
   const [selectedProduct, setSelectedProduct] = useState('')
   const { data: purchaseDetails, isLoading: purchaseIsLoadingDetails } = useGet("purchase-details", `/purchase/products/${state?.id}`);
   const { isLoading, data, isError, error, mutate } = usePut(`/purchase/${purchaseId}`); 
+  const [isSubmitSuccessful, setIsSubmitSuccessful] = useState(false)
 
 
   const [productFormData, setProductFormData] = useState({ id:'', unitPrice: '', quantity: '', amount: '', manufacturingDate:'', expireDate:''})
@@ -101,9 +102,12 @@ const EditPurchase = () => {
     setLoading(true)
     axios.get(`/purchase/product/${productId}/${batchNumber}`)
     .then((res) => {
-      if(res.data.status == false){
+      if(res.data.statusText == 'Allow Purchase'){
+        
+      }
+      else if(res.data.statusText == 'Deny Purchase'){
         alertify.set("notifier", "position", "top-right");
-        alertify.warning("Batch number already exists. Please enter a new one");
+        alertify.warning(res.data.message);
         setProductFormData({ ...productFormData, batchNumber:'' })
       }
     })
@@ -146,8 +150,9 @@ const EditPurchase = () => {
       })
     }
 
-    console.log(postBody)
+    // console.log(postBody)
     mutate(postBody)
+    setIsSubmitSuccessful(true)
   };
 
   useEffect(() => {
@@ -193,7 +198,7 @@ const EditPurchase = () => {
   }, [suppliers, products])
 
   useEffect(() => {
-    if (!isError && data) {
+    if (!isError && isSubmitSuccessful) {
       alertify.set("notifier", "position", "top-right");
       alertify.success("Purchase updated successfully.");
       setTimeout(() => {
@@ -205,7 +210,9 @@ const EditPurchase = () => {
       alertify.warning("Failed to update");
     }
     return () => {};
-  }, [isError, data]);
+  }, [isError, isSubmitSuccessful]);
+
+
 
 
   const columns = [
