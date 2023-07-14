@@ -11,18 +11,16 @@ import { useEffect } from "react";
 import alertify from "alertifyjs";
 import "../../../node_modules/alertifyjs/build/css/alertify.css";
 import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
-import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 
 
 
 const EditCustomer = () => {
   const {state} = useLocation()
-  console.log(state)
+
   const [formData, setFormData] = useState(state)
   const [customerType, setCustomerType] = useState(formData?.customerType)
 
-  const history = useHistory()
 
   const validationSchema = Yup.object().shape({
     name: Yup.string().required("Product name is required"),
@@ -68,8 +66,8 @@ const EditCustomer = () => {
       alertify.set("notifier", "position", "top-right");
       alertify.success("Customer updated successfully.");
       setTimeout(() => {
-        history.push('/tinatett-pos/people/customerlist')
-      })
+        window.location = '/tinatett-pos/people/customerlist'
+      },1000)
     }
     return () => {};
   }, [isSubmitSuccessful, isError, isLoading]);

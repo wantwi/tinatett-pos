@@ -116,8 +116,8 @@ const EditSupplier = () => {
       alertify.set("notifier", "position", "top-right");
       alertify.success("Supplier updated successfully.");
       setTimeout(() => {
-        history.push('/tinatett-pos/people/supplierlist')
-      }, 100)
+        window.location = '/tinatett-pos/people/supplierlist'
+      },1500)
     }
     else if (isError) {
       alertify.set("notifier", "position", "top-right");

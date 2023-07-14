@@ -173,7 +173,7 @@ const Dashboard = (props) => {
       setAlerListData(alertList?.data)
     }
   
-  }, [isLoading, expLoading, topproductsLoading, topcustomersLoading])
+  }, [isLoading, expLoading, topproductsLoading, topcustomersLoading, profitmarginLoading, alertListLoading ])
 
   if(isLoading || topproductsLoading || topcustomersLoading){
     return <LoadingSpinner/>

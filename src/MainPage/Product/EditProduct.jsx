@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { Macbook, Upload } from "../../EntryFile/imagePath";
 import {Link} from "react-router-dom"
 import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
@@ -13,7 +12,6 @@ import { usePut } from "../../hooks/usePut";
 import alertify from "alertifyjs";
 import "../../../node_modules/alertifyjs/build/css/alertify.css";
 import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
-import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import { useForm } from "react-hook-form";
 
 const EditProduct = () => {
@@ -22,7 +20,6 @@ const EditProduct = () => {
   //console.log(state)
   const [data, setData] = useState(state)
 
-  const history = useHistory()
   const [ownershipType, setOwnershipType] = useState(state?.ownershipType)
 
 
