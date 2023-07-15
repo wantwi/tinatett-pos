@@ -154,8 +154,10 @@ const Dashboard = (props) => {
   const [topcustomersData, settopcustomersData] = useState([])
   const [alertListData, setAlerListData] = useState([])
   const [profitMarginData, setprofitMarginData] = useState([])
+ // const [summaryData, setSummaryData] = useState([])
   
-  const {data: dashboardSummary,isLoading} = useGet("dashboardSummary", "/dashboard/salesAndpurchase");
+  const {data: salesAndpurchase,isLoading} = useGet("salesAndpurchase", "/dashboard/salesAndpurchase");
+ // const {data: summary,isLoading: summaryIsLoading} = useGet("dashboardSummary", "/dashboard/summary");
   const {data: expiring, isLoading: expLoading} = useGet("expiring", "/dashboard/productExpirationStatus");
   const {data: topproducts, isLoading: topproductsLoading} = useGet("topproducts", "/dashboard/topproducts");
   const {data: topcustomers, isLoading: topcustomersLoading} = useGet("topcustomers", "/dashboard/topcustomers");
@@ -165,12 +167,13 @@ const Dashboard = (props) => {
 
   useEffect(() => {
     if (!isLoading && !expLoading && !topcustomersLoading && !topproductsLoading && !profitmarginLoading && !alertListLoading) {
-      setData(dashboardSummary?.data[0])
+      setData(salesAndpurchase?.data[0])
       setExpiredData(expiring?.data)
       settopProductsData(topproducts?.data)
       settopcustomersData(topcustomers?.data)
       setprofitMarginData(profitmargin?.data)
       setAlerListData(alertList?.data)
+      // setSummaryData(summary?.data)
     }
   
   }, [isLoading, expLoading, topproductsLoading, topcustomersLoading, profitmarginLoading, alertListLoading ])
@@ -273,7 +276,7 @@ const Dashboard = (props) => {
                   <h5>
                   GHS {' '} 
                     <span className="counters">
-                      <CountUp end={data?.numberofPurchase} />
+                      <CountUp end={data?.stock_value} />
                     </span>
                   </h5>
                   <h6>Total Stock Value</h6>
@@ -291,7 +294,7 @@ const Dashboard = (props) => {
                   <h5>
                   
                     <span className="counters">
-                      <CountUp end={data?.numberofSales} />
+                      <CountUp end={data?.numberOfSaleInvoice} />
                     </span>
                   </h5>
                   <h6>No of Invoices</h6>
@@ -345,7 +348,7 @@ const Dashboard = (props) => {
                   <h5>
                    GHS {' '}
                     <span className="counters">
-                      <CountUp end={data?.total_daily_profit_margin || 0} />
+                      <CountUp end={profitMarginData?.total_daily_profit_margin || 0} />
                     </span>
                   </h5>
                   <h6>Total Profit Margin (Daily)</h6>
@@ -363,7 +366,7 @@ const Dashboard = (props) => {
                   <h5>
                     GHS {' '}
                     <span className="counters">
-                      <CountUp end={data?.total_current_month_profit_margin || 0} />
+                      <CountUp end={profitMarginData?.total_current_month_profit_margin || 0} />
                     </span>
                   </h5>
                   <h6>Total Profit Margin (Monthly)</h6>
