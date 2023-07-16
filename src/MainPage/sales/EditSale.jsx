@@ -105,6 +105,12 @@ const EditSales = () => {
 
   const processPayment = (type, print) =>{
 
+    if(productGridData.length < 1){
+      alertify.set("notifier", "position", "top-right");
+      alertify.warning("Please add at least one item to list before saving.");
+    }
+    else{
+
     //handle the suspend first and then use the reference to process payment
     setIsSaving(true)
     let payload = {
@@ -204,7 +210,7 @@ const EditSales = () => {
      }
       )
 
-    
+    }
 
   }
 
@@ -243,6 +249,12 @@ const EditSales = () => {
   }
 
   const handleSuspend = () => {
+
+    if(productGridData.length < 1){
+      alertify.set("notifier", "position", "top-right");
+      alertify.warning("Please add at least one item to list before saving.");
+    }
+    else{
     setIsSaving(true)
     let payload = {
       customerId: selectedCustomer?.value,
@@ -279,6 +291,7 @@ const EditSales = () => {
       $('#reference').modal('show')
      }
       )
+    }
     
   }
 
@@ -1063,7 +1076,7 @@ const EditSales = () => {
                         <h5>GHS {moneyInTxt(productGridData.reduce((total, item) => total + item.amount, 0))}</h5>
                       </li>
                       <li>
-                        <h4>Balance</h4>
+                        <h4>{Number(productGridData.reduce((total, item) => total + item.amount, 0)) - Number(paymentInfo.amountPaid) < 0 ? 'Change' : 'Balance'}</h4>
                         <h5>GHS {moneyInTxt(Math.abs(Number(productGridData.reduce((total, item) => total + item.amount, 0)) - Number(paymentInfo.amountPaid)))}</h5>
                       </li>
                      

@@ -25,6 +25,7 @@ const Sidebar = (props) => {
   const [isSideMenu, setSideMenu] = useState("");
   const [path, setPath] = useState("");
   const history = useHistory();
+  const [userType, setUserType] = useState('')
 
   const toggleSidebar = (value) => {
     setSideMenu(value);
@@ -50,6 +51,13 @@ const Sidebar = (props) => {
     };
   }, [pathname]);
 
+  useEffect(() => {
+    let userRole = sessionStorage.getItem('auth')
+    let obj =JSON.parse(userRole)
+    //console.log("Role:", obj.role)
+    setUserType(obj.role)
+  }, [])
+
   return (
     <div className="sidebar" id="sidebar" >
       <Scrollbars>
@@ -74,7 +82,7 @@ const Sidebar = (props) => {
               </li>
 
               {/* Products */}
-              <li className="submenu">
+              {userType == 'admin' || userType == 'supervisor' ? (<li className="submenu">
                 <a
                   href="#"
                   className={
@@ -200,10 +208,10 @@ const Sidebar = (props) => {
                 ) : (
                   ""
                 )}
-              </li>
+              </li>) : null}
 
               {/* Customer */}
-              <li className="submenu">
+              {userType == 'admin' || userType == 'supervisor' ? (<li className="submenu">
                 <a
                   href="#"
                   className={
@@ -290,10 +298,10 @@ const Sidebar = (props) => {
                 ) : (
                   ""
                 )}
-              </li>
+              </li>) : null}
 
                {/* Supplier */}
-               <li className="submenu">
+               {userType == 'admin' || userType == 'supervisor' ?  (<li className="submenu">
                 <a
                   href="#"
                   className={
@@ -378,10 +386,10 @@ const Sidebar = (props) => {
                 ) : (
                   ""
                 )}
-              </li>
+               </li>): null}
 
                 {/* Purchases */}
-              <li className="submenu">
+                {userType == 'admin' || userType == 'supervisor' ? (<li className="submenu">
                 <a
                   href="#"
                   className={
@@ -436,10 +444,10 @@ const Sidebar = (props) => {
                 ) : (
                   ""
                 )}
-              </li>
+                </li>) : null}
 
               {/* Proforma */}
-              <li className="submenu">
+              {userType == 'admin' || userType == 'supervisor' || userType == 'sales' ? (<li className="submenu">
                 <a
                   href="#"
                   id="proform-submenu"
@@ -505,105 +513,105 @@ const Sidebar = (props) => {
                 ) : (
                   ""
                 )}
-              </li>
+              </li>): null}
 
             
 
                {/* Sales */}
-            <li className="submenu">
-                <a
-                  href="#"
-                  className={
-                    pathname.includes("/tinatett-pos/sales")
-                      ? "active subdrop"
-                      : "" || isSideMenu == "sales"
-                        ? "subdrop active"
-                        : ""
-                  }
-                  onClick={() =>
-                    toggleSidebar(isSideMenu == "sales" ? "" : "sales")
-                  }
-                >
-                  <img src={Sales1} alt="img" />
-                  <span> Sales </span> <span className="menu-arrow" />
-                </a>
-                {isSideMenu == "sales" ? (
-                  <ul>
-                     <li>
-                      <Link
-                        to="/tinatett-pos/sales/add-sales"
-                        className={
-                          pathname.includes("add-sales") ? "active" : ""
-                        }
-                      >
-                        New Sales
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        className={
-                          pathname.includes("sales/suspended") ? "active" : ""
-                        }
-                        to="/tinatett-pos/sales/suspended"
-                      >
-                        Suspended
-                      </Link>
-                    </li>
-                    {/* <li>
-                      <Link
-                        className={
-                          pathname.includes("cashier") ? "active" : ""
-                        }
-                        to="/tinatett-pos/sales/cashier/suspended"
-                      >
-                        Cashier
-                      </Link>
-                    </li> */}
-                    <li>
-                      <Link
-                        className={
-                          pathname.includes("saleslist") ? "active" : ""
-                        }
-                        to="/tinatett-pos/sales/saleslist"
-                      >
-                        Sales List
-                      </Link>
-                    </li>
-                    {/* <li>
-                      <Link to="/pos">POS</Link>
-                    </li> */}
-                   
-                    {/* <li>
-                      <Link
-                        className={
-                          pathname.includes("salesreturnlist") ? "active" : ""
-                        }
-                        to="/tinatett-pos/sales/salesreturnlist-return"
-                      >
-                        Sales Return List
-                      </Link>
-                    </li> */}
-                    {/* <li>
-                      <Link
-                        className={
-                          pathname.includes("addsalesreturn") ? "active" : ""
-                        }
-                        to="/tinatett-pos/sales/addsalesreturn-return"
-                      >
-                        New Sales Return
-                      </Link>
-                    </li> */}
-                  </ul>
-                ) : (
-                  ""
-                )}
-            </li> 
+               {userType == 'admin' || userType == 'supervisor' || userType == 'sales' ? (<li className="submenu">
+                  <a
+                    href="#"
+                    className={
+                      pathname.includes("/tinatett-pos/sales")
+                        ? "active subdrop"
+                        : "" || isSideMenu == "sales"
+                          ? "subdrop active"
+                          : ""
+                    }
+                    onClick={() =>
+                      toggleSidebar(isSideMenu == "sales" ? "" : "sales")
+                    }
+                  >
+                    <img src={Sales1} alt="img" />
+                    <span> Sales </span> <span className="menu-arrow" />
+                  </a>
+                  {isSideMenu == "sales" ? (
+                    <ul>
+                      <li>
+                        <Link
+                          to="/tinatett-pos/sales/add-sales"
+                          className={
+                            pathname.includes("add-sales") ? "active" : ""
+                          }
+                        >
+                          New Sales
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          className={
+                            pathname.includes("sales/suspended") ? "active" : ""
+                          }
+                          to="/tinatett-pos/sales/suspended"
+                        >
+                          Suspended
+                        </Link>
+                      </li>
+                      {/* <li>
+                        <Link
+                          className={
+                            pathname.includes("cashier") ? "active" : ""
+                          }
+                          to="/tinatett-pos/sales/cashier/suspended"
+                        >
+                          Cashier
+                        </Link>
+                      </li> */}
+                      <li>
+                        <Link
+                          className={
+                            pathname.includes("saleslist") ? "active" : ""
+                          }
+                          to="/tinatett-pos/sales/saleslist"
+                        >
+                          Sales List
+                        </Link>
+                      </li>
+                      {/* <li>
+                        <Link to="/pos">POS</Link>
+                      </li> */}
+                    
+                      {/* <li>
+                        <Link
+                          className={
+                            pathname.includes("salesreturnlist") ? "active" : ""
+                          }
+                          to="/tinatett-pos/sales/salesreturnlist-return"
+                        >
+                          Sales Return List
+                        </Link>
+                      </li> */}
+                      {/* <li>
+                        <Link
+                          className={
+                            pathname.includes("addsalesreturn") ? "active" : ""
+                          }
+                          to="/tinatett-pos/sales/addsalesreturn-return"
+                        >
+                          New Sales Return
+                        </Link>
+                      </li> */}
+                    </ul>
+                  ) : (
+                    ""
+                  )}
+              </li> ): null}
 
 
               {/* Cashier Window */}
 
 
-              <li className={pathname.includes("/tinatett-pos/cashier/suspended") ? "active" : ""}>
+              {userType == 'admin' || userType == 'supervisor' || userType == 'cashier' ? (<li className={pathname.includes("/tinatett-pos/cashier/suspended") ? "active" : ""}>
                 <Link
                   to="/tinatett-pos/cashier/suspended"
                   onClick={() => toggleSidebar(isSideMenu == "cashier" ? "" : "")}
@@ -611,7 +619,7 @@ const Sidebar = (props) => {
                   <img src={debitcard} alt="img" />
                   <span>Cashier </span>
                 </Link>
-              </li>
+              </li>) : null}
 
               {/* Transfer */}
               <li className="submenu">
@@ -671,11 +679,7 @@ const Sidebar = (props) => {
                   )}
                 </li>
 
-             
-
-
-
-            
+             {/* Expense */}
               <li className="submenu">
                   <a
                     href="#"
@@ -734,6 +738,8 @@ const Sidebar = (props) => {
                     ""
                   )}
                 </li>
+
+              {/* Product Transfer */}
                <li className="submenu">
                   <a
                     href="#"
