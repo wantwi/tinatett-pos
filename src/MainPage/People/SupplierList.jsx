@@ -18,6 +18,8 @@ import {
 } from "../../EntryFile/imagePath";
 import { useGet } from "../../hooks/useGet";
 import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
+import { debounce } from "lodash";
+import useCustomApi from "../../hooks/useCustomApi";
 
 const SupplierList = () => {
   const [inputfilter, setInputfilter] = useState(false);
@@ -87,6 +89,38 @@ const SupplierList = () => {
       console.log('loading...')
     }
   }, [isLoading])
+
+
+  const axios = useCustomApi()
+
+  const handleSearch = debounce((value) => {
+    axios.get(`/supplier/search?name=${value}`)
+    .then((res) => {
+     let mapped = res?.data.data.map((supplier) => {
+        return {
+          id: supplier.id,
+          name: supplier.name,
+          status: supplier.status,
+          contact: supplier.contact,
+          othercontact: supplier.othercontact,
+          email: supplier.email,
+          location: supplier.location,
+          customerType: supplier.customerType,
+          gpsAddress: supplier.gpsAddress,
+          creditPeriod: supplier.creditPeriod,
+          product: supplier.product,
+          paymentInfo: supplier.paymentInfo,
+          cashDetails: supplier?.paymentInfo[0]?.details,
+          bankDetails: supplier?.paymentInfo[2]?.details,
+          momoDetails: supplier?.paymentInfo[1]?.details,
+          createdBy: supplier.user.firstName + ' ' + supplier.user.lastName
+        }
+    })
+    setData(mapped)
+  })
+    
+
+}, 300)
 
 
   const columns = [
@@ -167,44 +201,14 @@ const SupplierList = () => {
           {/* /product list */}
           <div className="card">
             <div className="card-body">
-              <Tabletop inputfilter={inputfilter} togglefilter={togglefilter} data={data} title={'Suppliers List'}/>
+              <Tabletop inputfilter={inputfilter} togglefilter={togglefilter} data={data} title={'Suppliers List'} handleSearch={handleSearch}/>
               {/* /Filter */}
               <div
                 className={`card mb-0 ${inputfilter ? "toggleCls" : ""}`}
                 id="filter_inputs"
                 style={{ display: inputfilter ? "block" : "none" }}
               >
-                <div className="card-body pb-0">
-                  <div className="row">
-                    <div className="col-lg-2 col-sm-6 col-12">
-                      <div className="form-group">
-                        <input type="text" placeholder="Enter Supplier Code" />
-                      </div>
-                    </div>
-                    <div className="col-lg-2 col-sm-6 col-12">
-                      <div className="form-group">
-                        <input type="text" placeholder="Enter Supplier" />
-                      </div>
-                    </div>
-                    <div className="col-lg-2 col-sm-6 col-12">
-                      <div className="form-group">
-                        <input type="text" placeholder="Enter Phone" />
-                      </div>
-                    </div>
-                    <div className="col-lg-2 col-sm-6 col-12">
-                      <div className="form-group">
-                        <input type="text" placeholder="Enter Email" />
-                      </div>
-                    </div>
-                    <div className="col-lg-1 col-sm-6 col-12 ms-auto">
-                      <div className="form-group">
-                        <a className="btn btn-filters ms-auto">
-                          <img src={search_whites} alt="img" />
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                
               </div>
               {/* /Filter */}
               <div className="table-responsive">

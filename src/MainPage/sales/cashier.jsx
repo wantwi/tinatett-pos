@@ -794,7 +794,7 @@ const Cashier = () => {
                                 <h5>GHS {moneyInTxt(modalData?.Total)}</h5>
                               </li>
                               <li>
-                                <h4>Balance</h4>
+                                <h4>{Number(modalData?.Total) - Number(paymentInfo.amountPaid) < 0 ? 'Change' : 'Balance'}</h4>
                                 <h5>GHS {moneyInTxt(Math.abs(Number(modalData?.Total) - Number(paymentInfo.amountPaid)))}</h5>
                               </li>
 

@@ -622,7 +622,7 @@ const Sidebar = (props) => {
               </li>) : null}
 
               {/* Transfer */}
-              <li className="submenu">
+              {userType == 'admin' || userType == 'supervisor' ? (<li className="submenu">
                   <a
                     href="#"
                     className={
@@ -677,10 +677,10 @@ const Sidebar = (props) => {
                   ) : (
                     ""
                   )}
-                </li>
+                </li>) :null}
 
              {/* Expense */}
-              <li className="submenu">
+             {userType == 'admin' || userType == 'supervisor' ? (<li className="submenu">
                   <a
                     href="#"
                     className={
@@ -737,10 +737,10 @@ const Sidebar = (props) => {
                   ) : (
                     ""
                   )}
-                </li>
+                </li>) : null}
 
               {/* Product Transfer */}
-               <li className="submenu">
+              {userType == 'admin' || userType == 'supervisor' ? (<li className="submenu">
                   <a
                     href="#"
                     className={
@@ -787,8 +787,106 @@ const Sidebar = (props) => {
                   ) : (
                     ""
                   )}
-                </li> 
+                </li> ) :null }
             
+
+             {/* Reports */}
+             {userType == 'admin' || userType == 'supervisor' ? (<li className="submenu">
+                <Link
+                  to="#"
+                  className={
+                    pathname.includes("/tinatett-pos/report")
+                      ? "subdrop active"
+                      : "" || isSideMenu == "Report"
+                        ? "subdrop active"
+                        : ""
+                  }
+                  onClick={() =>
+                    toggleSidebar(isSideMenu == "Report" ? "" : "Report")
+                  }
+                >
+                  <img src={Time} alt="img" />
+                  <span> Reports</span> <span className="menu-arrow" />
+                </Link>
+                {isSideMenu == "Report" ? (
+                  <ul>
+                    <li>
+                      <Link
+                        to="/tinatett-pos/report/purchaseorderreport"
+                        className={
+                          pathname.includes("purchaseorderreport")
+                            ? "active"
+                            : ""
+                        }
+                      >
+                        Purchase order report
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        to="/tinatett-pos/report/inventoryreport"
+                        className={
+                          pathname.includes("inventoryreport") ? "active" : ""
+                        }
+                      >
+                        Inventory Report
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        to="/tinatett-pos/report/salesreport"
+                        className={
+                          pathname.includes("salesreport") ? "active" : ""
+                        }
+                      >
+                        Sales Report
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        to="/tinatett-pos/report/invoicereport"
+                        className={
+                          pathname.includes("invoicereport") ? "active" : ""
+                        }
+                      >
+                        Invoice Report
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        to="/tinatett-pos/report/purchasereport"
+                        className={
+                          pathname.includes("purchasereport") ? "active" : ""
+                        }
+                      >
+                        Purchase Report
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        to="/tinatett-pos/report/supplierreport"
+                        className={
+                          pathname.includes("supplierreport") ? "active" : ""
+                        }
+                      >
+                        Supplier Report
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        to="/tinatett-pos/report/customerreport"
+                        className={
+                          pathname.includes("customerreport") ? "active" : ""
+                        }
+                      >
+                        Customer Report
+                      </Link>
+                    </li>
+                  </ul>
+                ) : (
+                  ""
+                )}
+              </li>) : null }
               {/* <li className="submenu">
                   <a
                     href="#"
@@ -1598,103 +1696,7 @@ const Sidebar = (props) => {
                 )}
               </li> */}
 
-              {/* Reports */}
-              <li className="submenu">
-                <Link
-                  to="#"
-                  className={
-                    pathname.includes("/tinatett-pos/report")
-                      ? "subdrop active"
-                      : "" || isSideMenu == "Report"
-                        ? "subdrop active"
-                        : ""
-                  }
-                  onClick={() =>
-                    toggleSidebar(isSideMenu == "Report" ? "" : "Report")
-                  }
-                >
-                  <img src={Time} alt="img" />
-                  <span> Reports</span> <span className="menu-arrow" />
-                </Link>
-                {isSideMenu == "Report" ? (
-                  <ul>
-                    <li>
-                      <Link
-                        to="/tinatett-pos/report/purchaseorderreport"
-                        className={
-                          pathname.includes("purchaseorderreport")
-                            ? "active"
-                            : ""
-                        }
-                      >
-                        Purchase order report
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="/tinatett-pos/report/inventoryreport"
-                        className={
-                          pathname.includes("inventoryreport") ? "active" : ""
-                        }
-                      >
-                        Inventory Report
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="/tinatett-pos/report/salesreport"
-                        className={
-                          pathname.includes("salesreport") ? "active" : ""
-                        }
-                      >
-                        Sales Report
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="/tinatett-pos/report/invoicereport"
-                        className={
-                          pathname.includes("invoicereport") ? "active" : ""
-                        }
-                      >
-                        Invoice Report
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="/tinatett-pos/report/purchasereport"
-                        className={
-                          pathname.includes("purchasereport") ? "active" : ""
-                        }
-                      >
-                        Purchase Report
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="/tinatett-pos/report/supplierreport"
-                        className={
-                          pathname.includes("supplierreport") ? "active" : ""
-                        }
-                      >
-                        Supplier Report
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="/tinatett-pos/report/customerreport"
-                        className={
-                          pathname.includes("customerreport") ? "active" : ""
-                        }
-                      >
-                        Customer Report
-                      </Link>
-                    </li>
-                  </ul>
-                ) : (
-                  ""
-                )}
-              </li>
+             
 
               {/* Users */}
               {/* <li className="submenu">

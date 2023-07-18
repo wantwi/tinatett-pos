@@ -22,6 +22,8 @@ import {
 } from "../../EntryFile/imagePath";
 import { useGet } from "../../hooks/useGet";
 import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
+import { debounce } from "lodash";
+import useCustomApi from "../../hooks/useCustomApi";
 
 const CustomerList = () => {
   const [tableID] = useState("customerList")
@@ -36,7 +38,30 @@ const CustomerList = () => {
     isSuccess,
   } = useGet("customers", "/customer");
 
+  const axios = useCustomApi()
+  const handleSearch = debounce((value) => {
+      axios.get(`/customer/search?name=${value}`)
+      .then((res) => {
+       let mapped = res?.data.data.map((customer) => {
+          return {
+            id: customer?.id,
+            image: Thomas,
+            customerName: customer?.name,
+            status: customer?.status,
+            customerType: customer?.customerType,
+            location: customer?.location,
+            gpsAddress: customer?.gpsAddress,
+            email: customer?.email,
+            contact: customer?.contact,
+            othercontact: customer?.otherContact,
+            createdBy: customer?.user.firstName  + ' ' + customer.user.lastName,
+          }
+      })
+      setData(mapped)
+    })
+      
 
+  }, 300)
 
 
   useEffect(() => {
@@ -174,7 +199,7 @@ const CustomerList = () => {
           {/* /product list */}
           <div className="card">
             <div className="card-body">
-            <Tabletop inputfilter={inputfilter} togglefilter={togglefilter} tableID={tableID} data={data} title={'Customers List'}/>
+            <Tabletop inputfilter={inputfilter} togglefilter={togglefilter} tableID={tableID} data={data} title={'Customers List'} handleSearch={handleSearch}/>
               {/* /Filter */}
               <div
                 className={`card mb-0 ${ inputfilter ? "toggleCls" : ""}`}
