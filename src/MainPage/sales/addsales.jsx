@@ -105,6 +105,10 @@ const Addsales = () => {
       alertify.set("notifier", "position", "top-right");
       alertify.warning("Please add at least one item to list before saving.");
     }
+    if(paymentInfo.amountPaid == '' || paymentInfo.amountPaid < 1 || paymentInfo.amountPaid == null){
+      alertify.set("notifier", "position", "top-right");
+      alertify.warning("Please provide payment amount before saving.");
+    }
     else{
     //handle the suspend first and then use the reference to process payment
     setIsSaving(true)
