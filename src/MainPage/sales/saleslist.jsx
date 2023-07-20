@@ -29,6 +29,7 @@ import "react-select2-wrapper/css/select2.css";
 import { useGet } from "../../hooks/useGet";
 import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 import { getInvoiceReceipt, moneyInTxt } from "../../utility";
+import useCustomApi from "../../hooks/useCustomApi";
 
 const SalesList = () => {
   const [startDate, setStartDate] = useState(new Date());
@@ -38,6 +39,9 @@ const SalesList = () => {
   const togglefilter = (value) => {
     setInputfilter(value);
   };
+
+
+  const axios = useCustomApi()
 
   const confirmText = (id) => {
     Swal.fire({
@@ -248,7 +252,7 @@ const SalesList = () => {
                 <Link
                   to="#"
                   className="confirm-text"
-                  onClick={confirmText}
+                  onClick={() => confirmText(record?.id)}
                   title=" Delete Sale"
                 >
                   <img src={DeleteIcon} alt="img" />
