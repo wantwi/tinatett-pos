@@ -27,12 +27,12 @@ const AddSupplier = () => {
 
   const validationSchema = Yup.object().shape({
     name: Yup.string().required("Supplier name is required"),
-    email: Yup.string()
-      .required("Email is required"),
+    // email: Yup.string()
+    //   .required("Email is required"),
     contact: Yup.string()
       .required("Phone number is required"),
-    location: Yup.string()
-      .required("Location is required"),
+    // location: Yup.string()
+    //   .required("Location is required"),
   });
 
 

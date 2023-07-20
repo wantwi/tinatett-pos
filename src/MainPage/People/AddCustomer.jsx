@@ -19,13 +19,13 @@ const AddCustomer = () => {
   const axios = useCustomApi();
   const [customerType, setCustomerType] = useState(0)
   const validationSchema = Yup.object().shape({
-    name: Yup.string().required("Product name is required"),
-    email: Yup.string()
-      .required("Email is required"),
+    name: Yup.string().required("Customer name is required"),
+    // email: Yup.string()
+    //   .required("Email is required"),
     contact: Yup.string()
       .required("Phone number is required"),
-    location: Yup.string()
-      .required("Location is required"),
+    // location: Yup.string()
+    //   .required("Location is required"),
   });
 
   const {
@@ -39,7 +39,7 @@ const AddCustomer = () => {
       name: "",
       email: "",
       contact: "",
-      othercontact: "",
+      otherContact: "",
       location: "",
       customerType: 0,
       gpsAddress:""
@@ -145,9 +145,7 @@ const AddCustomer = () => {
                     type="text"
                     {...register("email")}
                   />
-                  <div className="invalid-feedback">
-                    {errors.name?.message}
-                  </div> 
+                 
                   </div>
                 </div>
 
@@ -177,11 +175,9 @@ const AddCustomer = () => {
                           errors.name ? "is-invalid" : ""
                         }`}
                         type="text"
-                        {...register("othercontact")}
+                        {...register("otherContact")}
                       />
-                      <div className="invalid-feedback">
-                        {errors.name?.message}
-                      </div>
+                     
                   </div>
                 </div>
               
@@ -208,24 +204,6 @@ const AddCustomer = () => {
                         {...register("gpsAddress")}/>
                   </div>
                 </div>
-                {/* <div className="col-lg-12">
-                  <div className="form-group">
-                    <label>Description</label>
-                    <textarea className="form-control" defaultValue={""} />
-                  </div>
-                </div> */}
-                {/* <div className="col-lg-12">
-                  <div className="form-group">
-                    <label> Avatar</label>
-                    <div className="image-upload">
-                      <input type="file" />
-                      <div className="image-uploads">
-                        <img src={Upload} alt="img" />
-                        <h4>Drag and drop a file to upload</h4>
-                      </div>
-                    </div>
-                  </div>
-                </div> */}
               
                 <div className="col-lg-12" style={{textAlign:'right'}}>
                   <button type="submit" className="btn btn-submit me-2"><FeatherIcon icon="save"/> Save</button>

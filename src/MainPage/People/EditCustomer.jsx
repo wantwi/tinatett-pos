@@ -17,19 +17,19 @@ import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 
 const EditCustomer = () => {
   const {state} = useLocation()
-
+console.log(state)
   const [formData, setFormData] = useState(state)
   const [customerType, setCustomerType] = useState(formData?.customerType)
 
 
   const validationSchema = Yup.object().shape({
-    name: Yup.string().required("Product name is required"),
-    email: Yup.string()
-      .required("Email is required"),
+    name: Yup.string().required("Customer name is required"),
+    // email: Yup.string()
+    //   .required("Email is required"),
     contact: Yup.string()
       .required("Phone number is required"),
-    location: Yup.string()
-      .required("Location is required"),
+    // location: Yup.string()
+    //   .required("Location is required"),
   });
 
   const {
@@ -44,6 +44,7 @@ const EditCustomer = () => {
       name: formData?.customerName,
       email: formData?.email,
       contact: formData?.contact,
+      otherContact: formData?.otherContact,
       location: formData?.location,
       customerType: formData?.customerType,
       gpsAddress: formData?.gpsAddress
@@ -91,68 +92,89 @@ const EditCustomer = () => {
             <div className="card-body">
             <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="row">
-                <div className="col-lg-4 col-sm-6 col-12">
-                  <div className="form-group">
-                    <label>Customer Name</label>
-                    <input type="text"  {...register("name")} disabled/>
+                  <div className="col-lg-4 col-sm-6 col-12">
+                    <div className="form-group">
+                      <label>Customer Name</label>
+                      <input type="text"  {...register("name")} disabled/>
+                    </div>
                   </div>
-                </div>
-                <div className="col-lg-4 col-sm-6 col-12">
-                  <div className="form-group">
-                    <label>Email</label>
-                    <input type="text"  {...register("email")}/>
+
+                  <div className="col-lg-4 col-sm-6 col-12">
+                    <div className="form-group">
+                      <label>Choose Type</label>
+                      <div className="row">
+                          <div class="col-lg-6">
+                            <div class="input-group">
+                              <div class="input-group-text">
+                                <input className="form-check-input" type="radio" name="customerType" value="0" checked={customerType == 0} onChange = {(e) => setCustomerType(e.target.value)}/>
+                              </div>
+                              <input type="text" className="form-control" aria-label="Text input with radio button" value={'Company'}/>
+                            </div>
+                        </div>
+
+                          <div class="col-lg-6">
+
+                            <div class="input-group">
+                              <div class="input-group-text">
+                                <input className="form-check-input" type="radio" name="customerType" value="1" checked={customerType == 1} onChange = {(e) => setCustomerType(e.target.value)}/>
+                              </div>
+                              <input type="text" className="form-control" aria-label="Text input with radio button" value={'Individual'} />
+                            </div>
+                          
+                          </div>
+                      </div>                   
+                    </div>
                   </div>
-                </div>
-                <div className="col-lg-4 col-sm-6 col-12">
-                  <div className="form-group">
-                    <label>Phone</label>
-                    <input type="text"  {...register("contact")}/>
+
+                  <div className="col-lg-4 col-sm-6 col-12">
+                    <div className="form-group">
+                      <label>Email</label>
+                      <input type="text"  {...register("email")}/>
+                    </div>
                   </div>
-                </div>
               
                 </div> 
                 <div className="row">
+
                 <div className="col-lg-4 col-sm-6 col-12">
                   <div className="form-group">
-                    <label>Choose Type</label>
-                    <div className="row">
-                        <div class="col-lg-6">
-                          <div class="input-group">
-                            <div class="input-group-text">
-                              <input className="form-check-input" type="radio" name="customerType" value="0" checked={customerType == 0} onChange = {(e) => setCustomerType(e.target.value)}/>
-                            </div>
-                            <input type="text" className="form-control" aria-label="Text input with radio button" value={'Company'}/>
-                          </div>
-                       </div>
-
-                        <div class="col-lg-6">
-
-                          <div class="input-group">
-                            <div class="input-group-text">
-                              <input className="form-check-input" type="radio" name="customerType" value="1" checked={customerType == 1} onChange = {(e) => setCustomerType(e.target.value)}/>
-                            </div>
-                            <input type="text" className="form-control" aria-label="Text input with radio button" value={'Individual'} />
-                          </div>
-                        
-                        </div>
-                    </div>                   
+                    <label>Contact</label>
+                    <input type="text"  {...register("contact")}/>
                   </div>
                 </div>
+
+                <div className="col-lg-4 col-12">
+                  <div className="form-group">
+                    <label>Other Contact</label>
+                    <input  className={`form-control ${
+                          errors.name ? "is-invalid" : ""
+                        }`}
+                        type="text"
+                        {...register("otherContact")}
+                      />
+                     
+                  </div>
+                </div>
+               
                 <div className="col-lg-4 col-12">
                   <div className="form-group">
                     <label>Location/Address</label>
                     <input type="text"  {...register("location")}/>
                   </div>
                 </div>
-                <div className="col-lg-4 col-12">
+
+                 <div className="col-lg-4 col-12">
                   <div className="form-group">
-                    <label>GPS</label>
-                    <input className={`form-control`}
+                    <label>Ghana Post Address</label>
+                    <input className={`form-control ${
+                          errors.name ? "is-invalid" : ""
+                        }`}
                         type="text"
-                        {...register("gpsAddress")}
-                        />
+                        placeholder="GZ-000-0000"
+                        {...register("gpsAddress")}/>
                   </div>
                 </div>
+
                 <div className="col-lg-12" style={{textAlign:'right'}}>
                   <button  type="submit" className="btn btn-submit me-2">Update</button>
                   <Link to="/tinatett-pos/people/customerlist" className="btn btn-cancel">

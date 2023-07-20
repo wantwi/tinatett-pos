@@ -32,12 +32,11 @@ const EditSupplier = () => {
 
   const validationSchema = Yup.object().shape({
     name: Yup.string().required("Supplier name is required"),
-    email: Yup.string()
-      .required("Email is required"),
-    contact: Yup.string()
-      .required("Phone number is required"),
-    location: Yup.string()
-      .required("Location is required"),
+    // email: Yup.string()
+    //   .required("Email is required"),
+    contact: Yup.string().required("Phone number is required"),
+    // location: Yup.string()
+    //   .required("Location is required"),
   });
 
 
@@ -198,11 +197,13 @@ const EditSupplier = () => {
                 <div className="row">
                   <div className="col-lg-4 col-sm-6 col-12">
                     <div className="form-group">
-                      <label>Product</label>
-                      <input className={`form-control ${errors.name ? "is-invalid" : ""
+                     <label>Products Supplied</label>
+                      <textarea className={`form-control ${errors.name ? "is-invalid" : ""
                         }`}
                         type="text"
+                        placeholder="Enter products, separated by comma"
                         {...register("product")} />
+                      
                     </div>
                   </div>
 

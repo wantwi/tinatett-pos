@@ -53,7 +53,7 @@ const CustomerList = () => {
             gpsAddress: customer?.gpsAddress,
             email: customer?.email,
             contact: customer?.contact,
-            othercontact: customer?.otherContact,
+            otherContact: customer?.otherContact,
             createdBy: customer?.user.firstName  + ' ' + customer.user.lastName,
           }
       })
@@ -78,7 +78,7 @@ const CustomerList = () => {
             gpsAddress: customer?.gpsAddress,
             email: customer?.email,
             contact: customer?.contact,
-            othercontact: customer?.otherContact,
+            otherContact: customer?.otherContact,
             createdBy: customer?.user.firstName  + ' ' + customer.user.lastName,
           }
         })
@@ -240,7 +240,7 @@ const CustomerList = () => {
               </div>
 
               {/* /Filter */}
-              <div className="table-responsive" id={tableID} title={'Customers List'}>
+              <div className="table-responsive" id={tableID} >
                 <Table columns={columns} dataSource={data} />
               </div>
             </div>
