@@ -141,6 +141,11 @@ const PurchaseList = () => {
 
   const columns = [
     {
+      title: "Purchase Date",
+      dataIndex: "date",
+      sorter: (a, b) => a.date.length - b.date.length,
+    },
+    {
       title: "Supplier Name",
       dataIndex: "supplierName",
       sorter: (a, b) => a.supplierName.length - b.supplierName.length,
@@ -150,11 +155,7 @@ const PurchaseList = () => {
       dataIndex: "reference",
       sorter: (a, b) => a.reference.length - b.reference.length,
     },
-    {
-      title: "Purchase Date",
-      dataIndex: "date",
-      sorter: (a, b) => a.date.length - b.date.length,
-    },
+    
     {
       title: "# of Products",
       dataIndex: "numberOfProduct",

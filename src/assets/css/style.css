@@ -1034,7 +1034,7 @@ strong {
   font-size: 18px;
   font-weight: 700;
   color: #212B36;
-  margin: 0 0 20px;
+  margin: 0 0 10px;
 }
 @media (max-width: 991px) {
   .card .card-header .card-title {
@@ -1042,11 +1042,11 @@ strong {
   }
 }
 .card .card-body {
-  padding: 20px;
+  padding: 10px;
 }
 @media (max-width: 991px) {
   .card .card-body {
-    padding: 15px;
+    padding: 5px;
   }
 }
 .card .card-body .card-title {
@@ -1210,7 +1210,7 @@ a:hover {
 }
 
 .form-group {
-  margin-bottom: 25px;
+  margin-bottom: 15px;
 }
 .form-group label {
   margin-bottom: 8px;
@@ -1477,7 +1477,7 @@ body[data-theme=dark] .table tbody tr td a {
 .cardhead .card-header {
   border-bottom: 1px solid #E8EBED;
   background: transparent;
-  padding: 15px;
+  padding: 10px;
 }
 .cardhead .card-header .card-title {
   margin: 0;

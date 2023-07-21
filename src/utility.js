@@ -1,4 +1,5 @@
 import axios from "axios";
+import { BASE_URL } from "./api/CustomAxios";
 
 export const moneyInTxt = (value, standard, dec = 2) => {
     var nf = new Intl.NumberFormat(standard, {
@@ -20,9 +21,10 @@ export const commaRemover = (value) => {
   return parseFloat(value)
 }
   let token = JSON.parse(sessionStorage.getItem("auth"))
+  //console.log(token)
 
   export const getInvoiceReceipt = (salesref) => {
-    axios.get('https://backendapi.akwaabaevolution.com/api/sales/getSaleReceipt/'+ salesref, {
+    axios.get(`${BASE_URL}/sales/getSaleReceipt/`+ salesref, {
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token.token}`
@@ -34,8 +36,10 @@ export const commaRemover = (value) => {
     var base64 = res.data.base64
     const blob = base64ToBlob( base64, 'application/pdf' );
     const url = URL.createObjectURL( blob );
+    //window.print(url)
     const pdfWindow = window.open("");
     pdfWindow.document.write("<iframe width='100%' height='100%' src='" + url + "'></iframe>");
+    //window.print()
     })
     
     function base64ToBlob( base64, type = "application/octet-stream" ) {

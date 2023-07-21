@@ -85,6 +85,7 @@ const ProformaSales = () => {
      
   })
   
+  const [transactionType, setTransactionType] = useState('SP')
 
   const retailRef = useRef()
   const wholesaleRef = useRef()
@@ -136,182 +137,207 @@ const ProformaSales = () => {
 
   const processPayment = (type, print) =>{
 
-    //handle the suspend first and then use the reference to process payment
-    setIsSaving(true)
-    let payload = {
-      customerId: selectedCustomer?.value,
-      transDate: transDate,
-      totalAmount : productGridData.reduce((total, item) => total + item.amount, 0),
-      salesType:salesType,
-      products: productGridData
-    }
 
-    axios.post(`/sales/suspend`, payload)
-    .then((res) => {
-      if(res.data.success){
-        setProductGridData([])
-        setFormData({quantity:'', amount:'', batchNumber:'', manuDate:'', expDate:''})
-        setSelectedProduct('')
-        setInvoiceNo('')
-        setReferenceData(res.data)
-
-
-        //call payment api
-        let pType = ''
-          if(paymentInfo.cashAmount > 0){
-            pType = pType.concat('Cash,')
-          }
-          if(paymentInfo.momoAmount > 0){
-            pType = 
-            pType.concat('Momo,')
-          }
-          if(paymentInfo.chequeAmount > 0){
-            pType = pType.concat('Cheque,')
-          }
-          let payload = {
-            status: type,
-            salesRef: res.data.reference,
-            amount: productGridData.reduce((total, item) => total + item.amount, 0),
-            paymentType: pType,
-            paymentInfo: [
-              {"type":"Cash", waybill:paymentInfo.cashWaybill, amountPaid: paymentInfo.cashAmount },
-              {"type":"Momo", name: paymentInfo.momoName,  receiptNo: paymentInfo.momoReceiptNo, amountPaid: paymentInfo.momoAmount},
-              {"type":"Cheque", waybill: paymentInfo.chequeWaybill,  chequeNo: paymentInfo.chequeNo, chequeReceiptNo: paymentInfo.chequeReceiptNo, amountPaid: paymentInfo.chequeAmount, waybill: paymentInfo.chequeWaybill}
-            ]
-          }
-
-          
-          axios.post('/sales',payload)
-          .then((res) => {
-            if(res.data.success){
-              if(print){
-                getInvoiceReceipt(payload.salesRef)
-              }
-              alertify.set("notifier", "position", "top-right");
-              alertify.success("Sale completed.");
-            
-            }
-          })
-          .catch((error) => {
-            alertify.set("notifier", "position", "top-right");
-            alertify.error("Error...Could not complete transaction");
-          })
-          .finally(() => {
-            setPaymentInfo({type:'',
-            cashWaybill:'',
-            cashReceiptNo:'',
-            cashAmount:'',
-            chequeNo:'',
-            chequeReceiptNo:'',
-            chequeAmount:'',
-            chequeWaybill:'',
-            dueDate:'',
-            bank:'',
-            momoName:'',
-            momoReceiptNo:'',
-            momoAmount:'' ,
-            transactionID:'',
-            amountPaid:''
-          })
-            setTimeout(() => {
-              $('.modal').modal('hide')
-            }, 1500)
-            //
-          })
-       
-      }
-      else{
-        alertify.set("notifier", "position", "top-right");
-        alertify.warning("Unsuccessful, please try again");
-      }
-    })
-    .catch((error) => {
+    if (productGridData.length < 1) {
       alertify.set("notifier", "position", "top-right");
-      alertify.error("Some error occured. Please contact admin");
-    })
-    .finally(() => {
-      setIsSaving(false)
-      $('#reference').modal('show')
-     }
-      )
-
-    
-
-  }
-
-  const getInvoiceReceipt = (salesref) => {
-    axios.get('/sales/getSaleReceipt/'+ salesref)
-    .then((res) =>{
-    console.log(res.data)
-    var base64 = res.data.base64
-    const blob = base64ToBlob( base64, 'application/pdf' );
-    const url = URL.createObjectURL( blob );
-    const pdfWindow = window.open("");
-    pdfWindow.document.write("<iframe width='100%' height='100%' src='" + url + "'></iframe>");
-    })
-    
-    function base64ToBlob( base64, type = "application/octet-stream" ) {
-      const binStr = atob( base64 );
-      const len = binStr.length;
-      const arr = new Uint8Array(len);
-      for (let i = 0; i < len; i++) {
-        arr[ i ] = binStr.charCodeAt( i );
-      }
-      return new Blob( [ arr ], { type: type } );
+      alertify.warning("Please add at least one item to list before saving.");
     }
-  }
+    if (paymentInfo.amountPaid == '' || paymentInfo.amountPaid < 1 || paymentInfo.amountPaid == null) {
+      alertify.set("notifier", "position", "top-right");
+      alertify.warning("Please provide payment amount before saving.");
+    }
 
-  const handleSalesTypeChange = (e) => {
-    if(e.target.value == "Retail"){
-      setSalesType("Retail")
-    }
-    else if(e.target.value == "Wholesale"){
-      setSalesType("Wholesale")
-    }
     else{
-      setSalesType('')
-    }
-  }
+      //handle the suspend first and then use the reference to process payment
+      setIsSaving(true)
+      let payload = {
+        customerId: selectedCustomer?.value,
+        transDate: transDate,
+        totalAmount : productGridData.reduce((total, item) => total + item.amount, 0),
+        salesType:salesType,
+        products: productGridData
+      }
 
-  const handleSuspend = () => {
-    setIsSaving(true)
-    let payload = {
-      customerId: selectedCustomer?.value,
-      transDate: transDate,
-      totalAmount : productGridData.reduce((total, item) => total + item.amount, 0),
-      salesType:salesType,
-      products: productGridData
-    }
+      axios.post(`/sales/suspend`, payload)
+      .then((res) => {
+        if(res.data.success){
+          setProductGridData([])
+          setFormData({quantity:'', amount:'', batchNumber:'', manuDate:'', expDate:''})
+          setSelectedProduct('')
+          setInvoiceNo('')
+          setReferenceData(res.data)
 
-    //console.log(payload)
 
-    axios.post(`/sales/suspend`, payload)
-    .then((res) => {
-      if(res.data.success){
-        setProductGridData([])
-        setFormData({quantity:'', amount:'', batchNumber:'', manuDate:'', expDate:''})
-        setSelectedProduct('')
-        setInvoiceNo('')
+          //call payment api
+          let pType = ''
+            if(paymentInfo.cashAmount > 0){
+              pType = pType.concat('Cash,')
+            }
+            if(paymentInfo.momoAmount > 0){
+              pType = 
+              pType.concat('Momo,')
+            }
+            if(paymentInfo.chequeAmount > 0){
+              pType = pType.concat('Cheque,')
+            }
+            let payload = {
+              status: type,
+              salesRef: res.data.reference,
+              amount: productGridData.reduce((total, item) => total + item.amount, 0),
+              paymentType: pType,
+              paymentInfo: [
+                {"type":"Cash", waybill:paymentInfo.cashWaybill, amountPaid: paymentInfo.cashAmount },
+                {"type":"Momo", name: paymentInfo.momoName,  receiptNo: paymentInfo.momoReceiptNo, amountPaid: paymentInfo.momoAmount},
+                {"type":"Cheque", waybill: paymentInfo.chequeWaybill,  chequeNo: paymentInfo.chequeNo, chequeReceiptNo: paymentInfo.chequeReceiptNo, amountPaid: paymentInfo.chequeAmount, waybill: paymentInfo.chequeWaybill}
+              ]
+            }
+
+            
+            axios.post('/sales',payload)
+            .then((res) => {
+              if(res.data.success){
+                if(print){
+                  getInvoiceReceipt(payload.salesRef)
+                }
+                alertify.set("notifier", "position", "top-right");
+                alertify.success("Sale completed.");
+              
+              }
+            })
+            .catch((error) => {
+              alertify.set("notifier", "position", "top-right");
+              alertify.error("Error...Could not complete transaction");
+            })
+            .finally(() => {
+              setPaymentInfo({type:'',
+              cashWaybill:'',
+              cashReceiptNo:'',
+              cashAmount:'',
+              chequeNo:'',
+              chequeReceiptNo:'',
+              chequeAmount:'',
+              chequeWaybill:'',
+              dueDate:'',
+              bank:'',
+              momoName:'',
+              momoReceiptNo:'',
+              momoAmount:'' ,
+              transactionID:'',
+              amountPaid:''
+            })
+              setTimeout(() => {
+                $('.modal').modal('hide')
+              }, 1500)
+              //
+            })
         
+        }
+        else{
+          alertify.set("notifier", "position", "top-right");
+          alertify.warning("Unsuccessful, please try again");
+        }
+      })
+      .catch((error) => {
         alertify.set("notifier", "position", "top-right");
-        alertify.success("Suspended successfully");
-        setReferenceData(res.data)
-       
+        alertify.error("Some error occured. Please contact admin");
+      })
+      .finally(() => {
+        setIsSaving(false)
+        $('#reference').modal('show')
+      })
+
+      }
+    }
+
+    const handlePayment = () => {
+      if(transactionType == "SP"){
+        processPayment("Paid", true)
+      }
+      if(transactionType == "SO"){
+        processPayment("Paid", false)
+      }
+      if(transactionType == "CP"){
+        processPayment("Credit", true)
+      }
+      if(transactionType == "CO"){
+        processPayment("Credit", false)
+      }
+      $('.modal').modal('hide')
+    }
+
+    const getInvoiceReceipt = (salesref) => {
+      axios.get('/sales/getSaleReceipt/'+ salesref)
+      .then((res) =>{
+      console.log(res.data)
+      var base64 = res.data.base64
+      const blob = base64ToBlob( base64, 'application/pdf' );
+      const url = URL.createObjectURL( blob );
+      const pdfWindow = window.open("");
+      pdfWindow.document.write("<iframe width='100%' height='100%' src='" + url + "'></iframe>");
+      })
+      
+      function base64ToBlob( base64, type = "application/octet-stream" ) {
+        const binStr = atob( base64 );
+        const len = binStr.length;
+        const arr = new Uint8Array(len);
+        for (let i = 0; i < len; i++) {
+          arr[ i ] = binStr.charCodeAt( i );
+        }
+        return new Blob( [ arr ], { type: type } );
+      }
+    }
+
+    const handleSalesTypeChange = (e) => {
+      if(e.target.value == "Retail"){
+        setSalesType("Retail")
+      }
+      else if(e.target.value == "Wholesale"){
+        setSalesType("Wholesale")
       }
       else{
-        alertify.set("notifier", "position", "top-right");
-        alertify.warning("Suspend unsuccessful");
+        setSalesType('')
       }
-    })
-    .catch((error) => {
-      alertify.set("notifier", "position", "top-right");
-      alertify.error("Some error occured. Please contact admin");
-    })
-    .finally(() => {
-      setIsSaving(false)
-      $('#reference').modal('show')
-     }
-      )
+    }
+
+    const handleSuspend = () => {
+      setIsSaving(true)
+      let payload = {
+        customerId: selectedCustomer?.value,
+        transDate: transDate,
+        totalAmount : productGridData.reduce((total, item) => total + item.amount, 0),
+        salesType:salesType,
+        products: productGridData
+      }
+
+      //console.log(payload)
+
+      axios.post(`/sales/suspend`, payload)
+      .then((res) => {
+        if(res.data.success){
+          setProductGridData([])
+          setFormData({quantity:'', amount:'', batchNumber:'', manuDate:'', expDate:''})
+          setSelectedProduct('')
+          setInvoiceNo('')
+          
+          alertify.set("notifier", "position", "top-right");
+          alertify.success("Suspended successfully");
+          setReferenceData(res.data)
+        
+        }
+        else{
+          alertify.set("notifier", "position", "top-right");
+          alertify.warning("Suspend unsuccessful");
+        }
+      })
+      .catch((error) => {
+        alertify.set("notifier", "position", "top-right");
+        alertify.error("Some error occured. Please contact admin");
+      })
+      .finally(() => {
+        setIsSaving(false)
+        $('#reference').modal('show')
+      }
+        )
     
   }
 
@@ -756,12 +782,12 @@ const ProformaSales = () => {
                 </div> */}
 
                 <div className="col-12" style={{display:'flex', justifyContent:'flex-end'}}>
-                <div className="form-group">
+               
                   <label></label>
                   <Link to="#" className="btn btn-submit me-2" style={{width: '100%', textAlign:'center', marginTop:8}} onClick={handleAddItem}>
                   <FeatherIcon icon="shopping-cart"/> {" Add to Basket"}
                     </Link>
-                  </div>
+                 
                  
                 </div>
                 </div>
@@ -770,7 +796,7 @@ const ProformaSales = () => {
             
           </div>
 
-          <div className="card">
+          {/* <div className="card">
             <div className="card-body">
             <div className="payment-div" >
                         <ul className="nav nav-tabs">
@@ -1027,7 +1053,7 @@ const ProformaSales = () => {
                         </div> : null}
                       </div>
             </div>
-          </div>
+          </div> */}
         </div>
 
 
@@ -1037,64 +1063,56 @@ const ProformaSales = () => {
           <div className="card-body">
               <div className="row">
                 <div className="col-lg-12">
-                <div className="row" >
-                <div className="table-responsive mb-3" style={{height:830, maxHeight:900, overflow:'auto'}}>
-                  <table className="table">
-                    <thead>
-                      <tr>
-                        <th>#</th>
-                        <th>Product Name</th>
-                        <th>Exp Date</th>
-                        <th>QTY</th>
-                        <th>Price</th>
-                        <th>Subtotal</th>
-                        <th>Action</th>
-                        <th />
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {
-                        productGridData?.map((item, i) => {
-                          return (
-                            <tr>
-                            <td>{i+1}</td>
-                            <td>
-                              <Link to="#">{item.name}</Link>
-                            </td>
-                            <td>{item?.expireDate}</td>
-                            <td>{item.quantity}</td>
-                            <td>{item.unitPrice}</td>
-                            <td>{item.amount}</td>
-                            
-                            <td>
-                            <Link to="#" className="delete-set me-2" data-bs-toggle="modal" data-bs-target="#editproduct" onClick={() => handleEdit(item)}>
-                                <img src={EditIcon} alt="svg" />
-                              </Link>
-                              <Link to="#" className="delete-set" onClick={() => deleteRow(item)}>
-                                <img src={DeleteIcon} alt="svg" />
-                              </Link>
-                            </td>
-                          </tr>
-                          )
-                        })
-                      }
-                     
-                     
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-                </div>
+                    <div className="row" >
+                  <div className="table-responsive mb-3" style={{ height: 480, maxHeight: 500, overflow: 'auto' }}>
+                    <table className="table">
+                      <thead>
+                        <tr>
+                          <th>#</th>
+                          <th>Product Name</th>
+                          <th>Exp Date</th>
+                          <th>QTY</th>
+                          <th>Price</th>
+                          <th>Subtotal</th>
+                          <th>Batch #</th>
+                          <th>Action</th>
+                          <th />
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {
+                          productGridData?.map((item, i) => {
+                            return (
+                              <tr>
+                              <td>{i+1}</td>
+                              <td>
+                                <Link to="#">{item.name}</Link>
+                              </td>
+                              <td>{item?.expireDate}</td>
+                              <td>{item.quantity}</td>
+                              <td>{item.unitPrice}</td>
+                              <td>{item.amount}</td>
+                              <td>{item.batchNumber}</td>
+                              <td>
+                              <Link to="#" className="delete-set me-2" data-bs-toggle="modal" data-bs-target="#editproduct" onClick={() => handleEdit(item)}>
+                                  <img src={EditIcon} alt="svg" />
+                                </Link>
+                                <Link to="#" className="delete-set" onClick={() => deleteRow(item)}>
+                                  <img src={DeleteIcon} alt="svg" />
+                                </Link>
+                              </td>
+                            </tr>
+                            )
+                          })
+                        }
+                      
+                      
+                      </tbody>
+                    </table>
+                  </div>
+                  </div>
 
-
-
-              </div>  
-          </div>
-        </div>     
-            
-        <div className="card" >
-          <div className="card-body">
-              <div className="row">
+                  <div className="row">
                 <div className="col-lg-6 ">
                   <div className="total-order w-100 max-widthauto m-auto mb-4">
                     <ul>
@@ -1137,24 +1155,30 @@ const ProformaSales = () => {
 
               <div className="row mt-2">
                 <div className="col-lg-12" style={{display:'flex', justifyContent:'space-between'}} >
-                  <button className="btn btn-info me-2" onClick={() => processPayment("Paid", true)} style={{width:'20%'}}>
-                    Sell and Print
-                  </button>
-                  <button className="btn btn-warning me-2" onClick={() => processPayment("Paid", false)} style={{width:'20%'}}>
-                    Sell Only
-                  </button>
-                  <button className="btn btn-danger me-2" style={{width:'20%'}} onClick={() => processPayment("Credit", true)} >
-                    Credit and Print
-                  </button>
-                  <button  className="btn btn-cancel" style={{width:'20%'}} onClick={() => processPayment("Credit", false)}>
-                     Credit Only
-                  </button>
+                <button className="btn btn-info me-2" data-bs-toggle="modal" data-bs-target="#payment" onClick={() => setTransactionType("SP")} style={{ width: '20%' }}>
+                      Sell and Print
+                    </button>
+                    <button className="btn btn-warning me-2" data-bs-toggle="modal" data-bs-target="#payment"  onClick={() => setTransactionType("SO")} style={{ width: '20%' }}>
+                      Sell Only
+                    </button>
+                    <button className="btn btn-danger me-2" data-bs-toggle="modal" data-bs-target="#payment"  style={{ width: '20%' }} onClick={() => setTransactionType("CP")} >
+                      Credit and Print
+                    </button>
+                    <button className="btn btn-cancel" data-bs-toggle="modal" data-bs-target="#payment"  style={{ width: '20%' }} onClick={() => setTransactionType("CO")}>
+                      Credit Only
+                    </button>
                   
                 </div>
               </div>
-               
-            </div>
-        </div>
+                </div>
+
+
+
+              </div>  
+          </div>
+        </div>     
+            
+        
         </div>
 
        
@@ -1277,6 +1301,296 @@ const ProformaSales = () => {
               </div>
             </div>
           </div>
+
+                {/*  Modal Payment  */}
+              <div className="modal fade"
+                id="payment"
+                tabIndex={-1}
+                aria-labelledby="payment"
+                aria-hidden="true">
+
+                <div className="modal-dialog modal-md modal-dialog-centered">
+                  <div className="modal-content">
+                    <div className="modal-header">
+                      <h5 className="modal-title">Payment Details </h5>
+                      <button
+                        type="button"
+                        className="close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"
+                      >
+                        <span aria-hidden="true">×</span>
+                      </button>
+                    </div>
+                    <div className="modal-body">
+                      
+                        <div className="payment-div" >
+                                <ul className="nav nav-tabs">
+                                  <li className="nav-item" onClick={() => setActiveTab('Cash')}>
+                                    <a className={activeTab == 'Cash' ? `nav-link active` : `nav-link`} href="javascript:void(0);">Cash</a>
+                                  </li>
+
+                                  <li className="nav-item" onClick={() => setActiveTab('Cheque')}>
+                                    <a className={activeTab == 'Cheque' ? `nav-link active` : `nav-link`} href="javascript:void(0);">Cheque</a>
+                                  </li>
+
+                                  <li className="nav-item" onClick={() => setActiveTab('Momo')}>
+                                    <a className={activeTab == 'Momo' ? `nav-link active` : `nav-link`} href="javascript:void(0);">Mobile Money</a>
+                                  </li>
+
+                                </ul>
+
+                                
+                                {activeTab == 'Cash' ? <div id="cash-tab" style={{ marginTop: 20 }}>
+                                  <div className="row">
+                                    <div className="col-6">
+                                      <div className="form-group">
+                                        <label>Waybill</label>
+                                        <div className="input-groupicon">
+                                          <input
+                                            type="text"
+                                            placeholder=""
+                                            value={paymentInfo.cashWaybill}
+                                            onChange={(e) => setPaymentInfo({...paymentInfo, cashWaybill: e.target.value})}
+                                          />
+
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    <div className="col-6">
+                                      <div className="form-group">
+                                        <label>Amount </label>
+                                        <div className="input-groupicon">
+                                          <input
+                                            type="text"
+                                            placeholder=""
+                                            value={paymentInfo.cashAmount}
+                                            onChange={(e) => {
+                                              if(e.target.value == ''){
+                                                setPaymentInfo({...paymentInfo, cashAmount: ''})
+                                              }
+                                              else if(isValidNumber(e.target.value)){
+                                                setPaymentInfo({...paymentInfo, cashAmount: Number(e.target.value)})
+                                              }
+                                            
+                                            }}
+                                          />
+
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    <div className="col-6">
+                                      <div className="form-group">
+                                        <label>Receipt No </label>
+                                        <div className="input-groupicon">
+                                          <input
+                                            type="text"
+                                            placeholder=""
+                                            value={paymentInfo.cashReceiptNo}
+                                            onChange={(e) => setPaymentInfo({...paymentInfo, cashReceiptNo: e.target.value})}
+                                          />
+
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                  </div>
+                                </div> : null}
+                                {activeTab == 'Cheque' ? <div id="cheque-tab" style={{ marginTop: 20 }}>
+                                  <div className="row">
+
+                                    <div className="col-6">
+                                      <div className="form-group">
+                                        <label>Waybill</label>
+                                        <div className="input-groupicon">
+                                          <input
+                                            type="text"
+                                            placeholder=""
+                                            value={paymentInfo.chequeWaybill}
+                                            onChange={(e) => setPaymentInfo({...paymentInfo, chequeWaybill: e.target.value})}
+                                          />
+
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    <div className="col-6">
+                                      <div className="form-group">
+                                        <label>Cheque No</label>
+                                        <div className="input-groupicon">
+                                          <input
+                                            type="text"
+                                            placeholder=""
+                                            value={paymentInfo.chequeNo}
+                                            onChange={(e) => setPaymentInfo({...paymentInfo, chequeNo: e.target.value})}
+                                          />
+
+                                        </div>
+                                      </div>
+                                    </div>
+
+
+                                    <div className="col-6">
+                                      <div className="form-group">
+                                        <label>Receipt No</label>
+                                        <div className="input-groupicon">
+                                          <input
+                                            type="text"
+                                            placeholder=""
+                                            value={paymentInfo.chequeReceiptNo}
+                                            onChange={(e) => setPaymentInfo({...paymentInfo, chequeReceiptNo: e.target.value})}
+                                          />
+
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    <div className="col-6">
+                                      <div className="form-group">
+                                        <label>Due Date</label>
+                                        <div className="input-groupicon">
+                                          <input
+                                            type="date"
+                                            placeholder=""
+                                            className="form-control"
+                                            value={paymentInfo.dueDate}
+                                            onChange={(e) => setPaymentInfo({...paymentInfo, dueDate: e.target.value})}
+                                          />
+
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    <div className="col-6">
+                                      <div className="form-group">
+                                        <label>Bank</label>
+                                        <div className="input-groupicon">
+                                          <input
+                                            type="text"
+                                            placeholder=""
+                                            value={paymentInfo.bank}
+                                            onChange={(e) => setPaymentInfo({...paymentInfo, bank: e.target.value})}
+                                          />
+
+                                        </div>
+                                      </div>
+                                    </div>
+
+
+
+                                    <div className="col-6">
+                                      <div className="form-group">
+                                        <label>Amount</label>
+                                        <div className="input-groupicon">
+                                          <input
+                                            type="text"
+                                            placeholder=""
+                                            value={paymentInfo.chequeAmount}
+                                            onChange={(e) => {
+                                              if(e.target.value == ''){
+                                                setPaymentInfo({...paymentInfo, chequeAmount: ''})
+                                              }
+                                              else if(isValidNumber(e.target.value)){
+                                                setPaymentInfo({...paymentInfo, chequeAmount: Number(e.target.value)})
+                                              }
+                                      
+                                            }}
+                                          />
+
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                </div> : null}
+                                {activeTab == 'Momo' ? <div id="momo-tab" style={{ marginTop: 20 }}>
+                                  <div className="row">
+                                    <div className="col-6">
+                                      <div className="form-group">
+                                        <label>Receipt No</label>
+                                        <div className="input-groupicon">
+                                          <input
+                                            type="text"
+                                            placeholder=""
+                                            value={paymentInfo.momoReceiptNo}
+                                            onChange={(e) => setPaymentInfo({...paymentInfo, momoReceiptNo: e.target.value})}
+                                          />
+
+                                        </div>
+                                      </div>
+                                    </div>
+
+
+                                    <div className="col-6">
+                                      <div className="form-group">
+                                        <label>Name</label>
+                                        <div className="input-groupicon">
+                                          <input
+                                            type="text"
+                                            placeholder=""
+                                            value={paymentInfo.momoName}
+                                            onChange={(e) => setPaymentInfo({...paymentInfo, momoName: e.target.value})}
+                                          />
+
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    <div className="col-6">
+                                      <div className="form-group">
+                                        <label>Amount</label>
+                                        <div className="input-groupicon">
+                                          <input
+                                            type="text"
+                                            placeholder=""
+                                            value={paymentInfo.momoAmount}
+                                            onChange={(e) => {
+                                              if(e.target.value == ''){
+                                                setPaymentInfo({...paymentInfo, momoAmount: ''})
+                                              }
+                                              else if(isValidNumber(e.target.value)){
+                                                setPaymentInfo({...paymentInfo, momoAmount: Number(e.target.value)})
+                                              }
+                                      
+                                            }}
+                                          />
+
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    <div className="col-6">
+                                      <div className="form-group">
+                                        <label>Transaction ID</label>
+                                        <div className="input-groupicon">
+                                          <input
+                                            type="text"
+                                            placeholder=""
+                                            value={paymentInfo.transactionID}
+                                            onChange={(e) => setPaymentInfo({...paymentInfo, transactionID: e.target.value})}
+                                          />
+
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                </div> : null}
+                        </div>
+
+                    </div>
+                    <div className="modal-footer" style={{ justifyContent: 'flex-end' }}>
+                      <button type="button" className="btn btn-submit" onClick={handlePayment}>
+                        Complete Transaction
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+
+              </div>
 
 
           {/* Reference Modal */}

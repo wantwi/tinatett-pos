@@ -28,7 +28,7 @@ import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
 import { useGet } from "../../hooks/useGet";
 import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
-import { getInvoiceReceipt, moneyInTxt } from "../../utility";
+import { moneyInTxt } from "../../utility";
 import useCustomApi from "../../hooks/useCustomApi";
 
 const SalesList = () => {
@@ -126,7 +126,8 @@ const SalesList = () => {
             Biller: sale?.salesPerson,
           }
         })
-      setData(mappedData)
+      let sortedData = mappedData.sort((a,b) => new Date(b.Date) - new Date(a.Date))
+      setData(sortedData)
       console.log('loaded..')
     }
     else{
@@ -167,18 +168,18 @@ const SalesList = () => {
       ),
       sorter: (a, b) => a.Status.length - b.Status.length,
     },
-    {
-      title: "Payment",
-      dataIndex: "Payment",
-      render: (text, record) => (
-        <>
+    // {
+    //   title: "Payment",
+    //   dataIndex: "Payment",
+    //   render: (text, record) => (
+    //     <>
          
-            <span className="badges bg-lightgreen">{(text)}</span>
+    //         <span className="badges bg-lightgreen">{(text)}</span>
         
-        </>
-      ),
-      sorter: (a, b) => a.Payment.length - b.Payment.length,
-    },
+    //     </>
+    //   ),
+    //   sorter: (a, b) => a.Payment.length - b.Payment.length,
+    // },
     {
       title: "Total (GHS)",
       dataIndex: "Total",
@@ -249,7 +250,7 @@ const SalesList = () => {
                 </a>
              
             
-                <Link
+                {/* <Link
                   to="#"
                   className="confirm-text"
                   onClick={() => confirmText(record?.id)}
@@ -257,13 +258,37 @@ const SalesList = () => {
                 >
                   <img src={DeleteIcon} alt="img" />
                  
-                </Link>
+                </Link> */}
              
            
         </>
       ),
     },
   ];
+
+
+  const getInvoiceReceipt = (salesref) => {
+    axios.get('/sales/getSaleReceipt/' + salesref)
+      .then((res) => {
+        console.log(res.data)
+        var base64 = res.data.base64
+        const blob = base64ToBlob(base64, 'application/pdf');
+        const url = URL.createObjectURL(blob);
+        const pdfWindow = window.open("");
+        pdfWindow.document.write("<iframe width='100%' height='100%' src='" + url + "'></iframe>");
+        //window.print()
+      })
+
+    function base64ToBlob(base64, type = "application/octet-stream") {
+      const binStr = atob(base64);
+      const len = binStr.length;
+      const arr = new Uint8Array(len);
+      for (let i = 0; i < len; i++) {
+        arr[i] = binStr.charCodeAt(i);
+      }
+      return new Blob([arr], { type: type });
+    }
+  }
 
 
   if(isLoading){

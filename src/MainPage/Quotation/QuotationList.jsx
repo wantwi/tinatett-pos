@@ -114,7 +114,8 @@ const QuotationList = () => {
         }
       })
 
-      setData(mappedData)
+      let sortedData = mappedData.sort((a,b) => new Date(b.requestDate) - new Date(a.requestDate))
+      setData(sortedData)
 
     }
   }, [isLoading])
@@ -126,17 +127,18 @@ const QuotationList = () => {
 
 
   const columns = [
+    {
+      title: "Request Date",
+      dataIndex: "requestDate",
+      sorter: (a, b) => a.requestDate.length - b.requestDate.length,
+    },
  
     {
       title: "Reference",
       dataIndex: "reference",
       sorter: (a, b) => a.reference.length - b.reference.length,
     },
-    {
-      title: "Request Date",
-      dataIndex: "requestDate",
-      sorter: (a, b) => a.requestDate.length - b.requestDate.length,
-    },
+    
     {
       title: "Status",
       dataIndex: "status",

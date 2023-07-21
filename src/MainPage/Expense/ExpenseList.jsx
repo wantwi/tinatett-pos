@@ -35,7 +35,8 @@ const ExpenseList = () => {
             ...expense, expenseDate: expense?.expenseDate.substring(0,10) || expense.expenseDate
           }
         })
-      setData(mappedData)
+      let sortedData = mappedData.sort((a,b) => new Date(b.expenseDate) - new Date(a.expenseDate))
+      setData(sortedData)
     }
  
   }, [isLoading])
@@ -104,6 +105,11 @@ const ExpenseList = () => {
 
   const columns = [
     {
+      title: "Date",
+      dataIndex: "expenseDate",
+      sorter: (a, b) => a.expenseDate.length - b.expenseDate.length,
+    },
+    {
       title: "Category Name",
       dataIndex: "category",
       sorter: (a, b) => a.category.length - b.category.length,
@@ -118,11 +124,7 @@ const ExpenseList = () => {
       dataIndex: "description",
       sorter: (a, b) => a.description.length - b.description.length,
     },
-    {
-      title: "Date",
-      dataIndex: "expenseDate",
-      sorter: (a, b) => a.expenseDate.length - b.expenseDate.length,
-    },
+   
     // {
     //   title: "Amount",
     //   dataIndex: "amount",

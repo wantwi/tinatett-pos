@@ -116,7 +116,8 @@ const ProformaList = () => {
           createdBy: proforma?.createdBy || 'N/A',
         }
       })
-      setData(mappedData)
+      let sortedData = mappedData.sort((a,b) => new Date(b.date) - new Date(a.date))
+      setData(sortedData)
 
 
       let branchList = customers?.data.map((customer) => {
@@ -236,7 +237,12 @@ const ProformaList = () => {
 
   const columns = [
     {
-      title: "Costumer Name",
+      title: "Date",
+      dataIndex: "date",
+      sorter: (a, b) => a.createdAt.length - b.createdAt.length,
+    },
+    {
+      title: "Custumer Name",
       dataIndex: "customerName",
       // sorter: (a, b) => a.customerName.length - b.customerName.length,
       render: (text, record) =>
@@ -253,11 +259,7 @@ const ProformaList = () => {
           <Link to={{ pathname: "/tinatett-pos/proforma/proforma-details", state: record }} title={'View Details'}>{text}</Link>
         </>
     },
-    {
-      title: "Date",
-      dataIndex: "date",
-      sorter: (a, b) => a.createdAt.length - b.createdAt.length,
-    },
+    
     {
       title: "# of Products",
       dataIndex: "numberOfProduct",
@@ -320,9 +322,14 @@ const ProformaList = () => {
           {/* <span className="badges btn-cancel me-2">View</span> */}
           {/* </Link> */}
 
+          <Link to={{ pathname: "/tinatett-pos/proforma/proforma-details", state: record }} >
+            {/* <img src={Eye1} className="me-2" alt="img" /> */}
+            <span className="badges btn-cancel me-2">View</span>
+          </Link>
+
           <Link to={{ pathname: "/tinatett-pos/proforma/edit-proforma", state: record }} >
             {/* <img src={Eye1} className="me-2" alt="img" /> */}
-            <span className="badges btn-cancel me-2">Edit</span>
+            <span className="badges btn-info me-2">Edit</span>
           </Link>
 
           <a href={`/tinatett-pos/sales/proforma-sales?id=${record.id}`} >

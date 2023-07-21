@@ -262,12 +262,10 @@ const Suspended = () => {
           salestype: sale?.salesType
         }
       })
-      setData(mappedData)
-      console.log('loaded..')
+      let sortedData = mappedData.sort((a,b) => new Date(b.Date) - new Date(a.Date))
+      setData(sortedData)  
     }
-    else {
-      console.log('loading...')
-    }
+   
   }, [isLoading])
 
   const columns = [
