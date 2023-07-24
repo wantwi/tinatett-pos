@@ -152,7 +152,7 @@ const TransferProformaItems = () => {
 
   useEffect(() => {
     getProformaProductsBatchNumbers()
-  }, [transferIsLoading])
+  }, [proformaIsLoading, transferIsLoading])
 
   const handleProductSelect = (e) => {
     setSelectedProduct(e)
@@ -210,8 +210,9 @@ const TransferProformaItems = () => {
         let x = res.data.data.batchNumber?.map((item) => {
           return {value:item.batchNumber, label:item?.batchNumber + '-(' + item?.Quantity +')', expireDate:item?.expireDate, manufacturingDate: item?.manufacturingDate}
         })
-        //console.log(x)
-        setFormData({...formData, batchNumber: x[0], manuDate: x[0].manufacturingDate, expDate: x[0].expireDate})
+        if(x.length>0){
+          setFormData({...formData, batchNumber: x[0], manuDate: x[0].manufacturingDate, expDate: x[0].expireDate})
+        }
         retailpriceTypeRef.current.checked = true
       }
     })

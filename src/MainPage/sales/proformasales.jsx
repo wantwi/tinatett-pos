@@ -88,6 +88,7 @@ const ProformaSales = () => {
   
   const [transactionType, setTransactionType] = useState('SP')
 
+
   const retailRef = useRef()
   const wholesaleRef = useRef()
 
@@ -144,10 +145,10 @@ const ProformaSales = () => {
 
 useEffect(() => {
   getProformaProductsBatchNumbers()
-}, [proformaDetailsLoading])
+}, [proformaIsLoading, proformaDetailsLoading])
 
 
-const handleEdit = (item) => {
+  const handleEdit = (item) => {
     setIsLoadingDetails(true)
     let product = productsList.find((product) => product.id == item.productId)
     console.log("Product Selected", product)
@@ -446,8 +447,11 @@ const handleEdit = (item) => {
         let x = res.data.data.batchNumber?.map((item) => {
           return {value:item.batchNumber, label:item?.batchNumber + '-(' + item?.Quantity +')', expireDate:item?.expireDate, manufacturingDate: item?.manufacturingDate}
         })
-        //console.log(x)
-        setFormData({...formData, batchNumber: x[0], manuDate: x[0].manufacturingDate, expDate: x[0].expireDate})
+      
+        if(x.length>0){
+          setFormData({...formData, batchNumber: x[0], manuDate: x[0].manufacturingDate, expDate: x[0].expireDate})
+        }
+        
         retailpriceTypeRef.current.checked = true
       }
     })
@@ -501,9 +505,11 @@ const handleEdit = (item) => {
   }
   
 
-  if(productsIsLoading && productGridData.length<1 ){
+  if(productsIsLoading && customersIsLoading){
     return <LoadingSpinner message="Loading...please wait"/>
   }
+
+  
 
 
 
@@ -662,7 +668,7 @@ const handleEdit = (item) => {
                         })}
                         placeholder=""
                         value={formData.batchNumber}
-                        onChange={(e) => setFormData({...formData, batchNumber: (e), manuDate: e.manufacturingDate, expDate: e.expireDate})}
+                        onChange={(e) => setFormData({...formData, batchNumber: (e), manuDate: e?.manufacturingDate, expDate: e?.expireDate})}
                         //onChange={(e) => console.log(e)}
                       />
                       
