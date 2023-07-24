@@ -37,9 +37,9 @@ const AddProforma = () => {
   const [productOptions, setProductOptions] = useState([])
 
 
-  const { data: customers, isError, isLoading: isCustomerLoading, isSuccess } = useGet("customers", "/customer");
+  const { data: customers, isError, isLoading: isCustomerLoading, refetch } = useGet("customers", "/customer");
   const { data: products, isLoading: isProductLoading } = useGet("products", "/product");
-  const { isLoading, isError: isPostError, error, mutate } = usePost("/proforma");
+  // const { isLoading, isError: isPostError, error, mutate } = usePost("/proforma");
 
   const [selectedProduct, setSelectedProduct] = useState('')
   const [selectedCustomer, setSelectedCustomer] = useState('')
@@ -52,7 +52,67 @@ const AddProforma = () => {
   const retailpriceTypeRef = useRef()
   const specialpriceTypeRef = useRef()
   const wholesalepriceTypeRef = useRef()
-  const [isSubmitSuccessful, setIsSubmitSuccessful] = useState(false)
+ 
+  
+  //add customer states
+  const [customerType, setCustomerType] = useState(0)
+  const validationSchema = Yup.object().shape({
+    name: Yup.string().required("Customer name is required"),
+    contact: Yup.string().required("Phone number is required"),
+  });
+
+  const {register,handleSubmit,reset,formState: { errors, isSubmitSuccessful }} = useForm({
+    defaultValues: {
+      name: "",
+      email: "",
+      contact: "",
+      otherContact: "",
+      location: "",
+      customerType: 0,
+      gpsAddress:""
+      
+    },
+    resolver: yupResolver(validationSchema),
+  });
+
+  const axios = useCustomApi()
+
+  const onSubmit = (data) => {
+    let payload = {...data, customerType}
+
+    axios.post(`/customer`,  payload)
+    .then((res) => {
+      console.log(res.data)
+      if(res.data.success){
+        let addedCustomer =  {
+            id: res.data.data?.id,
+            label: res.data.data?.name,
+            value: res.data.data?.id,
+            location: res.data.data?.location,
+            contact: res.data.data?.contact,
+            email: res.data.data?.email
+  
+          }
+        setCustomerOptions([addedCustomer,...customerOptions])
+      }
+      else{
+        alertify.set("notifier", "position", "top-right");
+        alertify.error("Error...Could not save customer.");
+      }
+      
+    })
+  };
+
+  useEffect(() => {
+    if (isSubmitSuccessful && !isError) {
+      reset();
+
+      alertify.set("notifier", "position", "top-right");
+      alertify.success("Customer added successfully.");
+      $('.modal').modal('hide')
+    }
+    return () => {};
+  }, [isSubmitSuccessful, isError]);
 
 
   useEffect(() => {
@@ -84,7 +144,7 @@ const AddProforma = () => {
    
     }
    
-  }, [isCustomerLoading, isProductLoading])
+  }, [isCustomerLoading, isProductLoading, refetch])
 
 
   const handleProductSelect = (e) => {
@@ -119,9 +179,10 @@ const AddProforma = () => {
     setProductGridData(listCopy)
     $('.modal').modal('hide')
   }
+
+
   const handleAddItem = () => {
     let item =
-
     {
       productId: selectedProduct.id,
       productName: selectedProduct.label,
@@ -149,8 +210,8 @@ const AddProforma = () => {
 
   }
 
-  const axios = useCustomApi()
-  const onSubmit = () => {
+
+  const onSubmitProforma = () => {
 
     if (productGridData.length < 1) {
       alertify.set("notifier", "position", "top-right");
@@ -261,7 +322,6 @@ const AddProforma = () => {
 
           <div style={{ display: 'flex', flexDirection: 'column', width: '35%', }}>
             <div className="card">
-              {/* <form onSubmit={handleSubmit(onSubmit)}> */}
               <div className="card-body">
                 <div className="row">
                   <div className="col-lg-12 col-sm-12 col-12">
@@ -280,7 +340,7 @@ const AddProforma = () => {
 
                         <div className="col-lg-2 col-sm-2 col-2 ps-0">
                             <div className="add-icon">
-                              <Link to="#">
+                              <Link to="#" data-bs-toggle="modal" data-bs-target="#addsupplier">
                                 <img src={Plus} alt="img" />
                               </Link>
                             </div>
@@ -528,7 +588,7 @@ const AddProforma = () => {
                   </div>
                 </div>
                 <div className="col-lg-12" style={{ textAlign: 'right' }}>
-                  <button type="submit" className="btn btn-submit me-2" onClick={onSubmit}><FeatherIcon icon="save" />
+                  <button type="submit" className="btn btn-submit me-2" onClick={onSubmitProforma}><FeatherIcon icon="save" />
                     {" Generate Proforma"}
                   </button>
                   {/* <Link id="printModalClick" to="#" className="btn btn-cancel me-2" style={{ backgroundColor: '#FF9F43' }} data-bs-toggle="modal"
@@ -646,7 +706,7 @@ const AddProforma = () => {
         </div>
       </div>
 
-
+{/* Edit Modal */}
           <div
             className="modal fade"
             id="editproduct"
@@ -729,6 +789,157 @@ const AddProforma = () => {
                     Close
                   </button>
                 </div>
+              </div>
+            </div>
+          </div>
+
+{/* Add Supplier Modal */}
+<div
+            className="modal fade"
+            id="addsupplier"
+            tabIndex={-1}
+            aria-labelledby="addsupplier"
+            aria-hidden="true"
+          >
+            <div className="modal-dialog modal-md modal-dialog-centered">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">Add Customer</h5>
+                  <button
+                    type="button"
+                    className="close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                  >
+                    <span aria-hidden="true">×</span>
+                  </button>
+                </div>
+                <div className="modal-body">
+                <form onSubmit={handleSubmit(onSubmit)}>
+                    <div className="row">
+                      <div className="col-lg-12 col-sm-6 col-12">
+                        <div className="form-group">
+                          <label>Customer Name</label>
+                          <input 
+                          className={`form-control ${
+                            errors.name ? "is-invalid" : ""
+                          }`}
+                          type="text"
+                          {...register("name")}
+                        />
+                        <div className="invalid-feedback">
+                          {errors.name?.message}
+                        </div>
+                        </div>
+                      </div>
+
+                      <div className="col-lg-12 col-sm-6 col-12">
+                        <div className="form-group">
+                          <label>Choose Type</label>
+                          <div className="row">
+                              <div class="col-lg-6">
+                                <div class="input-group">
+                                  <div class="input-group-text">
+                                    <input className="form-check-input" type="radio" name="customerType" value="0" onChange = {(e) => setCustomerType(e.target.value)}/>
+                                  </div>
+                                  <input type="text" className="form-control" aria-label="Text input with radio button" value={'Company'}/>
+                                </div>
+                            </div>
+
+                              <div class="col-lg-6">
+
+                                <div class="input-group">
+                                  <div class="input-group-text">
+                                    <input className="form-check-input" type="radio" name="customerType" value="1" onChange = {(e) => setCustomerType(e.target.value)}/>
+                                  </div>
+                                  <input type="text" className="form-control" aria-label="Text input with radio button" value={'Individual'} />
+                                </div>
+                              
+                              </div>
+                          </div>
+                          
+                        </div>
+                      </div>
+
+                      <div className="col-lg-12 col-sm-12 col-12">
+                        <div className="form-group">
+                          <label>Email</label>
+                          <input 
+                          placeholder="someone@gmail.com"
+                          className={`form-control ${
+                            errors.name ? "is-invalid" : ""
+                          }`}
+                          type="text"
+                          {...register("email")}
+                        />
+                      
+                        </div>
+                      </div>
+
+                      
+                    </div>
+
+                    <div className="row">
+                      <div className="col-lg-6 col-sm-6 col-12">
+                        <div className="form-group">
+                          <label>Contact</label>
+                          <input  className={`form-control ${
+                                errors.name ? "is-invalid" : ""
+                              }`}
+                              type="text"
+                              {...register("contact")}
+                            />
+                            <div className="invalid-feedback">
+                              {errors.name?.message}
+                            </div>
+                        </div>
+                      </div>
+
+                      <div className="col-lg-6 col-12">
+                        <div className="form-group">
+                          <label>Other Contact</label>
+                          <input  className={`form-control ${
+                                errors.name ? "is-invalid" : ""
+                              }`}
+                              type="text"
+                              {...register("otherContact")}
+                            />
+                          
+                        </div>
+                      </div>
+                    
+                  
+                      <div className="col-lg-12 col-12">
+                        <div className="form-group">
+                          <label>Location/Address</label>
+                          <input className={`form-control ${
+                                errors.name ? "is-invalid" : ""
+                              }`}
+                              type="text"
+                              {...register("location")}/>
+                        </div>
+                      </div>
+
+                      <div className="col-lg-12 col-12">
+                        <div className="form-group">
+                          <label>Ghana Post Address</label>
+                          <input className={`form-control ${
+                                errors.name ? "is-invalid" : ""
+                              }`}
+                              type="text"
+                              placeholder="GZ-000-0000"
+                              {...register("gpsAddress")}/>
+                        </div>
+                      </div>
+                    
+                      <div className="col-lg-12" style={{textAlign:'right'}}>
+                        <button type="submit" className="btn btn-submit me-2"><FeatherIcon icon="save"/> Save</button>
+                        <button className="btn btn-cancel" onClick={() =>reset()}>Clear</button>
+                      </div>
+                    </div>
+              </form>
+                </div>
+                
               </div>
             </div>
           </div>

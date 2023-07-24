@@ -656,7 +656,7 @@ const EditProforma = () => {
         </div>
       </div>
 
-
+{/* Edit Modal */}
           <div
             className="modal fade"
             id="editproduct"

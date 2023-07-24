@@ -57,6 +57,7 @@ const ProformaSales = () => {
   const [editFormData, setEditFormData] = useState({name:'',quantity:'', amount:'', batchNumber:'', manufacturingDate:'', expireDate:''})
   const [salesType, setSalesType] = useState('Retail')
   const [productGridData, setProductGridData] = useState([])
+  const [productGridList, setProductGridList] = useState([])
   const [transDate, setTransDate] = useState(new Date().toISOString().substring(0,10))
   const [invoiceNo, setInvoiceNo] = useState('')
   const retailpriceTypeRef = useRef()
@@ -107,23 +108,34 @@ const ProformaSales = () => {
   const getProformaProductsBatchNumbers = () => {
     //get the batchNumber for each product
     let list = []
+    let list2 = []
     if (!proformaIsLoading && !proformaDetailsLoading) {
         proformaItems.data.map((product) => {
           axios.get(`/purchase/product/${product.productId}`)
           .then((res) => {
-              console.log("Batch Number", res.data.data)
+              //console.log("Batch Number", res.data.data)
               let mapped = {
                 ...product,
                 name:product.product.name,
                 batchNumber: res.data.data.batchNumber[0].batchNumber, 
                 expireDate: res.data.data.batchNumber[0].expireDate, 
               }
+              let mapped2 = {
+                ...product,
+                name:product.product.name,
+                productId:product.productId,
+                batchNumber: res.data.data.batchNumber, 
+              }
               //console.log(mapped)
               list =[...list, mapped]
-              console.log('mappedList', list)
+              list2 = [...list2, mapped2]
+              //console.log('mappedList', list)
              
           })
-          .finally(() =>  setProductGridData(list))
+          .finally(() =>  {
+            setProductGridData(list)
+            setProductGridList(list2)
+          })
         })
        
       }
@@ -135,15 +147,22 @@ useEffect(() => {
 }, [proformaDetailsLoading])
 
 
-  const handleEdit = (item) => {
+const handleEdit = (item) => {
     setIsLoadingDetails(true)
-    //console.log("Options:", productOptions)
     let product = productsList.find((product) => product.id == item.productId)
-    console.log("Product", product)
+    console.log("Product Selected", product)
     setSelectedProductEditMode(product)
   
 
     //get batch number
+    // let query = productGridList.find((productX) => productX.productId == product.id)
+    // console.log("M:", productGridList);
+    // console.log("X:", query)
+        //  let x = res.data.data.batchNumber?.map((item) => {
+        //   return {value:item.batchNumber, label:item?.batchNumber + '-(' + item?.Quantity +')', expireDate:item?.expireDate, manufacturingDate: item?.manufacturingDate}
+        // })
+        //console.log(x)
+
     axios.get(`${BASE_URL}/purchase/product/${item.productId}`).then((res) => {
       if(res.data.success){
         setSelectedProductInfoEditMode(res.data.data)
