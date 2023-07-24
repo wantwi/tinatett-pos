@@ -55,7 +55,37 @@ const AddPurchase = () => {
   const [isSubmitSuccessful, setIsSubmitSuccessful] = useState(false)
   const [loading, setLoading] = useState(false)
 
-  const dateRef = useRef()
+  //add customer states
+  const [supplierType, setSupplierType] = useState(0)
+  const validationSchema = Yup.object().shape({
+    name: Yup.string().required("Customer name is required"),
+    contact: Yup.string().required("Phone number is required"),
+  });
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    getValues,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      name: "",
+      email: "",
+      contact: "",
+      location: "",
+      customerType: 0,
+      type: 0,
+      creditPeriod: "",
+      othercontact: "",
+      bankDetails: "",
+      cashDetails: "",
+      momoDetails: ""
+
+    },
+    resolver: yupResolver(validationSchema),
+  });
+
   const axios = useCustomApi()
 
 
@@ -67,7 +97,7 @@ const AddPurchase = () => {
     setProductGridData(newGridData)
   };
 
-  const handleUpdate = ()=> {
+  const handleUpdate = () => {
     let updated = editFormData
     let listCopy = [...productGridData]
     let index = productGridData.findIndex(item => item.productId == updated.productId)
@@ -80,17 +110,17 @@ const AddPurchase = () => {
   const checkIfBatchNoExists = (batchNumber, productId) => {
     setLoading(true)
     axios.get(`/purchase/product/${productId}/${batchNumber}`)
-    .then((res) => {
-      if(res.data.statusText == 'Allow Purchase'){
-        
-      }
-      else if(res.data.statusText == 'Deny Purchase'){
-        alertify.set("notifier", "position", "top-right");
-        alertify.warning(res.data.message);
-        setProductFormData({ ...productFormData, batchNumber:'' })
-      }
-    })
-    .finally(() => setLoading(false))
+      .then((res) => {
+        if (res.data.statusText == 'Allow Purchase') {
+
+        }
+        else if (res.data.statusText == 'Deny Purchase') {
+          alertify.set("notifier", "position", "top-right");
+          alertify.warning(res.data.message);
+          setProductFormData({ ...productFormData, batchNumber: '' })
+        }
+      })
+      .finally(() => setLoading(false))
   }
 
 
@@ -98,68 +128,58 @@ const AddPurchase = () => {
     setProductFormData({ ...productFormData, amount: productFormData.quantity * productFormData.unitPrice })
   }, [productFormData.quantity, productFormData.unitPrice])
 
-  const columns = [
-    {
-      title: "Product Name",
-      dataIndex: "productName",
-      render: (text, record) => (
-        <div className="productimgname">
-          <Link className="product-img">
-            <img alt="" src={record.image} />
-          </Link>
-          <Link style={{ fontSize: "15px", marginLeft: "10px" }}>
-            {record.productName}
-          </Link>
-        </div>
-      ),
-    },
-    {
-      title: "QTY",
-      dataIndex: "quantity",
-      // render: (text, record) => <p style={{textAlign:'center'}}>{text || 0}</p>
-    },
-    {
-      title: "Unit Price",
-      dataIndex: "unitPrice",
-      render: (text, record) => <p style={{ textAlign: 'center' }}>{moneyInTxt(text)}</p>
-    },
-    {
-      title: "Amount",
-      dataIndex: "amount",
-      render: (text, record) => <p style={{ textAlign: 'center' }}>{moneyInTxt(text)}</p>
-    },
-    {
-      title: "Batch #",
-      dataIndex: "batchNumber",
-      width: "150px"
-      // render: (text, record) => <p style={{textAlign:'center'}}>{text || 0}</p>
-    },
-    
-   
-    {
-      title: "Manufacturing",
-      dataIndex: "manufacturingDate",
-      render: (text, record) => <p key={text} style={{ textAlign: 'center' }}>{record?.manufacturingDate.substring(0, 10) || ''}</p>
-    },
-    {
-      title: "Expiring",
-      dataIndex: "expireDate",
-      render: (text, record) => <p key={text} style={{ textAlign: 'center' }}>{record?.expireDate.substring(0, 10) || ''}</p>
-    },
-    {
-      title: "Action",
-      render: (text, record) => (
-        <>
-          <span className="me-2"> <img src={EditIcon} alt="img" data-bs-toggle="modal" data-bs-target="#editproduct" onClick={() => setEditFormData(record)}/></span>
-          <Link className="delete-set" to="#" onClick={() => deleteRow(record)}>
-            <img src={DeleteIcon} alt="img" />
-          </Link>
-         
-        </>
-      ),
-    },
-  ];
 
+  //save adhoc supplier
+  const onSubmit = (data) => {
+    let payload = {
+      "name": data.name,
+      "contact": data.contact,
+      "othercontact": data.othercontact,
+      "location": data.location,
+      "customerType": supplierType,
+      "email": data.email,
+      "gpsAddress": data.gpsAddress,
+      "creditPeriod": data.creditPeriod,
+      "product": data.product,
+      paymentInfo: [
+        {
+          type: 'cash',
+          details: data.cashDetails
+        },
+        {
+          type: 'momo',
+          details: data.momoDetails
+        },
+        {
+          type: 'bank',
+          details: data.bankDetails
+        },
+
+      ]
+      //paymentInfo: {"type":paymentType.label, "accountNumber":data.accountNumber,"branch":data.branch,"serviceProvider":data.serviceProvider} 
+    }
+
+    axios.post(`/supplier`, payload)
+      .then((res) => {
+        console.log(res.data)
+        if (res.data.success) {
+          alertify.set("notifier", "position", "top-right");
+          alertify.success("Supplier added successfully.");
+          $('.modal').modal('hide')
+          let addedCustomer = {
+            id: res.data.data?.id,
+            label: res.data.data?.name,
+            value: res.data.data?.id,
+          }
+          setSuppliersDropdown([addedCustomer, ...suppliersDropdown])
+        }
+        else {
+          alertify.set("notifier", "position", "top-right");
+          alertify.error("Error...Could not save supplier.");
+        }
+
+      })
+  };
 
   const handleProductSelect = (e) => {
     //console.log("Product:", e)
@@ -183,7 +203,7 @@ const AddPurchase = () => {
 
   }
 
-  const onSubmit = (data) => {
+  const onSubmitPurchase = (data) => {
     if (purDate == '' || supplier == '' || productGridData.length < 1) {
       alertify.set("notifier", "position", "top-right");
       alertify.warning("Please make sure all fields are filled.");
@@ -251,6 +271,70 @@ const AddPurchase = () => {
     return () => { };
   }, [isError, !isSubmitSuccessful]);
 
+
+  const columns = [
+    {
+      title: "Product Name",
+      dataIndex: "productName",
+      render: (text, record) => (
+        <div className="productimgname">
+          <Link className="product-img">
+            <img alt="" src={record.image} />
+          </Link>
+          <Link style={{ fontSize: "15px", marginLeft: "10px" }}>
+            {record.productName}
+          </Link>
+        </div>
+      ),
+    },
+    {
+      title: "QTY",
+      dataIndex: "quantity",
+      // render: (text, record) => <p style={{textAlign:'center'}}>{text || 0}</p>
+    },
+    {
+      title: "Unit Price",
+      dataIndex: "unitPrice",
+      render: (text, record) => <p style={{ textAlign: 'center' }}>{moneyInTxt(text)}</p>
+    },
+    {
+      title: "Amount",
+      dataIndex: "amount",
+      render: (text, record) => <p style={{ textAlign: 'center' }}>{moneyInTxt(text)}</p>
+    },
+    {
+      title: "Batch #",
+      dataIndex: "batchNumber",
+      width: "150px"
+      // render: (text, record) => <p style={{textAlign:'center'}}>{text || 0}</p>
+    },
+
+
+    {
+      title: "Manufacturing",
+      dataIndex: "manufacturingDate",
+      render: (text, record) => <p key={text} style={{ textAlign: 'center' }}>{record?.manufacturingDate.substring(0, 10) || ''}</p>
+    },
+    {
+      title: "Expiring",
+      dataIndex: "expireDate",
+      render: (text, record) => <p key={text} style={{ textAlign: 'center' }}>{record?.expireDate.substring(0, 10) || ''}</p>
+    },
+    {
+      title: "Action",
+      render: (text, record) => (
+        <>
+          <span className="me-2"> <img src={EditIcon} alt="img" data-bs-toggle="modal" data-bs-target="#editproduct" onClick={() => setEditFormData(record)} /></span>
+          <Link className="delete-set" to="#" onClick={() => deleteRow(record)}>
+            <img src={DeleteIcon} alt="img" />
+          </Link>
+
+        </>
+      ),
+    },
+  ];
+
+
   if (isLoading) {
     <LoadingSpinner />
   }
@@ -293,7 +377,7 @@ const AddPurchase = () => {
                           </div>
                           <div className="col-lg-2 col-sm-2 col-2 ps-0">
                             <div className="add-icon">
-                              <Link to="#" title="Add Supplier">
+                              <Link to="#" title="Add Supplier" data-bs-toggle="modal" data-bs-target="#addsupplier">
                                 <img src={Plus} alt="img" />
                               </Link>
                             </div>
@@ -301,9 +385,9 @@ const AddPurchase = () => {
 
                         </div>
                       </div>
-                      
+
                     </div>
-                   
+
 
                     <div className="col-lg-12 col-sm-12 col-12">
                       <div className="form-group">
@@ -403,7 +487,7 @@ const AddPurchase = () => {
                         <label>Batch No</label>
                         <input type="text" className={`form-control `} disabled={selectedProduct?.ownershipType == "Tinatett" ? false : false}
                           value={productFormData?.batchNumber}
-                          onBlur={(e) => checkIfBatchNoExists(e.target.value,selectedProduct.id, )}
+                          onBlur={(e) => checkIfBatchNoExists(e.target.value, selectedProduct.id,)}
                           onChange={(e) => {
                             setProductFormData({ ...productFormData, batchNumber: e.target.value })
                           }
@@ -417,8 +501,8 @@ const AddPurchase = () => {
                         <input type="text" className={`form-control `}
                           value={productFormData?.quantity}
                           onChange={(e) => {
-                            if(e.target.value == ''){
-                              setProductFormData({...productFormData, quantity: ''})
+                            if (e.target.value == '') {
+                              setProductFormData({ ...productFormData, quantity: '' })
                             }
                             else if (isValidNumber(e.target.value)) {
                               let qty = parseInt(e.target.value) || 0
@@ -520,7 +604,7 @@ const AddPurchase = () => {
 
 
                   <div className="col-lg-12" style={{ textAlign: 'right' }}>
-                    <button className="btn btn-submit me-2" type="submit" onClick={onSubmit}><FeatherIcon icon="save" />Save</button>
+                    <button className="btn btn-submit me-2" type="submit" onClick={onSubmitPurchase}><FeatherIcon icon="save" />Save</button>
                     <Link to="/tinatett-pos/purchase/purchaselist" className="btn btn-cancel">
                       Cancel
                     </Link>
@@ -557,54 +641,54 @@ const AddPurchase = () => {
                       <div className="form-group">
                         <label>Product Name</label>
                         <div className="input-groupicon">
-                        <input type="text" value={editFormData?.productName} onChange={(e) => setEditFormData({...editFormData, productName:e.target.value})} disabled/>
+                          <input type="text" value={editFormData?.productName} onChange={(e) => setEditFormData({ ...editFormData, productName: e.target.value })} disabled />
                         </div>
                       </div>
                     </div>
                     <div className="col-lg-6 col-sm-12 col-12">
                       <div className="form-group">
                         <label>Manufacturing Date</label>
-                        <input type="date" className="form-control" value={editFormData?.manufacturingDate.substring(0,10)}  onChange={(e) => setEditFormData({...editFormData, manufacturingDate:e.target.value})}/>
+                        <input type="date" className="form-control" value={editFormData?.manufacturingDate.substring(0, 10)} onChange={(e) => setEditFormData({ ...editFormData, manufacturingDate: e.target.value })} />
                       </div>
                     </div>
                     <div className="col-lg-6 col-sm-12 col-12">
                       <div className="form-group">
                         <label>Expiring Date</label>
-                        <input type="date" className="form-control" value={editFormData?.expireDate.substring(0,10)}  onChange={(e) => setEditFormData({...editFormData, expireDate:e.target.value})}/>
+                        <input type="date" className="form-control" value={editFormData?.expireDate.substring(0, 10)} onChange={(e) => setEditFormData({ ...editFormData, expireDate: e.target.value })} />
                       </div>
                     </div>
                     <div className="col-lg-6 col-sm-12 col-12">
                       <div className="form-group">
                         <label>Quantity</label>
                         <input type="text" value={editFormData?.quantity}
-                         onChange={(e) => {
-                          if(e.target.value == ''){
-                            setEditFormData({...editFormData, quantity: ''})
+                          onChange={(e) => {
+                            if (e.target.value == '') {
+                              setEditFormData({ ...editFormData, quantity: '' })
+                            }
+                            else if (isValidNumber(e.target.value)) {
+                              let qty = parseInt(e.target.value) || 0
+                              let unitP = parseInt(editFormData.unitPrice) || 0
+                              setEditFormData({ ...editFormData, quantity: e.target.value, amount: editFormData.quantity ? unitP * qty : unitP * 1 })
+                            }
                           }
-                          else if (isValidNumber(e.target.value)) {
-                            let qty = parseInt(e.target.value) || 0
-                            let unitP = parseInt(editFormData.unitPrice) || 0
-                            setEditFormData({ ...editFormData, quantity: e.target.value, amount: editFormData.quantity ? unitP * qty : unitP * 1 })
-                          }
-                        }
-                        }/>
+                          } />
                       </div>
                     </div>
                     <div className="col-lg-6 col-sm-12 col-12">
                       <div className="form-group">
                         <label>Batch No.</label>
-                        <input type="text" value={editFormData?.batchNumber} onChange={(e) => setEditFormData({...editFormData, batchNumber:e.target.value})}/>
+                        <input type="text" value={editFormData?.batchNumber} onChange={(e) => setEditFormData({ ...editFormData, batchNumber: e.target.value })} />
                       </div>
                     </div>
                     <div className="col-lg-6 col-sm-12 col-12">
                       <div className="form-group">
                         <label>Unit Price</label>
-                        <input type="text" value={editFormData?.unitPrice} 
-                         onChange={(e) => {
-                          let unitP = parseInt(e.target.value) || 0
-                          let qty = parseInt(editFormData.quantity) || 0
-                          setEditFormData({ ...editFormData, unitPrice: e.target.value, amount: editFormData ? unitP * qty : unitP * 1 })
-                        }}
+                        <input type="text" value={editFormData?.unitPrice}
+                          onChange={(e) => {
+                            let unitP = parseInt(e.target.value) || 0
+                            let qty = parseInt(editFormData.quantity) || 0
+                            setEditFormData({ ...editFormData, unitPrice: e.target.value, amount: editFormData ? unitP * qty : unitP * 1 })
+                          }}
                         />
                       </div>
                     </div>
@@ -614,11 +698,11 @@ const AddPurchase = () => {
                         <input type="text" value={editFormData?.amount} />
                       </div>
                     </div>
-                   
-                   
+
+
                   </div>
                 </div>
-                <div className="modal-footer" style={{justifyContent:'flex-end'}}>
+                <div className="modal-footer" style={{ justifyContent: 'flex-end' }}>
                   <button type="button" className="btn btn-submit" onClick={handleUpdate}>
                     Update
                   </button>
@@ -630,6 +714,194 @@ const AddPurchase = () => {
                     Close
                   </button>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Add Customer Modal */}
+          <div
+            className="modal fade"
+            id="addsupplier"
+            tabIndex={-1}
+            aria-labelledby="addsupplier"
+            aria-hidden="true"
+          >
+            <div className="modal-dialog modal-lg modal-dialog-centered">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">Add Supplier</h5>
+                  <button
+                    type="button"
+                    className="close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                  >
+                    <span aria-hidden="true">×</span>
+                  </button>
+                </div>
+                <div className="modal-body">
+                  <form onSubmit={handleSubmit(onSubmit)}>
+                    <div className="row">
+                      <div className="col-lg-6 col-sm-6 col-12">
+                        <div className="form-group">
+                          <label>Supplier Name</label>
+                          <input className={`form-control ${errors.name ? "is-invalid" : ""
+                            }`}
+                            type="text"
+                            {...register("name")} />
+                        </div>
+                      </div>
+
+                      <div className="col-lg-6 col-sm-6 col-12">
+                        <div className="form-group">
+                          <label>Supplier Type</label>
+                          <div className="row">
+                            <div class="col-lg-6">
+                              <div class="input-group">
+                                <div class="input-group-text">
+                                  <input className="form-check-input" type="radio" name="customerType" value="Company" onChange={(e) => setSupplierType(e.target.value)} />
+                                </div>
+                                <input type="text" className="form-control" aria-label="Text input with radio button" value={'Company'} />
+                              </div>
+                            </div>
+
+                            <div class="col-lg-6">
+
+                              <div class="input-group">
+                                <div class="input-group-text">
+                                  <input className="form-check-input" type="radio" name="customerType" value="Individual" onChange={(e) => setSupplierType(e.target.value)} />
+                                </div>
+                                <input type="text" className="form-control" aria-label="Text input with radio button" value={'Individual'} />
+                              </div>
+
+                            </div>
+                          </div>
+
+                        </div>
+                      </div>
+
+                      <div className="col-lg-4 col-sm-6 col-12">
+                        <div className="form-group">
+                          <label>Credit Period</label>
+                          <input className={`form-control ${errors.name ? "is-invalid" : ""
+                            }`}
+                            type="text"
+                            placeholder="month, days, weeks..."
+                            {...register("creditPeriod")} />
+                        </div>
+                      </div>
+
+                    </div>
+
+                    <div className="row">
+                      <div className="col-lg-4 col-sm-6 col-12">
+                        <div className="form-group">
+                          <label>Products Supplied</label>
+                          <textarea className={`form-control ${errors.name ? "is-invalid" : ""
+                            }`}
+                            type="text"
+                            placeholder="Enter products, separated by comma"
+                            {...register("product")} />
+                        </div>
+                      </div>
+
+                      <div className="col-lg-4 col-sm-6 col-12">
+                        <div className="form-group">
+                          <label>Email</label>
+                          <input className={`form-control ${errors.name ? "is-invalid" : ""
+                            }`}
+                            type="text"
+                            {...register("email")} />
+                        </div>
+                      </div>
+
+                      <div className="col-lg-4 col-sm-6 col-12">
+                        <div className="form-group">
+                          <label>Contact No</label>
+                          <input className={`form-control ${errors.name ? "is-invalid" : ""
+                            }`}
+                            type="text"
+                            {...register("contact")} />
+                        </div>
+                      </div>
+
+                      <div className="col-lg-4 col-sm-6 col-12">
+                        <div className="form-group">
+                          <label>Other Contact No</label>
+                          <input className={`form-control ${errors.name ? "is-invalid" : ""
+                            }`}
+                            type="text"
+                            {...register("othercontact")} />
+                        </div>
+                      </div>
+
+                      <div className="col-lg-4 col-12">
+                        <div className="form-group">
+                          <label>Location/Address</label>
+                          <input className={`form-control ${errors.name ? "is-invalid" : ""
+                            }`}
+                            type="text"
+                            {...register("location")} />
+                        </div>
+                      </div>
+
+                      <div className="col-lg-4 col-12">
+                        <div className="form-group">
+                          <label>Ghana Post Address</label>
+                          <input className={`form-control ${errors.name ? "is-invalid" : ""
+                            }`}
+                            type="text"
+                            placeholder="GZ-000-0000"
+                            {...register("gpsAddress")} />
+                        </div>
+                      </div>
+
+
+                      <fieldset>
+
+                        <div className="row">
+
+                          <div className="col-lg-4 col-sm-6 col-12">
+                            <div className="form-group">
+                              <label>Cash Details</label>
+                              <textarea className={`form-control ${errors.name ? "is-invalid" : ""
+                                }`}
+                                type="text"
+                                {...register("cashDetails")} ></textarea>
+                            </div>
+                          </div>
+
+                          <div className="col-lg-4 col-sm-6 col-12">
+                            <div className="form-group">
+                              <label>Bank Details</label>
+                              <textarea className={`form-control ${errors.name ? "is-invalid" : ""
+                                }`}
+                                type="text"
+                                {...register("bankDetails")} ></textarea>
+                            </div>
+                          </div>
+
+                          <div className="col-lg-4 col-sm-6 col-12">
+                            <div className="form-group">
+                              <label>Momo Details</label>
+                              <textarea className={`form-control ${errors.name ? "is-invalid" : ""
+                                }`}
+                                type="text"
+                                {...register("momoDetails")} ></textarea>
+                            </div>
+                          </div>
+                        </div>
+                      </fieldset>
+
+
+                      <div className="col-lg-12" style={{ textAlign: 'right' }}>
+                        <button type="submit" className="btn btn-submit me-2"><FeatherIcon icon="save" />Save</button>
+                        <button className="btn btn-cancel" onClick={() => reset()}>Clear</button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+
               </div>
             </div>
           </div>

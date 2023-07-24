@@ -77,6 +77,8 @@ const AddProforma = () => {
 
   const axios = useCustomApi()
 
+
+  //save adhoc customer
   const onSubmit = (data) => {
     let payload = {...data, customerType}
 
@@ -793,8 +795,8 @@ const AddProforma = () => {
             </div>
           </div>
 
-{/* Add Supplier Modal */}
-<div
+{/* Add Customer Modal */}
+<           div
             className="modal fade"
             id="addsupplier"
             tabIndex={-1}
