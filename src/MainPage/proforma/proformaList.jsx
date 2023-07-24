@@ -98,17 +98,43 @@ const ProformaList = () => {
     .finally(() => setLoadingTransfer(false))
   }
 
+// const getProformaProductsBatchNumbers = () => {
+//     //console.log("Proformas", proformas)
+//     let proformaProducts
+//     proformas.data.forEach((proforma, index) => {
+//       //get proforma products
+//       axios.get(`/proforma/products/${proforma.id}`)
+//       .then((res) => {
+//       proformaProducts = (res.data?.data)
+//       console.log("Proforma Item", index+1, proformaProducts)
+//       })
+//       //get the details of each product
+//       .then(() => {
+//         proformaProducts.forEach((product) => console.log("Product Details", product))
+//       })
+//       //get the batchNumber for each product
+//       .then(() => {
+//           proformaProducts.forEach((product) => {
+//             axios.get(`/purchase/product/${product.productId}`).then((res) => {
+//                 console.log("Batch Number", res.data.data)
+//           })
+//        })
+//     })
+
+//   })
+
+// }
 
 
 
   useEffect(() => {
     if (!isLoading) {
-      // console.log(proformas)
+      
       let mappedData = proformas?.data.map((proforma) => {
         return {
           id: proforma?.id,
-          customerName: proforma.customer?.name,
-          customer: proforma?.customer,
+          customerName: proforma.customerName,
+          customer: proforma?.customerId,
           status: proforma?.status,
           date: new Date(proforma.createdAt).toISOString().substring(0, 10),
           proformaRef: proforma?.proformaRef,
@@ -210,31 +236,6 @@ const ProformaList = () => {
     { id: 2, text: "Inprogess", text: "Inprogess" },
   ];
 
-  const getProformaProducts = (id) => {
-    axios.get(`/proforma/products/${id}`)
-    .then((res) => {
-      let x = (res.data?.data)
-      let mapped = x.map((item) => 
-        {
-          return {
-            name:  item?.product?.name,
-            productId: item?.id,
-            quantity: item?.quantity,
-            unitPrice: item?.unitPrice,
-            amount: item?.amount
-          }
-      })
-      setProductGridData(mapped)
-    }).finally(() => setLoading(false))
-  }
-
-
-  // useEffect(() => {
-  //   console.log("Grid", productGridData)
-  // }, [productGridData])
-
-
-
   const columns = [
     {
       title: "Date",
@@ -242,7 +243,7 @@ const ProformaList = () => {
       sorter: (a, b) => a.createdAt.length - b.createdAt.length,
     },
     {
-      title: "Custumer Name",
+      title: "Customer Name",
       dataIndex: "customerName",
       // sorter: (a, b) => a.customerName.length - b.customerName.length,
       render: (text, record) =>
@@ -265,47 +266,6 @@ const ProformaList = () => {
       dataIndex: "numberOfProduct",
       sorter: (a, b) => a.numberOfProduct.length - b.numberOfProduct.length,
     },
-
-    // {
-    //   title: "Status",
-    //   dataIndex: "status",
-    //   render: (text, record) => (
-    //     <>
-    //       {text == "1" && (
-    //         <span className="badges bg-lightred">{"Pending"}</span>
-    //       )}
-    //       {text == "2" && (
-    //         <span className="badges bg-lightgreen">{"Fulfilled"}</span>
-    //       )}
-    //     </>
-    //   ),
-    //   sorter: (a, b) => a.status.length - b.status.length,
-    // },
-    // {
-
-
-    // {
-    //   title: "Paid",
-    //   dataIndex: "Paid",
-    //   render: (text, record) => (
-    //     <>
-    //       {text === 100 && <div className="text-green">{text}</div>}
-    //       {text === 0 && <div>{text}</div>}
-    //     </>
-    //   ),
-    //   sorter: (a, b) => a.Paid.length - b.Paid.length,
-    // },
-    // {
-    //   title: "Due",
-    //   dataIndex: "Due",
-    //   render: (text, record) => (
-    //     <>
-    //       {text === 100 && <div className="text-red">{text}</div>}
-    //       {text === 0 && <div>{text}</div>}
-    //     </>
-    //   ),
-    //   sorter: (a, b) => a.Due.length - b.Due.length,
-    // },
     {
       title: "Biller",
       dataIndex: "createdBy",
@@ -363,6 +323,7 @@ const ProformaList = () => {
       width: '20%'
     },
   ];
+
   return (
     <>
       <div className="page-wrapper">

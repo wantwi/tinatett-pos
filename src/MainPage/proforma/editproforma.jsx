@@ -43,7 +43,7 @@ const EditProforma = () => {
   const { data: proformaDetails } = useGet("proforma-product-details", `/proforma/products/${state?.id}`);
 
   const [selectedProduct, setSelectedProduct] = useState('')
-  const [selectedCustomer, setSelectedCustomer] = useState(state?.customer.id)
+  const [selectedCustomer, setSelectedCustomer] = useState(state?.customer)
   const [selectedCustomerPrint, setSelectedCustomerPrint] = useState('')
   const [formData, setFormData] = useState({ amount: '', quantity: '', price: '' })
   const [editFormData, setEditFormData] = useState({ amount: '', quantity: '', price: '' })

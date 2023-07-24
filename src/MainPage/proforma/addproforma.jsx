@@ -12,6 +12,7 @@ import {
   Product1,
   Printer,
   EditIcon,
+  Plus,
 } from "../../EntryFile/imagePath";
 import Select from "react-select";
 import "react-select2-wrapper/css/select2.css";
@@ -28,6 +29,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import FeatherIcon from 'feather-icons-react'
 import jsPDF from "jspdf";
+import useCustomApi from "../../hooks/useCustomApi";
 
 
 const AddProforma = () => {
@@ -84,18 +86,6 @@ const AddProforma = () => {
    
   }, [isCustomerLoading, isProductLoading])
 
-  useEffect(() => {
-    if (!isPostError && isSubmitSuccessful) {
-      alertify.set("notifier", "position", "top-right");
-      alertify.success("Proforma saved successfully.");
-    }
-    else if (isPostError) {
-      alertify.set("notifier", "position", "top-right");
-      alertify.error("Error...Could not save.");
-    }
-
-    return () => { };
-  }, [isPostError, isSubmitSuccessful]);
 
   const handleProductSelect = (e) => {
     if (products && !isProductLoading) {
@@ -159,6 +149,7 @@ const AddProforma = () => {
 
   }
 
+  const axios = useCustomApi()
   const onSubmit = () => {
 
     if (productGridData.length < 1) {
@@ -166,29 +157,51 @@ const AddProforma = () => {
       alertify.warning("Please add at least one item to list before saving.");
     }
     else {
-      let postBody = {
+      let payload = {
         customerId: selectedCustomer.id,
         transDate: transDate,
         products: productGridData
       }
-      mutate(postBody)
+     // mutate(postBody)
+     axios.post('/proforma', payload)
+     .then((res) => {
+        if(res.status == 201 || res.data.success == true){
 
-      if (!isError) {
-        setTimeout(() => {
-          setIsSubmitSuccessful(true)
-          //$('#create').modal('show');
-        }, 1500)
-        setSelectedCustomer({})
-        setSelectedProduct({})
-        setFormData({ amount: '', quantity: '', price: '' })
-        setProductGridData([])
-        setTransDate('')
-      }
-      else {
-        alertify.set("notifier", "position", "top-right");
-        alertify.success("Proforma preview saved successfully.");
-      }
+          alertify.set("notifier", "position", "top-right");
+          alertify.success("Proforma saved successfully.");
 
+          setSelectedCustomer({})
+          setSelectedProduct({})
+          setFormData({ amount: '', quantity: '', price: '' })
+          setProductGridData([])
+          setTransDate('')
+
+          setTimeout(() => {
+            let base64 = res.data.base64
+            const blob = base64ToBlob(base64, 'application/pdf');
+            const url = URL.createObjectURL(blob);
+            const pdfWindow = window.open("");
+            pdfWindow.document.write("<iframe width='100%' height='100%' src='" + url + "'></iframe>");
+          }, 1500)
+          
+        }
+        else{
+          alertify.set("notifier", "position", "top-right");
+          alertify.error("Error...Could not save.");
+        }
+     })
+
+
+      //base 64 function
+      function base64ToBlob(base64, type = "application/octet-stream") {
+        const binStr = atob(base64);
+        const len = binStr.length;
+        const arr = new Uint8Array(len);
+        for (let i = 0; i < len; i++) {
+          arr[i] = binStr.charCodeAt(i);
+        }
+        return new Blob([arr], { type: type });
+      }
 
     }
 
@@ -246,16 +259,16 @@ const AddProforma = () => {
 
         <div style={{ display: 'flex', gap: 20 }}>
 
-          <div style={{ display: 'flex', flexDirection: 'column', width: '37%', }}>
+          <div style={{ display: 'flex', flexDirection: 'column', width: '35%', }}>
             <div className="card">
               {/* <form onSubmit={handleSubmit(onSubmit)}> */}
               <div className="card-body">
                 <div className="row">
-                  <div className="col-lg-8 col-sm-6 col-12">
+                  <div className="col-lg-12 col-sm-12 col-12">
                     <div className="form-group">
                       <label>Customer Name</label>
                       <div className="row">
-                        <div className="col-lg-12 col-sm-12 col-12">
+                        <div className="col-lg-10 col-sm-12 col-12">
                           <Select
                             className="select"
                             options={customerOptions}
@@ -265,24 +278,22 @@ const AddProforma = () => {
                           />
                         </div>
 
+                        <div className="col-lg-2 col-sm-2 col-2 ps-0">
+                            <div className="add-icon">
+                              <Link to="#">
+                                <img src={Plus} alt="img" />
+                              </Link>
+                            </div>
+                        </div>
+
                       </div>
                     </div>
                   </div>
-                  <div className="col-lg-4 col-sm-6 col-12">
+                  <div className="col-lg-12 col-sm-12 col-12">
                     <div className="form-group">
                       <label> Date</label>
-                      <input type="date" className="form-control" value={transDate} onChange={(e) => setTransDate(e.target.value)} />                      {/* <div className="input-groupicon">
-                        <DatePicker
-                          selected={transDate}
-                            onChange={(e) => {
-                              setTransDate(e)
-                            }
-                            }
-                        />
-                        <Link className="addonset">
-                          <img src={Calendar} alt="img" />
-                        </Link>
-                      </div> */}
+                      <input type="date" className="form-control" value={transDate} onChange={(e) => setTransDate(e.target.value)} />                   
+                
                     </div>
                   </div>
                 </div>
@@ -438,7 +449,7 @@ const AddProforma = () => {
           </div>
 
 
-          <div className="card" style={{ width: '62%' }} >
+          <div className="card" style={{ width: '65%' }} >
             <div className="card-body">
               <div className="row">
                 <div className="table-responsive mb-3">

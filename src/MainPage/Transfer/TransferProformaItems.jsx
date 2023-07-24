@@ -105,19 +105,19 @@ const TransferProformaItems = () => {
       setProductOptions(mappedData2)
 
 
-      let mappedData3 = proformaItems?.data.map((item) =>{
-        return {
-          productId: item?.productId,
-          name: item?.product.name,
-          batchNumber: item?.batchNumber,
-          manufacturingDate: item?.manufacturingDate,
-          expireDate: item?.expireDate,
-          quantity: item?.quantity,
-          unitPrice:item?.unitPrice,
-          amount:item?.amount
-        }
-      })
-      setProductGridData(mappedData3)
+      // let mappedData3 = proformaItems?.data.map((item) =>{
+      //   return {
+      //     productId: item?.productId,
+      //     name: item?.product.name,
+      //     batchNumber: item?.batchNumber,
+      //     manufacturingDate: item?.manufacturingDate,
+      //     expireDate: item?.expireDate,
+      //     quantity: item?.quantity,
+      //     unitPrice:item?.unitPrice,
+      //     amount:item?.amount
+      //   }
+      // })
+      // setProductGridData(mappedData3)
 
     }
 
@@ -125,6 +125,34 @@ const TransferProformaItems = () => {
 
   }, [isCustomerLoading, isProductsLoading, proformaIsLoading])
 
+  const getProformaProductsBatchNumbers = () => {
+    //get the batchNumber for each product
+    let list = []
+    if (!proformaIsLoading && !transferIsLoading) {
+        proformaItems.data.map((product) => {
+          axios.get(`/purchase/product/${product.productId}`)
+          .then((res) => {
+              console.log("Batch Number", res.data.data)
+              let mapped = {
+                ...product,
+                name:product.product.name,
+                batchNumber: res.data.data.batchNumber[0].batchNumber, 
+                expireDate: res.data.data.batchNumber[0].expireDate, 
+              }
+              //console.log(mapped)
+              list =[...list, mapped]
+              console.log('mappedList', list)
+             
+          })
+          .finally(() =>  setProductGridData(list))
+        })
+       
+      }
+  } 
+
+  useEffect(() => {
+    getProformaProductsBatchNumbers()
+  }, [transferIsLoading])
 
   const handleProductSelect = (e) => {
     setSelectedProduct(e)

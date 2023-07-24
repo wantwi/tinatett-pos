@@ -274,11 +274,11 @@ const AddPurchase = () => {
 
 
                   <div className="row">
-                    <div className="col-lg-7 col-sm-6 col-12">
+                    <div className="col-lg-12 col-sm-6 col-12">
                       <div className="form-group">
                         <label>Supplier Name</label>
                         <div className="row">
-                          <div className="col-lg-12 col-sm-12 col-12">
+                          <div className="col-lg-10 col-sm-10 col-10">
                             <Select
                               className="select"
                               options={suppliersDropdown}
@@ -291,12 +291,21 @@ const AddPurchase = () => {
                               }}
                             />
                           </div>
+                          <div className="col-lg-2 col-sm-2 col-2 ps-0">
+                            <div className="add-icon">
+                              <Link to="#" title="Add Supplier">
+                                <img src={Plus} alt="img" />
+                              </Link>
+                            </div>
+                          </div>
 
                         </div>
                       </div>
+                      
                     </div>
+                   
 
-                    <div className="col-lg-5 col-sm-6 col-12">
+                    <div className="col-lg-12 col-sm-12 col-12">
                       <div className="form-group">
                         <label>Purchase Date </label>
                         <input type="date" className="form-control" value={purDate} onChange={(e) => { setPurDate(e.target.value) }} />

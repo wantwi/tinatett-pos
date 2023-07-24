@@ -35,6 +35,14 @@ const PurchaseList = () => {
     isSuccess,
   } = useGet("purchases", "/purchase");
 
+  const [loggedInUser, setLoggedInUser] = useState({})
+
+  useEffect(() => {
+    let userDetails = sessionStorage.getItem('auth')
+    let user = JSON.parse(userDetails)
+    setLoggedInUser(user)
+  }, [])
+
   const confirmText = (id) => {
     Swal.fire({
       title: "Are you sure?",
@@ -86,15 +94,15 @@ const PurchaseList = () => {
             id: purchase?.id,
             supplier:{
               id: purchase?.supplierId,
-              text: purchase?.supplier.name,
+              text: purchase?.supplierName,
               value: purchase?.supplierId,
             },
-            supplierName: purchase?.supplier.name,
+            supplierName: purchase?.supplierName,
             supplierId: purchase?.supplierId,
             status: purchase?.status,
             reference: purchase.purchaseRef,
             numberOfProduct: purchase.numberOfProduct,
-            branch: purchase.branch?.name || '',
+            branch: loggedInUser?.branchName || '',
             date: new Date(purchase.purchaseDate).toISOString().substring(0,10),
             createdBy: "Admin",
 

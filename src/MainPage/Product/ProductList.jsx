@@ -23,6 +23,8 @@ import "react-select2-wrapper/css/select2.css";
 import { useGet } from "../../hooks/useGet";
 import { moneyInTxt } from "../../utility";
 import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
+import { debounce } from "lodash";
+import useCustomApi from "../../hooks/useCustomApi";
 
 const ProductList = () => {
   const [inputfilter, setInputfilter] = useState(false);
@@ -61,9 +63,34 @@ const ProductList = () => {
     }
   }, [isLoading])
 
+  const axios = useCustomApi()
+  const handleSearch = debounce((value) => {
+    axios.get(`/product?ownershipType=&name=${value}`)
+    .then((res) => {
+     let mapped = res?.data.data.map((product) => {
+      return {
+        id: product?.id,
+        image: AvocatImage,
+        name: product?.name,
+        status: product?.status,
+        alert: product?.alert,
+        retailPrice: product?.retailPrice,
+        wholeSalePrice: product?.wholeSalePrice,
+        specialPrice: product?.specialPrice,
+        remainingStock: product?.stock_count || 0,
+        ownershipType: product?.ownershipType,
+        createdBy: product?.createdBy
+      }
+    })
+    setData(mapped)
+  })
+    
+
+}, 300)
+
 
   const togglefilter = (value) => {
-    setInputfilter(value);
+    setInputfilter(false);
   };
   const confirmText = () => {
     Swal.fire({
@@ -175,7 +202,7 @@ const ProductList = () => {
           {/* /product list */}
           <div className="card">
             <div className="card-body">
-              <Tabletop inputfilter={inputfilter} togglefilter={togglefilter} title={'Products List'} data={data}/>
+              <Tabletop inputfilter={inputfilter} togglefilter={togglefilter} title={'Products List'} data={data} handleSearch={handleSearch}/>
               {/* /Filter */}
               <div
                 className={`card mb-0 ${inputfilter ? "toggleCls" : ""}`}

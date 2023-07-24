@@ -103,6 +103,38 @@ const ProformaSales = () => {
     setProductGridData(newGridData)
   };
 
+
+  const getProformaProductsBatchNumbers = () => {
+    //get the batchNumber for each product
+    let list = []
+    if (!proformaIsLoading && !proformaDetailsLoading) {
+        proformaItems.data.map((product) => {
+          axios.get(`/purchase/product/${product.productId}`)
+          .then((res) => {
+              console.log("Batch Number", res.data.data)
+              let mapped = {
+                ...product,
+                name:product.product.name,
+                batchNumber: res.data.data.batchNumber[0].batchNumber, 
+                expireDate: res.data.data.batchNumber[0].expireDate, 
+              }
+              //console.log(mapped)
+              list =[...list, mapped]
+              console.log('mappedList', list)
+             
+          })
+          .finally(() =>  setProductGridData(list))
+        })
+       
+      }
+  } 
+
+
+useEffect(() => {
+  getProformaProductsBatchNumbers()
+}, [proformaDetailsLoading])
+
+
   const handleEdit = (item) => {
     setIsLoadingDetails(true)
     //console.log("Options:", productOptions)
@@ -119,7 +151,7 @@ const ProformaSales = () => {
           return {value:item.batchNumber, label:item?.batchNumber + '-(' + item?.Quantity +')', expireDate:item?.expireDate, manufacturingDate: item?.manufacturingDate}
         })
         //console.log(x)
-        setEditFormData({...editFormData, ...item, batchNumber: x[0],  manufacturingDate: x[0].manufacturingDate.substring(0,10), expireDate: x[0].expireDate.substring(0,10)})
+        setEditFormData({...editFormData, ...item, batchNumber: x[0],  manufacturingDate: x[0]?.manufacturingDate.substring(0,10), expireDate: x[0]?.expireDate.substring(0,10)})
       }
     }).finally(() => setIsLoadingDetails(false))
     
@@ -247,9 +279,9 @@ const ProformaSales = () => {
       })
 
       }
-    }
+  }
 
-    const handlePayment = () => {
+  const handlePayment = () => {
       if(transactionType == "SP"){
         processPayment("Paid", true)
       }
@@ -263,9 +295,9 @@ const ProformaSales = () => {
         processPayment("Credit", false)
       }
       $('.modal').modal('hide')
-    }
+  }
 
-    const getInvoiceReceipt = (salesref) => {
+  const getInvoiceReceipt = (salesref) => {
       axios.get('/sales/getSaleReceipt/'+ salesref)
       .then((res) =>{
       console.log(res.data)
@@ -285,9 +317,9 @@ const ProformaSales = () => {
         }
         return new Blob( [ arr ], { type: type } );
       }
-    }
+  }
 
-    const handleSalesTypeChange = (e) => {
+  const handleSalesTypeChange = (e) => {
       if(e.target.value == "Retail"){
         setSalesType("Retail")
       }
@@ -297,9 +329,9 @@ const ProformaSales = () => {
       else{
         setSalesType('')
       }
-    }
+  }
 
-    const handleSuspend = () => {
+  const handleSuspend = () => {
       setIsSaving(true)
       let payload = {
         customerId: selectedCustomer?.value,
@@ -384,9 +416,7 @@ const ProformaSales = () => {
 
   const handleProductSelectEditMode = (e) => {
     setSelectedProductEditMode(e)
-  }
-
-  
+  }  
 
   useEffect(() => {
     axios.get(`${BASE_URL}/purchase/product/${selectedProduct?.value}`).then((res) => {
@@ -407,7 +437,7 @@ const ProformaSales = () => {
 
   useEffect(() => {
     setPaymentInfo({...paymentInfo, amountPaid: Number(paymentInfo.cashAmount) + Number(paymentInfo.chequeAmount) + Number(paymentInfo.momoAmount)})
-   }, [paymentInfo.cashAmount, paymentInfo.chequeAmount, paymentInfo.momoAmount])
+  }, [paymentInfo.cashAmount, paymentInfo.chequeAmount, paymentInfo.momoAmount])
  
 
   useEffect(() => {
@@ -444,31 +474,19 @@ const ProformaSales = () => {
         //retailpriceTypeRef.current.checked = true
 
       
-        let mappedData3 = proformaItems?.data.map((item) => {
-          return{
-            quantity: item.quantity, 
-            amount: item.amount, 
-            batchNumber: item.batchNumber, 
-            manufacturingDate: item.manuDate,
-            expireDate: item.expireDate,
-            name: item.product.name,
-            productId:item.productId,
-            unitPrice: item.unitPrice,
-          }
-        })
-        setProductGridData(mappedData3)
-      
     }
   }, [productsIsLoading, customersIsLoading, proformaIsLoading])
-
-
-  if(productsIsLoading && customersIsLoading){
-    return <LoadingSpinner message="Loading...please wait"/>
-  }
 
   if(isSaving){
     return <LoadingSpinner message="Processing...please wait"/>
   }
+  
+
+  if(productsIsLoading && productGridData.length<1 ){
+    return <LoadingSpinner message="Loading...please wait"/>
+  }
+
+
 
  
 
@@ -796,264 +814,7 @@ const ProformaSales = () => {
             
           </div>
 
-          {/* <div className="card">
-            <div className="card-body">
-            <div className="payment-div" >
-                        <ul className="nav nav-tabs">
-                          <li className="nav-item" onClick={() => setActiveTab('Cash')}>
-                            <a className={activeTab == 'Cash' ? `nav-link active` : `nav-link`} href="javascript:void(0);">Cash</a>
-                          </li>
-
-                          <li className="nav-item" onClick={() => setActiveTab('Cheque')}>
-                            <a className={activeTab == 'Cheque' ? `nav-link active` : `nav-link`} href="javascript:void(0);">Cheque</a>
-                          </li>
-
-                          <li className="nav-item" onClick={() => setActiveTab('Momo')}>
-                            <a className={activeTab == 'Momo' ? `nav-link active` : `nav-link`} href="javascript:void(0);">Mobile Money</a>
-                          </li>
-
-                        </ul>
-
-                        {activeTab == 'Cash' ? <div id="cash-tab" style={{ marginTop: 20 }}>
-                          <div className="row">
-                            <div className="col-6">
-                              <div className="form-group">
-                                <label>Waybill</label>
-                                <div className="input-groupicon">
-                                  <input
-                                    type="text"
-                                    placeholder=""
-                                    value={paymentInfo.cashWaybill}
-                                    onChange={(e) => setPaymentInfo({...paymentInfo, cashWaybill: e.target.value})}
-                                  />
-
-                                </div>
-                              </div>
-                            </div>
-
-                            <div className="col-6">
-                              <div className="form-group">
-                                <label>Amount </label>
-                                <div className="input-groupicon">
-                                  <input
-                                    type="text"
-                                    placeholder=""
-                                    value={paymentInfo.cashAmount}
-                                    onChange={(e) => {
-                                      if(e.target.value == ''){
-                                        setPaymentInfo({...paymentInfo, cashAmount: ''})
-                                      }
-                                      else if(isValidNumber(e.target.value)){
-                                        setPaymentInfo({...paymentInfo, cashAmount: Number(e.target.value)})
-                                      }
-                                     
-                                    }}
-                                  />
-
-                                </div>
-                              </div>
-                            </div>
-
-                            <div className="col-6">
-                              <div className="form-group">
-                                <label>Receipt No </label>
-                                <div className="input-groupicon">
-                                  <input
-                                    type="text"
-                                    placeholder=""
-                                    value={paymentInfo.cashReceiptNo}
-                                    onChange={(e) => setPaymentInfo({...paymentInfo, cashReceiptNo: e.target.value})}
-                                  />
-
-                                </div>
-                              </div>
-                            </div>
-
-                          </div>
-                        </div> : null}
-                        {activeTab == 'Cheque' ? <div id="cheque-tab" style={{ marginTop: 20 }}>
-                          <div className="row">
-
-                            <div className="col-6">
-                              <div className="form-group">
-                                <label>Waybill</label>
-                                <div className="input-groupicon">
-                                  <input
-                                    type="text"
-                                    placeholder=""
-                                    value={paymentInfo.chequeWaybill}
-                                    onChange={(e) => setPaymentInfo({...paymentInfo, chequeWaybill: e.target.value})}
-                                  />
-
-                                </div>
-                              </div>
-                            </div>
-
-                            <div className="col-6">
-                              <div className="form-group">
-                                <label>Cheque No</label>
-                                <div className="input-groupicon">
-                                  <input
-                                    type="text"
-                                    placeholder=""
-                                    value={paymentInfo.chequeNo}
-                                    onChange={(e) => setPaymentInfo({...paymentInfo, chequeNo: e.target.value})}
-                                  />
-
-                                </div>
-                              </div>
-                            </div>
-
-
-                            <div className="col-6">
-                              <div className="form-group">
-                                <label>Receipt No</label>
-                                <div className="input-groupicon">
-                                  <input
-                                    type="text"
-                                    placeholder=""
-                                    value={paymentInfo.chequeReceiptNo}
-                                    onChange={(e) => setPaymentInfo({...paymentInfo, chequeReceiptNo: e.target.value})}
-                                  />
-
-                                </div>
-                              </div>
-                            </div>
-
-                            <div className="col-6">
-                              <div className="form-group">
-                                <label>Due Date</label>
-                                <div className="input-groupicon">
-                                  <input
-                                    type="date"
-                                    placeholder=""
-                                    className="form-control"
-                                    value={paymentInfo.dueDate}
-                                    onChange={(e) => setPaymentInfo({...paymentInfo, dueDate: e.target.value})}
-                                  />
-
-                                </div>
-                              </div>
-                            </div>
-
-                            <div className="col-6">
-                              <div className="form-group">
-                                <label>Bank</label>
-                                <div className="input-groupicon">
-                                  <input
-                                    type="text"
-                                    placeholder=""
-                                    value={paymentInfo.bank}
-                                    onChange={(e) => setPaymentInfo({...paymentInfo, bank: e.target.value})}
-                                  />
-
-                                </div>
-                              </div>
-                            </div>
-
-
-
-                            <div className="col-6">
-                              <div className="form-group">
-                                <label>Amount</label>
-                                <div className="input-groupicon">
-                                  <input
-                                    type="text"
-                                    placeholder=""
-                                    value={paymentInfo.chequeAmount}
-                                    onChange={(e) => {
-                                      if(e.target.value == ''){
-                                        setPaymentInfo({...paymentInfo, chequeAmount: ''})
-                                      }
-                                      else if(isValidNumber(e.target.value)){
-                                        setPaymentInfo({...paymentInfo, chequeAmount: Number(e.target.value)})
-                                      }
-                              
-                                    }}
-                                  />
-
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-
-                        </div> : null}
-                        {activeTab == 'Momo' ? <div id="momo-tab" style={{ marginTop: 20 }}>
-                          <div className="row">
-                            <div className="col-6">
-                              <div className="form-group">
-                                <label>Receipt No</label>
-                                <div className="input-groupicon">
-                                  <input
-                                    type="text"
-                                    placeholder=""
-                                    value={paymentInfo.momoReceiptNo}
-                                    onChange={(e) => setPaymentInfo({...paymentInfo, momoReceiptNo: e.target.value})}
-                                  />
-
-                                </div>
-                              </div>
-                            </div>
-
-
-                            <div className="col-6">
-                              <div className="form-group">
-                                <label>Name</label>
-                                <div className="input-groupicon">
-                                  <input
-                                    type="text"
-                                    placeholder=""
-                                    value={paymentInfo.momoName}
-                                    onChange={(e) => setPaymentInfo({...paymentInfo, momoName: e.target.value})}
-                                  />
-
-                                </div>
-                              </div>
-                            </div>
-
-                            <div className="col-6">
-                              <div className="form-group">
-                                <label>Amount</label>
-                                <div className="input-groupicon">
-                                  <input
-                                    type="text"
-                                    placeholder=""
-                                    value={paymentInfo.momoAmount}
-                                    onChange={(e) => {
-                                      if(e.target.value == ''){
-                                        setPaymentInfo({...paymentInfo, momoAmount: ''})
-                                      }
-                                      else if(isValidNumber(e.target.value)){
-                                        setPaymentInfo({...paymentInfo, momoAmount: Number(e.target.value)})
-                                      }
-                              
-                                    }}
-                                  />
-
-                                </div>
-                              </div>
-                            </div>
-
-                            <div className="col-6">
-                              <div className="form-group">
-                                <label>Transaction ID</label>
-                                <div className="input-groupicon">
-                                  <input
-                                    type="text"
-                                    placeholder=""
-                                    value={paymentInfo.transactionID}
-                                    onChange={(e) => setPaymentInfo({...paymentInfo, transactionID: e.target.value})}
-                                  />
-
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-
-                        </div> : null}
-                      </div>
-            </div>
-          </div> */}
+         
         </div>
 
 
@@ -1088,7 +849,7 @@ const ProformaSales = () => {
                               <td>
                                 <Link to="#">{item.name}</Link>
                               </td>
-                              <td>{item?.expireDate}</td>
+                              <td>{item?.expireDate.substring(0,10)}</td>
                               <td>{item.quantity}</td>
                               <td>{item.unitPrice}</td>
                               <td>{item.amount}</td>
