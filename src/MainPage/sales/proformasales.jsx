@@ -609,7 +609,7 @@ const handleEdit = (item) => {
                             value={selectedCustomer}
                             onChange={(e) => setSelectedCustomer(e)}
                             isLoading={customersIsLoading}
-                            isDisabled
+                            // isDisabled
                         />
                         
                         </div>

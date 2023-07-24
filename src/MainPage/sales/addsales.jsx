@@ -22,7 +22,9 @@ import { isValidNumber, moneyInTxt } from "../../utility";
 import { BASE_URL } from "../../api/CustomAxios";
 import useCustomApi from "../../hooks/useCustomApi";
 import FeatherIcon from 'feather-icons-react'
-import { usePost } from "../../hooks/usePost";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as Yup from "yup";
 import alertify from "alertifyjs";
 import "../../../node_modules/alertifyjs/build/css/alertify.css";
 import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
@@ -80,8 +82,60 @@ const Addsales = () => {
   const { data: products, isLoading: productsIsLoading } = useGet("products", "/product");
   // const { isLoading, data, isError, error, mutate } = usePost("/sales/suspend");
 
+   //add customer states
+   const [customerType, setCustomerType] = useState(0)
+   const validationSchema = Yup.object().shape({
+     name: Yup.string().required("Customer name is required"),
+     contact: Yup.string().required("Phone number is required"),
+   });
+ 
+   const {register,handleSubmit,reset,formState: { errors, isSubmitSuccessful }} = useForm({
+     defaultValues: {
+       name: "",
+       email: "",
+       contact: "",
+       otherContact: "",
+       location: "",
+       customerType: 0,
+       gpsAddress:""
+       
+     },
+     resolver: yupResolver(validationSchema),
+   });
+ 
+
 
   const axios = useCustomApi()
+
+    //save adhoc customer
+    const onSubmit = (data) => {
+      let payload = {...data, customerType}
+  
+      axios.post(`/customer`,  payload)
+      .then((res) => {
+        console.log(res.data)
+        if(res.data.success){
+          let addedCustomer =  {
+              id: res.data.data?.id,
+              label: res.data.data?.name,
+              value: res.data.data?.id,
+              customerType: res.data.data?.customerType,
+    
+            }
+            setCustomerList([addedCustomer,...customerList])
+            reset();
+
+            alertify.set("notifier", "position", "top-right");
+            alertify.success("Customer added successfully.");
+      $('.modal').modal('hide')
+        }
+        else{
+          alertify.set("notifier", "position", "top-right");
+          alertify.error("Error...Could not save customer.");
+        }
+        
+      })
+    };
 
   const deleteRow = (record) => {
     console.log(record)
@@ -498,7 +552,7 @@ const Addsales = () => {
                     <div className="form-group">
                       <label>Customer</label>
                       <div className="row">
-                        <div className="col-lg-12 col-sm-10 col-10">
+                        <div className="col-lg-10 col-sm-10 col-10">
 
                           <Select
                             className="select"
@@ -508,6 +562,13 @@ const Addsales = () => {
                             isLoading={customersIsLoading}
                           />
 
+                        </div>
+                        <div className="col-lg-2 col-sm-2 col-2 ps-0">
+                            <div className="add-icon">
+                              <Link to="#" data-bs-toggle="modal" data-bs-target="#addsupplier">
+                                <img src={Plus} alt="img" />
+                              </Link>
+                            </div>
                         </div>
 
                       </div>
@@ -1508,7 +1569,161 @@ const Addsales = () => {
           </div>
         </div>
       </div>
+
+{/* Add Customer Modal */}
+          <div
+            className="modal fade"
+            id="addsupplier"
+            tabIndex={-1}
+            aria-labelledby="addsupplier"
+            aria-hidden="true"
+          >
+            <div className="modal-dialog modal-md modal-dialog-centered">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">Add Customer</h5>
+                  <button
+                    type="button"
+                    className="close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                  >
+                    <span aria-hidden="true">×</span>
+                  </button>
+                </div>
+                <div className="modal-body">
+                <form onSubmit={handleSubmit(onSubmit)}>
+                    <div className="row">
+                      <div className="col-lg-12 col-sm-6 col-12">
+                        <div className="form-group">
+                          <label>Customer Name</label>
+                          <input 
+                          className={`form-control ${
+                            errors.name ? "is-invalid" : ""
+                          }`}
+                          type="text"
+                          {...register("name")}
+                        />
+                        <div className="invalid-feedback">
+                          {errors.name?.message}
+                        </div>
+                        </div>
+                      </div>
+
+                      <div className="col-lg-12 col-sm-6 col-12">
+                        <div className="form-group">
+                          <label>Choose Type</label>
+                          <div className="row">
+                              <div class="col-lg-6">
+                                <div class="input-group">
+                                  <div class="input-group-text">
+                                    <input className="form-check-input" type="radio" name="customerType" value="0" onChange = {(e) => setCustomerType(e.target.value)}/>
+                                  </div>
+                                  <input type="text" className="form-control" aria-label="Text input with radio button" value={'Company'}/>
+                                </div>
+                            </div>
+
+                              <div class="col-lg-6">
+
+                                <div class="input-group">
+                                  <div class="input-group-text">
+                                    <input className="form-check-input" type="radio" name="customerType" value="1" onChange = {(e) => setCustomerType(e.target.value)}/>
+                                  </div>
+                                  <input type="text" className="form-control" aria-label="Text input with radio button" value={'Individual'} />
+                                </div>
+                              
+                              </div>
+                          </div>
+                          
+                        </div>
+                      </div>
+
+                      <div className="col-lg-12 col-sm-12 col-12">
+                        <div className="form-group">
+                          <label>Email</label>
+                          <input 
+                          placeholder="someone@gmail.com"
+                          className={`form-control ${
+                            errors.name ? "is-invalid" : ""
+                          }`}
+                          type="text"
+                          {...register("email")}
+                        />
+                      
+                        </div>
+                      </div>
+
+                      
+                    </div>
+
+                    <div className="row">
+                      <div className="col-lg-6 col-sm-6 col-12">
+                        <div className="form-group">
+                          <label>Contact</label>
+                          <input  className={`form-control ${
+                                errors.name ? "is-invalid" : ""
+                              }`}
+                              type="text"
+                              {...register("contact")}
+                            />
+                            <div className="invalid-feedback">
+                              {errors.name?.message}
+                            </div>
+                        </div>
+                      </div>
+
+                      <div className="col-lg-6 col-12">
+                        <div className="form-group">
+                          <label>Other Contact</label>
+                          <input  className={`form-control ${
+                                errors.name ? "is-invalid" : ""
+                              }`}
+                              type="text"
+                              {...register("otherContact")}
+                            />
+                          
+                        </div>
+                      </div>
+                    
+                  
+                      <div className="col-lg-12 col-12">
+                        <div className="form-group">
+                          <label>Location/Address</label>
+                          <input className={`form-control ${
+                                errors.name ? "is-invalid" : ""
+                              }`}
+                              type="text"
+                              {...register("location")}/>
+                        </div>
+                      </div>
+
+                      <div className="col-lg-12 col-12">
+                        <div className="form-group">
+                          <label>Ghana Post Address</label>
+                          <input className={`form-control ${
+                                errors.name ? "is-invalid" : ""
+                              }`}
+                              type="text"
+                              placeholder="GZ-000-0000"
+                              {...register("gpsAddress")}/>
+                        </div>
+                      </div>
+                    
+                      <div className="col-lg-12" style={{textAlign:'right'}}>
+                        <button type="submit" className="btn btn-submit me-2"><FeatherIcon icon="save"/> Save</button>
+                        <button className="btn btn-cancel" onClick={() =>reset()}>Clear</button>
+                      </div>
+                    </div>
+              </form>
+                </div>
+                
+              </div>
+            </div>
+          </div>
     </div>
+
+
+      
 
   );
 };

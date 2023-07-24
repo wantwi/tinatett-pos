@@ -161,17 +161,18 @@ const AddPurchase = () => {
 
     axios.post(`/supplier`, payload)
       .then((res) => {
-        console.log(res.data)
+        // console.log(res.data)
         if (res.data.success) {
           alertify.set("notifier", "position", "top-right");
           alertify.success("Supplier added successfully.");
-          $('.modal').modal('hide')
+         
           let addedCustomer = {
             id: res.data.data?.id,
             label: res.data.data?.name,
             value: res.data.data?.id,
           }
           setSuppliersDropdown([addedCustomer, ...suppliersDropdown])
+          $('.modal').modal('hide')
         }
         else {
           alertify.set("notifier", "position", "top-right");
@@ -370,7 +371,6 @@ const AddPurchase = () => {
                               isLoading={suppliersIsLoading}
                               //onChange={(e) => handleSupplierSelect(e)}
                               onChange={(e) => {
-                                console.log(e)
                                 setSupplier(e)
                               }}
                             />

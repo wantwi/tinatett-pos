@@ -796,7 +796,7 @@ const AddProforma = () => {
           </div>
 
 {/* Add Customer Modal */}
-<           div
+            <div
             className="modal fade"
             id="addsupplier"
             tabIndex={-1}
