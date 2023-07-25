@@ -142,7 +142,7 @@ const PurchaseList = () => {
   ];
 
   const togglefilter = (value) => {
-    setInputfilter(value);
+    setInputfilter(false);
   };
 
 

@@ -112,17 +112,17 @@ const SalesList = () => {
     if(!isLoading){
      
       let mappedData =  sales?.data.map((sale) => {
-        console.log("Payment Infor:", (JSON.parse(sale?.paymentInfo)).type)
+        // console.log("Payment Infor:", (JSON.parse(sale?.paymentInfo)).type)
           return {
             id: sale?.id,
             Date: sale?.transDate, 
-            Name: sale?.customer?.name,
+            Name: sale?.customerName,
             Status: sale?.status,
             Reference: sale?.salesRef,
-            Payment: JSON.parse(sale?.paymentInfo).type,
-            Total: moneyInTxt(sale?.totalAmount),
-            Paid: JSON.parse(sale?.paymentInfo).amountPaid,
-            Due: Number(sale?.totalAmount) - Number(JSON.parse(sale?.paymentInfo).amountPaid),
+            // Payment: JSON.parse(sale?.paymentInfo).type,
+            Total: moneyInTxt(sale?.totalAmount) || '',
+            // Paid: JSON.parse(sale?.paymentInfo).amountPaid,
+            // Due: Number(sale?.totalAmount) - Number(JSON.parse(sale?.paymentInfo).amountPaid),
             Biller: sale?.salesPerson,
           }
         })
@@ -185,23 +185,7 @@ const SalesList = () => {
       dataIndex: "Total",
       sorter: (a, b) => a.Total.length - b.Total.length,
     },
-   
-    // {
-    //   title: "Due (GHS)",
-    //   dataIndex: "Due",
-    //   render: (text, record) => (
-    //     <>
-    //       {<div className="text-red">{moneyInTxt(text)}</div>}
-    //       {/* {text === 0 && <div>{moneyInTxt(text)}</div>} */}
-    //     </>
-    //   ),
-    //   sorter: (a, b) => a.Due.length - b.Due.length,
-    // },
-    // {
-    //   title: "Biller",
-    //   dataIndex: "Biller",
-    //   sorter: (a, b) => a.Biller.length - b.Biller.length,
-    // },
+  
     {
       title: "Action",
       render: (text, record) => (

@@ -190,7 +190,7 @@ const Cashier = () => {
        })
         setTimeout(() => {
           $('.modal').modal('hide')
-          //window.location.reload()
+          window.location.reload()
         }, 1500)
         //
       })
@@ -793,7 +793,7 @@ const Cashier = () => {
                                 <h4>Grand Total</h4>
                                 <h5>GHS {moneyInTxt(modalData?.Total)}</h5>
                               </li>
-                              <li>
+                              <li style={{border: Number(modalData?.Total) - Number(paymentInfo.amountPaid) > 0 ? '2px solid red' : Number(modalData?.Total) - Number(paymentInfo.amountPaid) < 0 ? '2px solid green' : null}}>
                                 <h4>{Number(modalData?.Total) - Number(paymentInfo.amountPaid) < 0 ? 'Change' : 'Balance'}</h4>
                                 <h5>GHS {moneyInTxt(Math.abs(Number(modalData?.Total) - Number(paymentInfo.amountPaid)))}</h5>
                               </li>
