@@ -1200,6 +1200,7 @@ const EditSales = () => {
                   <div className="form-group">
                     <label>Unit Price</label>
                     <input type="text" value={editFormData?.unitPrice}
+                      disabled
                       onChange={(e) => {
                         let unitP = parseInt(e.target.value) || 0
                         let qty = parseInt(editFormData.quantity) || 0
