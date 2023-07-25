@@ -1712,7 +1712,7 @@ const Addsales = () => {
                     
                       <div className="col-lg-12" style={{textAlign:'right'}}>
                         <button type="submit" className="btn btn-submit me-2"><FeatherIcon icon="save"/> Save</button>
-                        <button className="btn btn-cancel"  data-bs-dismiss="modal">Close</button>
+                        <button type="button" className="btn btn-cancel"  data-bs-dismiss="modal">Close</button>
                       </div>
                     </div>
               </form>
