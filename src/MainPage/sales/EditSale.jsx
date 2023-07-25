@@ -1112,7 +1112,7 @@ const EditSales = () => {
                   </div>
                 </div>
 
-                <div className="row mt-2">
+                {/* <div className="row mt-2">
                   <div className="col-lg-12" style={{ display: 'flex', justifyContent: 'space-between' }} >
                   <button className="btn btn-info me-2" data-bs-toggle="modal" data-bs-target="#payment" onClick={() => setTransactionType("SP")} style={{ width: '20%' }}>
                       Sell and Print
@@ -1128,7 +1128,7 @@ const EditSales = () => {
                     </button>
 
                   </div>
-                </div>
+                </div> */}
               </div>
             </div>
 
