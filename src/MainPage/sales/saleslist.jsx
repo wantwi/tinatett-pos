@@ -158,11 +158,14 @@ const SalesList = () => {
       dataIndex: "Status",
       render: (text, record) => (
         <>
-          {text === "Suspend" && (
-            <span className="badges bg-lightred">{"Suspended"}</span>
-          )}
           {text === "Paid" && (
-            <span className="badges bg-lightgreen">{"Paid"}</span>
+            <span className="badges btn-success">{"Paid"}</span>
+          )}
+          {text === "Suspended" && (
+            <span className="badges bg-lightgreen">{"Suspended"}</span>
+          )}
+           {text === "Credit" && (
+            <span className="badges bg-lightred">{"Credit"}</span>
           )}
         </>
       ),

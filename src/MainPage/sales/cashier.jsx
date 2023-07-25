@@ -451,10 +451,10 @@ const Cashier = () => {
               <h6>Complete Suspend </h6>
             </div>
             <div className="page-btn">
-              <Link to="/tinatett-pos/sales/add-sales" className="btn btn-added">
+              {/* <Link to="/tinatett-pos/sales/add-sales" className="btn btn-added">
                 <img src={PlusIcon} alt="img" className="me-1" />
                 Go to Sales
-              </Link>
+              </Link> */}
             </div>
           </div>
           {/* /product list */}
