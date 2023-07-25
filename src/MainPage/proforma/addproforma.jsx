@@ -193,6 +193,20 @@ const AddProforma = () => {
       amount: formData?.price * formData?.quantity
 
     }
+    if (selectedCustomer == '') {
+      $('#selectedCustomerRef').css('border', '1px solid red')
+      setTimeout(() => {
+        $('#selectedCustomerRef').css('border', 'none')
+      }, 3000)
+    }
+
+    if (item.quantity == '') {
+      $('#quantity').css('border', '1px solid red')
+      setTimeout(() => {
+        $('#quantity').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+      }, 3000)
+    }
+
     if (item.amount < 1 || formData.unitPrice == '' || item.productName == '' || selectedCustomer == '') {
       alertify.set("notifier", "position", "top-right");
       alertify.warning("Please make sure all fields are filled.");
@@ -332,6 +346,7 @@ const AddProforma = () => {
                       <div className="row">
                         <div className="col-lg-10 col-sm-12 col-12">
                           <Select
+                            id="selectedCustomerRef"
                             className="select"
                             options={customerOptions}
                             onChange={handleCustomerSelect}
@@ -459,7 +474,7 @@ const AddProforma = () => {
                       <div className="input-groupicon">
                         <input
                           type="text"
-                          //min={1}
+                          id="quantity"
                           className="form-control"
                           value={formData.quantity}
                           // {...register("quantity")}
@@ -936,7 +951,7 @@ const AddProforma = () => {
                     
                       <div className="col-lg-12" style={{textAlign:'right'}}>
                         <button type="submit" className="btn btn-submit me-2"><FeatherIcon icon="save"/> Save</button>
-                        <button className="btn btn-cancel" onClick={() =>reset()}>Clear</button>
+                        <button className="btn btn-cancel"  data-bs-dismiss="modal">Close</button>
                       </div>
                     </div>
               </form>
