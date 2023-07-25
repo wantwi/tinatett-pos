@@ -129,7 +129,7 @@ const Cashier = () => {
   const axios = useCustomApi()
 
   const processPayment = (type, print) =>{
-    if(Number(paymentInfo.cashAmount) + Number(paymentInfo.cashAmount) + Number(paymentInfo.cashAmount) > 0){
+    if((Number(paymentInfo.cashAmount) + Number(paymentInfo.cashAmount) + Number(paymentInfo.cashAmount) > 0 ) || type == 'Credit'){
       let pType = ''
       if(paymentInfo.cashAmount > 0){
         pType = pType.concat('Cash,')
@@ -382,7 +382,7 @@ const Cashier = () => {
                   // className="dropdown-item"
                   data-bs-toggle="modal"
                   data-bs-target="#showpayment"
-                  onClick={() => setModalData(record)}
+                  onClick={() => {setModalData(record), setIsCredit(false)}}
                   title={'Pay'}
                 >
                   {/* <img src={Dollar1} className="me-2" alt="img" /> */}
@@ -390,14 +390,28 @@ const Cashier = () => {
                   {/* Pay */}
                 </Link>
 
+                <Link
+                  to="#"
+                  // className="dropdown-item"
+                  data-bs-toggle="modal"
+                  data-bs-target="#cashpayment"
+                  onClick={() => {setModalData(record), setIsCredit(false)}}
+                  title={'Pay Cash'}
+                >
+                  {/* <img src={Dollar1} className="me-2" alt="img" /> */}
+                  <span className="badges btn-success me-2"><FeatherIcon icon="dollar-sign"/> Cash</span>
+                  {/* Pay */}
+                </Link>
+             
+
 
                 <Link
                   to="#"
                   // className="dropdown-item"
                   data-bs-toggle="modal"
-                  data-bs-target="#showpayment"
+                  data-bs-target="#creditpayment"
                   onClick={() => {setModalData(record), setIsCredit(true)}}
-                  title={'Pay'}
+                  title={'Credit'}
                 >
                   {/* <img src={Dollar1} className="me-2" alt="img" /> */}
                   <span className="badges btn-primary me-2"><FeatherIcon icon="credit-card"/> Credit</span>
@@ -489,6 +503,7 @@ const Cashier = () => {
         </div>
       </div>
       <>
+       {/* show payment Modal */}
         <div
           className="modal fade"
           id="showpayment"
@@ -836,110 +851,147 @@ const Cashier = () => {
             </div>
           </div>
         </div>
-        {/* show payment Modal */}
-        {/* show payment Modal */}
-        <div
+       
+         {/* cash payment Modal */}
+         <div
           className="modal fade"
-          id="createpayment"
+          id="cashpayment"
           tabIndex={-1}
-          aria-labelledby="createpayment"
+          aria-labelledby="cashpayment"
           aria-hidden="true"
         >
           <div className="modal-dialog modal-lg modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">Create Payment</h5>
+                <h5 className="modal-title">Sales Type: {modalData?.salestype}</h5>
                 <button
                   type="button"
-                  className="btn-close"
+                  className="close"
                   data-bs-dismiss="modal"
                   aria-label="Close"
+                  onClick={() => setIsCredit(false)}
                 >
                   <span aria-hidden="true">×</span>
                 </button>
               </div>
               <div className="modal-body">
-                <div className="row">
-                  <div className="col-lg-6 col-sm-12 col-12">
-                    <div className="form-group">
-                      <label>Customer</label>
-                      <div className="input-groupicon">
-                        <DatePicker
-                          selected={startDate}
-                          onChange={(date) => setStartDate(date)}
-                        />
-                        <div className="addonset">
-                          <img src={Calendar} alt="img" />
+                <div style={{ display: 'grid', gridTemplateColumns: '4fr 1fr' }}>
+                  <div className="card" style={{ border: '1px solid #252525' }}>
+                    <div className="card-body">
+                      <div className="payment-div" >
+                        <ul className="nav nav-tabs">
+                          <li className="nav-item" onClick={() => setActiveTab('Cash')}>
+                            <a className={activeTab == 'Cash' ? `nav-link active` : `nav-link`} href="javascript:void(0);">Cash</a>
+                          </li>
+
+                        </ul>
+
+                        {activeTab == 'Cash' ? <div id="cash-tab" style={{ marginTop: 20 }}>
+                          <div className="row">
+                           
+
+                            <div className="col-12">
+                              <div className="form-group">
+                                <label>Amount </label>
+                                <div className="input-groupicon">
+                                  <input
+                                    type="text"
+                                    placeholder=""
+                                    value={paymentInfo.cashAmount}
+                                    onChange={(e) => {
+                                      if(e.target.value == ''){
+                                        setPaymentInfo({...paymentInfo, cashAmount: ''})
+                                      }
+                                      else if(isValidNumber(e.target.value)){
+                                        setPaymentInfo({...paymentInfo, cashAmount: Number(e.target.value)})
+                                      }
+                                     
+                                    }}
+                                  />
+
+                                </div>
+                              </div>
+                            </div>
+
+
+                          </div>
+                        </div> : null}
+                       
+                      </div>
+
+                      <div className="row">
+                        <div className="col-lg-6 ">
+                          <div className="total-order w-100 max-widthauto m-auto mb-4">
+                            <ul>
+                              <li>
+                                <h4>Amount Given</h4>
+                                <h5>GHS {moneyInTxt(paymentInfo?.amountPaid)} </h5>
+                              </li>
+                              <li>
+                                <h4>Discount </h4>
+                                <h5>GHS 0.00</h5>
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
+                        <div className="col-lg-6 ">
+                          <div className="total-order w-100 max-widthauto m-auto mb-4">
+                            <ul>
+                              <li className="total">
+                                <h4>Grand Total</h4>
+                                <h5>GHS {moneyInTxt(modalData?.Total)}</h5>
+                              </li>
+                              <li style={{border: Number(modalData?.Total) - Number(paymentInfo.amountPaid) > 0 ? '2px solid red' : Number(modalData?.Total) - Number(paymentInfo.amountPaid) < 0 ? '2px solid green' : null}}>
+                                <h4>{Number(modalData?.Total) - Number(paymentInfo.amountPaid) < 0 ? 'Change' : 'Balance'}</h4>
+                                <h5>GHS {moneyInTxt(Math.abs(Number(modalData?.Total) - Number(paymentInfo.amountPaid)))}</h5>
+                              </li>
+
+                            </ul>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                  <div className="col-lg-6 col-sm-12 col-12">
-                    <div className="form-group">
-                      <label>Reference</label>
-                      <input type="text" defaultValue="INV/SL0101" />
+
+                
+                  <div style={{ display: 'flex', flexDirection:'column', justifyContent: 'center', alignItems: 'center',  fontWeight: 900 }}>
+                    <div  style={{ display: 'flex', flexDirection:'column', width:'90%', gap:10}}>
+                    <Button  data-bs-dismiss="modal" color="#3085d6">{' Hold '} </Button>
+                    <Button  data-bs-dismiss="modal" color="#252525">Remove</Button>
+                    </div> 
+                    <span style={{fontSize: 20, marginTop:180, marginBottom:180}}>GHS {modalData?.Total}</span>
                     </div>
-                  </div>
-                  <div className="col-lg-6 col-sm-12 col-12">
-                    <div className="form-group">
-                      <label>Received Amount</label>
-                      <input type="text" defaultValue={0.0} />
-                    </div>
-                  </div>
-                  <div className="col-lg-6 col-sm-12 col-12">
-                    <div className="form-group">
-                      <label>Paying Amount</label>
-                      <input type="text" defaultValue={0.0} />
-                    </div>
-                  </div>
-                  <div className="col-lg-6 col-sm-12 col-12">
-                    <div className="form-group">
-                      <label>Payment type</label>
-                      <Select2
-                        className="select"
-                        data={options1}
-                        options={{
-                          placeholder: "Choose Suppliers",
-                        }}
-                      />
-                    </div>
-                  </div>
-                  <div className="col-lg-12">
-                    <div className="form-group mb-0">
-                      <label>Note</label>
-                      <textarea className="form-control" defaultValue={""} />
-                    </div>
+                </div>
+
+                <div className="row mt-2">
+                  <div className="col-lg-12" style={{ display: 'flex', justifyContent: 'flex-start' }} >
+                    {!isCredit && (<button className="btn btn-info me-2" onClick={() => processPayment("Paid", true)} style={{ width: '20%' }}>
+                      Sell and Print
+                    </button>)}
+                    {!isCredit && (<button className="btn btn-warning me-2" onClick={() => processPayment("Paid", false)} style={{ width: '20%' }}>
+                      Sell Only
+                    </button>)}
+
                   </div>
                 </div>
-              </div>
-              <div className="modal-footer">
-                <button type="button" className="btn btn-submit">
-                  Submit
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-cancel"
-                  data-bs-dismiss="modal"
-                >
-                  Close
-                </button>
               </div>
             </div>
           </div>
         </div>
-        {/* show payment Modal */}
-        {/* edit payment Modal */}
-        <div
+
+
+          {/* Credit Modal */}
+          <div
           className="modal fade"
-          id="editpayment"
+          id="creditpayment"
           tabIndex={-1}
-          aria-labelledby="editpayment"
+          aria-labelledby=""
           aria-hidden="true"
         >
-          <div className="modal-dialog modal-lg modal-dialog-centered">
+          <div className="modal-dialog modal-md modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">Edit Payment</h5>
+                <h5 className="modal-title">Sales Type: {modalData?.salestype}</h5>
                 <button
                   type="button"
                   className="close"
@@ -950,74 +1002,24 @@ const Cashier = () => {
                 </button>
               </div>
               <div className="modal-body">
-                <div className="row">
-                  <div className="col-lg-6 col-sm-12 col-12">
-                    <div className="form-group">
-                      <label>Customer</label>
-                      <div className="input-groupicon">
-                        <DatePicker
-                          selected={startDate1}
-                          onChange={(date) => setStartDate1(date)}
-                        />
-                        <div className="addonset">
-                          <img src={datepicker} alt="img" />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="col-lg-6 col-sm-12 col-12">
-                    <div className="form-group">
-                      <label>Reference</label>
-                      <input type="text" defaultValue="INV/SL0101" />
-                    </div>
-                  </div>
-                  <div className="col-lg-6 col-sm-12 col-12">
-                    <div className="form-group">
-                      <label>Received Amount</label>
-                      <input type="text" defaultValue={0.0} />
-                    </div>
-                  </div>
-                  <div className="col-lg-6 col-sm-12 col-12">
-                    <div className="form-group">
-                      <label>Paying Amount</label>
-                      <input type="text" defaultValue={0.0} />
-                    </div>
-                  </div>
-                  <div className="col-lg-6 col-sm-12 col-12">
-                    <div className="form-group">
-                      <label>Payment type</label>
-                      <Select2
-                        className="select"
-                        data={options1}
-                        options={{
-                          placeholder: "Choose Suppliers",
-                        }}
-                      />
-                    </div>
-                  </div>
-                  <div className="col-lg-12">
-                    <div className="form-group mb-0">
-                      <label>Note</label>
-                      <textarea className="form-control" defaultValue={""} />
-                    </div>
-                  </div>
-                </div>
+                      <h3 style={{textAlign:'center'}}>Do you want to do a full credit? </h3>
               </div>
               <div className="modal-footer">
-                <button type="button" className="btn btn-submit">
-                  Submit
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-cancel"
-                  data-bs-dismiss="modal"
-                >
-                  Close
-                </button>
-              </div>
+                  <div className="col-lg-12" style={{ display: 'flex', justifyContent: 'flex-end' }} >
+                    <button className="btn btn-success me-2" onClick={() => processPayment("Credit", true)} style={{ width: '20%' }}>
+                      Yes
+                    </button>
+                    <button className="btn btn-danger me-2" data-bs-dismiss="modal">
+                     No
+                    </button>
+
+                  </div>
+                </div>
             </div>
           </div>
         </div>
+    
+
         {/* View Products Modal */}
         <div
           className="modal fade"
@@ -1029,7 +1031,7 @@ const Cashier = () => {
           <div className="modal-dialog modal-lg modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">Sales Ref - {productGridData[0]?.salesRef}</h5>
+                <h5 className="modal-title">Sales Ref - {productGridData[0]?.salesRef || 'N/A'}</h5>
                 <button
                   type="button"
                   className="close"
@@ -1054,7 +1056,7 @@ const Cashier = () => {
                         </tr>
                       </thead>
                       <tbody>
-                         {productGridData?.map((item, index) => {
+                      { productGridData.length > 0  ? productGridData?.map((item, index) => {
                           return (
                             <tr key={item?.id}>
                               <td>{index + 1}</td>
@@ -1068,7 +1070,7 @@ const Cashier = () => {
                              
                             </tr>
                           )
-                        })} 
+                        }): 'No Data'} 
 
                       </tbody>
                     </table>
