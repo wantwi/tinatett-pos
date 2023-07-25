@@ -31,7 +31,7 @@ import { useLocation } from "react-router-dom/cjs/react-router-dom.min";
 
 const EditSales = () => {
   const { state } = useLocation()
-  console.log(state)
+  console.log("State:", state)
   const [suspendId] = useState(state?.id)
   const [startDate, setStartDate] = useState(new Date());
   const [activeTab, setActiveTab] = useState('Cash')
@@ -290,20 +290,23 @@ const EditSales = () => {
 
       axios.put(`/sales/suspend/${suspendId}`, payload)
         .then((res) => {
-          if (res.data.success) {
-            setProductGridData([])
+          console.log(res)
+          if (res.status < 205) {
+            // setProductGridData([])
             setFormData({ quantity: '', amount: '', batchNumber: '', manuDate: '', expDate: '' })
             setSelectedProduct('')
             setInvoiceNo('')
 
             alertify.set("notifier", "position", "top-right");
-            alertify.success("Suspended successfully");
+            alertify.success("Suspend updated successfully");
             setReferenceData(res.data)
-
+            setTimeout(() => {
+              window.location.href = '/tinatett-pos/sales/suspended'
+            },2000)
           }
           else {
             alertify.set("notifier", "position", "top-right");
-            alertify.warning("Suspend unsuccessful");
+            alertify.warning("Suspend update unsuccessful");
           }
         })
         .catch((error) => {
@@ -312,7 +315,7 @@ const EditSales = () => {
         })
         .finally(() => {
           setIsSaving(false)
-          $('#reference').modal('show')
+          //$('#reference').modal('show')
         }
         )
     }
@@ -420,7 +423,7 @@ const EditSales = () => {
         return {
           salesRef: item?.salesRef,
           name: item?.product?.name,
-          productId: item?.id,
+          productId: item?.productId,
           quantity: item?.quantity,
           unitPrice: item?.unitPrice,
           amount: item?.amount,
