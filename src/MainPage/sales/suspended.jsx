@@ -98,7 +98,7 @@ const Suspended = () => {
       buttonsStyling: !1,
     }) .then( async() => {
      
-      let data = await axios.delete(`/suspend/${id}`)
+      let data = await axios.delete(`/sales/suspend/${id}`)
       if(data.status < 205){
         Swal.fire({
           type: "success",
@@ -336,7 +336,7 @@ const Suspended = () => {
           </Link>
 
 
-          <Link to="#" onClick={confirmText} title={'Remove'}>
+          <Link to="#" onClick={() => confirmText(record?.id)} title={'Remove'}>
             <span className="badges bg-lightred"><FeatherIcon icon="trash" /> Remove</span>
           </Link>
 
