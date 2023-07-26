@@ -52,7 +52,7 @@ const Sidebar = (props) => {
   }, [pathname]);
 
   useEffect(() => {
-    let userRole = sessionStorage.getItem('auth')
+    let userRole = localStorage.getItem('auth')
     let obj =JSON.parse(userRole)
     //console.log("Role:", obj.role)
     setUserType(obj.role)

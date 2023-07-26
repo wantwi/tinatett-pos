@@ -27,7 +27,7 @@ const Header = (props) => {
   const [loggedInUser, setLoggedInUser] = useState({})
 
   useEffect(() => {
-    let userDetails = sessionStorage.getItem('auth')
+    let userDetails = localStorage.getItem('auth')
     let user = JSON.parse(userDetails)
     setLoggedInUser(user)
   }, [])
@@ -343,7 +343,7 @@ const Header = (props) => {
                   Settings
                 </Link> */}
                 <hr className="m-0" />
-                <Link className="dropdown-item logout pb-0" to="/signIn" onClick={() => sessionStorage.clear()}>
+                <Link className="dropdown-item logout pb-0" to="/signIn" onClick={() => localStorage.removeItem('auth')}>
                   <img src={Logout} className="me-2" alt="img" />
                   Logout
                 </Link>

@@ -9,7 +9,7 @@ const DefaultLayout =(props)=> {
     const { match } = props;
     
     useEffect(() => {
-      const loggedInUser = sessionStorage.getItem('auth')
+      const loggedInUser = localStorage.getItem('auth')
       if(!loggedInUser){
         window.location.href = '/'
       }

@@ -6,6 +6,8 @@ export const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState(
     JSON.parse(sessionStorage.getItem("auth"))
       ? JSON.parse(sessionStorage.getItem("auth"))
+      :  JSON.parse(localStorage.getItem("auth"))
+      ? JSON.parse(localStorage.getItem("auth"))
       : {}
   );
 

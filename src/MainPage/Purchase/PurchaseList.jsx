@@ -38,7 +38,7 @@ const PurchaseList = () => {
   const [loggedInUser, setLoggedInUser] = useState({})
 
   useEffect(() => {
-    let userDetails = sessionStorage.getItem('auth')
+    let userDetails = localStorage.getItem('auth')
     let user = JSON.parse(userDetails)
     setLoggedInUser(user)
   }, [])

@@ -31,7 +31,7 @@ const PosHeader = (props) => {
   let pathname = location.pathname;
 
   useEffect(() => {
-    let userDetails = sessionStorage.getItem('auth')
+    let userDetails = localStorage.getItem('auth')
     let user = JSON.parse(userDetails)
     setLoggedInUser(user)
   }, [])

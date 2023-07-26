@@ -54,7 +54,8 @@ const SignInPage = (props) => {
        }
        else{
         setIsLoading(false)
-        sessionStorage.setItem("auth", JSON.stringify(user));
+        localStorage.setItem("auth", JSON.stringify(user));
+        
         setAuth(user);
         props.history.push("/tinatett-pos/dashboard");
       }

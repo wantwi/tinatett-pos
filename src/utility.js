@@ -20,7 +20,7 @@ export const commaRemover = (value) => {
   value = value.replace(/,/g, '')
   return parseFloat(value)
 }
-  let token = JSON.parse(sessionStorage.getItem("auth"))
+  let token = JSON.parse(localStorage.getItem("auth"))
   //console.log(token)
 
   export const getInvoiceReceipt = (salesref) => {
