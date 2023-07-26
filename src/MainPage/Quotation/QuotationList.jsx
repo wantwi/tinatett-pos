@@ -110,7 +110,7 @@ const QuotationList = () => {
           status: productRequest?.status,
           requestDate: new Date(productRequest.requestDate).toISOString().substring(0, 10),
           numberOfItems: productRequest?.numberOfItems,
-          createdBy: productRequest?.user.firstName + ' ' + productRequest?.user.lastName || 'N/A',
+          createdBy: productRequest?.createdBy || 'N/A',
         }
       })
 
@@ -160,6 +160,11 @@ const QuotationList = () => {
       title: "No of Items",
       dataIndex: "numberOfItems",
       sorter: (a, b) => a.numberOfItems.length - b.numberOfItems.length,
+    },
+    {
+      title: "Requested By",
+      dataIndex: "createdBy",
+     
     },
     {
       title: "Action",
