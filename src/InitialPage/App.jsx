@@ -19,7 +19,7 @@ export default function App(props) {
 
     const client = new QueryClient({
         defaultOptions: {
-          refetchOnWindowsFocus: false
+          refetchOnWindowsFocus: true
         }
       });
 

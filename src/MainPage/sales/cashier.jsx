@@ -144,7 +144,8 @@ const Cashier = () => {
       let payload = {
         status: type,
         salesRef:modalData.Reference,
-        amount:modalData?.Total,
+        amount: (Number(paymentInfo.cashAmount) + Number(paymentInfo.cashAmount) + Number(paymentInfo.cashAmount)) ,
+        // amount:modalData?.Total,
         paymentType: pType,
         paymentInfo: [
           {"type":"Cash", waybill:paymentInfo.cashWaybill, amountPaid: paymentInfo.cashAmount },
@@ -153,47 +154,47 @@ const Cashier = () => {
         ]
       }
   
-     // console.log(payload)
-      axios.post('/sales',payload)
-      .then((res) => {
-        console.log(res.data.success)
-        if(res.data.success){
-          if(print){
-            getInvoiceReceipt(modalData.Reference)
-          }
-          alertify.set("notifier", "position", "top-right");
-          alertify.success("Sale completed.");
+     console.log(payload)
+      // axios.post('/sales',payload)
+      // .then((res) => {
+      //   console.log(res.data.success)
+      //   if(res.data.success){
+      //     if(print){
+      //       getInvoiceReceipt(modalData.Reference)
+      //     }
+      //     alertify.set("notifier", "position", "top-right");
+      //     alertify.success("Sale completed.");
          
-        }
-      })
-      .catch((error) => {
-        alertify.set("notifier", "position", "top-right");
-        alertify.error("Error...Could not complete transaction");
-      })
-      .finally(() => {
-        setIsCredit(false)
-        setPaymentInfo({type:'',
-        cashWaybill:'',
-        cashReceiptNo:'',
-        cashAmount:'',
-        chequeNo:'',
-        chequeReceiptNo:'',
-        chequeAmount:'',
-        chequeWaybill:'',
-        dueDate:'',
-        bank:'',
-        momoName:'',
-        momoReceiptNo:'',
-        momoAmount:'' ,
-        transactionID:'',
-        amountPaid:''
-       })
-        setTimeout(() => {
-          $('.modal').modal('hide')
-          window.location.reload()
-        }, 1500)
-        //
-      })
+      //   }
+      // })
+      // .catch((error) => {
+      //   alertify.set("notifier", "position", "top-right");
+      //   alertify.error("Error...Could not complete transaction");
+      // })
+      // .finally(() => {
+      //   setIsCredit(false)
+      //   setPaymentInfo({type:'',
+      //   cashWaybill:'',
+      //   cashReceiptNo:'',
+      //   cashAmount:'',
+      //   chequeNo:'',
+      //   chequeReceiptNo:'',
+      //   chequeAmount:'',
+      //   chequeWaybill:'',
+      //   dueDate:'',
+      //   bank:'',
+      //   momoName:'',
+      //   momoReceiptNo:'',
+      //   momoAmount:'' ,
+      //   transactionID:'',
+      //   amountPaid:''
+      //  })
+      //   setTimeout(() => {
+      //     $('.modal').modal('hide')
+      //     window.location.reload()
+      //   }, 1500)
+      //   //
+      // })
     }
     else{
       alertify.set("notifier", "position", "top-right");
@@ -886,7 +887,7 @@ const Cashier = () => {
 
                         </ul>
 
-                        {activeTab == 'Cash' ? <div id="cash-tab" style={{ marginTop: 20 }}>
+                        <div id="cash-tab" style={{ marginTop: 20 }}>
                           <div className="row">
                            
 
@@ -915,7 +916,7 @@ const Cashier = () => {
 
 
                           </div>
-                        </div> : null}
+                        </div> 
                        
                       </div>
 
@@ -1058,7 +1059,7 @@ const Cashier = () => {
                       <tbody>
                       { productGridData.length > 0  ? productGridData?.map((item, index) => {
                           return (
-                            <tr key={item?.id}>
+                            <tr key={index}>
                               <td>{index + 1}</td>
                               <td>
                                 <Link to="#">{item?.name}</Link>

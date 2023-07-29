@@ -200,6 +200,13 @@ const AddProforma = () => {
       }, 3000)
     }
 
+    if (selectedProduct == '') {
+      $('#selectedProduct').css('border', '1px solid red')
+      setTimeout(() => {
+        $('#selectedProduct').css('border', 'none')
+      }, 3000)
+    }
+
     if (item.quantity == '') {
       $('#quantity').css('border', '1px solid red')
       setTimeout(() => {
@@ -251,7 +258,7 @@ const AddProforma = () => {
           setSelectedProduct({})
           setFormData({ amount: '', quantity: '', price: '' })
           setProductGridData([])
-          setTransDate('')
+          //setTransDate('')
 
           setTimeout(() => {
             let base64 = res.data.base64
@@ -383,6 +390,7 @@ const AddProforma = () => {
                   <div className="form-group">
                     <label>Product Name (Designation)</label>
                     <Select
+                    id="selectedProduct"
                       className="select"
                       options={productOptions}
                       onChange={handleProductSelect}

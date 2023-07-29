@@ -165,7 +165,7 @@ const AddPurchase = () => {
         if (res.data.success) {
           alertify.set("notifier", "position", "top-right");
           alertify.success("Supplier added successfully.");
-         
+
           let addedCustomer = {
             id: res.data.data?.id,
             label: res.data.data?.name,
@@ -190,10 +190,53 @@ const AddPurchase = () => {
 
   const handleAddItem = () => {
     //console.log(productFormData)
-    if (productFormData.expireDate == '' || productFormData.manufacturingDate == '' || purDate == '' || selectedProduct == '' || supplier == '') {
+    if (productFormData.expireDate == '' || productFormData.manufacturingDate == '' || purDate == '' || selectedProduct == '' ) {
       alertify.set("notifier", "position", "top-right");
       alertify.warning("Please make sure all fields are filled.");
     }
+    if (productFormData.expireDate == '') {
+      $('#expiryDate').css('border', '1px solid red')
+      setTimeout(() => {
+        $('#expiryDate').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+      }, 3000)
+    }
+
+    if (productFormData.manufacturingDate == '') {
+      $('#manufacturingDate').css('border', '1px solid red')
+      setTimeout(() => {
+        $('#manufacturingDate').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+      }, 3000)
+    }
+
+    if (selectedProduct == '') {
+      $('#productName').css('border', '1px solid red')
+      setTimeout(() => {
+        $('#productName').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+      }, 3000)
+    }
+
+    if (productFormData.quantity == '') {
+      $('#quantity').css('border', '1px solid red')
+      setTimeout(() => {
+        $('#quantity').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+      }, 3000)
+    }
+
+    if (productFormData.batchNumber == '') {
+      $('#batchNumber').css('border', '1px solid red')
+      setTimeout(() => {
+        $('#batchNumber').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+      }, 3000)
+    }
+
+    if (productFormData.unitPrice == '') {
+      $('#unitPrice').css('border', '1px solid red')
+      setTimeout(() => {
+        $('#unitPrice').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+      }, 3000)
+    }
+
+    
     else {
       setManDate('')
       setExpDate('')
@@ -205,9 +248,25 @@ const AddPurchase = () => {
   }
 
   const onSubmitPurchase = (data) => {
-    if (purDate == '' || supplier == '' || productGridData.length < 1) {
+    if (productGridData.length < 1) {
       alertify.set("notifier", "position", "top-right");
-      alertify.warning("Please make sure all fields are filled.");
+      alertify.warning("Please add items to your cart");
+    }
+    else if (supplier == '') {
+      alertify.set("notifier", "position", "top-right");
+      alertify.warning("Please make sure Supplier was selected.");
+      $('#supplier').css('border', '1px solid red')
+      setTimeout(() => {
+        $('#supplier').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+      }, 3000)
+    }
+    else if (purDate == '') {
+      alertify.set("notifier", "position", "top-right");
+      alertify.warning("Please make sure purchaase date was selected.");
+      $('#purDate').css('border', '1px solid red')
+      setTimeout(() => {
+        $('#purDate').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+      }, 3000)
     }
     else {
       let postBody = {
@@ -220,7 +279,7 @@ const AddPurchase = () => {
       mutate(postBody)
       setManDate('')
       setExpDate('')
-      setPurDate('')
+      //setPurDate('')
       setSelectedProduct('')
       setSupplier('')
       setProductGridData([])
@@ -365,6 +424,7 @@ const AddPurchase = () => {
                         <div className="row">
                           <div className="col-lg-10 col-sm-10 col-10">
                             <Select
+                             id="supplier"
                               className="select"
                               options={suppliersDropdown}
                               value={supplier}
@@ -392,7 +452,7 @@ const AddPurchase = () => {
                     <div className="col-lg-12 col-sm-12 col-12">
                       <div className="form-group">
                         <label>Purchase Date </label>
-                        <input type="date" className="form-control" value={purDate} onChange={(e) => { setPurDate(e.target.value) }} />
+                        <input type="date" id="purDate" className="form-control" value={purDate} onChange={(e) => { setPurDate(e.target.value) }} />
                         {/* <div className="input-groupicon">
                           <DatePicker
                             selected={purDate}
@@ -425,6 +485,7 @@ const AddPurchase = () => {
                       <div className="form-group">
                         <label>Product Name (Designation)</label>
                         <Select
+                          id="productName"
                           className="select"
                           options={productsDropdown}
                           value={selectedProduct}
@@ -438,7 +499,7 @@ const AddPurchase = () => {
                       <div className="form-group">
                         <label>Manufacturing Date </label>
                         <div className="input-groupicon">
-                          <input type="date" className="form-control" value={manDate} onChange={(e) => {
+                          <input type="date" id="manufacturingDate" className="form-control" value={manDate} onChange={(e) => {
                             setManDate(e.target.value)
                             setProductFormData({ ...productFormData, manufacturingDate: new Date(e.target.value).toISOString() })
                           }} />
@@ -461,7 +522,7 @@ const AddPurchase = () => {
                       <div className="form-group">
                         <label>Expiring Date </label>
                         <div className="input-groupicon">
-                          <input type="date" className="form-control" value={expDate} onChange={(e) => {
+                          <input type="date" id="expiryDate" className="form-control" value={expDate} onChange={(e) => {
                             setExpDate(e.target.value)
                             setProductFormData({ ...productFormData, expireDate: new Date(e.target.value).toISOString() })
                           }} />
@@ -485,7 +546,7 @@ const AddPurchase = () => {
                     <div className="col-lg-6 col-sm-6 col-12">
                       <div className="form-group">
                         <label>Batch No</label>
-                        <input type="text" className={`form-control `} disabled={selectedProduct?.ownershipType == "Tinatett" ? false : false}
+                        <input type="text" id="batchNumber" className={`form-control `} disabled={selectedProduct?.ownershipType == "Tinatett" ? false : false}
                           value={productFormData?.batchNumber}
                           onBlur={(e) => checkIfBatchNoExists(e.target.value, selectedProduct.id,)}
                           onChange={(e) => {
@@ -498,7 +559,7 @@ const AddPurchase = () => {
                     <div className="col-lg-6 col-sm-6 col-12">
                       <div className="form-group">
                         <label>Quantity</label>
-                        <input type="text" className={`form-control `}
+                        <input type="text" id="quantity" className={`form-control `}
                           value={productFormData?.quantity}
                           onChange={(e) => {
                             if (e.target.value == '') {
@@ -517,7 +578,7 @@ const AddPurchase = () => {
                     <div className="col-lg-6 col-sm-6 col-12">
                       <div className="form-group">
                         <label>Unit Price</label>
-                        <input type="text" className={`form-control `}
+                        <input type="text" id="unitPrice" className={`form-control `}
                           //step={0.01}
                           value={productFormData?.unitPrice}
                           onChange={(e) => {
@@ -535,7 +596,7 @@ const AddPurchase = () => {
                         <div className="input-groupicon">
                           <input
                             type="text" className={`form-control `}
-                            // step={0.01}
+                            id="amount"
                             placeholder=""
                             value={productFormData?.amount}
                             disabled
@@ -897,7 +958,7 @@ const AddPurchase = () => {
 
                       <div className="col-lg-12" style={{ textAlign: 'right' }}>
                         <button type="submit" className="btn btn-submit me-2"><FeatherIcon icon="save" />Save</button>
-                        <button type="button" className="btn btn-cancel"  data-bs-dismiss="modal">Close</button>
+                        <button type="button" className="btn btn-cancel" data-bs-dismiss="modal">Close</button>
                       </div>
                     </div>
                   </form>

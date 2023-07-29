@@ -52,7 +52,7 @@ const Addsales = () => {
   const retailpriceTypeRef = useRef()
   const specialpriceTypeRef = useRef()
   const wholesalepriceTypeRef = useRef()
-  const [referenceData, setReferenceData] = useState({ data: [], reference: '', amountToPay: '' })
+  const [referenceData, setReferenceData] = useState({ data: [], reference: '', amountToPay: '', balance:'' })
   const [isSaving, setIsSaving] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [paymentInfo, setPaymentInfo] = useState({
@@ -160,7 +160,7 @@ const Addsales = () => {
       alertify.set("notifier", "position", "top-right");
       alertify.warning("Please add at least one item to list before saving.");
     }
-    if (paymentInfo.amountPaid == '' || paymentInfo.amountPaid < 1 || paymentInfo.amountPaid == null) {
+    if ((paymentInfo.amountPaid == '' || paymentInfo.amountPaid < 1 || paymentInfo.amountPaid == null) && (transactionType == 'CP' || transactionType == 'CO') ) {
       alertify.set("notifier", "position", "top-right");
       alertify.warning("Please provide payment amount before saving.");
     }
@@ -243,10 +243,10 @@ const Addsales = () => {
                   transactionID: '',
                   amountPaid: ''
                 })
-                setTimeout(() => {
-                  $('.modal').modal('hide')
-                }, 1500)
-                //
+                // setTimeout(() => {
+                //   $('.modal').modal('hide')
+                // }, 1500)
+                
               })
 
           }
@@ -261,6 +261,7 @@ const Addsales = () => {
         })
         .finally(() => {
           setIsSaving(false)
+          retailRef.current.checked = true
           $('#reference').modal('show')
         }
         )
@@ -313,9 +314,6 @@ const Addsales = () => {
     }
     else if (e.target.value == "Wholesale") {
       setSalesType("Wholesale")
-    }
-    else {
-      setSalesType('')
     }
   }
 
@@ -1046,11 +1044,12 @@ const Addsales = () => {
                             <tr>
                               <th>#</th>
                               <th>Product Name</th>
+                              <th>Batch #</th>
                               <th>Exp Date</th>
                               <th>QTY</th>
                               <th>Price</th>
                               <th>Subtotal</th>
-                              <th>Batch #</th>
+                              
                               <th>Action</th>
                               <th />
                             </tr>
@@ -1064,11 +1063,12 @@ const Addsales = () => {
                                     <td>
                                       <Link to="#">{item.name}</Link>
                                     </td>
+                                    <td>{item.batchNumber}</td>
                                     <td>{item?.expireDate}</td>
                                     <td>{item.quantity}</td>
                                     <td>{item.unitPrice}</td>
                                     <td>{item.amount}</td>
-                                    <td>{item.batchNumber}</td>
+                                    
                                     <td>
                                       <Link to="#" className="delete-set me-2" data-bs-toggle="modal" data-bs-target="#editproduct" onClick={() => setEditFormData(item)}>
                                         <img src={EditIcon} alt="svg" />
@@ -1563,7 +1563,8 @@ const Addsales = () => {
             </div>
             <div className="modal-body">
 
-              <span>Amount to Pay:</span> <span style={{ fontSize: 40 }}> GHS {referenceData?.amountToPay}</span>
+              <span>Amount to Pay:</span> <span style={{ fontSize: 40 }}> GHS {referenceData?.amountToPay}</span> <br/>
+              <span>Balance:</span> <span style={{ fontSize: 40 }}> GHS {Math.abs(Number(productGridData.reduce((total, item) => total + item.amount, 0)) - Number(paymentInfo.amountPaid))}</span>
 
             </div>
 
