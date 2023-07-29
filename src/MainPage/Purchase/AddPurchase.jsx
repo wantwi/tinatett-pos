@@ -115,6 +115,12 @@ const AddPurchase = () => {
 
         }
         else if (res.data.statusText == 'Deny Purchase') {
+         
+          $('#batchNumber').css('border', '1px solid red')
+            setTimeout(() => {
+              $('#batchNumber').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+          }, 3000)
+          
           alertify.set("notifier", "position", "top-right");
           alertify.warning(res.data.message);
           setProductFormData({ ...productFormData, batchNumber: '' })
