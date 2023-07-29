@@ -5,22 +5,7 @@ import DatePicker from "react-datepicker";
 import Tabletop from "../../EntryFile/tabletop";
 import Swal from "sweetalert2";
 import "react-datepicker/dist/react-datepicker.css";
-import {
-
-  Calendar,
-  Printer,
-  search_whites,
-  //Search,
-  PlusIcon,
-  //EditIcon,
-  Dollar1,
-  Download,
-  pause1,
-  delete1,
-  //DeleteIcon,
-  datepicker,
-  DeleteIcon,
-} from "../../EntryFile/imagePath";
+import { useMutation} from '@tanstack/react-query'
 import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
 import { useGet } from "../../hooks/useGet";
@@ -35,13 +20,7 @@ import { Button } from "antd";
 import FeatherIcon from 'feather-icons-react'
 
 const Cashier = () => {
-  const [startDate, setStartDate] = useState(new Date());
-  const [startDate1, setStartDate1] = useState(new Date());
-  const [inputfilter, setInputfilter] = useState(true);
-  const [activeTab, setActiveTab] = useState('Cash')
-  const [modalData, setModalData] = useState(null)
-  const [isCredit, setIsCredit] = useState(false)
-  const [paymentInfo, setPaymentInfo] = useState({
+  const init = {
     type:'',
     cashWaybill:'',
     cashReceiptNo:'',
@@ -58,7 +37,14 @@ const Cashier = () => {
     transactionID:'',
     amountPaid:''
      
-  })
+  }
+  const [startDate, setStartDate] = useState(new Date());
+  const [startDate1, setStartDate1] = useState(new Date());
+  const [inputfilter, setInputfilter] = useState(true);
+  const [activeTab, setActiveTab] = useState('Cash')
+  const [modalData, setModalData] = useState(null)
+  const [isCredit, setIsCredit] = useState(false)
+  const [paymentInfo, setPaymentInfo] = useState(init)
   const [filter, setFilter] = useState('All')
   const [productGridData, setProductGridData] = useState([])
 
@@ -144,7 +130,7 @@ const Cashier = () => {
       let payload = {
         status: type,
         salesRef:modalData.Reference,
-        amount: (Number(paymentInfo.cashAmount) + Number(paymentInfo.cashAmount) + Number(paymentInfo.cashAmount)) ,
+        amount: (Number(paymentInfo.cashAmount) + Number(paymentInfo.momoAmount) + Number(paymentInfo.chequeAmount)) ,
         // amount:modalData?.Total,
         paymentType: pType,
         paymentInfo: [
@@ -153,8 +139,50 @@ const Cashier = () => {
           {"type":"Cheque", waybill: paymentInfo.chequeWaybill,  chequeNo: paymentInfo.chequeNo, chequeReceiptNo: paymentInfo.chequeReceiptNo, amountPaid: paymentInfo.chequeAmount, waybill: paymentInfo.chequeWaybill}
         ]
       }
+
+
+      // Mutations
+      // const mutation = useMutation({
+      //   mutationFn: postSales,
+      //   onSuccess: () => {
+      //     if(print){
+      //       getInvoiceReceipt(modalData.Reference)
+      //     }
+      //     alertify.set("notifier", "position", "top-right");
+      //     alertify.success("Sale completed.");
+      //     // Invalidate and refetch
+      //     queryClient.invalidateQueries({ queryKey: ['sales'] })
+      //   },
+      //   onError: () => {
+      //     alertify.set("notifier", "position", "top-right");
+      //     alertify.error("Error...Could not complete transaction");
+      //   },
+      //   onSettled: () => {
+      //     setIsCredit(false)
+      //     setPaymentInfo({type:'',
+      //     cashWaybill:'',
+      //     cashReceiptNo:'',
+      //     cashAmount:'',
+      //     chequeNo:'',
+      //     chequeReceiptNo:'',
+      //     chequeAmount:'',
+      //     chequeWaybill:'',
+      //     dueDate:'',
+      //     bank:'',
+      //     momoName:'',
+      //     momoReceiptNo:'',
+      //     momoAmount:'' ,
+      //     transactionID:'',
+      //     amountPaid:''
+      //    })
+      //     setTimeout(() => {
+      //       $('.modal').modal('hide')
+      //       //window.location.reload()
+      //     }, 1500)
+      // })
+      // mutation.mutate(payload)
   
-     //console.log(payload)
+     console.log(payload)
       axios.post('/sales',payload)
       .then((res) => {
         console.log(res.data.success)
@@ -164,7 +192,7 @@ const Cashier = () => {
           }
           alertify.set("notifier", "position", "top-right");
           alertify.success("Sale completed.");
-         
+          queryClient.invalidateQueries({ queryKey: ['sales'] })
         }
       })
       .catch((error) => {
@@ -195,7 +223,7 @@ const Cashier = () => {
         }, 1500)
         //
       })
-    }
+     }
     else{
       alertify.set("notifier", "position", "top-right");
       alertify.warning("Please enter an amount first");
@@ -521,7 +549,7 @@ const Cashier = () => {
                   className="close"
                   data-bs-dismiss="modal"
                   aria-label="Close"
-                  onClick={() => setIsCredit(false)}
+                  onClick={() => {setIsCredit(false), setPaymentInfo(init)}}
                 >
                   <span aria-hidden="true">×</span>
                 </button>
@@ -870,7 +898,7 @@ const Cashier = () => {
                   className="close"
                   data-bs-dismiss="modal"
                   aria-label="Close"
-                  onClick={() => setIsCredit(false)}
+                  onClick={() => {setIsCredit(false), setPaymentInfo(init)}}
                 >
                   <span aria-hidden="true">×</span>
                 </button>
@@ -998,6 +1026,7 @@ const Cashier = () => {
                   className="close"
                   data-bs-dismiss="modal"
                   aria-label="Close"
+                  onClick={() => {setPaymentInfo(init)}}
                 >
                   <span aria-hidden="true">×</span>
                 </button>

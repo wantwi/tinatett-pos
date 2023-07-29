@@ -79,7 +79,8 @@ const Suspended = () => {
   } = useGet("suspend", "/sales/suspend");
   const [data, setData] = useState([])
 
-
+  const axios = useCustomApi()
+  
   const togglefilter = (value) => {
     setInputfilter(value);
   };
@@ -129,8 +130,6 @@ const Suspended = () => {
         });
     });
   };
-
-  const axios = useCustomApi()
 
   const processPayment = (type, print) => {
     if (Number(paymentInfo.cashAmount) + Number(paymentInfo.cashAmount) + Number(paymentInfo.cashAmount) > 0) {
