@@ -170,8 +170,8 @@ const Addsales = () => {
       let payload = {
         customerId: selectedCustomer?.value,
         transDate: transDate,
-        totalAmount: (Number(paymentInfo.cashAmount) + Number(paymentInfo.momoAmount) + Number(paymentInfo.chequeAmount)) ,
-        // totalAmount: productGridData.reduce((total, item) => total + item.amount, 0),
+        // totalAmount: (Number(paymentInfo.cashAmount) + Number(paymentInfo.momoAmount) + Number(paymentInfo.chequeAmount)) ,
+        totalAmount: productGridData.reduce((total, item) => total + item.amount, 0),
         salesType: salesType,
         products: productGridData
       }
