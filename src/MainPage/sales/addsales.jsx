@@ -170,7 +170,8 @@ const Addsales = () => {
       let payload = {
         customerId: selectedCustomer?.value,
         transDate: transDate,
-        totalAmount: productGridData.reduce((total, item) => total + item.amount, 0),
+        totalAmount: (Number(paymentInfo.cashAmount) + Number(paymentInfo.cashAmount) + Number(paymentInfo.cashAmount)),
+        // totalAmount: productGridData.reduce((total, item) => total + item.amount, 0),
         salesType: salesType,
         products: productGridData
       }
@@ -200,7 +201,8 @@ const Addsales = () => {
             let payload = {
               status: type,
               salesRef: res.data.reference,
-              amount: productGridData.reduce((total, item) => total + item.amount, 0),
+              amount: (Number(paymentInfo.cashAmount) + Number(paymentInfo.cashAmount) + Number(paymentInfo.cashAmount)),
+              // amount: productGridData.reduce((total, item) => total + item.amount, 0),
               paymentType: pType,
               paymentInfo: [
                 { "type": "Cash", waybill: paymentInfo.cashWaybill, amountPaid: paymentInfo.cashAmount },
