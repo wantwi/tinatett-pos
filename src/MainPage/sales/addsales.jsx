@@ -412,10 +412,10 @@ const Addsales = () => {
       setIsLoading(true)
       if (res.data.success) {
         setIsLoading(false)
-        console.log(res.data.newProduct)
+        //console.log(res.data.newProduct)
         setSelectedProductInfo(res.data.newProduct)
         let x = res.data.newProduct.batchNumber?.map((item) => {
-          return { value: item.batchNumber, label: item?.batchNumber + '-(' + item?.Quantity + ')', expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
+          return { value: item.batchNumber, label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')': item?.batchNumber + '-(' + item?.availablequantity + ')', expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
         })
         // //console.log(x)
          setFormData({ ...formData, batchNumber: x[0], manuDate: x[0].manufacturingDate, expDate: x[0].expireDate })
@@ -616,7 +616,8 @@ const Addsales = () => {
                         <Select
                           isLoading={isLoading}
                           options={selectedProductInfo?.batchNumber?.map((item) => {
-                            return { value: item.batchNumber, label: item?.batchNumber + '-(' + item?.Quantity + ')', expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
+                            console.log(item)
+                            return { value: item.batchNumber, label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')': item?.batchNumber + '-(' + item?.availablequantity + ')', expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
                           })}
                           placeholder=""
                           value={formData.batchNumber}
