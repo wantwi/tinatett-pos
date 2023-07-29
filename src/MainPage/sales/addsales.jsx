@@ -412,12 +412,13 @@ const Addsales = () => {
       setIsLoading(true)
       if (res.data.success) {
         setIsLoading(false)
-        setSelectedProductInfo(res.data.data)
+        console.log(res.data.newProduct)
+        setSelectedProductInfo(res.data.newProduct)
         let x = res.data.data.batchNumber?.map((item) => {
           return { value: item.batchNumber, label: item?.batchNumber + '-(' + item?.Quantity + ')', expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
         })
-        //console.log(x)
-        setFormData({ ...formData, batchNumber: x[0], manuDate: x[0].manufacturingDate, expDate: x[0].expireDate })
+        // //console.log(x)
+         setFormData({ ...formData, batchNumber: x[0], manuDate: x[0].manufacturingDate, expDate: x[0].expireDate })
         retailpriceTypeRef.current.checked = true
       }
     })
@@ -600,7 +601,7 @@ const Addsales = () => {
                         <input
                           className="form-control"
                           type="text"
-                          value={selectedProduct?.remainingStock}
+                          value={selectedProductInfo?.totalCount}
                           disabled
                         />
 
