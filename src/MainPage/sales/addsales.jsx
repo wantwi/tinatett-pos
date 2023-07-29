@@ -201,7 +201,7 @@ const Addsales = () => {
             let payload = {
               status: type,
               salesRef: res.data.reference,
-              amount: (Number(paymentInfo.cashAmount) + Number(paymentInfo.cashAmount) + Number(paymentInfo.cashAmount)),
+              amount: (Number(paymentInfo.cashAmount) + Number(paymentInfo.momoAmount) + Number(paymentInfo.chequeAmount)) ,
               // amount: productGridData.reduce((total, item) => total + item.amount, 0),
               paymentType: pType,
               paymentInfo: [

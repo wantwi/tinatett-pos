@@ -38,8 +38,7 @@ const Cashier = () => {
     amountPaid:''
      
   }
-  const [startDate, setStartDate] = useState(new Date());
-  const [startDate1, setStartDate1] = useState(new Date());
+
   const [inputfilter, setInputfilter] = useState(true);
   const [activeTab, setActiveTab] = useState('Cash')
   const [modalData, setModalData] = useState(null)
@@ -57,7 +56,8 @@ const Cashier = () => {
     data: sales,
     isError,
     isLoading,
-    isSuccess,
+    refetch,
+    
   } = useGet("suspend", "/sales/suspend");
   const [data, setData] = useState([])
 
@@ -269,8 +269,9 @@ const Cashier = () => {
   ];
 
 
-
+//
   useEffect(() => {
+    refetch()
     if(!isLoading){
       let mappedData =  sales?.data.map((sale) => {
           return {
@@ -293,7 +294,7 @@ const Cashier = () => {
     else{
       console.log('loading...')
     }
-  }, [isLoading])
+  }, [isLoading, refetch])
 
 
 
