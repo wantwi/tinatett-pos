@@ -154,47 +154,47 @@ const Cashier = () => {
         ]
       }
   
-     console.log(payload)
-      // axios.post('/sales',payload)
-      // .then((res) => {
-      //   console.log(res.data.success)
-      //   if(res.data.success){
-      //     if(print){
-      //       getInvoiceReceipt(modalData.Reference)
-      //     }
-      //     alertify.set("notifier", "position", "top-right");
-      //     alertify.success("Sale completed.");
+     //console.log(payload)
+      axios.post('/sales',payload)
+      .then((res) => {
+        console.log(res.data.success)
+        if(res.data.success){
+          if(print){
+            getInvoiceReceipt(modalData.Reference)
+          }
+          alertify.set("notifier", "position", "top-right");
+          alertify.success("Sale completed.");
          
-      //   }
-      // })
-      // .catch((error) => {
-      //   alertify.set("notifier", "position", "top-right");
-      //   alertify.error("Error...Could not complete transaction");
-      // })
-      // .finally(() => {
-      //   setIsCredit(false)
-      //   setPaymentInfo({type:'',
-      //   cashWaybill:'',
-      //   cashReceiptNo:'',
-      //   cashAmount:'',
-      //   chequeNo:'',
-      //   chequeReceiptNo:'',
-      //   chequeAmount:'',
-      //   chequeWaybill:'',
-      //   dueDate:'',
-      //   bank:'',
-      //   momoName:'',
-      //   momoReceiptNo:'',
-      //   momoAmount:'' ,
-      //   transactionID:'',
-      //   amountPaid:''
-      //  })
-      //   setTimeout(() => {
-      //     $('.modal').modal('hide')
-      //     window.location.reload()
-      //   }, 1500)
-      //   //
-      // })
+        }
+      })
+      .catch((error) => {
+        alertify.set("notifier", "position", "top-right");
+        alertify.error("Error...Could not complete transaction");
+      })
+      .finally(() => {
+        setIsCredit(false)
+        setPaymentInfo({type:'',
+        cashWaybill:'',
+        cashReceiptNo:'',
+        cashAmount:'',
+        chequeNo:'',
+        chequeReceiptNo:'',
+        chequeAmount:'',
+        chequeWaybill:'',
+        dueDate:'',
+        bank:'',
+        momoName:'',
+        momoReceiptNo:'',
+        momoAmount:'' ,
+        transactionID:'',
+        amountPaid:''
+       })
+        setTimeout(() => {
+          $('.modal').modal('hide')
+          window.location.reload()
+        }, 1500)
+        //
+      })
     }
     else{
       alertify.set("notifier", "position", "top-right");
