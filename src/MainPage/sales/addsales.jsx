@@ -414,7 +414,7 @@ const Addsales = () => {
         setIsLoading(false)
         console.log(res.data.newProduct)
         setSelectedProductInfo(res.data.newProduct)
-        let x = res.data.data.batchNumber?.map((item) => {
+        let x = res.data.newProduct.batchNumber?.map((item) => {
           return { value: item.batchNumber, label: item?.batchNumber + '-(' + item?.Quantity + ')', expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
         })
         // //console.log(x)
