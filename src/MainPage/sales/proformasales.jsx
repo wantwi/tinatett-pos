@@ -405,10 +405,23 @@ useEffect(() => {
          unitPrice:price,
          amount:formData.quantity * price
       } 
-      if (obj.amount < 1 || obj.unitPrice == '' || obj.name == '' || selectedCustomer == null) {
+      if (!obj.name) {
         alertify.set("notifier", "position", "top-right");
-        alertify.warning("Please make sure all fields are filled.");
-      }   
+        alertify.warning("Please select a product.");
+        $('#selectedProduct').css('border', '1px solid red')
+      }
+  
+      if (selectedCustomer == '' || selectedCustomer == null) {
+        alertify.set("notifier", "position", "top-right");
+        alertify.warning("Please select a customer.");
+        $('#selectedCustomer').css('border', '1px solid red')
+      }
+  
+       if ( obj.quantity == '') {
+        alertify.set("notifier", "position", "top-right");
+        alertify.warning("Please enter quantity.");
+        $('#quantity').css('border', '1px solid red')
+      }
       else{
         setProductGridData([...productGridData, obj])
         setFormData({quantity:'', amount:'', batchNumber:'', manuDate:'', expDate:''})
@@ -455,8 +468,18 @@ useEffect(() => {
         retailpriceTypeRef.current.checked = true
       }
     })
+    $('#selectedProduct').css('border', '1px solid rgba(145, 158, 171, 0.32)')
 
   }, [selectedProduct])
+
+  useEffect(() => {
+    $('#quantity').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+  }, [formData.quantity])
+
+
+  useEffect(() => {
+    $('#selectedCustomer').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+  }, [selectedCustomer])
 
   useEffect(() => {
     setPaymentInfo({...paymentInfo, amountPaid: Number(paymentInfo.cashAmount) + Number(paymentInfo.chequeAmount) + Number(paymentInfo.momoAmount)})
@@ -610,6 +633,7 @@ useEffect(() => {
                         <div className="col-lg-12 col-sm-10 col-10">
                         
                         <Select
+                            id="selectedCustomer"
                             className="select"
                             options={customerList}
                             value={selectedCustomer}
@@ -629,6 +653,7 @@ useEffect(() => {
                     <label>Product Name</label>
                     <div className="input-groupicon">
                       <Select style={{width:'100%'}}
+                           id="selectedProduct"
                           options={productsList}
                           placeholder={'Select product'}
                           value={selectedProduct}
@@ -647,6 +672,7 @@ useEffect(() => {
                     <label>Quantity Left</label>
                     <div className="input-groupicon">
                       <input
+                       
                         className="form-control"
                         type="text"
                         value={selectedProduct?.remainingStock}
@@ -774,7 +800,8 @@ useEffect(() => {
                     <label>Quantity</label>
                     <div className="input-groupicon">
                       <input
-                       className="form-control"
+                        id="quantity"
+                        className="form-control"
                         type="text"
                         value={formData?.quantity}
                         onChange={(e) => {

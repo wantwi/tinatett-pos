@@ -154,6 +154,7 @@ const AddProforma = () => {
       // let item = products?.data.find((product) => product.id == e.target.value)
       setSelectedProduct(e)
     }
+    $('#selectedProduct').css('border', 'none')
   }
 
   const handleCustomerSelect = (e) => {
@@ -163,6 +164,7 @@ const AddProforma = () => {
       setSelectedCustomerPrint(e)
       
     }
+    $('#selectedCustomerRef').css('border', '1px solid rgba(145, 158, 171, 0.32)')
   }
 
   const deleteRow = (record) => {
@@ -195,23 +197,23 @@ const AddProforma = () => {
     }
     if (selectedCustomer == '') {
       $('#selectedCustomerRef').css('border', '1px solid red')
-      setTimeout(() => {
-        $('#selectedCustomerRef').css('border', 'none')
-      }, 3000)
+      // setTimeout(() => {
+      //   $('#selectedCustomerRef').css('border', 'none')
+      // }, 3000)
     }
 
     if (selectedProduct == '') {
       $('#selectedProduct').css('border', '1px solid red')
-      setTimeout(() => {
-        $('#selectedProduct').css('border', 'none')
-      }, 3000)
+      // setTimeout(() => {
+      //   $('#selectedProduct').css('border', 'none')
+      // }, 3000)
     }
 
     if (item.quantity == '') {
       $('#quantity').css('border', '1px solid red')
-      setTimeout(() => {
-        $('#quantity').css('border', '1px solid rgba(145, 158, 171, 0.32)')
-      }, 3000)
+      // setTimeout(() => {
+      //   $('#quantity').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+      // }, 3000)
     }
 
     if (item.amount < 1 || formData.unitPrice == '' || item.productName == '' || selectedCustomer == '') {
@@ -232,6 +234,12 @@ const AddProforma = () => {
     }
 
   }
+
+
+  useEffect(() => {
+    $('#quantity').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+  }, [formData.quantity])
+
 
 
   const onSubmitProforma = () => {

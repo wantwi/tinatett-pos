@@ -379,7 +379,7 @@ const Addsales = () => {
   }
   const handleAddItem = () => {
     
-    console.log(selectedProduct)
+    //console.log(selectedProduct)
     let obj = {
       name: selectedProduct.label,
       productId: selectedProduct.value,
@@ -400,27 +400,27 @@ const Addsales = () => {
       alertify.set("notifier", "position", "top-right");
       alertify.warning("Please select a product.");
       $('#selectedProduct').css('border', '1px solid red')
-      setTimeout(() => {
-        $('#selectedProduct').css('border', '1px solid rgba(145, 158, 171, 0.32)')
-      }, 3000)
+      // setTimeout(() => {
+      //   $('#selectedProduct').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+      // }, 3000)
     }
 
     if (selectedCustomer == '' || selectedCustomer == null) {
       alertify.set("notifier", "position", "top-right");
       alertify.warning("Please select a customer.");
       $('#selectedCustomer').css('border', '1px solid red')
-      setTimeout(() => {
-        $('#selectedCustomer').css('border', '1px solid rgba(145, 158, 171, 0.32)')
-      }, 3000)
+      // setTimeout(() => {
+      //   $('#selectedCustomer').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+      // }, 3000)
     }
 
      if ( obj.quantity == '') {
       alertify.set("notifier", "position", "top-right");
       alertify.warning("Please enter quantity.");
       $('#quantity').css('border', '1px solid red')
-      setTimeout(() => {
-        $('#quantity').css('border', '1px solid rgba(145, 158, 171, 0.32)')
-      }, 3000)
+      // setTimeout(() => {
+      //   $('#quantity').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+      // }, 3000)
     }
 
     else {
@@ -463,12 +463,22 @@ const Addsales = () => {
         retailpriceTypeRef.current.checked = true
       }
     })
+    $('#selectedProduct').css('border', '1px solid rgba(145, 158, 171, 0.32)')
 
   }, [selectedProduct])
 
   useEffect(() => {
     setPaymentInfo({ ...paymentInfo, amountPaid: Number(paymentInfo.cashAmount) + Number(paymentInfo.chequeAmount) + Number(paymentInfo.momoAmount) })
   }, [paymentInfo.cashAmount, paymentInfo.chequeAmount, paymentInfo.momoAmount])
+
+  useEffect(() => {
+    $('#quantity').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+  }, [formData.quantity])
+
+
+  useEffect(() => {
+    $('#selectedCustomer').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+  }, [selectedCustomer])
 
 
   useEffect(() => {
@@ -1611,10 +1621,11 @@ const Addsales = () => {
             <div className="modal-body">
 
               <span>Amount to Pay:</span> <span style={{ fontSize: 40 }}> GHS {recieptData?.amountToPay}</span> <br/>
-              {recieptData?.change > 0 ?
-               (<><span>Change:</span> <span style={{ fontSize: 40 }}> GHS {(recieptData?.change)}</span></>) :
+              {/* {recieptData?.change > 0 ? */}
+               (<><span>Change:</span> <span style={{ fontSize: 40 }}> GHS {(recieptData?.change)}</span></>)
+                {/* : */}
                (<><span>Balance:</span> <span style={{ fontSize: 40 }}> GHS {(recieptData?.balance)}</span></>)
-              }
+              {/* } */}
              
 
             </div>

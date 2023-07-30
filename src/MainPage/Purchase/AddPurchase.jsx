@@ -192,7 +192,28 @@ const AddPurchase = () => {
     //console.log("Product:", e)
     setSelectedProduct(e)
     setProductFormData({ ...productFormData, productName: e.label, productId: e.value, })
+    $('#productName').css('border', '1px solid rgba(145, 158, 171, 0.32)')
   }
+
+  useEffect(() => {
+    $('#unitPrice').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+  }, [productFormData.unitPrice])
+
+  useEffect(() => {
+    $('#batchNumber').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+  }, [productFormData.batchNumber])
+
+  useEffect(() => {
+    $('#quantity').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+  }, [productFormData.quantity])
+
+  useEffect(() => {
+    $('#manufacturingDate').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+  }, [productFormData.manufacturingDate])
+
+  useEffect(() => {
+    $('#expiryDate').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+  }, [productFormData.expireDate])
 
   const handleAddItem = () => {
     //console.log(productFormData)
@@ -202,46 +223,27 @@ const AddPurchase = () => {
     }
     if (productFormData.expireDate == '') {
       $('#expiryDate').css('border', '1px solid red')
-      setTimeout(() => {
-        $('#expiryDate').css('border', '1px solid rgba(145, 158, 171, 0.32)')
-      }, 3000)
     }
 
     if (productFormData.manufacturingDate == '') {
       $('#manufacturingDate').css('border', '1px solid red')
-      setTimeout(() => {
-        $('#manufacturingDate').css('border', '1px solid rgba(145, 158, 171, 0.32)')
-      }, 3000)
-    }
-
-    if (selectedProduct == '') {
-      $('#productName').css('border', '1px solid red')
-      setTimeout(() => {
-        $('#productName').css('border', '1px solid rgba(145, 158, 171, 0.32)')
-      }, 3000)
     }
 
     if (productFormData.quantity == '') {
       $('#quantity').css('border', '1px solid red')
-      setTimeout(() => {
-        $('#quantity').css('border', '1px solid rgba(145, 158, 171, 0.32)')
-      }, 3000)
     }
 
     if (productFormData.batchNumber == '') {
       $('#batchNumber').css('border', '1px solid red')
-      setTimeout(() => {
-        $('#batchNumber').css('border', '1px solid rgba(145, 158, 171, 0.32)')
-      }, 3000)
     }
 
     if (productFormData.unitPrice == '') {
       $('#unitPrice').css('border', '1px solid red')
-      setTimeout(() => {
-        $('#unitPrice').css('border', '1px solid rgba(145, 158, 171, 0.32)')
-      }, 3000)
     }
 
+    if(selectedProduct == '' || selectedProduct == null){
+      $('#productName').css('border', '1px solid red')
+    }
     
     else {
       setManDate('')
@@ -253,6 +255,10 @@ const AddPurchase = () => {
 
   }
 
+  useEffect(() => {
+    $('#supplier').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+  }, [supplier])
+
   const onSubmitPurchase = (data) => {
     if (productGridData.length < 1) {
       alertify.set("notifier", "position", "top-right");
@@ -262,9 +268,6 @@ const AddPurchase = () => {
       alertify.set("notifier", "position", "top-right");
       alertify.warning("Please make sure Supplier was selected.");
       $('#supplier').css('border', '1px solid red')
-      setTimeout(() => {
-        $('#supplier').css('border', '1px solid rgba(145, 158, 171, 0.32)')
-      }, 3000)
     }
     else if (purDate == '') {
       alertify.set("notifier", "position", "top-right");
