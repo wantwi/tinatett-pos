@@ -271,8 +271,8 @@ const Cashier = () => {
 
 //
   useEffect(() => {
-    refetch()
-    if(!isLoading){
+   // refetch()
+    if(sales){
       let mappedData =  sales?.data.map((sale) => {
           return {
             id: sale?.id,
@@ -294,7 +294,7 @@ const Cashier = () => {
     else{
       console.log('loading...')
     }
-  }, [isLoading, refetch])
+  }, [sales])
 
 
 

@@ -74,6 +74,7 @@ const Addsales = () => {
 
   })
   const [transactionType, setTransactionType] = useState('SP')
+  const [recieptData, setReceiptData] = useState({})
 
   const retailRef = useRef()
   const wholesaleRef = useRef()
@@ -164,7 +165,13 @@ const Addsales = () => {
       alertify.set("notifier", "position", "top-right");
       alertify.warning("Please provide payment amount before saving.");
     }
+
+    if( (transactionType == 'SP' || transactionType == 'SO') && paymentInfo.amountPaid < (productGridData.reduce((total, item) => total + item.amount, 0))){
+      alertify.set("notifier", "position", "top-right");
+      alertify.warning("Please provide full payment amount before saving.");
+    }
     else {
+      $('#payment').modal('hide')
       //handle the suspend first and then use the reference to process payment
       setIsSaving(true)
       let payload = {
@@ -215,6 +222,12 @@ const Addsales = () => {
             axios.post('/sales', payload)
               .then((res) => {
                 if (res.data.success) {
+                  //console.log("Receipt:", res.data)
+                  setReceiptData({
+                    balance: res.data.data.balance,
+                    change: res.data.data.change,
+                    amountToPay: res.data.data.result?.totalAmount
+                  })
                   if (print) {
                     getInvoiceReceipt(payload.salesRef)
                   }
@@ -285,13 +298,13 @@ const Addsales = () => {
     if(transactionType == "CO"){
       processPayment("Credit", false)
     }
-    $('.modal').modal('hide')
+    
   }
 
   const getInvoiceReceipt = (salesref) => {
     axios.get('/sales/getSaleReceipt/' + salesref)
       .then((res) => {
-        console.log(res.data)
+        
         var base64 = res.data.base64
         const blob = base64ToBlob(base64, 'application/pdf');
         const url = URL.createObjectURL(blob);
@@ -365,8 +378,8 @@ const Addsales = () => {
     }
   }
   const handleAddItem = () => {
-    //console.log(productFormData)
-    //console.log(selectedCustomer)
+    
+    console.log(selectedProduct)
     let obj = {
       name: selectedProduct.label,
       productId: selectedProduct.value,
@@ -378,10 +391,38 @@ const Addsales = () => {
       priceType: salesType,
       amount: formData.quantity * price
     }
-    if (obj.amount < 1 || obj.unitPrice == '' || obj.name == '' || selectedCustomer == null) {
+    // if (obj.amount < 1 || obj.unitPrice == '' || obj.name == '' || obj.quantity == '' || selectedCustomer == null) { 
+    //   alertify.set("notifier", "position", "top-right");
+    //   alertify.warning("Please make sure all fields are filled.");
+    // }
+    
+    if (!obj.name) {
       alertify.set("notifier", "position", "top-right");
-      alertify.warning("Please make sure all fields are filled.");
+      alertify.warning("Please select a product.");
+      $('#selectedProduct').css('border', '1px solid red')
+      setTimeout(() => {
+        $('#selectedProduct').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+      }, 3000)
     }
+
+    if (selectedCustomer == '' || selectedCustomer == null) {
+      alertify.set("notifier", "position", "top-right");
+      alertify.warning("Please select a customer.");
+      $('#selectedCustomer').css('border', '1px solid red')
+      setTimeout(() => {
+        $('#selectedCustomer').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+      }, 3000)
+    }
+
+     if ( obj.quantity == '') {
+      alertify.set("notifier", "position", "top-right");
+      alertify.warning("Please enter quantity.");
+      $('#quantity').css('border', '1px solid red')
+      setTimeout(() => {
+        $('#quantity').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+      }, 3000)
+    }
+
     else {
       setProductGridData([...productGridData, obj])
       setFormData({ quantity: '', amount: '', batchNumber: '', manuDate: '', expDate: '' })
@@ -556,6 +597,7 @@ const Addsales = () => {
                         <div className="col-lg-10 col-sm-10 col-10">
 
                           <Select
+                            id="selectedCustomer"
                             className="select"
                             options={customerList}
                             value={selectedCustomer}
@@ -581,6 +623,7 @@ const Addsales = () => {
                       <label>Product Name</label>
                       <div className="input-groupicon">
                         <Select style={{ width: '100%' }}
+                          id="selectedProduct"
                           options={productsList}
                           placeholder={'Select product'}
                           value={selectedProduct}
@@ -722,6 +765,7 @@ const Addsales = () => {
                       <label>Quantity</label>
                       <div className="input-groupicon">
                         <input
+                          id="quantity"
                           className="form-control"
                           type="text"
                           value={formData?.quantity}
@@ -1566,8 +1610,12 @@ const Addsales = () => {
             </div>
             <div className="modal-body">
 
-              <span>Amount to Pay:</span> <span style={{ fontSize: 40 }}> GHS {referenceData?.amountToPay}</span> <br/>
-              <span>Balance:</span> <span style={{ fontSize: 40 }}> GHS {Math.abs(Number(productGridData.reduce((total, item) => total + item.amount, 0)) - Number(paymentInfo.amountPaid))}</span>
+              <span>Amount to Pay:</span> <span style={{ fontSize: 40 }}> GHS {recieptData?.amountToPay}</span> <br/>
+              {recieptData?.change > 0 ?
+               (<><span>Change:</span> <span style={{ fontSize: 40 }}> GHS {(recieptData?.change)}</span></>) :
+               (<><span>Balance:</span> <span style={{ fontSize: 40 }}> GHS {(recieptData?.balance)}</span></>)
+              }
+             
 
             </div>
 
