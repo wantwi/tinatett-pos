@@ -88,6 +88,7 @@ const ProformaSales = () => {
   const [paymentInfo, setPaymentInfo] = useState(init)
   
   const [transactionType, setTransactionType] = useState('SP')
+  const [recieptData, setReceiptData] = useState({})
 
 
   const retailRef = useRef()
@@ -1426,7 +1427,7 @@ useEffect(() => {
               </div>
               <div className="modal-body">
                
-                <span>Amount to Pay:</span> <span style={{fontSize:40}}> GHS {referenceData?.amountToPay}</span>
+                <span>Amount to Pay:</span> <span style={{fontSize:40}}> GHS {referenceData?.amountToPay}</span><br/>
                 <><span>Balance:</span> <span style={{ fontSize: 40 }}> GHS {(recieptData?.balance)}</span></><br/>
                 <><span>Change:</span> <span style={{ fontSize: 40 }}> GHS {(recieptData?.change)}</span></>  
               </div>

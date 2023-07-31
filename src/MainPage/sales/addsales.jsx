@@ -1626,9 +1626,9 @@ const Addsales = () => {
             <div className="modal-body">
 
               <span>Amount to Pay:</span> <span style={{ fontSize: 40 }}> GHS {recieptData?.amountToPay}</span> <br/>
-              <><span>Balance:</span> <span style={{ fontSize: 40 }}> GHS {(recieptData?.balance)}</span></>
+              <><span>Balance:</span> <span style={{ fontSize: 40 }}> GHS {(recieptData?.balance)}</span></> <br/>
               {/* {recieptData?.change > 0 ? */}
-              <><span>Change:</span> <span style={{ fontSize: 40 }}> GHS {(recieptData?.change)}</span></>  <br/>
+              <><span>Change:</span> <span style={{ fontSize: 40 }}> GHS {(recieptData?.change)}</span></> 
                 {/* : */}
              
               {/* } */}
