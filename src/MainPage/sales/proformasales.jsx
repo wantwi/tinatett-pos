@@ -207,7 +207,7 @@ useEffect(() => {
         customerId: selectedCustomer?.value,
         transDate: transDate,
         totalAmount : productGridData.reduce((total, item) => total + item.amount, 0),
-        salesType:salesType,
+        salesType:retailpriceTypeRef.current.checked == true ? "Retail" : "Wholesale",
         products: productGridData
       }
 
@@ -248,7 +248,13 @@ useEffect(() => {
             
             axios.post('/sales',payload)
             .then((res) => {
+
               if(res.data.success){
+                setReceiptData({
+                  balance: res.data.data.balance,
+                  change: res.data.data.change,
+                  amountToPay: res.data.data.result?.totalAmount
+                })
                 if(print){
                   getInvoiceReceipt(payload.salesRef)
                 }
@@ -358,7 +364,7 @@ useEffect(() => {
         customerId: selectedCustomer?.value,
         transDate: transDate,
         totalAmount : productGridData.reduce((total, item) => total + item.amount, 0),
-        salesType:salesType,
+        salesType:retailpriceTypeRef.current.checked == true ? "Retail" : "Wholesale",
         products: productGridData
       }
 
@@ -404,6 +410,7 @@ useEffect(() => {
          expireDate: formData.expDate.substring(0,10),
          manufacturingDate:formData.manuDate.substring(0,10),
          unitPrice:price,
+         priceType: retailpriceTypeRef.current.checked == true ? 'Retail' : 'Wholesale',
          amount:formData.quantity * price
       } 
       if (!obj.name) {
@@ -427,9 +434,9 @@ useEffect(() => {
         setProductGridData([...productGridData, obj])
         setFormData({quantity:'', amount:'', batchNumber:'', manuDate:'', expDate:''})
         setSelectedProduct({remainingStock:''})
-        retailpriceTypeRef.current.checked = false
-        wholesalepriceTypeRef.current.checked = false
-        specialpriceTypeRef.current.checked = false
+        // retailpriceTypeRef.current.checked = false
+        // wholesalepriceTypeRef.current.checked = false
+        // specialpriceTypeRef.current.checked = false
         setWholesalePrice('')
         setSpecialPrice('')
         setRetailPrice('')
@@ -517,7 +524,7 @@ useEffect(() => {
           }
         })
         setProductsList(mappedData2)
-        retailRef.current.checked = true
+        //retailRef.current.checked = true
         //retailpriceTypeRef.current.checked = true
 
       
@@ -575,47 +582,34 @@ useEffect(() => {
                 </div>
                 <div className="row">
 
-                  <div className="col-12">
-                  <div className="form-group">
-                    <label>Sales Type</label>
-                    <div className="row">
-                        
-
-                          <div className="col-lg-6">
-
-                            <div className="input-group">
-                              <div className="input-group-text">
-                                <input className="form-check-input" type="radio" ref={retailRef} name="salesType" value={'Retail'} onChange={handleSalesTypeChange}  />
-                              </div>
-                              <input type="text" className="form-control" aria-label="Text input with radio button" value={'Retail'} placeholder={`Retail`} />
-                            </div>
-                          
-                          </div>
-
-                          <div className="col-lg-6">
-                            <div className="input-group">
-                              <div className="input-group-text">
-                                <input className="form-check-input" type="radio" ref={wholesaleRef} name="salesType" value={'Wholesale'} onChange={handleSalesTypeChange} />
-                              </div>
-                              <input type="text" className="form-control" aria-label="Text input with radio button" value={'Wholesale'} placeholder={`Wholesale`} />
-                            </div>
-                          </div>
-
-                          
-                      </div>
-                  </div>
-                  </div>
-
-                  {/* <div className="col-6">
+                  {/* <div className="col-12">
                     <div className="form-group">
                       <label>Sales Type</label>
-                      <div className="input-groupicon">
-                      <Select style={{width:'100%'}}
-                        options={options1}
-                        value={formData.salesType}
-                        onChange={(e) => setFormData({...formData, salesType: (e)})}
-                      />
-                      </div>
+                      <div className="row">
+                          
+
+                            <div className="col-lg-6">
+
+                              <div className="input-group">
+                                <div className="input-group-text">
+                                  <input className="form-check-input" type="radio" ref={retailRef} name="salesType" value={'Retail'} onChange={handleSalesTypeChange}  />
+                                </div>
+                                <input type="text" className="form-control" aria-label="Text input with radio button" value={'Retail'} placeholder={`Retail`} />
+                              </div>
+                            
+                            </div>
+
+                            <div className="col-lg-6">
+                              <div className="input-group">
+                                <div className="input-group-text">
+                                  <input className="form-check-input" type="radio" ref={wholesaleRef} name="salesType" value={'Wholesale'} onChange={handleSalesTypeChange} />
+                                </div>
+                                <input type="text" className="form-control" aria-label="Text input with radio button" value={'Wholesale'} placeholder={`Wholesale`} />
+                              </div>
+                            </div>
+
+                            
+                        </div>
                     </div>
                   </div> */}
 
@@ -684,7 +678,7 @@ useEffect(() => {
                   </div>
                 </div>
 
-                <div className="col-4">
+                <div className="col-12">
                   <div className="form-group">
                     <label>Batch No.</label>
                     <div className="input-groupicon">
@@ -703,7 +697,7 @@ useEffect(() => {
                   </div>
                 </div>
 
-                <div className="col-4">
+                <div className="col-6">
                   <div className="form-group">
                     <label>Manufacturing Date</label>
                     <div className="input-groupicon">
@@ -722,7 +716,7 @@ useEffect(() => {
 
                
 
-                <div className="col-4">
+                <div className="col-6">
                   <div className="form-group">
                     <label>Exp. Date</label>
                     <div className="input-groupicon">
@@ -1433,7 +1427,8 @@ useEffect(() => {
               <div className="modal-body">
                
                 <span>Amount to Pay:</span> <span style={{fontSize:40}}> GHS {referenceData?.amountToPay}</span>
-             
+                <><span>Balance:</span> <span style={{ fontSize: 40 }}> GHS {(recieptData?.balance)}</span></><br/>
+                <><span>Change:</span> <span style={{ fontSize: 40 }}> GHS {(recieptData?.change)}</span></>  
               </div>
             
             </div>

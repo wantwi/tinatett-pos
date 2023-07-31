@@ -180,7 +180,8 @@ const Addsales = () => {
         transDate: transDate,
         // totalAmount: (Number(paymentInfo.cashAmount) + Number(paymentInfo.momoAmount) + Number(paymentInfo.chequeAmount)) ,
         totalAmount: productGridData.reduce((total, item) => total + item.amount, 0),
-        salesType: salesType,
+        // salesType: salesType,
+        salesType: retailpriceTypeRef.current.checked == true ? "Retail" : "Wholesale",
         products: productGridData
       }
 
@@ -277,7 +278,7 @@ const Addsales = () => {
         })
         .finally(() => {
           setIsSaving(false)
-          retailRef.current.checked = true
+          //retailRef.current.checked = true
           $('#reference').modal('show')
         }
         )
@@ -345,7 +346,8 @@ const Addsales = () => {
         customerId: selectedCustomer?.value,
         transDate: transDate,
         totalAmount: productGridData.reduce((total, item) => total + item.amount, 0),
-        salesType: salesType,
+        // salesType: salesType,
+        salesType: retailpriceTypeRef.current.checked == true ? "Retail" : "Wholesale", 
         products: productGridData
       }
 
@@ -389,7 +391,8 @@ const Addsales = () => {
       expireDate: formData.expDate.substring(0, 10),
       manufacturingDate: formData.manuDate.substring(0, 10),
       unitPrice: price,
-      priceType: salesType,
+      // priceType: salesType,
+      priceType: retailpriceTypeRef.current.checked == true ? 'Retail' : 'Wholesale',
       amount: formData.quantity * price
     }
     // if (obj.amount < 1 || obj.unitPrice == '' || obj.name == '' || obj.quantity == '' || selectedCustomer == null) { 
@@ -428,9 +431,9 @@ const Addsales = () => {
       setProductGridData([...productGridData, obj])
       setFormData({ quantity: '', amount: '', batchNumber: '', manuDate: '', expDate: '' })
       setSelectedProduct({ remainingStock: '' })
-      retailpriceTypeRef.current.checked = false
-      wholesalepriceTypeRef.current.checked = false
-      specialpriceTypeRef.current.checked = false
+      // retailpriceTypeRef.current.checked = false
+      // wholesalepriceTypeRef.current.checked = false
+      // specialpriceTypeRef.current.checked = false
       setWholesalePrice('')
       setSpecialPrice('')
       setRetailPrice('')
@@ -508,7 +511,7 @@ const Addsales = () => {
         }
       })
       setProductsList(mappedData2)
-      retailRef.current.checked = true
+      //retailRef.current.checked = true
       //retailpriceTypeRef.current.checked = true
 
     }
@@ -537,7 +540,7 @@ const Addsales = () => {
         </div>
 
         <div style={{ display: 'flex', gap: 20 }}>
-          <div style={{ width: '40%' }}>
+          <div style={{ width: '40%', height: 'auto' }}>
             <div className="card" >
               <div className="card-body">
                 <div className="row">
@@ -560,7 +563,7 @@ const Addsales = () => {
                   </div>
                 </div>
 
-                <div className="row">
+                {/* <div className="row">
 
                   <div className="col-12">
                     <div className="form-group">
@@ -593,7 +596,7 @@ const Addsales = () => {
                     </div>
                   </div>
 
-                </div>
+                </div> */}
               </div>
             </div>
 
@@ -663,7 +666,7 @@ const Addsales = () => {
                     </div>
                   </div>
 
-                  <div className="col-4">
+                  <div className="col-12">
                     <div className="form-group">
                       <label>Batch No.</label>
                       <div className="input-groupicon">
@@ -682,7 +685,7 @@ const Addsales = () => {
                     </div>
                   </div>
 
-                  <div className="col-4">
+                  <div className="col-6">
                     <div className="form-group">
                       <label>Manufacturing Date</label>
                       <div className="input-groupicon">
@@ -699,7 +702,7 @@ const Addsales = () => {
                     </div>
                   </div>
 
-                  <div className="col-4">
+                  <div className="col-6">
                     <div className="form-group">
                       <label>Exp. Date</label>
                       <div className="input-groupicon">
@@ -1623,10 +1626,11 @@ const Addsales = () => {
             <div className="modal-body">
 
               <span>Amount to Pay:</span> <span style={{ fontSize: 40 }}> GHS {recieptData?.amountToPay}</span> <br/>
+              <><span>Balance:</span> <span style={{ fontSize: 40 }}> GHS {(recieptData?.balance)}</span></>
               {/* {recieptData?.change > 0 ? */}
               <><span>Change:</span> <span style={{ fontSize: 40 }}> GHS {(recieptData?.change)}</span></>  <br/>
                 {/* : */}
-              <><span>Balance:</span> <span style={{ fontSize: 40 }}> GHS {(recieptData?.balance)}</span></>
+             
               {/* } */}
              
 
