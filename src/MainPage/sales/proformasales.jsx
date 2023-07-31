@@ -39,6 +39,24 @@ const ProformaSales = () => {
   let id = urlParams.get('id' );
 
   // $('#proform-submenu').removeClass("active")
+  const init = {
+    type:'',
+    cashWaybill:'',
+    cashReceiptNo:'',
+    cashAmount:'',
+    chequeNo:'',
+    chequeReceiptNo:'',
+    chequeAmount:'',
+    chequeWaybill:'',
+    dueDate:'',
+    bank:'',
+    momoName:'',
+    momoReceiptNo:'',
+    momoAmount:'' ,
+    transactionID:'',
+    amountPaid:''
+     
+  }
   const [startDate, setStartDate] = useState(new Date());
   const [activeTab, setActiveTab] = useState('Cash')
   const [disabledUnselectedPrice,setDisableUnselectedPrice] = useState({retail: false, wholesale:false, special:false})
@@ -67,24 +85,7 @@ const ProformaSales = () => {
   const [isSaving, setIsSaving] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [isLoadingDetails, setIsLoadingDetails] = useState(false)
-  const [paymentInfo, setPaymentInfo] = useState({
-    type:'',
-    cashWaybill:'',
-    cashReceiptNo:'',
-    cashAmount:'',
-    chequeNo:'',
-    chequeReceiptNo:'',
-    chequeAmount:'',
-    chequeWaybill:'',
-    dueDate:'',
-    bank:'',
-    momoName:'',
-    momoReceiptNo:'',
-    momoAmount:'' ,
-    transactionID:'',
-    amountPaid:''
-     
-  })
+  const [paymentInfo, setPaymentInfo] = useState(init)
   
   const [transactionType, setTransactionType] = useState('SP')
 
@@ -1132,6 +1133,7 @@ useEffect(() => {
                         className="close"
                         data-bs-dismiss="modal"
                         aria-label="Close"
+                        onClick={() => setPaymentInfo(init)}
                       >
                         <span aria-hidden="true">×</span>
                       </button>

@@ -121,8 +121,8 @@ const SalesList = () => {
             Reference: sale?.salesRef,
             // Payment: JSON.parse(sale?.paymentInfo).type,
             Total: moneyInTxt(sale?.totalAmount) || '',
-            // Paid: JSON.parse(sale?.paymentInfo).amountPaid,
-            // Due: Number(sale?.totalAmount) - Number(JSON.parse(sale?.paymentInfo).amountPaid),
+            Paid: moneyInTxt(sale?.amountPaid),
+            Balance: moneyInTxt(sale?.balance),
             Biller: sale?.salesPerson,
           }
         })
@@ -184,9 +184,19 @@ const SalesList = () => {
     //   sorter: (a, b) => a.Payment.length - b.Payment.length,
     // },
     {
-      title: "Total (GHS)",
+      title: "Total Amount (GHS)",
       dataIndex: "Total",
       sorter: (a, b) => a.Total.length - b.Total.length,
+    },
+    {
+      title: "Paid Amount (GHS)",
+      dataIndex: "Paid",
+     
+    },
+    {
+      title: "Balance (GHS)",
+      dataIndex: "Balance",
+      
     },
   
     {

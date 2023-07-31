@@ -31,6 +31,24 @@ import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
 
 
 const Addsales = () => {
+  const init = {
+    type: '',
+    cashWaybill: '',
+    cashReceiptNo: '',
+    cashAmount: '',
+    chequeNo: '',
+    chequeReceiptNo: '',
+    chequeAmount: '',
+    chequeWaybill: '',
+    dueDate: '',
+    bank: '',
+    momoName: '',
+    momoReceiptNo: '',
+    momoAmount: '',
+    transactionID: '',
+    amountPaid: ''
+
+  }
   const [startDate, setStartDate] = useState(new Date());
   const [activeTab, setActiveTab] = useState('Cash')
   const [disabledUnselectedPrice, setDisableUnselectedPrice] = useState({ retail: false, wholesale: false, special: false })
@@ -55,24 +73,7 @@ const Addsales = () => {
   const [referenceData, setReferenceData] = useState({ data: [], reference: '', amountToPay: '', balance:'' })
   const [isSaving, setIsSaving] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [paymentInfo, setPaymentInfo] = useState({
-    type: '',
-    cashWaybill: '',
-    cashReceiptNo: '',
-    cashAmount: '',
-    chequeNo: '',
-    chequeReceiptNo: '',
-    chequeAmount: '',
-    chequeWaybill: '',
-    dueDate: '',
-    bank: '',
-    momoName: '',
-    momoReceiptNo: '',
-    momoAmount: '',
-    transactionID: '',
-    amountPaid: ''
-
-  })
+  const [paymentInfo, setPaymentInfo] = useState(init)
   const [transactionType, setTransactionType] = useState('SP')
   const [recieptData, setReceiptData] = useState({})
 
@@ -1322,6 +1323,7 @@ const Addsales = () => {
                 className="close"
                 data-bs-dismiss="modal"
                 aria-label="Close"
+                onClick={() => setPaymentInfo(init)}
               >
                 <span aria-hidden="true">×</span>
               </button>
@@ -1622,9 +1624,9 @@ const Addsales = () => {
 
               <span>Amount to Pay:</span> <span style={{ fontSize: 40 }}> GHS {recieptData?.amountToPay}</span> <br/>
               {/* {recieptData?.change > 0 ? */}
-               (<><span>Change:</span> <span style={{ fontSize: 40 }}> GHS {(recieptData?.change)}</span></>)
+              <><span>Change:</span> <span style={{ fontSize: 40 }}> GHS {(recieptData?.change)}</span></>  <br/>
                 {/* : */}
-               (<><span>Balance:</span> <span style={{ fontSize: 40 }}> GHS {(recieptData?.balance)}</span></>)
+              <><span>Balance:</span> <span style={{ fontSize: 40 }}> GHS {(recieptData?.balance)}</span></>
               {/* } */}
              
 
