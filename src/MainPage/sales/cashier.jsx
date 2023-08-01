@@ -139,48 +139,6 @@ const Cashier = () => {
           {"type":"Cheque", waybill: paymentInfo.chequeWaybill,  chequeNo: paymentInfo.chequeNo, chequeReceiptNo: paymentInfo.chequeReceiptNo, amountPaid: paymentInfo.chequeAmount, waybill: paymentInfo.chequeWaybill}
         ]
       }
-
-
-      // Mutations
-      // const mutation = useMutation({
-      //   mutationFn: postSales,
-      //   onSuccess: () => {
-      //     if(print){
-      //       getInvoiceReceipt(modalData.Reference)
-      //     }
-      //     alertify.set("notifier", "position", "top-right");
-      //     alertify.success("Sale completed.");
-      //     // Invalidate and refetch
-      //     queryClient.invalidateQueries({ queryKey: ['sales'] })
-      //   },
-      //   onError: () => {
-      //     alertify.set("notifier", "position", "top-right");
-      //     alertify.error("Error...Could not complete transaction");
-      //   },
-      //   onSettled: () => {
-      //     setIsCredit(false)
-      //     setPaymentInfo({type:'',
-      //     cashWaybill:'',
-      //     cashReceiptNo:'',
-      //     cashAmount:'',
-      //     chequeNo:'',
-      //     chequeReceiptNo:'',
-      //     chequeAmount:'',
-      //     chequeWaybill:'',
-      //     dueDate:'',
-      //     bank:'',
-      //     momoName:'',
-      //     momoReceiptNo:'',
-      //     momoAmount:'' ,
-      //     transactionID:'',
-      //     amountPaid:''
-      //    })
-      //     setTimeout(() => {
-      //       $('.modal').modal('hide')
-      //       //window.location.reload()
-      //     }, 1500)
-      // })
-      // mutation.mutate(payload)
   
      console.log(payload)
       axios.post('/sales',payload)
@@ -192,10 +150,11 @@ const Cashier = () => {
           }
           alertify.set("notifier", "position", "top-right");
           alertify.success("Sale completed.");
-          queryClient.invalidateQueries({ queryKey: ['sales'] })
+          
         }
       })
       .catch((error) => {
+        console.log(error)
         alertify.set("notifier", "position", "top-right");
         alertify.error("Error...Could not complete transaction");
       })

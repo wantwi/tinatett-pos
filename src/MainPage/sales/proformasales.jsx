@@ -1459,11 +1459,11 @@ useEffect(() => {
               <table>
                   <tr>
                     <td> <span>Amount to Pay:</span></td>
-                    <td> <span style={{ fontSize: 40 }}> GHS {recieptData?.amountToPay}</span></td>
+                    <td> <span style={{ fontSize: 40 }}> GHS {recieptData?.amountToPay || referenceData.amountToPay}</span></td>
                   </tr>
                   <tr>
                     <td> <span>Amount Paid:</span></td>
-                    <td> <span style={{ fontSize: 40 }}> GHS {recieptData?.amountPaid}</span></td>
+                    <td> <span style={{ fontSize: 40 }}> GHS {recieptData?.amountPaid || 0}</span></td>
                   </tr>
                   <tr>
                     <td><span>Balance:</span></td>

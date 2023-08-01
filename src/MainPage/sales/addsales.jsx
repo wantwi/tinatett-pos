@@ -194,7 +194,6 @@ const Addsales = () => {
             setInvoiceNo('')
             setReferenceData(res.data)
 
-
             //call payment api
             let pType = ''
             if (paymentInfo.cashAmount > 0) {
@@ -225,12 +224,14 @@ const Addsales = () => {
               .then((res) => {
                 if (res.data.success) {
                  // console.log("Receipt:", res.data)
-                  setReceiptData({
+                  setReceiptData((prev) => ({
+                    
+                    ...prev,
                     amountPaid:res.data.data?.amountPaid,
                     balance: res.data.data.balance,
                     change: res.data.data.change,
                     amountToPay: res.data.data.result?.totalAmount
-                  })
+                  }))
                   if (print) {
                     getInvoiceReceipt(payload.salesRef)
                   }
@@ -1638,11 +1639,11 @@ const Addsales = () => {
             <table>
                   <tr>
                     <td> <span>Amount to Pay:</span></td>
-                    <td> <span style={{ fontSize: 40 }}> GHS {recieptData?.amountToPay}</span></td>
+                    <td> <span style={{ fontSize: 40 }}> GHS {recieptData?.amountToPay || referenceData.amountToPay}</span></td>
                   </tr>
                   <tr>
                     <td> <span>Amount Paid:</span></td>
-                    <td> <span style={{ fontSize: 40 }}> GHS {recieptData?.amountPaid}</span></td>
+                    <td> <span style={{ fontSize: 40 }}> GHS {recieptData?.amountPaid || 0}</span></td>
                   </tr>
                   <tr>
                     <td><span>Balance:</span></td>
