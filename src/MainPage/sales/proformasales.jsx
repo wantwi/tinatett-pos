@@ -267,6 +267,7 @@ useEffect(() => {
 
               if(res.data.success){
                 setReceiptData({
+                  amountPaid:res.data.data?.amountPaid,
                   balance: res.data.data.balance,
                   change: res.data.data.change,
                   amountToPay: res.data.data.result?.totalAmount
@@ -1455,10 +1456,14 @@ useEffect(() => {
               </div>
               <div className="modal-body">
 
-                  <table>
+              <table>
                   <tr>
                     <td> <span>Amount to Pay:</span></td>
                     <td> <span style={{ fontSize: 40 }}> GHS {recieptData?.amountToPay}</span></td>
+                  </tr>
+                  <tr>
+                    <td> <span>Amount Paid:</span></td>
+                    <td> <span style={{ fontSize: 40 }}> GHS {recieptData?.amountPaid}</span></td>
                   </tr>
                   <tr>
                     <td><span>Balance:</span></td>
