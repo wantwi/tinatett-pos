@@ -521,7 +521,7 @@ const Addsales = () => {
   }, [productsIsLoading, customersIsLoading])
 
   useEffect(() => {
-    console.log(customerList[0])
+    //console.log(customerList[0])
     setSelectedCustomer(customerList[0])
   }, [customerList])
 
@@ -1634,21 +1634,20 @@ const Addsales = () => {
             </div>
             <div className="modal-body">
 
-              <table>
-                <tr>
-                  <td> <span>Amount to Pay:</span></td>
-                  <td> <span style={{ fontSize: 40 }}> GHS {recieptData?.amountToPay}</span></td>
-                </tr>
-                <tr>
-                  <td><span>Balance:</span></td>
-                  <td><span style={{ fontSize: 40 }}> GHS {(recieptData?.balance)}</span></td>
-                </tr>
-                <tr>
-                  <td><span>Change:</span> </td>
-                  <td><span style={{ fontSize: 40 }}> GHS {(recieptData?.change)}</span></td>
-                </tr>
-              </table> 
-             
+            <table>
+                  <tr>
+                    <td> <span>Amount to Pay:</span></td>
+                    <td> <span style={{ fontSize: 40 }}> GHS {recieptData?.amountToPay}</span></td>
+                  </tr>
+                  <tr>
+                    <td><span>Balance:</span></td>
+                    <td><span style={{ fontSize: 40 }}> GHS {(recieptData?.balance) || 0}</span></td>
+                  </tr>
+                  <tr>
+                    <td><span>Change:</span> </td>
+                    <td><span style={{ fontSize: 40 }}> GHS {(recieptData?.change) || 0}</span></td>
+                  </tr>
+                </table> 
 
             </div>
 

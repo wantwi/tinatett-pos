@@ -1454,10 +1454,21 @@ useEffect(() => {
                 </button>
               </div>
               <div className="modal-body">
-               
-                <span>Amount to Pay:</span> <span style={{fontSize:40}}> GHS {referenceData?.amountToPay}</span><br/>
-                <><span>Balance:</span> <span style={{ fontSize: 40 }}> GHS {(recieptData?.balance || 0.00)}</span></><br/>
-                <><span>Change:</span> <span style={{ fontSize: 40 }}> GHS {(recieptData?.change) || 0.00}</span></>  
+
+                  <table>
+                  <tr>
+                    <td> <span>Amount to Pay:</span></td>
+                    <td> <span style={{ fontSize: 40 }}> GHS {recieptData?.amountToPay}</span></td>
+                  </tr>
+                  <tr>
+                    <td><span>Balance:</span></td>
+                    <td><span style={{ fontSize: 40 }}> GHS {(recieptData?.balance) || 0}</span></td>
+                  </tr>
+                  <tr>
+                    <td><span>Change:</span> </td>
+                    <td><span style={{ fontSize: 40 }}> GHS {(recieptData?.change) || 0}</span></td>
+                  </tr>
+                </table> 
               </div>
             
             </div>
