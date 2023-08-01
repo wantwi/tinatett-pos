@@ -80,7 +80,7 @@ const Addsales = () => {
   const retailRef = useRef()
   const wholesaleRef = useRef()
 
-  const { data: customers, isLoading: customersIsLoading } = useGet("customers", "/customer");
+  const { data: customers, isLoading: customersIsLoading } = useGet("customers", "/customer/combo");
   const { data: products, isLoading: productsIsLoading } = useGet("products", "/product");
   // const { isLoading, data, isError, error, mutate } = usePost("/sales/suspend");
 
@@ -496,6 +496,9 @@ const Addsales = () => {
         }
       })
       setCustomerList(mappedData)
+      console.log(customerList[0])
+    
+    
 
 
       let mappedData2 = products?.data.map((product) => {
@@ -517,6 +520,10 @@ const Addsales = () => {
     }
   }, [productsIsLoading, customersIsLoading])
 
+  useEffect(() => {
+    console.log(customerList[0])
+    setSelectedCustomer(customerList[0])
+  }, [customerList])
 
   if (productsIsLoading && customersIsLoading) {
     return <LoadingSpinner message="Loading...please wait" />
@@ -615,7 +622,9 @@ const Addsales = () => {
                             className="select"
                             options={customerList}
                             value={selectedCustomer}
-                            onChange={(e) => setSelectedCustomer(e)}
+                            onChange={(e) => {
+                              console.log(e)
+                              setSelectedCustomer(e)}}
                             isLoading={customersIsLoading}
                           />
 
@@ -1625,13 +1634,20 @@ const Addsales = () => {
             </div>
             <div className="modal-body">
 
-              <span>Amount to Pay:</span> <span style={{ fontSize: 40 }}> GHS {recieptData?.amountToPay}</span> <br/>
-              <><span>Balance:</span> <span style={{ fontSize: 40 }}> GHS {(recieptData?.balance)}</span></> <br/>
-              {/* {recieptData?.change > 0 ? */}
-              <><span>Change:</span> <span style={{ fontSize: 40 }}> GHS {(recieptData?.change)}</span></> 
-                {/* : */}
-             
-              {/* } */}
+              <table>
+                <tr>
+                  <td> <span>Amount to Pay:</span></td>
+                  <td> <span style={{ fontSize: 40 }}> GHS {recieptData?.amountToPay}</span></td>
+                </tr>
+                <tr>
+                  <td><span>Balance:</span></td>
+                  <td><span style={{ fontSize: 40 }}> GHS {(recieptData?.balance)}</span></td>
+                </tr>
+                <tr>
+                  <td><span>Change:</span> </td>
+                  <td><span style={{ fontSize: 40 }}> GHS {(recieptData?.change)}</span></td>
+                </tr>
+              </table> 
              
 
             </div>

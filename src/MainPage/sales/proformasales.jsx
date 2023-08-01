@@ -116,10 +116,11 @@ const ProformaSales = () => {
         proformaItems.data.map((product) => {
           axios.get(`/purchase/product/${product.productId}`)
           .then((res) => {
-              //console.log("Batch Number", res.data.data)
+              console.log("Batch Number", res.data.data)
               let mapped = {
                 ...product,
                 name:product.product.name,
+                manufacturingDate: res.data.data.batchNumber[0].manufacturingDate, 
                 batchNumber: res.data.data.batchNumber[0].batchNumber, 
                 expireDate: res.data.data.batchNumber[0].expireDate, 
               }
@@ -209,9 +210,23 @@ useEffect(() => {
         transDate: transDate,
         totalAmount : productGridData.reduce((total, item) => total + item.amount, 0),
         salesType:retailpriceTypeRef.current.checked == true ? "Retail" : "Wholesale",
-        products: productGridData
+        products: productGridData.map((product) => {
+          return {
+            name: product?.name,
+            productId: product?.productId,
+            batchNumber: product?.batchNumber,
+            quantity: product?.quantity,
+            expireDate: product?.expireDate.substring(0,10),
+            manufacturingDate: product?.manufacturingDate.substring(0,10),
+            unitPrice: product?.unitPrice,
+            // priceType: salesType,
+            priceType: retailpriceTypeRef.current.checked == true ? 'Retail' : 'Wholesale',
+            amount: product?.amount
+          }
+        })
       }
 
+      console.log(payload)
       axios.post(`/sales/suspend`, payload)
       .then((res) => {
         if(res.data.success){
@@ -366,10 +381,23 @@ useEffect(() => {
         transDate: transDate,
         totalAmount : productGridData.reduce((total, item) => total + item.amount, 0),
         salesType:retailpriceTypeRef.current.checked == true ? "Retail" : "Wholesale",
-        products: productGridData
+        products: productGridData.map((product) => {
+          return {
+            name: product?.name,
+            productId: product?.productId,
+            batchNumber: product?.batchNumber,
+            quantity: product?.quantity,
+            expireDate: product?.expireDate.substring(0,10),
+            manufacturingDate: product?.manufacturingDate.substring(0,10),
+            unitPrice: product?.unitPrice,
+            // priceType: salesType,
+            priceType: retailpriceTypeRef.current.checked == true ? 'Retail' : 'Wholesale',
+            amount: product?.amount
+          }
+        })
       }
 
-      //console.log(payload)
+    //  console.log(payload)
 
       axios.post(`/sales/suspend`, payload)
       .then((res) => {
@@ -1428,8 +1456,8 @@ useEffect(() => {
               <div className="modal-body">
                
                 <span>Amount to Pay:</span> <span style={{fontSize:40}}> GHS {referenceData?.amountToPay}</span><br/>
-                <><span>Balance:</span> <span style={{ fontSize: 40 }}> GHS {(recieptData?.balance)}</span></><br/>
-                <><span>Change:</span> <span style={{ fontSize: 40 }}> GHS {(recieptData?.change)}</span></>  
+                <><span>Balance:</span> <span style={{ fontSize: 40 }}> GHS {(recieptData?.balance || 0.00)}</span></><br/>
+                <><span>Change:</span> <span style={{ fontSize: 40 }}> GHS {(recieptData?.change) || 0.00}</span></>  
               </div>
             
             </div>

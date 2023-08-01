@@ -54,6 +54,7 @@ const AddPurchase = () => {
   const { isLoading, data, isError, error, mutate } = usePost("/purchase");
   const [isSubmitSuccessful, setIsSubmitSuccessful] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
 
   //add customer states
   const [supplierType, setSupplierType] = useState(0)
@@ -278,6 +279,7 @@ const AddPurchase = () => {
       }, 3000)
     }
     else {
+      
       let postBody = {
         supplierId: supplier.id,
         purchaseDate: new Date(purDate).toISOString(),

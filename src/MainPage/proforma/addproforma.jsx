@@ -52,6 +52,7 @@ const AddProforma = () => {
   const retailpriceTypeRef = useRef()
   const specialpriceTypeRef = useRef()
   const wholesalepriceTypeRef = useRef()
+  const [isSaving, setIsSaving] = useState(false)
  
   
   //add customer states
@@ -249,6 +250,8 @@ const AddProforma = () => {
       alertify.warning("Please add at least one item to list before saving.");
     }
     else {
+      setIsSaving(true)
+
       let payload = {
         customerId: selectedCustomer.id,
         transDate: transDate,
@@ -281,7 +284,7 @@ const AddProforma = () => {
           alertify.set("notifier", "position", "top-right");
           alertify.error("Error...Could not save.");
         }
-     })
+     }).finally(() => setIsSaving(false))
 
 
       //base 64 function
@@ -333,6 +336,10 @@ const AddProforma = () => {
 
   if (isProductLoading && isCustomerLoading) {
     return <LoadingSpinner />
+  }
+
+  if (isSaving) {
+    return <LoadingSpinner message="Saving.."/>
   }
 
   // if(isLoading){

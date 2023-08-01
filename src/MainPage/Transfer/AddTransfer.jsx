@@ -177,6 +177,14 @@ const AddTransfer = () => {
       alertify.set("notifier", "position", "top-right");
       alertify.warning("Please add at least one item to list before saving.");
     }
+    if(selectedCustomer == ''){
+      alertify.set("notifier", "position", "top-right");
+      alertify.warning("Please select a branch before saving.");
+      $('#branch').css('border', '1px solid red')
+      setTimeout(() => {
+        $('#branch').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+      }, 3000)
+    }
     else {
       let postBody = {
         destinationBranchId: selectedCustomer.id,
@@ -286,6 +294,7 @@ const AddTransfer = () => {
                             options={customerOptions}
                             onChange={handleCustomerSelect}
                             value={selectedCustomer}
+                            id="branch"
 
                           />
                         </div>

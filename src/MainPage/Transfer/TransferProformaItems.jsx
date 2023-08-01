@@ -71,6 +71,7 @@ const TransferProformaItems = () => {
   const [price, setPrice] = useState(0)
   const [wholesaleprice, setWholesalePrice] = useState('')
   const [specialprice, setSpecialPrice] = useState('')
+  const [isSaving, setIsSaving] = useState(false)
 
 
   useEffect(() => {
@@ -273,6 +274,7 @@ const TransferProformaItems = () => {
 
 
   const onSubmit = (hasInvoice) => {
+    
     productGridData.forEach((item) => {
       if(item.batchNumber == undefined || item.batchNumber == 'undefined' || item.batchNumber == ''){
         alertify.set("notifier", "position", "top-right");
@@ -289,16 +291,21 @@ const TransferProformaItems = () => {
     if(selectedCustomer == ''){
       alertify.set("notifier", "position", "top-right");
       alertify.warning("Please select a branch before saving.");
+      $('#branch').css('border', '1px solid red')
+      setTimeout(() => {
+        $('#branch').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+      }, 3000)
     }
     
     else {
+      setIsSaving(true)
       let postBody = {
         destinationBranchId: selectedCustomer.id,
         transferDate: transDate,
         products: productGridData
       }
 
-      console.log(postBody)
+      //console.log(postBody)
       //mutate(postBody)
       axios.post('/transfer', postBody)
       .then((res) => {
@@ -323,6 +330,7 @@ const TransferProformaItems = () => {
         alertify.set("notifier", "position", "top-right");
         alertify.error("Error...Could not complete transfer.");
       })
+      .finally(() => setIsSaving(false))
       
     }
   }
@@ -354,6 +362,9 @@ const TransferProformaItems = () => {
   }, [formData.quantity])
 
 
+  if(isSaving){
+    return <LoadingSpinner message="Processing...please wait"/>
+  }
 
   if (isProductsLoading && isCustomerLoading) {
     return <LoadingSpinner />
@@ -387,6 +398,7 @@ const TransferProformaItems = () => {
                             options={customerOptions}
                             onChange={handleCustomerSelect}
                             value={selectedCustomer}
+                            id="branch"
                           />
                         </div>
 
