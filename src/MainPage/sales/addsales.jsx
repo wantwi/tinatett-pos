@@ -162,12 +162,12 @@ const Addsales = () => {
       alertify.set("notifier", "position", "top-right");
       alertify.warning("Please add at least one item to list before saving.");
     }
-    if ((paymentInfo.amountPaid == '' || paymentInfo.amountPaid < 1 || paymentInfo.amountPaid == null) && (transactionType == 'CP' || transactionType == 'CO') ) {
+    else if ((paymentInfo.amountPaid == '' || paymentInfo.amountPaid < 1 || paymentInfo.amountPaid == null) && (transactionType == 'CP' || transactionType == 'CO') ) {
       alertify.set("notifier", "position", "top-right");
       alertify.warning("Please provide payment amount before saving.");
     }
 
-    if( (transactionType == 'SP' || transactionType == 'SO') && paymentInfo.amountPaid < (productGridData.reduce((total, item) => total + item.amount, 0))){
+    else if( (transactionType == 'SP' || transactionType == 'SO') && paymentInfo.amountPaid < (productGridData.reduce((total, item) => total + item.amount, 0))){
       alertify.set("notifier", "position", "top-right");
       alertify.warning("Please provide full payment amount before saving.");
     }
@@ -1275,7 +1275,9 @@ const Addsales = () => {
                         else if (isValidNumber(e.target.value)) {
                           let qty = parseInt(e.target.value) || 0
                           let unitP = parseInt(editFormData.unitPrice) || 0
-                          setEditFormData({ ...editFormData, quantity: e.target.value, amount: editFormData.quantity ? unitP * qty : unitP * 1 })
+                          //console.log(qty, unitP)
+
+                          setEditFormData({ ...editFormData, quantity: e.target.value, amount: unitP * qty || unitP * 1 })
                         }
                       }
                       } />
@@ -1290,7 +1292,7 @@ const Addsales = () => {
                       onChange={(e) => {
                         let unitP = parseInt(e.target.value) || 0
                         let qty = parseInt(editFormData.quantity) || 0
-                        setEditFormData({ ...editFormData, unitPrice: e.target.value, amount: editFormData ? unitP * qty : unitP * 1 })
+                        setEditFormData({ ...editFormData, unitPrice: e.target.value, amount: unitP * qty || unitP * 1 })
                       }}
                     />
                   </div>

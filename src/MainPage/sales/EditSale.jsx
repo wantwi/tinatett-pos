@@ -416,7 +416,7 @@ const EditSales = () => {
         }
       })
       setProductsList(mappedData2)
-      retailRef.current.checked = true
+      // retailRef.current.checked = true
       //retailpriceTypeRef.current.checked = true
 
       let mappedData3 = suspendedItems?.data.map((item) => {
@@ -460,7 +460,7 @@ const EditSales = () => {
         </div>
 
         <div style={{ display: 'flex', gap: 20 }}>
-          <div style={{ width: '40%' }}>
+        <div style={{ width: '40%', height: 'auto' }}>
             <div className="card" >
               <div className="card-body">
                 <div className="row">
@@ -482,53 +482,7 @@ const EditSales = () => {
                     </div>
                   </div>
                 </div>
-                <div className="row">
-
-                  <div className="col-12">
-                    <div className="form-group">
-                      <label>Sales Type</label>
-                      <div className="row">
-
-
-                        <div className="col-lg-6">
-
-                          <div className="input-group">
-                            <div className="input-group-text">
-                              <input className="form-check-input" type="radio" ref={retailRef} name="salesType" value={'Retail'} onChange={handleSalesTypeChange} />
-                            </div>
-                            <input type="text" className="form-control" aria-label="Text input with radio button" value={'Retail'} placeholder={`Retail`} />
-                          </div>
-
-                        </div>
-
-                        <div className="col-lg-6">
-                          <div className="input-group">
-                            <div className="input-group-text">
-                              <input className="form-check-input" type="radio" ref={wholesaleRef} name="salesType" value={'Wholesale'} onChange={handleSalesTypeChange} />
-                            </div>
-                            <input type="text" className="form-control" aria-label="Text input with radio button" value={'Wholesale'} placeholder={`Wholesale`} />
-                          </div>
-                        </div>
-
-
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* <div className="col-6">
-                    <div className="form-group">
-                      <label>Sales Type</label>
-                      <div className="input-groupicon">
-                      <Select style={{width:'100%'}}
-                        options={options1}
-                        value={formData.salesType}
-                        onChange={(e) => setFormData({...formData, salesType: (e)})}
-                      />
-                      </div>
-                    </div>
-                  </div> */}
-
-                </div>
+               
               </div>
             </div>
 
@@ -589,7 +543,7 @@ const EditSales = () => {
                     </div>
                   </div>
 
-                  <div className="col-4">
+                  <div className="col-12">
                     <div className="form-group">
                       <label>Batch No.</label>
                       <div className="input-groupicon">
@@ -608,7 +562,7 @@ const EditSales = () => {
                     </div>
                   </div>
 
-                  <div className="col-4">
+                  <div className="col-6">
                     <div className="form-group">
                       <label>Manufacturing Date</label>
                       <div className="input-groupicon">
@@ -625,7 +579,7 @@ const EditSales = () => {
                     </div>
                   </div>
 
-                  <div className="col-4">
+                  <div className="col-6">
                     <div className="form-group">
                       <label>Exp. Date</label>
                       <div className="input-groupicon">
@@ -1189,7 +1143,7 @@ const EditSales = () => {
                         else if (isValidNumber(e.target.value)) {
                           let qty = parseInt(e.target.value) || 0
                           let unitP = parseInt(editFormData.unitPrice) || 0
-                          setEditFormData({ ...editFormData, quantity: e.target.value, amount: editFormData.quantity ? unitP * qty : unitP * 1 })
+                          setEditFormData({ ...editFormData, quantity: e.target.value, amount: unitP * qty || unitP * 1 })
                         }
                       }
                       } />
@@ -1204,7 +1158,7 @@ const EditSales = () => {
                       onChange={(e) => {
                         let unitP = parseInt(e.target.value) || 0
                         let qty = parseInt(editFormData.quantity) || 0
-                        setEditFormData({ ...editFormData, unitPrice: e.target.value, amount: editFormData ? unitP * qty : unitP * 1 })
+                        setEditFormData({ ...editFormData, unitPrice: e.target.value, amount: unitP * qty || unitP * 1 })
                       }}
                     />
                   </div>
