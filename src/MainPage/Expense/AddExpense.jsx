@@ -29,32 +29,32 @@ const AddExpense = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [listData, setProductGridData] = useState([])
   const options = [
-    { id: 1, label: "Choose Category", value: "Choose Category" },
+    // { id: 1, label: "Cho", value: "" },
     { id: 2, label: "Fuel", value: "Fuel" },
-    { id: 3, label: "Electric Power ", value: "Electric Power" },
-    { id: 4, label: "Poly Bag ", value: "Poly Bag " },
-    { id: 5, label: "Drinking Water ", value: "Drinking Water " },
+    { id: 3, label: "Electric Power", value: "Electric Power" },
+    { id: 4, label: "Poly Bag", value: "Poly Bag" },
+    { id: 5, label: "Drinking Water", value: "Drinking Water " },
     { id: 6, label: "Stationery", value: "Stationery" },
-    { id: 7, label: " Printing and Photocopies ", value: " Printing and Photocopies " },
-    { id: 8, label: "Detergent and Toiletries ", value: "Detergent and Toiletries " },
+    { id: 7, label: "Printing and Photocopies", value: "Printing and Photocopies" },
+    { id: 8, label: "Detergent and Toiletries", value: "Detergent and Toiletries" },
     { id: 9, label: "Sanitation", value: "Sanitation" },
-    { id: 10, label: "Plastic Tables and Chairs ", value: "Plastic Tables and Chairs " },
-    { id: 11, label: "Repairs and Maintenance ", value: "Repairs and Maintenance " },
+    { id: 10, label: "Plastic Tables and Chairs", value: "Plastic Tables and Chairs" },
+    { id: 11, label: "Repairs and Maintenance", value: "Repairs and Maintenance" },
     { id: 12, label: "Deliveries", value: "Deliveries" },
     { id: 13, label: "Refund", value: "Refund" },
-    { id: 14, label: " Printer cartriage ", value: " Printer cartriage " },
-    { id: 15, label: " Fire extinguisher ", value: " Fire extinguisher " },
-    { id: 16, label: "  Business Operations Permit ", value: "  Business Operations Permit " },
+    { id: 14, label: "Printer cartriage", value: "Printer cartriage" },
+    { id: 15, label: "Fire extinguisher", value: "Fire extinguisher" },
+    { id: 16, label: "Business Operations Permit", value: "Business Operations Permit" },
     { id: 17, label: "Head Potters", value: "Head Potters" },
-    { id: 18, label: "  Loading fee", value: "  Loading fee" },
-    { id: 19, label: "  Battery", value: "  Battery" },
+    { id: 18, label: "Loading fee", value: "Loading fee" },
+    { id: 19, label: "Battery", value: "Battery" },
     { id: 20, label: "Water bill", value: "Water bill" },
     { id: 21, label: "Payment to Supplier", value: "Payment to Supplier" },
     { id: 22, label: "Advertisement and Radio Show", value: "Advertisement and Radio Show" },
     { id: 23, label: "Accomodation (rent for staff)", value: "Accomodation (rent for staff)" },
     { id: 24, label: "FDA", value: "FDA" },
     { id: 25, label: "MOH", value: "MOH" },
-    { id: 26, label: " Assembly Levy", value: " Assembly Levy" },
+    { id: 26, label: "Assembly Levy", value: "Assembly Levy" },
     { id: 27, label: "Other", value: "Other" },
   ];
 
@@ -71,40 +71,48 @@ const AddExpense = () => {
   }
 
   const handleAddItem = () => {
-    let item =
-
-    {
+    let item = {
       id: listData.length + 1,
       expenseDate: expenseDate,
       category: formData.category,
       expenseFor: formData.expenseFor.label,
       description: formData?.description,
       amount: formData.amount
-
     }
-    if (item.amount < 1 || formData.category == '' || item.expenseFor == '' || item.expenseDate == '') {
+    console.log(item)
+   
+     if (formData.category == '') {
       alertify.set("notifier", "position", "top-right");
-      alertify.warning("Please make sure all fields are filled.");
+      alertify.warning("Please make sure category is selected.");
+      $('#category').css('border', '1px solid red')
+    }
+     if (item.expenseDate == '') {
+      alertify.set("notifier", "position", "top-right");
+      alertify.warning("Please make sure you select a date.");
+      $('#expenseDate').css('border', '1px solid red')
+    }
+     if (item.expenseFor == '' || item.expenseFor == undefined) {
+      alertify.set("notifier", "position", "top-right");
+      alertify.warning("Please make sure you selected type of expense");
+      $('#expenseFor').css('border', '1px solid red')
+    }
+     if (formData.amount < 1 || formData.amount == "" ) {
+      alertify.set("notifier", "position", "top-right");
+      alertify.warning("Please make you enter amount.");
+      $('#amount').css('border', '1px solid red')
     }
     else {
-
-
       setProductGridData([...listData, item])
       setFormData({ expenseFor:'', description:'', amount:'', category:''})
       directorRef.current.checked = false
       productionRef.current.checked = false
       shopRef.current.checked = false
       companyRef.current.checked = false
-
     }
-
   }
 
   const deleteRow = (record) => {
-    // console.log(record)
-    // console.log(listData)
     let newGridData = listData.filter((item) => item.id !== record.id)
-    //console.log(newGridData)
     setProductGridData(newGridData)
   };
 
@@ -121,7 +129,6 @@ const AddExpense = () => {
       })
     }
 
-    console.log(payload)
     setIsLoading(true)
     axios.post('/expense',payload)
     .then((res) => {
@@ -144,6 +151,22 @@ const AddExpense = () => {
       setIsLoading(false)
     })
   }
+
+  useEffect(() => {
+    $('#amount').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+  }, [formData.amount])
+
+  useEffect(() => {
+    $('#category').css('border', 'none')
+  }, [formData.category])
+
+  useEffect(() => {
+    $('#expenseDate').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+  }, [formData.expenseDate])
+
+  useEffect(() => {
+    $('#expenseFor').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+  }, [formData.expenseFor.label])
 
 
   if(isLoading){
@@ -169,7 +192,7 @@ const AddExpense = () => {
                       <div className="form-group">
                         <label>Expense Date </label>
                         <div className="input-groupicon">
-                          <input type="date" className="form-control"
+                          <input type="date" className="form-control" id="expenseDate"
                             value={expenseDate}
                             onChange={(e) => setExpenseDate(e.target.value)}
                           />
@@ -182,7 +205,7 @@ const AddExpense = () => {
                     <div className="col-lg-12 col-sm-12 col-12">
                       <div className="form-group">
                         <label>Expense Category</label>
-                        <div className="row">
+                        <div className="row" id="category">
                           <div className="col-lg-6">
                             <div className="input-group">
                               <div className="input-group-text">
@@ -236,6 +259,7 @@ const AddExpense = () => {
                             <div className="row">
                               <div className="col-lg-12 col-sm-12 col-12">
                               <Select style={{width:'100%'}}
+                              id="expenseFor"
                               className="select"
                               options={options}
                               value={formData.expenseFor}
@@ -254,7 +278,7 @@ const AddExpense = () => {
                     <div className="col-lg-12">
                       <div className="form-group">
                         <label>Description</label>
-                        <textarea className="form-control" value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})}/>
+                        <textarea id="description" className="form-control" value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})}/>
                       </div>
                   </div>
 
@@ -264,13 +288,14 @@ const AddExpense = () => {
                             <label>Amount</label>
                             <div className="input-groupicon">
                               <input type="text" 
+                              id="amount"
                               value={formData?.amount}
                               onChange={(e) => {
                                 if(e.target.value == ''){
                                   setFormData({...formData, amount: ''})
                                 }
                                 else if (isValidNumber(e.target.value)) {
-                                  let amt = parseInt(e.target.value) || 0
+                                  let amt = parseInt(e.target.value) 
                                   setFormData({ ...formData, amount:amt})
                                 }
                               }}

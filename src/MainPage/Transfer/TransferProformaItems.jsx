@@ -312,6 +312,8 @@ const TransferProformaItems = () => {
         if(res.data.success){
           alertify.set("notifier", "position", "top-right");
           alertify.success("Transfer completed successfully.");
+           //delete proforma
+           axios.delete(`/proforma/${id}`).then((res) => console.log(res))
           setTimeout(() => {
             setSelectedProduct('')
             setProductGridData([])

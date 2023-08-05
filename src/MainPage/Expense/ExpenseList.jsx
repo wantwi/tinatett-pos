@@ -172,7 +172,7 @@ const ExpenseList = () => {
             </div>
             <div className="page-btn">
               <Link
-                to="/dream-pos/expense/addexpense-expense"
+                to="/tinatett-pos/expense/addexpense"
                 className="btn btn-added"
               >
                 <img src={PlusIcon} alt="img" className="me-1" />

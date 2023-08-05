@@ -244,8 +244,6 @@ const EditProforma = () => {
 
 
   useEffect(() => {
-  
-    console.log(selectedCustomer)
   }, [selectedCustomer])
 
   if (isProductLoading && isCustomerLoading) {

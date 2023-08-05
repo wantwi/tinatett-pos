@@ -154,7 +154,6 @@ useEffect(() => {
   const handleEdit = (item) => {
     setIsLoadingDetails(true)
     let product = productsList.find((product) => product.id == item.productId)
-    console.log("Product Selected", product)
     setSelectedProductEditMode(product)
   
 
@@ -277,6 +276,11 @@ useEffect(() => {
                 }
                 alertify.set("notifier", "position", "top-right");
                 alertify.success("Sale completed.");
+
+
+                //delete proforma
+                axios.delete(`/proforma/${id}`)
+                .then((res) => console.log(res))
               
               }
             })
