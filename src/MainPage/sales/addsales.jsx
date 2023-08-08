@@ -28,7 +28,8 @@ import * as Yup from "yup";
 import alertify from "alertifyjs";
 import "../../../node_modules/alertifyjs/build/css/alertify.css";
 import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
-
+import { socket } from "../../InitialPage/Sidebar/Header";
+import useAuth from "../../hooks/useAuth";
 
 const Addsales = () => {
   const init = {
@@ -84,6 +85,8 @@ const Addsales = () => {
   const { data: customers, isLoading: customersIsLoading } = useGet("customers", "/customer/combo");
   const { data: products, isLoading: productsIsLoading } = useGet("products", "/product");
   // const { isLoading, data, isError, error, mutate } = usePost("/sales/suspend");
+
+  const {auth} = useAuth()
 
    //add customer states
    const [customerType, setCustomerType] = useState(0)
@@ -193,6 +196,9 @@ const Addsales = () => {
             setSelectedProduct('')
             setInvoiceNo('')
             setReferenceData(res.data)
+
+            //emit suspend
+            socket.emit("suspend", {room: auth?.branchId})
 
             //call payment api
             let pType = ''
@@ -364,6 +370,9 @@ const Addsales = () => {
             alertify.set("notifier", "position", "top-right");
             alertify.success("Suspended successfully");
             setReferenceData(res.data)
+
+            //emit suspend
+            socket.emit("suspend", {room: auth?.branchId})
 
           }
           else {

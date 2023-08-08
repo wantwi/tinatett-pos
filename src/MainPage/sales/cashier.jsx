@@ -18,6 +18,8 @@ import "../../../node_modules/alertifyjs/build/css/alertify.css";
 import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
 import { Button } from "antd";
 import FeatherIcon from 'feather-icons-react'
+import { socket } from "../../InitialPage/Sidebar/Header";
+import useAuth from "../../hooks/useAuth";
 
 const Cashier = () => {
   const init = {
@@ -255,6 +257,38 @@ const Cashier = () => {
       console.log('loading...')
     }
   }, [sales])
+
+
+  socket.on("receive_message", (data) => {
+    try {
+
+      let mappedData =  data?.response.map((sale) => {
+        return {
+          id: sale?.id,
+          Date: sale?.transDate,
+          Name: sale?.customer?.name || 'N/A',
+          Status: sale?.status,
+          Reference: sale?.salesRef,
+          Payment: sale?.paymentType,
+          Total: moneyInTxt(sale?.totalAmount),
+          Paid: sale?.changeAmt,
+          Due: sale?.balance,
+          Biller: sale?.salesPerson,
+          salestype: sale?.salesType
+        }
+      })
+
+      setData([])
+      setData(mappedData)
+     
+       console.log({receive_message: data});
+       return
+    } catch (error) {
+      
+    }
+      
+    
+  })
 
 
 

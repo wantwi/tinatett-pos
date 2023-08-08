@@ -19,6 +19,8 @@ import {
   Logout,
 } from "../../EntryFile/imagePath";
 import { Link } from "react-router-dom";
+import { io } from 'socket.io-client';
+export const socket = io.connect("https://backendapi.akwaabaevolution.com")
 
 const Header = (props) => {
   const [searchBar, SetSearchBar] = useState(false);
@@ -30,6 +32,9 @@ const Header = (props) => {
     let userDetails = localStorage.getItem('auth')
     let user = JSON.parse(userDetails)
     setLoggedInUser(user)
+    if(user){
+      socket.emit("join_room", user?.branchId)
+    }
   }, [])
 
   const handlesidebar = () => {
