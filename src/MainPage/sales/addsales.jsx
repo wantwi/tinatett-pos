@@ -57,6 +57,7 @@ const Addsales = () => {
   const [selectedCustomer, setSelectedCustomer] = useState(null)
   const [selectedProduct, setSelectedProduct] = useState({})
   const [selectedProductInfo, setSelectedProductInfo] = useState()
+  const [selectedProductInfoEditMode, setSelectedProductInfoEditMode] = useState()
   const [price, setPrice] = useState(0)
   const [retailprice, setRetailPrice] = useState('')
   const [wholesaleprice, setWholesalePrice] = useState('')
@@ -140,10 +141,9 @@ const Addsales = () => {
     };
 
   const deleteRow = (record) => {
-    console.log(record)
+    //console.log(record)
     // console.log(productGridData)
-    let newGridData = productGridData.filter((item) => item.productId !== record.productId)
-    //console.log(newGridData)
+    let newGridData = productGridData.filter((item) => item.id !== record.id)
     setProductGridData(newGridData)
   };
 
@@ -162,10 +162,10 @@ const Addsales = () => {
       alertify.set("notifier", "position", "top-right");
       alertify.warning("Please add at least one item to list before saving.");
     }
-    else if ((paymentInfo.amountPaid == '' || paymentInfo.amountPaid < 1 || paymentInfo.amountPaid == null) && (transactionType == 'CP' || transactionType == 'CO') ) {
-      alertify.set("notifier", "position", "top-right");
-      alertify.warning("Please provide payment amount before saving.");
-    }
+    // else if ((paymentInfo.amountPaid == '' || paymentInfo.amountPaid < 1 || paymentInfo.amountPaid == null) && (transactionType == 'CP' || transactionType == 'CO') ) {
+    //   alertify.set("notifier", "position", "top-right");
+    //   alertify.warning("Please provide payment amount before saving.");
+    // }
 
     else if( (transactionType == 'SP' || transactionType == 'SO') && paymentInfo.amountPaid < (productGridData.reduce((total, item) => total + item.amount, 0))){
       alertify.set("notifier", "position", "top-right");
@@ -386,6 +386,7 @@ const Addsales = () => {
     
     //console.log(selectedProduct)
     let obj = {
+      id: productGridData.length + 1,
       name: selectedProduct.label,
       productId: selectedProduct.value,
       batchNumber: formData.batchNumber?.value,
@@ -459,13 +460,15 @@ const Addsales = () => {
       setIsLoading(true)
       if (res.data.success) {
         setIsLoading(false)
-        //console.log(res.data.newProduct)
+        console.log(res.data.newProduct)
         setSelectedProductInfo(res.data.newProduct)
+        setSelectedProductInfoEditMode(res.data.newProduct)
         let x = res.data.newProduct.batchNumber?.map((item) => {
           return { value: item.batchNumber, label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')': item?.batchNumber + '-(' + item?.availablequantity + ')', expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
         })
         // //console.log(x)
          setFormData({ ...formData, batchNumber: x[0], manuDate: x[0].manufacturingDate, expDate: x[0].expireDate })
+         setEditFormData({...editFormData, batchNumber: x[0], manuDate: x[0].manufacturingDate, expDate: x[0].expireDate})
         retailpriceTypeRef.current.checked = true
       }
     })
@@ -1264,6 +1267,27 @@ const Addsales = () => {
                     </div>
                   </div>
                 </div>
+
+                <div className="col-12">
+                    <div className="form-group">
+                      <label>Batch No.</label>
+                      <div className="input-groupicon">
+                      <input type="text" value={editFormData?.batchNumber} onChange={(e) => setEditFormData({...editFormData, batchNumber: e.target.value})}/>
+                        {/* <Select
+                          options={selectedProductInfoEditMode?.batchNumber?.map((item) => {
+                            return { value: item.batchNumber, label: item?.batchNumber + '-(' + item?.Quantity + ')', expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
+                          })}
+                          
+                          placeholder=""
+                          value={editFormData.batchNumber}
+                          onChange={(e) => setEditFormData({ ...editFormData, batchNumber: (e), manufacturingDate: e.manufacturingDate, expireDate: e.expireDate })}
+                        //onChange={(e) => console.log(e)}
+                        /> */}
+
+                      </div>
+                    </div>
+                  </div>
+
                 <div className="col-lg-6 col-sm-12 col-12">
                   <div className="form-group">
                     <label>Quantity</label>
@@ -1297,6 +1321,7 @@ const Addsales = () => {
                     />
                   </div>
                 </div>
+
                 <div className="col-lg-6 col-sm-12 col-12">
                   <div className="form-group">
                     <label>Amount</label>
@@ -1632,6 +1657,7 @@ const Addsales = () => {
                 className="btn-close"
                 data-bs-dismiss="modal"
                 aria-label="Close"
+                onClick={() => setReceiptData({})}
               >
                 <span aria-hidden="true">×</span>
               </button>

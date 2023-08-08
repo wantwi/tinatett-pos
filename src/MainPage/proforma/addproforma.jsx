@@ -196,6 +196,7 @@ const AddProforma = () => {
       amount: formData?.price * formData?.quantity
 
     }
+    //console.log(item)
     if (selectedCustomer == '') {
       $('#selectedCustomerRef').css('border', '1px solid red')
       // setTimeout(() => {
@@ -217,7 +218,7 @@ const AddProforma = () => {
       // }, 3000)
     }
 
-    if (item.amount < 1 || formData.unitPrice == '' || item.productName == '' || selectedCustomer == '') {
+    if (item.amount < 1 || item.amount == '' || item.quantity == '' || formData.unitPrice == '' || item.productName == '' || selectedCustomer == '') {
       alertify.set("notifier", "position", "top-right");
       alertify.warning("Please make sure all fields are filled.");
     }

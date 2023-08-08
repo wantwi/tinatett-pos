@@ -140,7 +140,7 @@ const Cashier = () => {
         ]
       }
   
-     console.log(payload)
+    // console.log(payload)
       axios.post('/sales',payload)
       .then((res) => {
         console.log(res.data.success)
@@ -150,13 +150,17 @@ const Cashier = () => {
           }
           alertify.set("notifier", "position", "top-right");
           alertify.success("Sale completed.");
+          setTimeout(() => {
+            $('.modal').modal('hide')
+            window.location.reload()
+          }, 1500)
           
         }
       })
       .catch((error) => {
         console.log(error)
         alertify.set("notifier", "position", "top-right");
-        alertify.error("Error...Could not complete transaction");
+        alertify.error(error.response.data.error);
       })
       .finally(() => {
         setIsCredit(false)
@@ -176,10 +180,7 @@ const Cashier = () => {
         transactionID:'',
         amountPaid:''
        })
-        setTimeout(() => {
-          $('.modal').modal('hide')
-          window.location.reload()
-        }, 1500)
+       
         //
       })
      }
