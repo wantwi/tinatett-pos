@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -32,6 +32,7 @@ import FeatherIcon from 'feather-icons-react'
 import jsPDF from "jspdf";
 import useCustomApi from "../../hooks/useCustomApi";
 import { BASE_URL } from "../../api/CustomAxios";
+import { NotificationsContext } from "../../InitialPage/Sidebar/DefaultLayout";
 
 
 const AddTransfer = () => {
@@ -62,7 +63,7 @@ const AddTransfer = () => {
   const [specialprice, setSpecialPrice] = useState('')
   const [isSubmitSuccessful, setIsSubmitSuccessful] = useState(false)
 
-
+  const { notifications, setNotifications } = useContext(NotificationsContext)
 
   useEffect(() => {
     if (!isProductsLoading && !isCustomerLoading) {
@@ -208,11 +209,24 @@ const AddTransfer = () => {
     if (!isPostError && isSubmitSuccessful) {
       alertify.set("notifier", "position", "top-right");
       alertify.success("Transfer sent successfully.");
+
+      let storage = JSON.parse(localStorage.getItem("auth"))
+          let newNotification = {
+            message: `${storage.name} made a successful Transfer Request.`,
+            time: new Date().toISOString()
+          }
+          setNotifications([...notifications, newNotification])
   
     }
     else if (isPostError) {
       alertify.set("notifier", "position", "top-right");
       alertify.error("Error...Could not complete transfer.");
+      let storage = JSON.parse(localStorage.getItem("auth"))
+          let newNotification = {
+            message: `${storage.name} could not process Transfer Request.`,
+            time: new Date().toISOString()
+          }
+          setNotifications([...notifications, newNotification])
     }
 
     return () => { };

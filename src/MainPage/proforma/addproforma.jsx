@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -30,6 +30,7 @@ import * as Yup from "yup";
 import FeatherIcon from 'feather-icons-react'
 import jsPDF from "jspdf";
 import useCustomApi from "../../hooks/useCustomApi";
+import { NotificationsContext } from "../../InitialPage/Sidebar/DefaultLayout";
 
 
 const AddProforma = () => {
@@ -54,7 +55,8 @@ const AddProforma = () => {
   const wholesalepriceTypeRef = useRef()
   const [isSaving, setIsSaving] = useState(false)
  
-  
+  const { notifications, setNotifications } = useContext(NotificationsContext)
+
   //add customer states
   const [customerType, setCustomerType] = useState(0)
   const validationSchema = Yup.object().shape({
@@ -171,8 +173,11 @@ const AddProforma = () => {
   const deleteRow = (record) => {
     // console.log(record)
     // console.log(productGridData)
-    let newGridData = productGridData.filter((item) => item.productId !== record.productId)
+    // let newGridData = productGridData.filter((item) => item.productId !== record.productId)
     //console.log(newGridData)
+    // setProductGridData(newGridData)
+
+    let newGridData = productGridData.filter((item) => item.id !== record.id)
     setProductGridData(newGridData)
   };
 
@@ -189,6 +194,7 @@ const AddProforma = () => {
   const handleAddItem = () => {
     let item =
     {
+      id: productGridData.length + 1,
       productId: selectedProduct.id,
       productName: selectedProduct.label,
       quantity: formData.quantity,
@@ -256,7 +262,13 @@ const AddProforma = () => {
       let payload = {
         customerId: selectedCustomer.id,
         transDate: transDate,
-        products: productGridData
+        products: productGridData.map((item) => {
+          return {
+            "productId": item.productId,
+            "quantity": item.quantity,
+            "unitPrice": item.unitPrice
+          }
+        })
       }
      // mutate(postBody)
      axios.post('/proforma', payload)
@@ -265,6 +277,13 @@ const AddProforma = () => {
 
           alertify.set("notifier", "position", "top-right");
           alertify.success("Proforma saved successfully.");
+
+          let storage = JSON.parse(localStorage.getItem("auth"))
+          let newNotification = {
+            message: `${storage.name} added a Proforma successfully.`,
+            time: new Date().toISOString()
+          }
+          setNotifications([...notifications, newNotification])
 
           setSelectedCustomer({})
           setSelectedProduct({})

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   Logo,
   SmallLogo,
@@ -21,6 +21,9 @@ import {
 import { Link } from "react-router-dom";
 import { io } from 'socket.io-client';
 export const socket = io.connect("https://backendapi.akwaabaevolution.com")
+import { NotificationsContext } from "./DefaultLayout";
+import { notification } from "antd";
+import { timeAgo } from "../../utility";
 
 const Header = (props) => {
   const [searchBar, SetSearchBar] = useState(false);
@@ -28,11 +31,13 @@ const Header = (props) => {
   const [dateState, setDateState] = useState(new Date());
   const [loggedInUser, setLoggedInUser] = useState({})
 
+  const { notifications, setNotifications } = useContext(NotificationsContext)
+
   useEffect(() => {
     let userDetails = localStorage.getItem('auth')
     let user = JSON.parse(userDetails)
     setLoggedInUser(user)
-    if(user){
+    if (user) {
       socket.emit("join_room", user?.branchId)
     }
   }, [])
@@ -57,7 +62,7 @@ const Header = (props) => {
 
   useEffect(() => {
     setInterval(() => setDateState(new Date()), 1000);
-}, []);
+  }, []);
 
   return (
     <>
@@ -68,8 +73,8 @@ const Header = (props) => {
           onMouseLeave={expandMenu}
           onMouseOver={expandMenuOpen}
         >
-          <Link to="/tinatett-pos/dashboard" className="logo" style={{fontSize: '18px', fontWeight:900, display:'flex', alignItems:'center'}}>
-            <img src={Logo} alt="" style={{height:40, width:50}}/> Stock Manager
+          <Link to="/tinatett-pos/dashboard" className="logo" style={{ fontSize: '18px', fontWeight: 900, display: 'flex', alignItems: 'center' }}>
+            <img src={Logo} alt="" style={{ height: 40, width: 50 }} /> Stock Manager
           </Link>
           <Link to="/tinatett-pos/dashboard" className="logo-small">
             <img src={SmallLogo} alt="" />
@@ -81,8 +86,8 @@ const Header = (props) => {
               display: pathname.includes("tasks")
                 ? "none"
                 : pathname.includes("compose")
-                ? "none"
-                : "",
+                  ? "none"
+                  : "",
             }}
             onClick={handlesidebar}
           ></Link>{" "}
@@ -102,13 +107,13 @@ const Header = (props) => {
         </Link>
         {/* Header Menu */}
         <ul className="nav user-menu">
-          <li className="nav-item" style={{display:'flex', alignItems:'center', justifyContent:'flex-start', marginRight:50}}>Branch: {loggedInUser?.branchName}</li>
-          <li className="nav-item" style={{display:'flex', alignItems:'center', justifyContent:'flex-end'}}>
-            
-               {dateState.toUTCString('en-GB', {
-                hour: 'numeric',
-                minute: 'numeric',
-                hour12: true,
+          <li className="nav-item" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', marginRight: 50 }}>Branch: {loggedInUser?.branchName}</li>
+          <li className="nav-item" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+
+            {dateState.toUTCString('en-GB', {
+              hour: 'numeric',
+              minute: 'numeric',
+              hour12: true,
             })}
           </li>
           {/* Search */}
@@ -168,150 +173,59 @@ const Header = (props) => {
           </li>
           {/* /Flag */}
           {/* Notifications */}
-          {/* <li className="nav-item dropdown">
+          <li className="nav-item dropdown">
             <Link
               to="#"
               className="dropdown-toggle nav-link"
               data-bs-toggle="dropdown"
             >
               <img src={Notification} alt="img" className="noti-image" />
-              <span className="badge rounded-pill">4</span>
+              <span className="badge rounded-pill">{notifications.length}</span>
             </Link>
             <div className="dropdown-menu notifications">
               <div className="topnav-dropdown-header">
                 <span className="notification-title">Notifications</span>
-                <Link to="#" className="clear-noti">
+                <Link to="#" className="clear-noti" onClick={() => setNotifications([])}>
                   {" "}
                   Clear All{" "}
                 </Link>
               </div>
               <div className="noti-content">
                 <ul className="notification-list">
-                  <li className="notification-message">
-                    <Link to="/tinatett-pos/activities">
-                      <div className="media d-flex">
-                        <span className="avatar flex-shrink-0">
-                          <img alt="" src={Avatar2} />
-                        </span>
-                        <div className="media-body flex-grow-1">
-                          <p className="noti-details">
-                            <span className="noti-title">{loggedInUser?.name}</span> added
-                            new task{" "}
-                            <span className="noti-title">
-                              Patient appointment booking
-                            </span>
-                          </p>
-                          <p className="noti-time">
-                            <span className="notification-time">
-                              4 mins ago
-                            </span>
-                          </p>
-                        </div>
-                      </div>
-                    </Link>
-                  </li>
-                  <li className="notification-message">
-                    <Link to="/tinatett-pos/activities">
-                      <div className="media d-flex">
-                        <span className="avatar flex-shrink-0">
-                          <img alt="" src={Avatar3} />
-                        </span>
-                        <div className="media-body flex-grow-1">
-                          <p className="noti-details">
-                            <span className="noti-title">Tarah Shropshire</span>{" "}
-                            changed the task name{" "}
-                            <span className="noti-title">
-                              Appointment booking with payment gateway
-                            </span>
-                          </p>
-                          <p className="noti-time">
-                            <span className="notification-time">
-                              6 mins ago
-                            </span>
-                          </p>
-                        </div>
-                      </div>
-                    </Link>
-                  </li>
-                  <li className="notification-message">
-                    <Link to="/tinatett-pos/activities">
-                      <div className="media d-flex">
-                        <span className="avatar flex-shrink-0">
-                          <img alt="" src={Avatar6} />
-                        </span>
-                        <div className="media-body flex-grow-1">
-                          <p className="noti-details">
-                            <span className="noti-title">Misty Tison</span>{" "}
-                            added{" "}
-                            <span className="noti-title">Domenic Houston</span>{" "}
-                            and <span className="noti-title">Claire Mapes</span>{" "}
-                            to project{" "}
-                            <span className="noti-title">
-                              Doctor available module
-                            </span>
-                          </p>
-                          <p className="noti-time">
-                            <span className="notification-time">
-                              8 mins ago
-                            </span>
-                          </p>
-                        </div>
-                      </div>
-                    </Link>
-                  </li>
-                  <li className="notification-message">
-                    <Link to="/tinatett-pos/activities">
-                      <div className="media d-flex">
-                        <span className="avatar flex-shrink-0">
-                          <img alt="" src={Avatar17} />
-                        </span>
-                        <div className="media-body flex-grow-1">
-                          <p className="noti-details">
-                            <span className="noti-title">Rolland Webber</span>{" "}
-                            completed task{" "}
-                            <span className="noti-title">
-                              Patient and Doctor video conferencing
-                            </span>
-                          </p>
-                          <p className="noti-time">
-                            <span className="notification-time">
-                              12 mins ago
-                            </span>
-                          </p>
-                        </div>
-                      </div>
-                    </Link>
-                  </li>
-                  <li className="notification-message">
-                    <Link to="/tinatett-pos/activities">
-                      <div className="media d-flex">
-                        <span className="avatar flex-shrink-0">
-                          <img alt="" src={Avatar13} />
-                        </span>
-                        <div className="media-body flex-grow-1">
-                          <p className="noti-details">
-                            <span className="noti-title">Bernardo Galaviz</span>{" "}
-                            added new task{" "}
-                            <span className="noti-title">
-                              Private chat module
-                            </span>
-                          </p>
-                          <p className="noti-time">
-                            <span className="notification-time">
-                              2 days ago
-                            </span>
-                          </p>
-                        </div>
-                      </div>
-                    </Link>
-                  </li>
+                  {notifications.map((notification, idx) => {
+                    return (
+                      <li className="notification-message" key={idx}>
+                        <Link to="/tinatett-pos/activities">
+                          <div className="media d-flex">
+                            <div className="media-body flex-grow-1">
+                              <p className="noti-details">
+                                <span className="noti-title">{notification.message.split(' ').slice(0,2)}</span> {notification.message.split(' ').slice(2).join(' ')}
+                                {" "}
+                                {/* <span className="noti-title">
+                            successfully
+                            </span> */}
+                              </p>
+                              <p className="noti-time">
+                                <span className="notification-time">
+                                  {timeAgo(notification.time)}
+                                </span>
+                              </p>
+                            </div>
+                          </div>
+                        </Link>
+                      </li>
+                    )
+                  })}
+
+
+
                 </ul>
               </div>
               <div className="topnav-dropdown-footer">
                 <Link to="/tinatett-pos/activities">View all Notifications</Link>
               </div>
             </div>
-          </li> */}
+          </li>
           {/* /Notifications */}
           <li className="nav-item dropdown has-arrow main-drop">
             <Link

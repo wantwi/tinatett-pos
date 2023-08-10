@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import {
   Calendar,
   Plus,
@@ -27,6 +27,7 @@ import { usePost } from "../../hooks/usePost";
 import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 import FeatherIcon from "feather-icons-react";
 import useCustomApi from "../../hooks/useCustomApi";
+import { NotificationsContext } from "../../InitialPage/Sidebar/DefaultLayout";
 
 const options2 = [
   { id: 1, text: "choose Status", text: "choose Status" },
@@ -54,7 +55,7 @@ const AddPurchase = () => {
   const { isLoading, data, isError, error, mutate } = usePost("/purchase");
   const [isSubmitSuccessful, setIsSubmitSuccessful] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
+  const { notifications, setNotifications } = useContext(NotificationsContext)
 
   //add customer states
   const [supplierType, setSupplierType] = useState(0)
@@ -328,16 +329,31 @@ const AddPurchase = () => {
 
   }, [suppliers, products])
 
+  let storage = JSON.parse(localStorage.getItem("auth"))
   useEffect(() => {
     if (!isError && isSubmitSuccessful) {
       console.log("res", data)
       alertify.set("notifier", "position", "top-right");
       alertify.success("Purchase added successfully.");
+      
+      let newNotification = {
+        message: `${storage.name} Purchase added successfully.`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
+      
     }
     else if (isError) {
       alertify.set("notifier", "position", "top-right");
       alertify.error("Error...Could not save purchase transaction");
+  
+      let newNotification = {
+        message: `${storage.name} An error occured. Could not save purchase transaction.`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
     }
+   
 
     return () => { };
   }, [isError, !isSubmitSuccessful]);

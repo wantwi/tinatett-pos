@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -30,6 +30,7 @@ import "../../../node_modules/alertifyjs/build/css/alertify.css";
 import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
 import { socket } from "../../InitialPage/Sidebar/Header";
 import useAuth from "../../hooks/useAuth";
+import { NotificationsContext } from "../../InitialPage/Sidebar/DefaultLayout";
 
 const Addsales = () => {
   const init = {
@@ -87,6 +88,9 @@ const Addsales = () => {
   // const { isLoading, data, isError, error, mutate } = usePost("/sales/suspend");
 
   const {auth} = useAuth()
+
+  
+  const { notifications, setNotifications } = useContext(NotificationsContext)
 
    //add customer states
    const [customerType, setCustomerType] = useState(0)
@@ -256,6 +260,13 @@ const Addsales = () => {
                   alertify.set("notifier", "position", "top-right");
                   alertify.success("Sale completed.");
 
+                  let storage = JSON.parse(localStorage.getItem("auth"))
+                  let newNotification = {
+                    message: `${storage.name} completed a sale with reference ${payload.salesRef}`,
+                    time: new Date().toISOString()
+                  }
+                  setNotifications([...notifications, newNotification])
+
                 }
               })
               .catch((error) => {
@@ -283,7 +294,7 @@ const Addsales = () => {
                 // setTimeout(() => {
                 //   $('.modal').modal('hide')
                 // }, 1500)
-                
+               
               })
 
           }
@@ -394,6 +405,12 @@ const Addsales = () => {
             alertify.set("notifier", "position", "top-right");
             alertify.success("Suspended successfully");
             setReferenceData(res.data)
+            let storage = JSON.parse(localStorage.getItem("auth"))
+                  let newNotification = {
+                    message: `${storage.name} suspended a sale with reference ${res.data.reference}`,
+                    time: new Date().toISOString()
+                  }
+                  setNotifications([...notifications, newNotification])
 
             //emit suspend
             socket.emit("suspend", {room: auth?.branchId})
@@ -402,11 +419,23 @@ const Addsales = () => {
           else {
             alertify.set("notifier", "position", "top-right");
             alertify.warning("Suspend unsuccessful");
+            let storage = JSON.parse(localStorage.getItem("auth"))
+            let newNotification = {
+              message: `${storage.name} encountered an error with Suspend`,
+              time: new Date().toISOString()
+            }
+            setNotifications([...notifications, newNotification])
           }
         })
         .catch((error) => {
           alertify.set("notifier", "position", "top-right");
           alertify.error("Some error occured. Please contact admin");
+          let storage = JSON.parse(localStorage.getItem("auth"))
+          let newNotification = {
+            message: `${storage.name} some error occured. Please contact admin`,
+            time: new Date().toISOString()
+          }
+          setNotifications([...notifications, newNotification])
         })
         .finally(() => {
           setIsSaving(false)

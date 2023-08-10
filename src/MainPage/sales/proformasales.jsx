@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -28,6 +28,7 @@ import "../../../node_modules/alertifyjs/build/css/alertify.css";
 import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
 import { useLocation } from "react-router-dom/cjs/react-router-dom.min";
 import { LoadingOutlined } from "@ant-design/icons";
+import { NotificationsContext } from "../../InitialPage/Sidebar/DefaultLayout";
 
 
 const ProformaSales = () => {
@@ -101,9 +102,10 @@ const ProformaSales = () => {
 
 
   const axios = useCustomApi()
+  const { notifications, setNotifications } = useContext(NotificationsContext)
 
   const deleteRow = (record) => {
-    console.log(record, i)
+    //console.log(record, i)
     let newGridData = productGridData.filter((item) => item.id !== record.id)
     setProductGridData(newGridData)
   };
@@ -280,6 +282,12 @@ const ProformaSales = () => {
                   }
                   alertify.set("notifier", "position", "top-right");
                   alertify.success("Sale completed.");
+                  let storage = JSON.parse(localStorage.getItem("auth"))
+                  let newNotification = {
+                    message: `${storage.name} completed a sale with reference ${payload.salesRef}`,
+                    time: new Date().toISOString()
+                  }
+                  setNotifications([...notifications, newNotification])
 
                 }
               })
@@ -419,7 +427,12 @@ const ProformaSales = () => {
           axios.delete(`/proforma/${id}`).then((res) => console.log(res))
           setReferenceData(res.data)
 
-
+          let storage = JSON.parse(localStorage.getItem("auth"))
+          let newNotification = {
+            message: `${storage.name} completed a sale with reference ${res.data.reference}`,
+            time: new Date().toISOString()
+          }
+          setNotifications([...notifications, newNotification])
 
         }
         else {
