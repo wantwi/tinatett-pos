@@ -82,7 +82,7 @@ const EditSales = () => {
   const retailRef = useRef()
   const wholesaleRef = useRef()
 
-  const { data: customers, isLoading: customersIsLoading } = useGet("customers", "/customer");
+  const { data: customers, isLoading: customersIsLoading } = useGet("customers", "/customer/combo");
   const { data: products, isLoading: productsIsLoading } = useGet("products", "/product");
   const { data: suspendedItems, isLoading: suspendedItemsLoading } = useGet('suspendedItems', `/sales/suspend/items/${state?.id}`);
 
@@ -91,7 +91,7 @@ const EditSales = () => {
   const axios = useCustomApi()
 
   const deleteRow = (record) => {
-    console.log(record)
+    //console.log(record)
     // console.log(productGridData)
     let newGridData = productGridData.filter((item) => item.id !== record.id)
     //console.log(newGridData)
@@ -543,19 +543,44 @@ const EditSales = () => {
       retailpriceTypeRef.current.checked = true
       wholesalepriceTypeRef.current.disabled = true
       retailpriceTypeRef.current.disabled = false
-
+      if(selectedProduct != null || selectedProduct != '' || selectedProduct != {}){
+        setSalesType('Retail')
+      }
+       
       setDisableUnselectedPrice({ wholesale: true, retail: false, special: true })
     }
-    if(selectedCustomer?.label.includes('Whole')){
+    else if(selectedCustomer?.label.includes('Whole')){
       wholesalepriceTypeRef.current.checked = true
       retailpriceTypeRef.current.disabled = true
       wholesalepriceTypeRef.current.disabled = false
+      if(selectedProduct != null || selectedProduct != '' || selectedProduct != {}){
+        setSalesType('Wholesale')
+      }
+    
+     
 
       setDisableUnselectedPrice({ wholesale: false, retail: true, special: true })
     }
+    else if(selectedCustomer == null || selectedCustomer == undefined){
+      setPrice(0)
+    }
+
+    else if((!selectedCustomer?.label.includes('Whole')) && (!selectedCustomer?.label.includes('Retail'))){
+      console.log('Not a wholesale nor Retail')
+        wholesalepriceTypeRef.current.disabled = false
+        retailpriceTypeRef.current.disabled = false
+  
+        setDisableUnselectedPrice({ wholesale: false, retail: false, special: false })
+    }
+
     
     $('#selectedCustomer').css('border', '1px solid rgba(145, 158, 171, 0.32)')
   }, [selectedCustomer])
+
+
+  useEffect(() => {
+    salesType == 'Retail' ? setPrice(selectedProduct.retailPrice) : salesType == "Wholesale" ? setPrice(selectedProduct.wholeSalePrice) : setPrice(selectedProduct.specialPrice)
+  }, [salesType])
 
 
   if (productsIsLoading && customersIsLoading) {
@@ -686,7 +711,8 @@ const EditSales = () => {
                     <div className="form-group">
                       <label>Manufacturing Date</label>
                       <div className="input-groupicon">
-                        <DatePicker
+                        <input type="date" className="form-control" value={formData?.manuDate.substring(0, 10)} disabled/>
+                        {/* <DatePicker
                           selected={startDate}
                           value={formData?.manuDate.substring(0, 10)}
                           disabled
@@ -694,7 +720,7 @@ const EditSales = () => {
                         />
                         <Link className="addonset">
                           <img src={Calendar} alt="img" />
-                        </Link>
+                        </Link> */}
                       </div>
                     </div>
                   </div>
@@ -703,7 +729,8 @@ const EditSales = () => {
                     <div className="form-group">
                       <label>Exp. Date</label>
                       <div className="input-groupicon">
-                        <DatePicker
+                      <input type="date" className="form-control" value={formData?.expDate.substring(0, 10)} disabled/>
+                        {/* <DatePicker
                           selected={startDate}
                           value={formData?.expDate.substring(0, 10)}
                           disabled
@@ -711,7 +738,7 @@ const EditSales = () => {
                         />
                         <Link className="addonset">
                           <img src={Calendar} alt="img" />
-                        </Link>
+                        </Link> */}
                       </div>
                     </div>
                   </div>
@@ -727,7 +754,7 @@ const EditSales = () => {
                           <div className="input-group">
                             <div className="input-group-text">
                               <input className="form-check-input" type="radio" ref={retailpriceTypeRef} name="priceType" value={selectedProduct?.retailPrice}
-                                onChange={(e) => {
+                                onClick={(e) => {
                                   setPrice(e.target.value)
                                   //setSalesType('Retail')
                                   //retailRef.current.checked = true
@@ -744,7 +771,7 @@ const EditSales = () => {
                           <div className="input-group">
                             <div className="input-group-text">
                               <input className="form-check-input" type="radio" ref={wholesalepriceTypeRef} name="priceType" value={selectedProduct?.wholeSalePrice}
-                                onChange={(e) => {
+                                onClick={(e) => {
                                   setPrice(e.target.value)
                                   //setSalesType('Wholesale')
                                   //retailRef.current.checked = false
@@ -761,7 +788,7 @@ const EditSales = () => {
 
                           <div className="input-group">
                             <div className="input-group-text">
-                              <input className="form-check-input" type="radio" ref={specialpriceTypeRef} name="priceType" value={selectedProduct?.specialPrice} onChange={(e) => {
+                              <input className="form-check-input" type="radio" ref={specialpriceTypeRef} name="priceType" value={selectedProduct?.specialPrice} onClick={(e) => {
                                 setPrice(e.target.value)
                                 setDisableUnselectedPrice({ special: false, wholesale: true, retail: true })
                               }} />
@@ -807,7 +834,7 @@ const EditSales = () => {
                         <input
                           className="form-control"
                           type="text"
-                          value={formData.quantity ? formData.quantity * price : price * 1}
+                          value={formData.quantity ? formData.quantity * price : price * 1 || 0}
                         />
 
                       </div>

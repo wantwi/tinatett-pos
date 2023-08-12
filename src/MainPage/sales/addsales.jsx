@@ -175,7 +175,7 @@ const Addsales = () => {
 
     if (productGridData.length < 1) {
       alertify.set("notifier", "position", "bottom-right");
-      alertify.warning("Please add at least one item to list before saving.");
+      alertify.message("Please add at least one item to list before saving.");
 
       let newNotification = {
         id: Math.ceil(Math.random()*1000000),
@@ -186,12 +186,12 @@ const Addsales = () => {
     }
     // else if ((paymentInfo.amountPaid == '' || paymentInfo.amountPaid < 1 || paymentInfo.amountPaid == null) && (transactionType == 'CP' || transactionType == 'CO') ) {
     //   alertify.set("notifier", "position", "bottom-right");
-    //   alertify.warning("Please provide payment amount before saving.");
+    //   alertify.message("Please provide payment amount before saving.");
     // }
 
     else if( (transactionType == 'SP' || transactionType == 'SO') && paymentInfo.amountPaid < (productGridData.reduce((total, item) => total + item.amount, 0))){
       alertify.set("notifier", "position", "bottom-right");
-      alertify.warning("Please provide full payment amount before saving.");
+      alertify.message("Please provide full payment amount before saving.");
 
       let newNotification = {
         id: Math.ceil(Math.random()*1000000),
@@ -231,7 +231,7 @@ const Addsales = () => {
           if (res.data.success) {
             setProductGridData([])
             setFormData({ quantity: '', amount: '', batchNumber: '', manuDate: '', expDate: '' })
-            setSelectedProduct('')
+            setSelectedProduct({ remainingStock: '', wholeSalePrice:'', retailPrice:'', specialPrice:'' })
             setInvoiceNo('')
             setReferenceData(res.data)
 
@@ -287,6 +287,8 @@ const Addsales = () => {
                     time: new Date().toISOString()
                   }
                   setNotifications([...notifications, newNotification])
+                  retailpriceTypeRef.current.checked = true
+                  setSelectedCustomer(customerList[0])
 
                 }
               })
@@ -328,7 +330,7 @@ const Addsales = () => {
           }
           else {
             alertify.set("notifier", "position", "bottom-right");
-            alertify.warning("Unsuccessful, please try again");
+            alertify.message("Unsuccessful, please try again");
 
             let newNotification = {
               id: Math.ceil(Math.random()*1000000),
@@ -383,8 +385,8 @@ const Addsales = () => {
         var base64 = res.data.base64
         const blob = base64ToBlob(base64, 'application/pdf');
         const url = URL.createObjectURL(blob);
-        const pdfWindow = window.open("");
-        pdfWindow.document.write("<iframe width='100%' height='100%' src='" + url + "'></iframe>");
+        const pdfWindow = window.open(url, "_blank", "width=800, height=800");
+        //pdfWindow.document.write("<iframe width='100%' height='100%' src='" + url + "'></iframe>");
       })
 
     function base64ToBlob(base64, type = "application/octet-stream") {
@@ -402,7 +404,7 @@ const Addsales = () => {
 
     if (productGridData.length < 1) {
       alertify.set("notifier", "position", "bottom-right");
-      alertify.warning("Please add at least one item to list before saving.");
+      alertify.message("Please add at least one item to list before saving.");
 
       let newNotification = {
         id: Math.ceil(Math.random()*1000000),
@@ -439,11 +441,13 @@ const Addsales = () => {
           if (res.data.success) {
             setProductGridData([])
             setFormData({ quantity: '', amount: '', batchNumber: '', manuDate: '', expDate: '' })
-            setSelectedProduct('')
+            setSelectedProduct({ remainingStock: '', wholeSalePrice:'', retailPrice:'', specialPrice:'' })
+            //setSelectedCustomer(null)
             setInvoiceNo('')
 
             alertify.set("notifier", "position", "bottom-right");
             alertify.success("Suspended successfully");
+            retailpriceTypeRef.current.checked = true
             
             setReferenceData(res.data)
                   let newNotification = {
@@ -458,7 +462,7 @@ const Addsales = () => {
           }
           else {
             alertify.set("notifier", "position", "bottom-right");
-            alertify.warning("Suspend unsuccessful");
+            alertify.message("Suspend unsuccessful");
            
             let newNotification = {
               message: `${storage.name} encountered an error with Suspend`,
@@ -502,12 +506,12 @@ const Addsales = () => {
     }
     // if (obj.amount < 1 || obj.unitPrice == '' || obj.name == '' || obj.quantity == '' || selectedCustomer == null) { 
     //   alertify.set("notifier", "position", "bottom-right");
-    //   alertify.warning("Please make sure all fields are filled.");
+    //   alertify.message("Please make sure all fields are filled.");
     // }
     
     if (!obj.name) {
       alertify.set("notifier", "position", "bottom-right");
-      alertify.warning("Please select a product.");
+      alertify.message("Please select a product.");
       let newNotification = {
         id: Math.ceil(Math.random()*1000000),
         message: `${storage.name} Please select a product`,
@@ -522,7 +526,7 @@ const Addsales = () => {
 
     else if (selectedCustomer == '' || selectedCustomer == null) {
       alertify.set("notifier", "position", "bottom-right");
-      alertify.warning("Please select a customer.");
+      alertify.message("Please select a customer.");
       let newNotification = {
         id: Math.ceil(Math.random()*1000000),
         message: `${storage.name} Please select a customer.`,
@@ -537,7 +541,7 @@ const Addsales = () => {
 
     else if ( obj.quantity == '') {
       alertify.set("notifier", "position", "bottom-right");
-      alertify.warning("Please enter quantity.");
+      alertify.message("Please enter quantity.");
       let newNotification = {
         id: Math.ceil(Math.random()*1000000),
         message: `${storage.name} Please enter quantity.`,
@@ -606,6 +610,8 @@ const Addsales = () => {
     $('#quantity').css('border', '1px solid rgba(145, 158, 171, 0.32)')
   }, [formData.quantity])
 
+ 
+
 
 
   useEffect(() => {
@@ -613,15 +619,21 @@ const Addsales = () => {
       retailpriceTypeRef.current.checked = true
       wholesalepriceTypeRef.current.disabled = true
       retailpriceTypeRef.current.disabled = false
-      // setSalesType('Retail')
-
+      if(selectedProduct != null || selectedProduct != '' || selectedProduct != {}){
+        setSalesType('Retail')
+      }
+       
       setDisableUnselectedPrice({ wholesale: true, retail: false, special: true })
     }
     else if(selectedCustomer?.label.includes('Whole')){
       wholesalepriceTypeRef.current.checked = true
       retailpriceTypeRef.current.disabled = true
       wholesalepriceTypeRef.current.disabled = false
-      // setSalesType('Wholesale')
+      if(selectedProduct != null || selectedProduct != '' || selectedProduct != {}){
+        setSalesType('Wholesale')
+      }
+    
+     
 
       setDisableUnselectedPrice({ wholesale: false, retail: true, special: true })
     }
@@ -640,6 +652,7 @@ const Addsales = () => {
     
     $('#selectedCustomer').css('border', '1px solid rgba(145, 158, 171, 0.32)')
   }, [selectedCustomer])
+
 
   useEffect(() => {
     salesType == 'Retail' ? setPrice(selectedProduct.retailPrice) : salesType == "Wholesale" ? setPrice(selectedProduct.wholeSalePrice) : setPrice(selectedProduct.specialPrice)
@@ -676,7 +689,7 @@ const Addsales = () => {
       })
       setProductsList(mappedData2)
       //retailRef.current.checked = true
-      //retailpriceTypeRef.current.checked = true
+      retailpriceTypeRef.current.checked = true
 
     }
   }, [productsIsLoading, customersIsLoading])
@@ -859,7 +872,8 @@ const Addsales = () => {
                     <div className="form-group">
                       <label>Manufacturing Date</label>
                       <div className="input-groupicon">
-                        <DatePicker
+                        <input type="date" className="form-control" value={formData?.manuDate.substring(0, 10)} disabled/>
+                        {/* <DatePicker
                           selected={startDate}
                           value={formData?.manuDate.substring(0, 10)}
                           disabled
@@ -867,7 +881,7 @@ const Addsales = () => {
                         />
                         <Link className="addonset">
                           <img src={Calendar} alt="img" />
-                        </Link>
+                        </Link> */}
                       </div>
                     </div>
                   </div>
@@ -876,7 +890,8 @@ const Addsales = () => {
                     <div className="form-group">
                       <label>Exp. Date</label>
                       <div className="input-groupicon">
-                        <DatePicker
+                      <input type="date" className="form-control" value={formData?.expDate.substring(0, 10)} disabled/>
+                        {/* <DatePicker
                           selected={startDate}
                           value={formData?.expDate.substring(0, 10)}
                           disabled
@@ -884,7 +899,7 @@ const Addsales = () => {
                         />
                         <Link className="addonset">
                           <img src={Calendar} alt="img" />
-                        </Link>
+                        </Link> */}
                       </div>
                     </div>
                   </div>
@@ -959,7 +974,7 @@ const Addsales = () => {
                             }
                             if (Number(e.target.value) > (selectedProduct?.remainingStock)) {
                               alertify.set("notifier", "position", "bottom-right");
-                              alertify.warning('Quantity can not be greater than quantity in stock')
+                              alertify.message('Quantity can not be greater than quantity in stock')
                               let newNotification = {
                                 id: Math.ceil(Math.random()*1000000),
                                 message: `${storage.name} Quantity can not be greater than quantity in stock.`,
@@ -984,7 +999,7 @@ const Addsales = () => {
                         <input
                           className="form-control"
                           type="text"
-                          value={formData.quantity ? formData.quantity * price : price * 1}
+                          value={formData.quantity ? formData.quantity * price : price * 1 || 0}
                         />
 
                       </div>
