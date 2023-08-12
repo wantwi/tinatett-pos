@@ -194,8 +194,14 @@ const Header = (props) => {
                 <ul className="notification-list">
                   {notifications.map((notification, idx) => {
                     return (
-                      <li className="notification-message" key={idx}>
-                        <Link to="/tinatett-pos/activities">
+                      <li className="notification-message" key={idx} onClick={() => {
+                        let data = [...notifications]
+                        let filtered = data.filter((item) => item.message != notification.message)   
+                        //data.forEach(item => console.log(item, notification))
+                        console.log("Filtered:", filtered)
+                        setNotifications(filtered)
+                      }}>
+                        <Link to="#">
                           <div className="media d-flex">
                             <div className="media-body flex-grow-1">
                               <p className="noti-details">

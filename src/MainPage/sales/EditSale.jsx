@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -27,11 +27,12 @@ import alertify from "alertifyjs";
 import "../../../node_modules/alertifyjs/build/css/alertify.css";
 import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
 import { useLocation } from "react-router-dom/cjs/react-router-dom.min";
+import { NotificationsContext } from "../../InitialPage/Sidebar/DefaultLayout";
 
 
 const EditSales = () => {
   const { state } = useLocation()
-  console.log("State:", state)
+  //console.log("State:", state)
   const [suspendId] = useState(state?.id)
   const [startDate, setStartDate] = useState(new Date());
   const [activeTab, setActiveTab] = useState('Cash')
@@ -85,13 +86,14 @@ const EditSales = () => {
   const { data: products, isLoading: productsIsLoading } = useGet("products", "/product");
   const { data: suspendedItems, isLoading: suspendedItemsLoading } = useGet('suspendedItems', `/sales/suspend/items/${state?.id}`);
 
-
+  const { notifications, setNotifications } = useContext(NotificationsContext)
+  let storage = JSON.parse(localStorage.getItem("auth"))
   const axios = useCustomApi()
 
   const deleteRow = (record) => {
     console.log(record)
     // console.log(productGridData)
-    let newGridData = productGridData.filter((item) => item.productId !== record.productId)
+    let newGridData = productGridData.filter((item) => item.id !== record.id)
     //console.log(newGridData)
     setProductGridData(newGridData)
   };
@@ -108,12 +110,26 @@ const EditSales = () => {
   const processPayment = (type, print) => {
 
     if (productGridData.length < 1) {
-      alertify.set("notifier", "position", "top-right");
+      alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please add at least one item to list before saving.");
+      let newNotification = {
+        id: Math.ceil(Math.random()*1000000),
+        message: `${storage.name} Please add at least one item to list before saving.`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
     }
     if (paymentInfo.amountPaid == '' || paymentInfo.amountPaid < 1 || paymentInfo.amountPaid == null) {
-      alertify.set("notifier", "position", "top-right");
+      alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please provide payment amount before saving.");
+
+      let newNotification = {
+        id: Math.ceil(Math.random()*1000000),
+        message: `${storage.name} Please provide payment amount before saving.`,
+        time: new Date().toISOString()
+
+      }
+      setNotifications([...notifications, newNotification])
     }
     else {
 
@@ -123,8 +139,20 @@ const EditSales = () => {
         customerId: selectedCustomer?.value,
         transDate: transDate,
         totalAmount: productGridData.reduce((total, item) => total + item.amount, 0),
-        salesType: salesType,
-        products: productGridData
+        // salesType: salesType,
+        products: productGridData.map((item) => {
+          return {
+            "productId": item.productId,
+            "name": item.name,
+            "batchNumber": item.batchNumber,
+            "manufacturingDate": item.manufacturingDate,
+            "expireDate": item.expireDate,
+            "quantity": item.quantity,
+            "unitPrice": item.unitPrice,
+            "priceType": item.priceType,
+            "amount": item.amount
+          }
+        })
       }
 
       axios.post(`/sales/suspend`, payload)
@@ -168,14 +196,27 @@ const EditSales = () => {
                   if (print) {
                     getInvoiceReceipt(payload.salesRef)
                   }
-                  alertify.set("notifier", "position", "top-right");
+                  alertify.set("notifier", "position", "bottom-right");
                   alertify.success("Sale completed.");
 
+                  let newNotification = {
+                    id: Math.ceil(Math.random()*1000000),
+                    message: `${storage.name} Sale completed with reference ${payload.salesRef}`,
+                    time: new Date().toISOString()
+                  }
+                  setNotifications([...notifications, newNotification])
                 }
               })
               .catch((error) => {
-                alertify.set("notifier", "position", "top-right");
+                alertify.set("notifier", "position", "bottom-right");
                 alertify.error("Error...Could not complete transaction");
+
+                let newNotification = {
+                  id: Math.ceil(Math.random()*1000000),
+                  message: `${storage.name} Error...Could not complete transaction`,
+                  time: new Date().toISOString()
+                }
+                setNotifications([...notifications, newNotification])
               })
               .finally(() => {
                 setPaymentInfo({
@@ -203,13 +244,27 @@ const EditSales = () => {
 
           }
           else {
-            alertify.set("notifier", "position", "top-right");
+            alertify.set("notifier", "position", "bottom-right");
             alertify.warning("Unsuccessful, please try again");
+
+            let newNotification = {
+              id: Math.ceil(Math.random()*1000000),
+              message: `${storage.name} Unsuccessful, please try again.`,
+              time: new Date().toISOString()
+            }
+            setNotifications([...notifications, newNotification])
           }
         })
         .catch((error) => {
-          alertify.set("notifier", "position", "top-right");
-          alertify.error("Some error occured. Please contact admin");
+          alertify.set("notifier", "position", "bottom-right");
+          alertify.error("Internal server error occured. Please contact admin");
+
+          let newNotification = {
+            id: Math.ceil(Math.random()*1000000),
+            message: `${storage.name} Internal server error occured. Please contact admin.`,
+            time: new Date().toISOString()
+          }
+          setNotifications([...notifications, newNotification])
         })
         .finally(() => {
           setIsSaving(false)
@@ -275,8 +330,15 @@ const EditSales = () => {
   const handleSuspendUpdate = () => {
 
     if (productGridData.length < 1) {
-      alertify.set("notifier", "position", "top-right");
+      alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please add at least one item to list before saving.");
+
+      let newNotification = {
+        id: Math.ceil(Math.random()*1000000),
+        message: `${storage.name} please add at least one item to list before saving.`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
     }
     else {
       setIsSaving(true)
@@ -284,8 +346,20 @@ const EditSales = () => {
         customerId: selectedCustomer?.value,
         transDate: transDate,
         totalAmount: productGridData.reduce((total, item) => total + item.amount, 0),
-        salesType: salesType,
-        products: productGridData
+        // salesType: salesType,
+        products: productGridData.map((item) => {
+          return {
+            "productId": item.productId,
+            "name": item.name,
+            "batchNumber": item.batchNumber,
+            "manufacturingDate": item.manufacturingDate,
+            "expireDate": item.expireDate,
+            "quantity": item.quantity,
+            "unitPrice": item.unitPrice,
+            "priceType": item.priceType,
+            "amount": item.amount
+          }
+        })
       }
 
       axios.put(`/sales/suspend/${suspendId}`, payload)
@@ -297,7 +371,7 @@ const EditSales = () => {
             setSelectedProduct('')
             setInvoiceNo('')
 
-            alertify.set("notifier", "position", "top-right");
+            alertify.set("notifier", "position", "bottom-right");
             alertify.success("Suspend updated successfully");
             setReferenceData(res.data)
             setTimeout(() => {
@@ -305,13 +379,27 @@ const EditSales = () => {
             },2000)
           }
           else {
-            alertify.set("notifier", "position", "top-right");
+            alertify.set("notifier", "position", "bottom-right");
             alertify.warning("Suspend update unsuccessful");
+
+            let newNotification = {
+              id: Math.ceil(Math.random()*1000000),
+              message: `${storage.name} Suspend update unsuccessful.`,
+              time: new Date().toISOString()
+            }
+            setNotifications([...notifications, newNotification])
           }
         })
         .catch((error) => {
-          alertify.set("notifier", "position", "top-right");
-          alertify.error("Some error occured. Please contact admin");
+          alertify.set("notifier", "position", "bottom-right");
+          alertify.error("Internal server error occured. Please contact admin");
+
+          let newNotification = {
+            id: Math.ceil(Math.random()*1000000),
+            message: `${storage.name} Internal server error occured. Please contact admin`,
+            time: new Date().toISOString()
+          }
+          setNotifications([...notifications, newNotification])
         })
         .finally(() => {
           setIsSaving(false)
@@ -326,6 +414,7 @@ const EditSales = () => {
     //console.log(productFormData)
     //console.log(selectedCustomer)
     let obj = {
+      id: productGridData.length + 1,
       name: selectedProduct.label,
       productId: selectedProduct.value,
       batchNumber: formData.batchNumber?.value,
@@ -337,8 +426,14 @@ const EditSales = () => {
       amount: formData.quantity * price
     }
     if (obj.amount < 1 || obj.unitPrice == '' || obj.name == '' || selectedCustomer == null) {
-      alertify.set("notifier", "position", "top-right");
+      alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please make sure all fields are filled.");
+      let newNotification = {
+        id: Math.ceil(Math.random()*1000000),
+        message: `${storage.name} Please make sure all fields are filled.`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
     }
     else {
       setProductGridData([...productGridData, obj])
@@ -376,7 +471,7 @@ const EditSales = () => {
         })
         //console.log(x)
         setFormData({ ...formData, batchNumber: x[0], manuDate: x[0].manufacturingDate, expDate: x[0].expireDate })
-        retailpriceTypeRef.current.checked = true
+        // retailpriceTypeRef.current.checked = true
       }
     })
 
@@ -405,6 +500,7 @@ const EditSales = () => {
 
       let mappedData2 = products?.data.map((product) => {
         return {
+          
           value: product?.id,
           label: product?.name,
           retailPrice: product?.retailPrice,
@@ -415,12 +511,14 @@ const EditSales = () => {
           expDate: product?.expiryDate
         }
       })
+   
       setProductsList(mappedData2)
       // retailRef.current.checked = true
       //retailpriceTypeRef.current.checked = true
 
-      let mappedData3 = suspendedItems?.data.map((item) => {
+      let mappedData3 = suspendedItems?.data.map((item, index) => {
         return {
+          id: index+1,
           salesRef: item?.salesRef,
           name: item?.product?.name,
           productId: item?.productId,
@@ -432,10 +530,32 @@ const EditSales = () => {
           manufacturingDate: item.manufacturingDate.substring(0, 10),
         }
       })
+      console.log("MApped", mappedData3)
       setProductGridData(mappedData3)
 
     }
   }, [productsIsLoading, customersIsLoading, suspendedItemsLoading])
+
+
+  
+  useEffect(() => {
+    if(selectedCustomer?.label.includes('Retail')){
+      retailpriceTypeRef.current.checked = true
+      wholesalepriceTypeRef.current.disabled = true
+      retailpriceTypeRef.current.disabled = false
+
+      setDisableUnselectedPrice({ wholesale: true, retail: false, special: true })
+    }
+    if(selectedCustomer?.label.includes('Whole')){
+      wholesalepriceTypeRef.current.checked = true
+      retailpriceTypeRef.current.disabled = true
+      wholesalepriceTypeRef.current.disabled = false
+
+      setDisableUnselectedPrice({ wholesale: false, retail: true, special: true })
+    }
+    
+    $('#selectedCustomer').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+  }, [selectedCustomer])
 
 
   if (productsIsLoading && customersIsLoading) {
@@ -667,7 +787,7 @@ const EditSales = () => {
                               setFormData({ ...formData, quantity: '' })
                             }
                             if (Number(e.target.value) > (selectedProduct?.remainingStock)) {
-                              alertify.set("notifier", "position", "top-right");
+                              alertify.set("notifier", "position", "bottom-right");
                               alertify.warning('Quantity can not be greater than quantity in stock')
                             }
                             else if (isValidNumber(e.target.value)) {

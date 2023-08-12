@@ -64,7 +64,7 @@ console.log(state)
   useEffect(() => {
     if (isSubmitSuccessful && !isError && !isLoading) {
       reset();
-      alertify.set("notifier", "position", "top-right");
+      alertify.set("notifier", "position", "bottom-right");
       alertify.success("Customer updated successfully.");
       setTimeout(() => {
         window.location = '/tinatett-pos/people/customerlist'

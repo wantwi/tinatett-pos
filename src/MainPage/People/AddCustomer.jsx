@@ -65,7 +65,7 @@ const AddCustomer = () => {
   useEffect(() => {
     if (isSubmitSuccessful && !isError) {
       reset();
-      alertify.set("notifier", "position", "top-right");
+      alertify.set("notifier", "position", "bottom-right");
       alertify.success("Customer added successfully.");
     }
     return () => {};

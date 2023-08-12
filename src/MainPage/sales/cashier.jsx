@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Table from "../../EntryFile/datatable";
 import { Link } from "react-router-dom";
 import DatePicker from "react-datepicker";
@@ -20,6 +20,7 @@ import { Button } from "antd";
 import FeatherIcon from 'feather-icons-react'
 import { socket } from "../../InitialPage/Sidebar/Header";
 import useAuth from "../../hooks/useAuth";
+import { NotificationsContext } from "../../InitialPage/Sidebar/DefaultLayout";
 
 const Cashier = () => {
   const init = {
@@ -48,6 +49,11 @@ const Cashier = () => {
   const [paymentInfo, setPaymentInfo] = useState(init)
   const [filter, setFilter] = useState('All')
   const [productGridData, setProductGridData] = useState([])
+  const [isDeleting, setIsDeleting] = useState(false)
+
+  const { notifications, setNotifications } = useContext(NotificationsContext)
+  let storage = JSON.parse(localStorage.getItem("auth"))
+
 
 
   useEffect(() => {
@@ -81,8 +87,8 @@ const Cashier = () => {
       cancelButtonClass: "btn btn-danger ml-1",
       buttonsStyling: !1,
     }) .then( async() => {
-     
-      let data = await axios.delete(`/suspend/${id}`)
+     setIsDeleting(true)
+      let data = await axios.delete(`/sales/suspend/${id}`)
       if(data.status < 205){
         Swal.fire({
           type: "success",
@@ -110,8 +116,9 @@ const Cashier = () => {
           title: "Error!",
           text: error,
           confirmButtonClass: "btn btn-danger",
-        });
-    });
+        })
+    })
+    .finally(() => setIsDeleting(false))
   };
 
   const axios = useCustomApi()
@@ -150,7 +157,7 @@ const Cashier = () => {
           if(print){
             getInvoiceReceipt(modalData.Reference)
           }
-          alertify.set("notifier", "position", "top-right");
+          alertify.set("notifier", "position", "bottom-right");
           alertify.success("Sale completed.");
           setTimeout(() => {
             $('.modal').modal('hide')
@@ -161,8 +168,15 @@ const Cashier = () => {
       })
       .catch((error) => {
         console.log(error)
-        alertify.set("notifier", "position", "top-right");
+        alertify.set("notifier", "position", "bottom-right");
         alertify.error(error.response.data.error);
+
+        let newNotification = {
+          id: Math.ceil(Math.random()*1000000),
+          message: `${storage.name} ${error.response.data.error}`,
+          time: new Date().toISOString()
+        }
+        setNotifications([...notifications, newNotification])
       })
       .finally(() => {
         setIsCredit(false)
@@ -187,8 +201,15 @@ const Cashier = () => {
       })
      }
     else{
-      alertify.set("notifier", "position", "top-right");
+      alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please enter an amount first");
+
+      let newNotification = {
+        id: Math.ceil(Math.random()*1000000),
+        message: `${storage.name} Please enter an amount first`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
     }
     
 
@@ -446,7 +467,7 @@ const Cashier = () => {
                 <Link
                   to="#"
                   // className="dropdown-item confirm-text"
-                  onClick={confirmText}
+                  onClick={() => confirmText(record.id)}
                   title={'Remove'}
                 >
                   
@@ -463,6 +484,11 @@ const Cashier = () => {
 
   if (isLoading) {
     return (<LoadingSpinner message="Fetching Suspended sales.." />)
+  }
+
+
+  if (isDeleting) {
+    return (<LoadingSpinner message="Deleting.." />)
   }
 
   return (

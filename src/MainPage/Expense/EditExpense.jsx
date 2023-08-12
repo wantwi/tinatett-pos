@@ -113,7 +113,7 @@ const AddExpense = () => {
     .then((res) => {
   
       if(res.data.success){
-        alertify.set("notifier", "position", "top-right");
+        alertify.set("notifier", "position", "bottom-right");
         alertify.success("Expense successfully updated.");
         setTimeout(() => {
           history.push('/tinatett-pos/expense/expenselist')
@@ -121,7 +121,7 @@ const AddExpense = () => {
       }
     })
     .catch((error) => {
-      alertify.set("notifier", "position", "top-right");
+      alertify.set("notifier", "position", "bottom-right");
       alertify.error("Error...Could not complete transaction");
     })
     .finally(() => setIsLoading(false))

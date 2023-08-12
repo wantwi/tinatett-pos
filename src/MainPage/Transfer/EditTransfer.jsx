@@ -70,6 +70,9 @@ const EditTransfer = () => {
   const [specialprice, setSpecialPrice] = useState('')
   const [isSubmitSuccessful, setIsSubmitSuccessful] = useState(false)
 
+  const { notifications, setNotifications } = useContext(NotificationsContext)
+  let storage = JSON.parse(localStorage.getItem("auth"))
+
 
 
 
@@ -182,8 +185,15 @@ const EditTransfer = () => {
 
     }
     if (item.amount < 1 || formData.unitPrice == '' || item.productName == '') {
-      alertify.set("notifier", "position", "top-right");
+      alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please make sure all fields are filled.");
+
+      let newNotification = {
+        id: Math.ceil(Math.random()*1000000),
+        message: `${storage.name} Please make sure all fields are filled.`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
     }
     else {
 
@@ -206,8 +216,15 @@ const EditTransfer = () => {
   const onSubmit = () => {
 
     if (productGridData.length < 1) {
-      alertify.set("notifier", "position", "top-right");
+      alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please add at least one item to list before saving.");
+
+      let newNotification = {
+        id: Math.ceil(Math.random()*1000000),
+        message: `${storage.name} Please add at least one item to list before saving.`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
     }
     else {
       let postBody = {
@@ -227,13 +244,25 @@ const EditTransfer = () => {
 
   useEffect(() => {
     if (!isPostError && isSubmitSuccessful) {
-      alertify.set("notifier", "position", "top-right");
+      alertify.set("notifier", "position", "bottom-right");
       alertify.success("Transfer updated successfully.");
+
+      let newNotification = {
+        message: `${storage.name} Transfer updated successfully.`,
+        time: new Date().toISOString()
+      }
+  setNotifications([...notifications, newNotification])
       // $('#create').modal('show');
     }
     else if (isPostError) {
-      alertify.set("notifier", "position", "top-right");
+      alertify.set("notifier", "position", "bottom-right");
       alertify.error("Error...Could not complete update.");
+
+      let newNotification = {
+        message: `${storage.name} could not process Transfer Update.`,
+        time: new Date().toISOString()
+      }
+  setNotifications([...notifications, newNotification])
     }
 
     return () => { };
@@ -255,7 +284,7 @@ const EditTransfer = () => {
   useEffect(() => {
     setFormData({ ...formData, amount: Number(formData.price) * Number(formData.quantity) || '' })
     if(Number(formData?.quantity) > selectedProduct?.totalQuantity){
-      alertify.set("notifier", "position", "top-right");
+      alertify.set("notifier", "position", "bottom-right");
       alertify.warning("You can not transfer more than stock available.");
       setFormData(({...formData, quantity:''}))
     }

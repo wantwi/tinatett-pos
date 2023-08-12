@@ -56,6 +56,7 @@ const AddPurchase = () => {
   const [isSubmitSuccessful, setIsSubmitSuccessful] = useState(false)
   const [loading, setLoading] = useState(false)
   const { notifications, setNotifications } = useContext(NotificationsContext)
+  let storage = JSON.parse(localStorage.getItem("auth"))
 
   //add customer states
   const [supplierType, setSupplierType] = useState(0)
@@ -123,8 +124,15 @@ const AddPurchase = () => {
               $('#batchNumber').css('border', '1px solid rgba(145, 158, 171, 0.32)')
           }, 3000)
           
-          alertify.set("notifier", "position", "top-right");
+          alertify.set("notifier", "position", "bottom-right");
           alertify.warning(res.data.message);
+
+          let newNotification = {
+            id: Math.ceil(Math.random()*1000000),
+            message: `${storage.name} ${res.data.message}`,
+            time: new Date().toISOString()
+          }
+          setNotifications([...notifications, newNotification])
           setProductFormData({ ...productFormData, batchNumber: '' })
         }
       })
@@ -171,7 +179,7 @@ const AddPurchase = () => {
       .then((res) => {
         // console.log(res.data)
         if (res.data.success) {
-          alertify.set("notifier", "position", "top-right");
+          alertify.set("notifier", "position", "bottom-right");
           alertify.success("Supplier added successfully.");
 
           let addedCustomer = {
@@ -183,8 +191,13 @@ const AddPurchase = () => {
           $('.modal').modal('hide')
         }
         else {
-          alertify.set("notifier", "position", "top-right");
+          alertify.set("notifier", "position", "bottom-right");
           alertify.error("Error...Could not save supplier.");
+          let newNotification = {
+            message: `${storage.name} Error...Could not save supplier.`,
+            time: new Date().toISOString()
+          }
+          setNotifications([...notifications, newNotification])
         }
 
       })
@@ -220,30 +233,35 @@ const AddPurchase = () => {
   const handleAddItem = () => {
     //console.log(productFormData)
     if (productFormData.expireDate == '' || productFormData.manufacturingDate == '' || purDate == '' || selectedProduct == '' ) {
-      alertify.set("notifier", "position", "top-right");
+      alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please make sure all fields are filled.");
+      let newNotification = {
+        message: `${storage.name} Please make sure all fields are filled`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
     }
-    if (productFormData.expireDate == '') {
+    else if (productFormData.expireDate == '') {
       $('#expiryDate').css('border', '1px solid red')
     }
 
-    if (productFormData.manufacturingDate == '') {
+    else if (productFormData.manufacturingDate == '') {
       $('#manufacturingDate').css('border', '1px solid red')
     }
 
-    if (productFormData.quantity == '') {
+    else if (productFormData.quantity == '') {
       $('#quantity').css('border', '1px solid red')
     }
 
-    if (productFormData.batchNumber == '') {
+    else if (productFormData.batchNumber == '') {
       $('#batchNumber').css('border', '1px solid red')
     }
 
-    if (productFormData.unitPrice == '') {
+    else if (productFormData.unitPrice == '') {
       $('#unitPrice').css('border', '1px solid red')
     }
 
-    if(selectedProduct == '' || selectedProduct == null){
+    else if(selectedProduct == '' || selectedProduct == null){
       $('#productName').css('border', '1px solid red')
     }
     
@@ -263,17 +281,34 @@ const AddPurchase = () => {
 
   const onSubmitPurchase = (data) => {
     if (productGridData.length < 1) {
-      alertify.set("notifier", "position", "top-right");
+      alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please add items to your cart");
+      let newNotification = {
+        message: `${storage.name} Please add items to your cart.`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
     }
     else if (supplier == '') {
-      alertify.set("notifier", "position", "top-right");
+      alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please make sure Supplier was selected.");
+
+      let newNotification = {
+        message: `${storage.name} Please make sure Supplier was selected.`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
       $('#supplier').css('border', '1px solid red')
     }
     else if (purDate == '') {
-      alertify.set("notifier", "position", "top-right");
-      alertify.warning("Please make sure purchaase date was selected.");
+      alertify.set("notifier", "position", "bottom-right");
+      alertify.warning("Please make sure purchase date was selected.");
+      let newNotification = {
+        message: `${storage.name} Please make sure purchase date was selected.`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
+
       $('#purDate').css('border', '1px solid red')
       setTimeout(() => {
         $('#purDate').css('border', '1px solid rgba(145, 158, 171, 0.32)')
@@ -329,11 +364,11 @@ const AddPurchase = () => {
 
   }, [suppliers, products])
 
-  let storage = JSON.parse(localStorage.getItem("auth"))
+
   useEffect(() => {
     if (!isError && isSubmitSuccessful) {
       console.log("res", data)
-      alertify.set("notifier", "position", "top-right");
+      alertify.set("notifier", "position", "bottom-right");
       alertify.success("Purchase added successfully.");
       
       let newNotification = {
@@ -344,7 +379,7 @@ const AddPurchase = () => {
       
     }
     else if (isError) {
-      alertify.set("notifier", "position", "top-right");
+      alertify.set("notifier", "position", "bottom-right");
       alertify.error("Error...Could not save purchase transaction");
   
       let newNotification = {

@@ -9,9 +9,10 @@ import Sidebar from "./Sidebar";
 export const NotificationsContext = createContext()
 
 const DefaultLayout =(props)=> {
+  let storage = JSON.parse(localStorage.getItem("auth"))
     const { match } = props;
     const [notifications, setNotifications] = useState([
-      { message: "Augustine Akoto welcome to Tinatett POS", time: '2023-08-09T15:29:01+0000'}
+      { message: `${storage.name} welcome to Tinatett POS`, time: new Date().toISOString()}
     ])
     
     useEffect(() => {

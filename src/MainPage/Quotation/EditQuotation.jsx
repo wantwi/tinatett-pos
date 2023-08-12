@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Select from "react-select";
 import "react-select2-wrapper/css/select2.css";
 import {
@@ -23,12 +23,13 @@ import "../../../node_modules/alertifyjs/build/css/alertify.css";
 import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
 import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 import { useLocation } from "react-router-dom/cjs/react-router-dom.min";
+import { NotificationsContext } from "../../InitialPage/Sidebar/DefaultLayout";
 
 
 
 const EditQuotation = () => {
   const {state} = useLocation()
-  console.log("State:", state)
+  //console.log("State:", state)
   const [id] = useState(state?.id)
   const [startDate, setStartDate] = useState((state?.requestDate));
   const [selectedProduct, setSelectedProduct] = useState('')
@@ -43,6 +44,9 @@ const EditQuotation = () => {
 
 
   const axios = useCustomApi()
+
+  const { notifications, setNotifications } = useContext(NotificationsContext)
+  let storage = JSON.parse(localStorage.getItem("auth"))
 
   
   useEffect(() => {
@@ -128,12 +132,26 @@ const EditQuotation = () => {
 
   const handleAddItem = () => {
     if(selectedProduct == null || selectedProduct == ''){
-      alertify.set("notifier", "position", "top-right");
+      alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please select a product first");
+
+      let newNotification = {
+        id: Math.ceil(Math.random()*1000000),
+        message: `${storage.name} Please select a product first`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
     }
     if(productFormData?.qty == ''){
-      alertify.set("notifier", "position", "top-right");
+      alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please provide a quantity first");
+
+      let newNotification = {
+        id: Math.ceil(Math.random()*1000000),
+        message: `${storage.name} Please provide a quantity first.`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
     }
     else{
       setProductGridData([...productGridData, productFormData])
@@ -147,8 +165,15 @@ const EditQuotation = () => {
 
   const handleSubmit = () => {
     if(productGridData.length <1){
-      alertify.set("notifier", "position", "top-right");
+      alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please add at least one product to the list");
+
+      let newNotification = {
+        id: Math.ceil(Math.random()*1000000),
+        message: `${storage.name} Please add at least one product to the list.`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
     }else{
       setLoading(true)
       const payload = {
@@ -166,14 +191,21 @@ const EditQuotation = () => {
       axios.put(`/productRequest/${id}`, payload)
       .then((res) => {
         if(res.data.success){
-          alertify.set("notifier", "position", "top-right");
+          alertify.set("notifier", "position", "bottom-right");
           alertify.success("Request updated.");
           setProductGridData([])
         }
       })
       .catch((err) => {
-        alertify.set("notifier", "position", "top-right");
+        alertify.set("notifier", "position", "bottom-right");
         alertify.error("Error. Failed to update request");
+
+        let newNotification = {
+          id: Math.ceil(Math.random()*1000000),
+          message: `${storage.name} Failed to update request due to an error.`,
+          time: new Date().toISOString()
+        }
+        setNotifications([...notifications, newNotification])
       })
       .finally(() => setLoading(false))
     }
@@ -267,8 +299,14 @@ const EditQuotation = () => {
                               setProductFormData({...productFormData, qty: ''})
                             }
                             if(Number(e.target.value) > (productFormData?.remainingStock)){
-                              alertify.set("notifier", "position", "top-right");
-                              alertify.warning('Amount can not be greater than amount due')
+                              alertify.set("notifier", "position", "bottom-right");
+                              alertify.warning('Amount can not be greater than amount in stock')
+                              let newNotification = {
+                                id: Math.ceil(Math.random()*1000000),
+                                message: `${storage.name} Amount can not be greater than amount in stock.`,
+                                time: new Date().toISOString()
+                              }
+                              setNotifications([...notifications, newNotification])
                             }
                             else{
                               let qty = parseInt(e.target.value) || 0

@@ -108,11 +108,11 @@ const EditProforma = () => {
 
   useEffect(() => {
     if (!isPostError && isSubmitSuccessful) {
-      alertify.set("notifier", "position", "top-right");
+      alertify.set("notifier", "position", "bottom-right");
       alertify.success("Proforma saved successfully.");
     }
     else if (isPostError) {
-      alertify.set("notifier", "position", "top-right");
+      alertify.set("notifier", "position", "bottom-right");
       alertify.error("Error...Could not save.");
     }
 
@@ -163,7 +163,7 @@ const EditProforma = () => {
 
     }
     if (item.amount < 1 || formData.unitPrice == '' || item.productName == '' || selectedCustomer == '') {
-      alertify.set("notifier", "position", "top-right");
+      alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please make sure all fields are filled.");
     }
     else {
@@ -184,7 +184,7 @@ const EditProforma = () => {
   const onSubmit = () => {
 
     if (productGridData.length < 1) {
-      alertify.set("notifier", "position", "top-right");
+      alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please add at least one item to list before saving.");
     }
     else {
@@ -207,7 +207,7 @@ const EditProforma = () => {
         setTransDate('')
       }
       else {
-        alertify.set("notifier", "position", "top-right");
+        alertify.set("notifier", "position", "bottom-right");
         alertify.success("Proforma updated successfully.");
       }
 
@@ -335,7 +335,7 @@ const EditProforma = () => {
                             <input className="form-check-input" type="radio" name="customerType" value={selectedProduct?.retailPrice} ref={retailpriceTypeRef}
                               onChange={(e) => {
                                 if (selectedProduct == '') {
-                                  alertify.set("notifier", "position", "top-right");
+                                  alertify.set("notifier", "position", "bottom-right");
                                   alertify.warning("Please select a product first.");
                                   retailpriceTypeRef.current.checked = false
                                 } else {
@@ -356,7 +356,7 @@ const EditProforma = () => {
                             <input className="form-check-input" type="radio" name="customerType" value={selectedProduct?.wholeSalePrice} ref={wholesalepriceTypeRef}
                               onChange={(e) => {
                                 if (selectedProduct == '') {
-                                  alertify.set("notifier", "position", "top-right");
+                                  alertify.set("notifier", "position", "bottom-right");
                                   alertify.warning("Please select a product first.");
                                   wholesalepriceTypeRef.current.checked = false
                                 } else {
@@ -379,7 +379,7 @@ const EditProforma = () => {
                             <input className="form-check-input" type="radio" name="customerType" value={selectedProduct?.specialPrice} ref={specialpriceTypeRef}
                               onChange={(e) => {
                                 if (selectedProduct == '') {
-                                  alertify.set("notifier", "position", "top-right");
+                                  alertify.set("notifier", "position", "bottom-right");
                                   alertify.warning("Please select a product first.");
                                   specialpriceTypeRef.current.checked = false
                                 } else {

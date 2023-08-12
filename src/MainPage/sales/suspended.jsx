@@ -164,13 +164,13 @@ const Suspended = () => {
             if (print) {
               getInvoiceReceipt(modalData.Reference)
             }
-            alertify.set("notifier", "position", "top-right");
+            alertify.set("notifier", "position", "bottom-right");
             alertify.success("Sale completed.");
 
           }
         })
         .catch((error) => {
-          alertify.set("notifier", "position", "top-right");
+          alertify.set("notifier", "position", "bottom-right");
           alertify.error("Error...Could not complete transaction");
         })
         .finally(() => {
@@ -199,7 +199,7 @@ const Suspended = () => {
         })
     }
     else {
-      alertify.set("notifier", "position", "top-right");
+      alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please enter an amount first");
     }
 

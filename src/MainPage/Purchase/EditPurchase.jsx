@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import {
   Calendar,
   Plus,
@@ -24,6 +24,7 @@ import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
 import Select from "react-select";
 import Swal from "sweetalert2";
 import useCustomApi from "../../hooks/useCustomApi";
+import { NotificationsContext } from "../../InitialPage/Sidebar/DefaultLayout";
 
 
 const EditPurchase = () => {
@@ -54,6 +55,9 @@ const EditPurchase = () => {
   const [editFormData, setEditFormData] = useState({ id:'', unitPrice: '', quantity: '', amount: '', manufacturingDate:'', expireDate:''})
   const [productList, setProductList] = useState([])
 
+  const { notifications, setNotifications } = useContext(NotificationsContext)
+  let storage = JSON.parse(localStorage.getItem("auth"))
+
   const axios = useCustomApi()
 
   const handleProductSelect = (e) => {
@@ -64,8 +68,14 @@ const EditPurchase = () => {
 
   const handleAddItem = () => {
     if(productFormData.expireDate == '' || productFormData.manufacturingDate == '' || manDate == '' || expDate == '' || productFormData.quantity == '' || productFormData.unitPrice == ''){
-      alertify.set("notifier", "position", "top-right");
+      alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please make sure all fields are filled.");
+
+      let newNotification = {
+        message: `${storage.name} Please make sure all fields are filled.`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
     }
     else{
       
@@ -106,8 +116,14 @@ const EditPurchase = () => {
         
       }
       else if(res.data.statusText == 'Deny Purchase'){
-        alertify.set("notifier", "position", "top-right");
+        alertify.set("notifier", "position", "bottom-right");
         alertify.warning(res.data.message);
+
+        let newNotification = {
+          message: `${storage.name} ${res.data.message}`,
+          time: new Date().toISOString()
+        }
+        setNotifications([...notifications, newNotification])
         setProductFormData({ ...productFormData, batchNumber:'' })
       }
     })
@@ -199,15 +215,21 @@ const EditPurchase = () => {
 
   useEffect(() => {
     if (!isError && isSubmitSuccessful) {
-      alertify.set("notifier", "position", "top-right");
+      alertify.set("notifier", "position", "bottom-right");
       alertify.success("Purchase updated successfully.");
       setTimeout(() => {
         history.push('/tinatett-pos/purchase/purchaselist')
       })
     }
     else if(isError){
-      alertify.set("notifier", "position", "top-right");
+      alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Failed to update");
+
+      let newNotification = {
+        message: `${storage.name} Failed to update.`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
     }
     return () => {};
   }, [isError, isSubmitSuccessful]);

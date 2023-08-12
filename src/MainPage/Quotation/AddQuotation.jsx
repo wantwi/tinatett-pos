@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Select from "react-select";
 import "react-select2-wrapper/css/select2.css";
 import {
@@ -22,6 +22,7 @@ import alertify from "alertifyjs";
 import "../../../node_modules/alertifyjs/build/css/alertify.css";
 import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
 import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
+import { NotificationsContext } from "../../InitialPage/Sidebar/DefaultLayout";
 
 
 
@@ -84,21 +85,35 @@ const AddQuotation = () => {
     },
   ];
 
+  const { notifications, setNotifications } = useContext(NotificationsContext)
+  let storage = JSON.parse(localStorage.getItem("auth"))
 
   const handleProductSelect = (e) => {
-    console.log("Product:", e)
+    //console.log("Product:", e)
     setSelectedProduct(e)
     setProductFormData({ ...productFormData, productName: e.label, productId: e.value, remainingStock: e.remainingStock })
   }
 
   const handleAddItem = () => {
     if(selectedProduct == null || selectedProduct == ''){
-      alertify.set("notifier", "position", "top-right");
+      alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please select a product first");
+      let newNotification = {
+        id: Math.ceil(Math.random()*1000000),
+        message: `${storage.name} Please select a product first`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
     }
-    if(productFormData?.qty == ''){
-      alertify.set("notifier", "position", "top-right");
+    else if(productFormData?.qty == ''){
+      alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please provide a quantity first");
+      let newNotification = {
+        id: Math.ceil(Math.random()*1000000),
+        message: `${storage.name} Please provide a quantity first.`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
     }
     else{
       setProductGridData([...productGridData, productFormData])
@@ -131,8 +146,14 @@ const AddQuotation = () => {
   const handleSubmit = () => {
 
       if(productGridData.length <1){
-        alertify.set("notifier", "position", "top-right");
+        alertify.set("notifier", "position", "bottom-right");
         alertify.warning("Please add at least one product to the list");
+        let newNotification = {
+          id: Math.ceil(Math.random()*1000000),
+          message: `${storage.name} Please add at least one product to the list.`,
+          time: new Date().toISOString()
+        }
+        setNotifications([...notifications, newNotification])
       }
     else{
       setLoading(true)
@@ -151,8 +172,14 @@ const AddQuotation = () => {
       axios.post('/productRequest', payload)
       .then((res) => {
         if(res.data.success){
-          alertify.set("notifier", "position", "top-right");
+          alertify.set("notifier", "position", "bottom-right");
           alertify.success("Request successfully sent.");
+          let newNotification = {
+            id: Math.ceil(Math.random()*1000000),
+            message: `${storage.name} Request successfully sent.`,
+            time: new Date().toISOString()
+          }
+          setNotifications([...notifications, newNotification])
           setProductGridData([])
         }
       })

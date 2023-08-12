@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import {
   Calendar,
   Plus,
@@ -21,10 +21,11 @@ import "../../../node_modules/alertifyjs/build/css/alertify.css";
 import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
 import Select from "react-select";
 import FeatherIcon from 'feather-icons-react'
+import { NotificationsContext } from "../../InitialPage/Sidebar/DefaultLayout";
 
 const AddExpense = () => {
-  const [expenseDate, setExpenseDate] = useState(new Date().toISOString().substring(0,10));
-  const [formData, setFormData] = useState({expenseFor:'', description:'', amount:'', category:''})
+  const [expenseDate, setExpenseDate] = useState(new Date().toISOString().substring(0, 10));
+  const [formData, setFormData] = useState({ expenseFor: '', description: '', amount: '', category: '' })
   const [editFormData, setEditFormData] = useState({ amount: '', quantity: '', price: '' })
   const [isLoading, setIsLoading] = useState(false)
   const [listData, setProductGridData] = useState([])
@@ -65,9 +66,11 @@ const AddExpense = () => {
 
   const axios = useCustomApi();
 
+  const { notifications, setNotifications } = useContext(NotificationsContext)
+
 
   const handleTypeChange = (e) => {
-    setFormData({...formData, category: e.target.value})
+    setFormData({ ...formData, category: e.target.value })
   }
 
   const handleAddItem = () => {
@@ -79,31 +82,63 @@ const AddExpense = () => {
       description: formData?.description,
       amount: formData.amount
     }
-    console.log(item)
-   
-     if (formData.category == '') {
-      alertify.set("notifier", "position", "top-right");
+    //console.log(item)
+
+    if (item.category == '' || item.category == undefined) {
+      alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please make sure category is selected.");
       $('#category').css('border', '1px solid red')
+
+      let storage = JSON.parse(localStorage.getItem("auth"))
+      let newNotification = {
+        id: Math.ceil(Math.random()*1000000),
+        message: `${storage.name} Please make sure category is selected.`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
     }
-     if (item.expenseDate == '') {
-      alertify.set("notifier", "position", "top-right");
+    else if (item.expenseDate == '') {
+      alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please make sure you select a date.");
       $('#expenseDate').css('border', '1px solid red')
+
+      let storage = JSON.parse(localStorage.getItem("auth"))
+      let newNotification = {
+        id: Math.ceil(Math.random()*1000000),
+        message: `${storage.name} Please make sure you select a date.`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
     }
-     if (item.expenseFor == '' || item.expenseFor == undefined) {
-      alertify.set("notifier", "position", "top-right");
+    else if (item.expenseFor == '' || item.expenseFor == undefined) {
+      alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please make sure you selected type of expense");
       $('#expenseFor').css('border', '1px solid red')
+
+      let storage = JSON.parse(localStorage.getItem("auth"))
+      let newNotification = {
+        id: Math.ceil(Math.random()*1000000),
+        message: `${storage.name} Please make sure you selected type of expense.`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
     }
-     if (formData.amount < 1 || formData.amount == "" ) {
-      alertify.set("notifier", "position", "top-right");
+    else if (formData.amount < 1 || formData.amount == "") {
+      alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please make you enter amount.");
       $('#amount').css('border', '1px solid red')
+
+      let storage = JSON.parse(localStorage.getItem("auth"))
+      let newNotification = {
+        id: Math.ceil(Math.random()*1000000),
+        message: `${storage.name} Please make you enter amount.`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
     }
     else {
       setProductGridData([...listData, item])
-      setFormData({ expenseFor:'', description:'', amount:'', category:''})
+      setFormData({ expenseFor: '', description: '', amount: '', category: '' })
       directorRef.current.checked = false
       productionRef.current.checked = false
       shopRef.current.checked = false
@@ -120,36 +155,49 @@ const AddExpense = () => {
     let payload = {
       expenseList: listData.map((item) => {
         return {
-            "category": item.category,
-            "expenseDate": item.expenseDate,
-            "amount": item.amount,
-            "expenseFor":item.expenseFor,
-            "description": item.description
+          "category": item.category,
+          "expenseDate": item.expenseDate,
+          "amount": item.amount,
+          "expenseFor": item.expenseFor,
+          "description": item.description
         }
       })
     }
 
-    setIsLoading(true)
-    axios.post('/expense',payload)
-    .then((res) => {
-     
-      if(res.data.success){
-        alertify.set("notifier", "position", "top-right");
-        alertify.success("Expense successfully added.");
-        setIsLoading(false)
-        setProductGridData([])
+    if(!listData.length > 0){
+      alertify.set("notifier", "position", "bottom-right");
+      alertify.warning("Please make sure you've added expenses.");
+      let storage = JSON.parse(localStorage.getItem("auth"))
+      let newNotification = {
+        id: Math.ceil(Math.random()*1000000),
+        message: `${storage.name} Please make sure you've added expenses.`,
+        time: new Date().toISOString()
       }
-    })
-    .catch((error) => {
-      alertify.set("notifier", "position", "top-right");
-      alertify.error("Error...Could not complete transaction");
-      setIsLoading(false)
-    })
-    .finally(() => {
-      setFormData({amount:'', description:'', expenseFor:'', category:''})
-      setStartDate(new Date().toISOString().substring(0,10))
-      setIsLoading(false)
-    })
+      setNotifications([...notifications, newNotification])
+    }
+    else{
+    setIsLoading(true)
+    axios.post('/expense', payload)
+      .then((res) => {
+
+        if (res.data.success) {
+          alertify.set("notifier", "position", "bottom-right");
+          alertify.success("Expense successfully added.");
+          setIsLoading(false)
+          setProductGridData([])
+        }
+      })
+      .catch((error) => {
+        alertify.set("notifier", "position", "bottom-right");
+        alertify.error("Error...Could not complete transaction");
+        setIsLoading(false)
+      })
+      .finally(() => {
+        setFormData({ amount: '', description: '', expenseFor: '', category: '' })
+        setStartDate(new Date().toISOString().substring(0, 10))
+        setIsLoading(false)
+      })
+    }
   }
 
   useEffect(() => {
@@ -169,8 +217,8 @@ const AddExpense = () => {
   }, [formData.expenseFor.label])
 
 
-  if(isLoading){
-    return <LoadingSpinner message="Adding expense.."/>
+  if (isLoading) {
+    return <LoadingSpinner message="Adding expense.." />
   }
 
   return (
@@ -184,144 +232,144 @@ const AddExpense = () => {
             </div>
           </div>
 
-          <div style={{display:'flex', gap:20}}>
-              <div className="card" style={{width: '40%'}}>
-                <div className="card-body">
-                  <div  className="row">
-                    <div className="col-lg-6 col-sm-6 col-12">
-                      <div className="form-group">
-                        <label>Expense Date </label>
-                        <div className="input-groupicon">
-                          <input type="date" className="form-control" id="expenseDate"
-                            value={expenseDate}
-                            onChange={(e) => setExpenseDate(e.target.value)}
-                          />
-                        </div>
+          <div style={{ display: 'flex', gap: 20 }}>
+            <div className="card" style={{ width: '40%' }}>
+              <div className="card-body">
+                <div className="row">
+                  <div className="col-lg-6 col-sm-6 col-12">
+                    <div className="form-group">
+                      <label>Expense Date </label>
+                      <div className="input-groupicon">
+                        <input type="date" className="form-control" id="expenseDate"
+                          value={expenseDate}
+                          onChange={(e) => setExpenseDate(e.target.value)}
+                        />
                       </div>
                     </div>
                   </div>
+                </div>
 
-                  <div className="row">
-                    <div className="col-lg-12 col-sm-12 col-12">
-                      <div className="form-group">
-                        <label>Expense Category</label>
-                        <div className="row" id="category">
-                          <div className="col-lg-6">
-                            <div className="input-group">
-                              <div className="input-group-text">
-                                <input className="form-check-input" type="radio" ref={shopRef}  name="category" value={'Shop Related'}  onChange={handleTypeChange} />
-                              </div>
-                              <input type="text" className="form-control" aria-label="Text input with radio button" value={'Shop Related'} />
+                <div className="row">
+                  <div className="col-lg-12 col-sm-12 col-12">
+                    <div className="form-group">
+                      <label>Expense Category</label>
+                      <div className="row" id="category">
+                        <div className="col-lg-6">
+                          <div className="input-group">
+                            <div className="input-group-text">
+                              <input className="form-check-input" type="radio" ref={shopRef} name="category" value={'Shop Related'} onChange={handleTypeChange} />
                             </div>
+                            <input type="text" className="form-control" aria-label="Text input with radio button" value={'Shop Related'} />
+                          </div>
+                        </div>
+
+                        <div className="col-lg-6">
+                          <div className="input-group">
+                            <div className="input-group-text">
+                              <input className="form-check-input" type="radio" ref={companyRef} name="category" value={'Company'} onChange={handleTypeChange} />
+                            </div>
+                            <input type="text" className="form-control" aria-label="Text input with radio button" value={'Company'} />
+                          </div>
+                        </div>
+
+                        <br /><br />
+
+                        <div className="col-lg-6">
+
+                          <div className="input-group">
+                            <div className="input-group-text">
+                              <input className="form-check-input" type="radio" ref={productionRef} name="category" value={'Production'} onChange={handleTypeChange} />
+                            </div>
+                            <input type="text" className="form-control" aria-label="Text input with radio button" value={'Production'} />
                           </div>
 
-                          <div className="col-lg-6">
-                            <div className="input-group">
-                              <div className="input-group-text">
-                                <input className="form-check-input" type="radio" ref={companyRef}  name="category" value={'Company'}  onChange={handleTypeChange}/>
-                              </div>
-                              <input type="text" className="form-control" aria-label="Text input with radio button" value={'Company'} />
-                            </div>
-                          </div> 
+                        </div>
 
-                          <br/><br/>
-
-                          <div className="col-lg-6">
-
-                            <div className="input-group">
-                              <div className="input-group-text">
-                                <input className="form-check-input" type="radio" ref={productionRef}  name="category" value={'Production'}   onChange={handleTypeChange}/>
-                              </div>
-                              <input type="text" className="form-control" aria-label="Text input with radio button" value={'Production'} />
-                            </div>
-
-                          </div>
-
-                          <div className="col-lg-6">
+                        <div className="col-lg-6">
                           <div className="input-group">
                             <div className="input-group-text">
                               <input className="form-check-input" type="radio" ref={directorRef} name="category" value={'Director'} onChange={handleTypeChange} />
                             </div>
                             <input type="text" className="form-control" aria-label="Text input with radio button" value={'Director'} />
                           </div>
-                          </div>
                         </div>
                       </div>
                     </div>
-                  
                   </div>
 
-
-                  <div className="row">
-
-                          <div className="form-group">
-                            <label>Type of Expense</label>
-                            <div className="row">
-                              <div className="col-lg-12 col-sm-12 col-12">
-                              <Select style={{width:'100%'}}
-                              id="expenseFor"
-                              className="select"
-                              options={options}
-                              value={formData.expenseFor}
-                              onChange={(e) => setFormData({...formData, expenseFor: e})}
-                            
-                            />
-                              </div>
-
-                            </div>
-                          </div>
-                      
-                  </div>
-
-
-                  <div className="row">
-                    <div className="col-lg-12">
-                      <div className="form-group">
-                        <label>Description</label>
-                        <textarea id="description" className="form-control" value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})}/>
-                      </div>
-                  </div>
-
-                  <div  className="row" style={{}}>
-                      <div className="col-lg-6 col-sm-6 col-12">
-                          <div className="form-group">
-                            <label>Amount</label>
-                            <div className="input-groupicon">
-                              <input type="text" 
-                              id="amount"
-                              value={formData?.amount}
-                              onChange={(e) => {
-                                if(e.target.value == ''){
-                                  setFormData({...formData, amount: ''})
-                                }
-                                else if (isValidNumber(e.target.value)) {
-                                  let amt = parseInt(e.target.value) 
-                                  setFormData({ ...formData, amount:amt})
-                                }
-                              }}
-                              />
-                            
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="col-lg-6" style={{display:'flex', justifyContent:'flex-end'}}>
-                            <button style={{height:50,  marginTop:30}} className="btn btn-submit me-2" onClick={handleAddItem}>Add Expenses</button>
-                    
-                        </div>
-                  </div>
-
-                  
-                  </div>
-
-                
-
-                
                 </div>
+
+
+                <div className="row">
+
+                  <div className="form-group">
+                    <label>Type of Expense</label>
+                    <div className="row">
+                      <div className="col-lg-12 col-sm-12 col-12">
+                        <Select style={{ width: '100%' }}
+                          id="expenseFor"
+                          className="select"
+                          options={options}
+                          value={formData.expenseFor}
+                          onChange={(e) => setFormData({ ...formData, expenseFor: e })}
+
+                        />
+                      </div>
+
+                    </div>
+                  </div>
+
+                </div>
+
+
+                <div className="row">
+                  <div className="col-lg-12">
+                    <div className="form-group">
+                      <label>Description</label>
+                      <textarea id="description" className="form-control" value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} />
+                    </div>
+                  </div>
+
+                  <div className="row" style={{}}>
+                    <div className="col-lg-6 col-sm-6 col-12">
+                      <div className="form-group">
+                        <label>Amount</label>
+                        <div className="input-groupicon">
+                          <input type="text"
+                            id="amount"
+                            value={formData?.amount}
+                            onChange={(e) => {
+                              if (e.target.value == '') {
+                                setFormData({ ...formData, amount: '' })
+                              }
+                              else if (isValidNumber(e.target.value)) {
+                                let amt = parseInt(e.target.value)
+                                setFormData({ ...formData, amount: amt })
+                              }
+                            }}
+                          />
+
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="col-lg-6" style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                      <button style={{ height: 50, marginTop: 30 }} className="btn btn-submit me-2" onClick={handleAddItem}>Add Expenses</button>
+
+                    </div>
+                  </div>
+
+
+                </div>
+
+
+
+
               </div>
+            </div>
 
 
-              <div className="card" style={{width:'60%'}}>
+            <div className="card" style={{ width: '60%' }}>
               <div className="card-body">
                 <div className="row">
                   <div className="table-responsive mb-3">
@@ -365,7 +413,7 @@ const AddExpense = () => {
                 <div className="row">
                   <div className="col-lg-6 ">
                     <div className="total-order w-100 max-widthauto m-auto mb-4">
-                     
+
                     </div>
                   </div>
                   <div className="col-lg-6 ">
@@ -387,16 +435,16 @@ const AddExpense = () => {
                   <button type="submit" className="btn btn-submit me-2" onClick={handleSubmit}><FeatherIcon icon="save" />
                     {" Save Expenses"}
                   </button>
-                  
+
                   <Link to="/tinatett-pos/proforma/proformalist" className="btn btn-cancel">
                     Cancel
                   </Link>
                 </div>
-              
-            </div>
+
               </div>
+            </div>
           </div>
-         
+
         </div>
       </div>
     </>

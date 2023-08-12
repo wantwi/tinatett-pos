@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -31,6 +31,7 @@ import useCustomApi from "../../hooks/useCustomApi";
 import { BASE_URL } from "../../api/CustomAxios";
 import { usePost } from "../../hooks/usePost";
 import { LoadingOutlined } from "@ant-design/icons";
+import { NotificationsContext } from "../../InitialPage/Sidebar/DefaultLayout";
 
 
 const TransferProformaItems = () => {
@@ -72,6 +73,15 @@ const TransferProformaItems = () => {
   const [wholesaleprice, setWholesalePrice] = useState('')
   const [specialprice, setSpecialPrice] = useState('')
   const [isSaving, setIsSaving] = useState(false)
+
+  const { notifications, setNotifications } = useContext(NotificationsContext)
+  let storage = JSON.parse(localStorage.getItem("auth"))
+
+  //draggable modal
+  // $(".modal").draggable({
+  //   handle: ".modal-header"
+  // });
+
 
 
   useEffect(() => {
@@ -243,8 +253,15 @@ const TransferProformaItems = () => {
 
     }
     if (item.amount < 1 || formData.unitPrice == '' || item.productName == '') {
-      alertify.set("notifier", "position", "top-right");
+      alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please make sure all fields are filled.");
+
+      let newNotification = {
+        id: Math.ceil(Math.random()*1000000),
+        message: `${storage.name} Please make sure all fields are filled.`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
     }
     else {
 
@@ -277,20 +294,39 @@ const TransferProformaItems = () => {
     
     productGridData.forEach((item) => {
       if(item.batchNumber == undefined || item.batchNumber == 'undefined' || item.batchNumber == ''){
-        alertify.set("notifier", "position", "top-right");
+        alertify.set("notifier", "position", "bottom-right");
         alertify.warning("Please provide a batch number before saving.");
 
+        let newNotification = {
+          id: Math.ceil(Math.random()*1000000),
+          message: `${storage.name} Please provide a batch number before saving.`,
+          time: new Date().toISOString()
+        }
+        setNotifications([...notifications, newNotification])
         return
       }
     })
 
     if (productGridData.length < 1) {
-      alertify.set("notifier", "position", "top-right");
+      alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please add at least one item to list before saving.");
+      let newNotification = {
+        id: Math.ceil(Math.random()*1000000),
+        message: `${storage.name} Please add at least one item to list before saving.`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
     }
     if(selectedCustomer == ''){
-      alertify.set("notifier", "position", "top-right");
+      alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please select a branch before saving.");
+
+      let newNotification = {
+        id: Math.ceil(Math.random()*1000000),
+        message: `${storage.name} Please select a branch before saving.`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
       $('#branch').css('border', '1px solid red')
       setTimeout(() => {
         $('#branch').css('border', '1px solid rgba(145, 158, 171, 0.32)')
@@ -310,8 +346,16 @@ const TransferProformaItems = () => {
       axios.post('/transfer', postBody)
       .then((res) => {
         if(res.data.success){
-          alertify.set("notifier", "position", "top-right");
+          alertify.set("notifier", "position", "bottom-right");
           alertify.success("Transfer completed successfully.");
+
+          let newNotification = {
+            id: Math.ceil(Math.random()*1000000),
+            message: `${storage.name} Transfer completed successfully.`,
+            time: new Date().toISOString()
+          }
+          setNotifications([...notifications, newNotification])
+          
            //delete proforma
            axios.delete(`/proforma/${id}`).then((res) => console.log(res))
           setTimeout(() => {
@@ -323,14 +367,30 @@ const TransferProformaItems = () => {
           }, 500)
         }
         else{
-          alertify.set("notifier", "position", "top-right");
+          alertify.set("notifier", "position", "bottom-right");
           alertify.error("Error...Could not complete transfer.");
+
+          let newNotification = {
+            id: Math.ceil(Math.random()*1000000),
+            message: `${storage.name} Error...Could not complete transfer.`,
+            time: new Date().toISOString()
+          }
+          setNotifications([...notifications, newNotification])
         }
       })
       .catch((error) => {
         console.log(error)
-        alertify.set("notifier", "position", "top-right");
+        alertify.set("notifier", "position", "bottom-right");
         alertify.error("Error...Could not complete transfer.");
+
+        let newNotification = {
+          id: Math.ceil(Math.random()*1000000),
+          message: `${storage.name} Error...Could not complete transfer.`,
+          time: new Date().toISOString()
+        }
+        setNotifications([...notifications, newNotification])
+        
+        
       })
       .finally(() => setIsSaving(false))
       
@@ -356,8 +416,15 @@ const TransferProformaItems = () => {
   useEffect(() => {
     setFormData({ ...formData, amount: Number(formData.price) * Number(formData.quantity) || '' })
     if(Number(formData?.quantity) > selectedProduct?.totalQuantity){
-      alertify.set("notifier", "position", "top-right");
+      alertify.set("notifier", "position", "bottom-right");
       alertify.warning("You can not transfer more than stock available.");
+
+      let newNotification = {
+        id: Math.ceil(Math.random()*1000000),
+        message: `${storage.name} You can not transfer more than stock available.`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
       setFormData(({...formData, quantity:''}))
     }
 
@@ -487,7 +554,7 @@ const TransferProformaItems = () => {
                           disabled
 
                         />
-                        <Link className="addonset">
+                        <Link to="#" className="addonset">
                           <img src={Calendar} alt="img" />
                         </Link>
                       </div>
@@ -504,7 +571,7 @@ const TransferProformaItems = () => {
                           disabled
 
                         />
-                        <Link className="addonset">
+                        <Link to="#" className="addonset">
                           <img src={Calendar} alt="img" />
                         </Link>
                       </div>
@@ -762,6 +829,7 @@ const TransferProformaItems = () => {
             tabIndex={-1}
             aria-labelledby="editproduct"
             aria-hidden="true"
+            draggable
           >
             <div className="modal-dialog modal-md modal-dialog-centered">
               <div className="modal-content">

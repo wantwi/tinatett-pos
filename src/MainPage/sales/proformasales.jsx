@@ -103,6 +103,7 @@ const ProformaSales = () => {
 
   const axios = useCustomApi()
   const { notifications, setNotifications } = useContext(NotificationsContext)
+  let storage = JSON.parse(localStorage.getItem("auth"))
 
   const deleteRow = (record) => {
     //console.log(record, i)
@@ -196,12 +197,25 @@ const ProformaSales = () => {
 
 
     if (productGridData.length < 1) {
-      alertify.set("notifier", "position", "top-right");
+      alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please add at least one item to list before saving.");
+
+      let newNotification = {
+        id: Math.ceil(Math.random()*1000000),
+        message: `${storage.name} Please add at least one item to list before saving.`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
     }
     if (paymentInfo.amountPaid == '' || paymentInfo.amountPaid < 1 || paymentInfo.amountPaid == null) {
-      alertify.set("notifier", "position", "top-right");
+      alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please provide payment amount before saving.");
+      let newNotification = {
+        id: Math.ceil(Math.random()*1000000),
+        message: `${storage.name} Please provide payment amount before saving.`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
     }
 
     else {
@@ -280,9 +294,9 @@ const ProformaSales = () => {
                   if (print) {
                     getInvoiceReceipt(payload.salesRef)
                   }
-                  alertify.set("notifier", "position", "top-right");
+                  alertify.set("notifier", "position", "bottom-right");
                   alertify.success("Sale completed.");
-                  let storage = JSON.parse(localStorage.getItem("auth"))
+                 
                   let newNotification = {
                     message: `${storage.name} completed a sale with reference ${payload.salesRef}`,
                     time: new Date().toISOString()
@@ -292,8 +306,14 @@ const ProformaSales = () => {
                 }
               })
               .catch((error) => {
-                alertify.set("notifier", "position", "top-right");
+                alertify.set("notifier", "position", "bottom-right");
                 alertify.error("Error...Could not complete transaction");
+                let newNotification = {
+                  id: Math.ceil(Math.random()*1000000),
+                  message: `${storage.name} Error...Could not complete transaction.`,
+                  time: new Date().toISOString()
+                }
+                setNotifications([...notifications, newNotification])
               })
               .finally(() => {
                 setPaymentInfo({
@@ -321,13 +341,25 @@ const ProformaSales = () => {
 
           }
           else {
-            alertify.set("notifier", "position", "top-right");
+            alertify.set("notifier", "position", "bottom-right");
             alertify.warning("Unsuccessful, please try again");
+            let newNotification = {
+              id: Math.ceil(Math.random()*1000000),
+              message: `${storage.name} Unsuccessful, please try again.`,
+              time: new Date().toISOString()
+            }
+            setNotifications([...notifications, newNotification])
           }
         })
         .catch((error) => {
-          alertify.set("notifier", "position", "top-right");
-          alertify.error("Some error occured. Please contact admin");
+          alertify.set("notifier", "position", "bottom-right");
+          alertify.error("Internal server error occured. Please contact admin");
+          let newNotification = {
+            id: Math.ceil(Math.random()*1000000),
+            message: `${storage.name} Internal server error occured. Please contact admin.`,
+            time: new Date().toISOString()
+          }
+          setNotifications([...notifications, newNotification])
         })
         .finally(() => {
           setIsSaving(false)
@@ -420,14 +452,14 @@ const ProformaSales = () => {
           setSelectedProduct('')
           setInvoiceNo('')
 
-          alertify.set("notifier", "position", "top-right");
+          alertify.set("notifier", "position", "bottom-right");
           alertify.success("Suspended successfully");
 
           //delete proforma on suspend
           axios.delete(`/proforma/${id}`).then((res) => console.log(res))
           setReferenceData(res.data)
 
-          let storage = JSON.parse(localStorage.getItem("auth"))
+    
           let newNotification = {
             message: `${storage.name} completed a sale with reference ${res.data.reference}`,
             time: new Date().toISOString()
@@ -436,13 +468,27 @@ const ProformaSales = () => {
 
         }
         else {
-          alertify.set("notifier", "position", "top-right");
+          alertify.set("notifier", "position", "bottom-right");
           alertify.warning("Suspend unsuccessful");
+
+          let newNotification = {
+            id: Math.ceil(Math.random()*1000000),
+            message: `${storage.name} Suspend unsuccessful`,
+            time: new Date().toISOString()
+          }
+          setNotifications([...notifications, newNotification])
         }
       })
       .catch((error) => {
-        alertify.set("notifier", "position", "top-right");
-        alertify.error("Some error occured. Please contact admin");
+        alertify.set("notifier", "position", "bottom-right");
+        alertify.error("Internal server error occured. Please contact admin");
+
+        let newNotification = {
+          id: Math.ceil(Math.random()*1000000),
+          message: `${storage.name} Internal server error occured. Please contact admin.`,
+          time: new Date().toISOString()
+        }
+        setNotifications([...notifications, newNotification])
       })
       .finally(() => {
         setIsSaving(false)
@@ -467,21 +513,48 @@ const ProformaSales = () => {
       amount: formData.quantity * price
     }
     if (!obj.name) {
-      alertify.set("notifier", "position", "top-right");
+      alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please select a product.");
+      let newNotification = {
+        id: Math.ceil(Math.random()*1000000),
+        message: `${storage.name} Please select a product`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
       $('#selectedProduct').css('border', '1px solid red')
+      // setTimeout(() => {
+      //   $('#selectedProduct').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+      // }, 3000)
     }
 
-    if (selectedCustomer == '' || selectedCustomer == null) {
-      alertify.set("notifier", "position", "top-right");
+    else if (selectedCustomer == '' || selectedCustomer == null) {
+      alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please select a customer.");
+      let newNotification = {
+        id: Math.ceil(Math.random()*1000000),
+        message: `${storage.name} Please select a customer.`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
       $('#selectedCustomer').css('border', '1px solid red')
+      // setTimeout(() => {
+      //   $('#selectedCustomer').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+      // }, 3000)
     }
 
-    if (obj.quantity == '') {
-      alertify.set("notifier", "position", "top-right");
+    else if ( obj.quantity == '') {
+      alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please enter quantity.");
+      let newNotification = {
+        id: Math.ceil(Math.random()*1000000),
+        message: `${storage.name} Please enter quantity.`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
       $('#quantity').css('border', '1px solid red')
+      // setTimeout(() => {
+      //   $('#quantity').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+      // }, 3000)
     }
     else {
       setProductGridData([...productGridData, obj])
@@ -858,7 +931,7 @@ const ProformaSales = () => {
                               setFormData({ ...formData, quantity: '' })
                             }
                             if (Number(e.target.value) > (selectedProduct?.remainingStock)) {
-                              alertify.set("notifier", "position", "top-right");
+                              alertify.set("notifier", "position", "bottom-right");
                               alertify.warning('Quantity can not be greater than quantity in stock')
                             }
                             else if (isValidNumber(e.target.value)) {

@@ -66,14 +66,14 @@ const EditProduct = () => {
   useEffect(() => {
     if (isSubmitSuccessful && !isError) {
       reset();
-      alertify.set("notifier", "position", "top-right");
+      alertify.set("notifier", "position", "bottom-right");
       alertify.success("Product updated successfully.");
       setTimeout(() => {
         window.location = '/tinatett-pos/product/productlist'
       },1500)
     }
     else if(isError){
-      alertify.set("notifier", "position", "top-right");
+      alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Failed to update");
     }
     return () => {};

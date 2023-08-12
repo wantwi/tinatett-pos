@@ -81,17 +81,17 @@ const ProformaList = () => {
     .then((res) => {
       console.log(res.data)
       if(res.data.success){
-        alertify.set("notifier", "position", "top-right");
+        alertify.set("notifier", "position", "bottom-right");
         alertify.success("Transfer sent successfully.");
 //$('#transfer').modal('hide');
       }
       else{
-        alertify.set("notifier", "position", "top-right");
+        alertify.set("notifier", "position", "bottom-right");
         alertify.error("Transfer failed. Please try again");
       }
     })
     .catch((error) => {
-      alertify.set("notifier", "position", "top-right");
+      alertify.set("notifier", "position", "bottom-right");
       alertify.error("Transfer failed. Please try again");
       //$('#transfer').modal('hide');
     })

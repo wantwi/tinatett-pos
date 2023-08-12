@@ -56,6 +56,7 @@ const AddProforma = () => {
   const [isSaving, setIsSaving] = useState(false)
  
   const { notifications, setNotifications } = useContext(NotificationsContext)
+  let storage = JSON.parse(localStorage.getItem("auth"))
 
   //add customer states
   const [customerType, setCustomerType] = useState(0)
@@ -101,8 +102,15 @@ const AddProforma = () => {
         setCustomerOptions([addedCustomer,...customerOptions])
       }
       else{
-        alertify.set("notifier", "position", "top-right");
+        alertify.set("notifier", "position", "bottom-right");
         alertify.error("Error...Could not save customer.");
+
+        let newNotification = {
+          id: Math.ceil(Math.random()*1000000),
+          message: `${storage.name} Error..could not save customer`,
+          time: new Date().toISOString()
+        }
+        setNotifications([...notifications, newNotification])
       }
       
     })
@@ -112,8 +120,9 @@ const AddProforma = () => {
     if (isSubmitSuccessful && !isError) {
       reset();
 
-      alertify.set("notifier", "position", "top-right");
+      alertify.set("notifier", "position", "bottom-right");
       alertify.success("Customer added successfully.");
+
       $('.modal').modal('hide')
     }
     return () => {};
@@ -225,8 +234,15 @@ const AddProforma = () => {
     }
 
     if (item.amount < 1 || item.amount == '' || item.quantity == '' || formData.unitPrice == '' || item.productName == '' || selectedCustomer == '') {
-      alertify.set("notifier", "position", "top-right");
+      alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please make sure all fields are filled.");
+
+      let newNotification = {
+        id: Math.ceil(Math.random()*1000000),
+        message: `${storage.name} Please make sure all fields are filled`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
     }
     else {
 
@@ -253,8 +269,14 @@ const AddProforma = () => {
   const onSubmitProforma = () => {
 
     if (productGridData.length < 1) {
-      alertify.set("notifier", "position", "top-right");
+      alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please add at least one item to list before saving.");
+      let newNotification = {
+        id: Math.ceil(Math.random()*1000000),
+        message: `${storage.name} Please add at least one item to list before saving`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
     }
     else {
       setIsSaving(true)
@@ -275,7 +297,7 @@ const AddProforma = () => {
      .then((res) => {
         if(res.status == 201 || res.data.success == true){
 
-          alertify.set("notifier", "position", "top-right");
+          alertify.set("notifier", "position", "bottom-right");
           alertify.success("Proforma saved successfully.");
 
           let storage = JSON.parse(localStorage.getItem("auth"))
@@ -295,14 +317,23 @@ const AddProforma = () => {
             let base64 = res.data.base64
             const blob = base64ToBlob(base64, 'application/pdf');
             const url = URL.createObjectURL(blob);
-            const pdfWindow = window.open("");
-            pdfWindow.document.write("<iframe width='100%' height='100%' src='" + url + "'></iframe>");
+            //window.open(url, "_blank", "width=600, height=600", 'modal=yes');
+            var newWindow = window.open(   
+             url, "_blank", "width=800, height=800");  
+          
+            //pdfWindow.document.write("<iframe width='100%' height='100%' src='" + url + "'></iframe>");
           }, 1500)
           
         }
         else{
-          alertify.set("notifier", "position", "top-right");
+          alertify.set("notifier", "position", "bottom-right");
           alertify.error("Error...Could not save.");
+          let newNotification = {
+            id: Math.ceil(Math.random()*1000000),
+            message: `${storage.name} Error. Could not save Proforma`,
+            time: new Date().toISOString()
+          }
+          setNotifications([...notifications, newNotification])
         }
      }).finally(() => setIsSaving(false))
 
@@ -447,8 +478,14 @@ const AddProforma = () => {
                             <input className="form-check-input" type="radio" name="customerType" value={selectedProduct?.retailPrice} ref={retailpriceTypeRef}
                               onChange={(e) => {
                                 if (selectedProduct == '') {
-                                  alertify.set("notifier", "position", "top-right");
+                                  alertify.set("notifier", "position", "bottom-right");
                                   alertify.warning("Please select a product first.");
+                                  let newNotification = {
+                                    id: Math.ceil(Math.random()*1000000),
+                                    message: `${storage.name} Please select a product first`,
+                                    time: new Date().toISOString()
+                                  }
+                                  setNotifications([...notifications, newNotification])
                                   retailpriceTypeRef.current.checked = false
                                 } else {
                                   setFormData({ ...formData, price: selectedProduct.retailPrice, amount: formData.quantity ? selectedProduct?.retailPrice * formData.quantity : selectedProduct?.retailPrice * 1 })
@@ -468,8 +505,14 @@ const AddProforma = () => {
                             <input className="form-check-input" type="radio" name="customerType" value={selectedProduct?.wholeSalePrice} ref={wholesalepriceTypeRef}
                               onChange={(e) => {
                                 if (selectedProduct == '') {
-                                  alertify.set("notifier", "position", "top-right");
+                                  alertify.set("notifier", "position", "bottom-right");
                                   alertify.warning("Please select a product first.");
+                                  let newNotification = {
+                                    id: Math.ceil(Math.random()*1000000),
+                                    message: `${storage.name} Please select a product first`,
+                                    time: new Date().toISOString()
+                                  }
+                                  setNotifications([...notifications, newNotification])
                                   wholesalepriceTypeRef.current.checked = false
                                 } else {
                                   setFormData({ ...formData, price: selectedProduct.wholeSalePrice, amount: formData.quantity ? selectedProduct.wholeSalePrice * formData.quantity : selectedProduct.wholeSalePrice * 1 })
@@ -491,8 +534,14 @@ const AddProforma = () => {
                             <input className="form-check-input" type="radio" name="customerType" value={selectedProduct?.specialPrice} ref={specialpriceTypeRef}
                               onChange={(e) => {
                                 if (selectedProduct == '') {
-                                  alertify.set("notifier", "position", "top-right");
+                                  alertify.set("notifier", "position", "bottom-right");
                                   alertify.warning("Please select a product first.");
+                                  let newNotification = {
+                                    id: Math.ceil(Math.random()*1000000),
+                                    message: `${storage.name} Please select a product first`,
+                                    time: new Date().toISOString()
+                                  }
+                                  setNotifications([...notifications, newNotification])
                                   specialpriceTypeRef.current.checked = false
                                 } else {
                                   setFormData({ ...formData, price: selectedProduct.specialPrice, amount: formData.quantity ? selectedProduct.specialPrice * formData.quantity : selectedProduct.specialPrice * 1 })

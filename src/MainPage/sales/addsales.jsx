@@ -91,6 +91,7 @@ const Addsales = () => {
 
   
   const { notifications, setNotifications } = useContext(NotificationsContext)
+  let storage = JSON.parse(localStorage.getItem("auth"))
 
    //add customer states
    const [customerType, setCustomerType] = useState(0)
@@ -118,7 +119,7 @@ const Addsales = () => {
   const axios = useCustomApi()
 
     //save adhoc customer
-    const onSubmit = (data) => {
+  const onSubmit = (data) => {
       let payload = {...data, customerType}
   
       axios.post(`/customer`,  payload)
@@ -135,13 +136,20 @@ const Addsales = () => {
             setCustomerList([addedCustomer,...customerList])
             reset();
 
-            alertify.set("notifier", "position", "top-right");
+            alertify.set("notifier", "position", "bottom-right");
             alertify.success("Customer added successfully.");
       $('.modal').modal('hide')
         }
         else{
-          alertify.set("notifier", "position", "top-right");
+          alertify.set("notifier", "position", "bottom-right");
           alertify.error("Error...Could not save customer.");
+
+          let newNotification = {
+            id: Math.ceil(Math.random()*1000000),
+            message: `${storage.name} Error..could not save customer`,
+            time: new Date().toISOString()
+          }
+          setNotifications([...notifications, newNotification])
         }
         
       })
@@ -166,17 +174,31 @@ const Addsales = () => {
   const processPayment = (type, print) => {
 
     if (productGridData.length < 1) {
-      alertify.set("notifier", "position", "top-right");
+      alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please add at least one item to list before saving.");
+
+      let newNotification = {
+        id: Math.ceil(Math.random()*1000000),
+        message: `${storage.name} Please add at least one item to list before saving.`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
     }
     // else if ((paymentInfo.amountPaid == '' || paymentInfo.amountPaid < 1 || paymentInfo.amountPaid == null) && (transactionType == 'CP' || transactionType == 'CO') ) {
-    //   alertify.set("notifier", "position", "top-right");
+    //   alertify.set("notifier", "position", "bottom-right");
     //   alertify.warning("Please provide payment amount before saving.");
     // }
 
     else if( (transactionType == 'SP' || transactionType == 'SO') && paymentInfo.amountPaid < (productGridData.reduce((total, item) => total + item.amount, 0))){
-      alertify.set("notifier", "position", "top-right");
+      alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please provide full payment amount before saving.");
+
+      let newNotification = {
+        id: Math.ceil(Math.random()*1000000),
+        message: `${storage.name} Please provide full payment amount before saving.`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
     }
     else {
       $('#payment').modal('hide')
@@ -257,10 +279,9 @@ const Addsales = () => {
                   if (print) {
                     getInvoiceReceipt(payload.salesRef)
                   }
-                  alertify.set("notifier", "position", "top-right");
+                  alertify.set("notifier", "position", "bottom-right");
                   alertify.success("Sale completed.");
 
-                  let storage = JSON.parse(localStorage.getItem("auth"))
                   let newNotification = {
                     message: `${storage.name} completed a sale with reference ${payload.salesRef}`,
                     time: new Date().toISOString()
@@ -270,8 +291,15 @@ const Addsales = () => {
                 }
               })
               .catch((error) => {
-                alertify.set("notifier", "position", "top-right");
+                alertify.set("notifier", "position", "bottom-right");
                 alertify.error("Error...Could not complete transaction");
+
+                let newNotification = {
+                  id: Math.ceil(Math.random()*1000000),
+                  message: `${storage.name} Error...Could not complete transaction`,
+                  time: new Date().toISOString()
+                }
+                setNotifications([...notifications, newNotification])
               })
               .finally(() => {
                 setPaymentInfo({
@@ -299,13 +327,27 @@ const Addsales = () => {
 
           }
           else {
-            alertify.set("notifier", "position", "top-right");
+            alertify.set("notifier", "position", "bottom-right");
             alertify.warning("Unsuccessful, please try again");
+
+            let newNotification = {
+              id: Math.ceil(Math.random()*1000000),
+              message: `${storage.name} Unsuccessful, please try saving sales again`,
+              time: new Date().toISOString()
+            }
+            setNotifications([...notifications, newNotification])
           }
         })
         .catch((error) => {
-          alertify.set("notifier", "position", "top-right");
-          alertify.error("Some error occured. Please contact admin");
+          alertify.set("notifier", "position", "bottom-right");
+          alertify.error("Internal server error occured. Please contact admin");
+
+          let newNotification = {
+            id: Math.ceil(Math.random()*1000000),
+            message: `${storage.name} Internal server error occured. Please contact admin`,
+            time: new Date().toISOString()
+          }
+          setNotifications([...notifications, newNotification])
         })
         .finally(() => {
           setIsSaving(false)
@@ -356,20 +398,18 @@ const Addsales = () => {
     }
   }
 
-  const handleSalesTypeChange = (e) => {
-    if (e.target.value == "Retail") {
-      setSalesType("Retail")
-    }
-    else if (e.target.value == "Wholesale") {
-      setSalesType("Wholesale")
-    }
-  }
-
   const handleSuspend = () => {
 
     if (productGridData.length < 1) {
-      alertify.set("notifier", "position", "top-right");
+      alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please add at least one item to list before saving.");
+
+      let newNotification = {
+        id: Math.ceil(Math.random()*1000000),
+        message: `${storage.name} Please add at least one item to list before saving.`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
     }
     else {
       setIsSaving(true)
@@ -402,10 +442,10 @@ const Addsales = () => {
             setSelectedProduct('')
             setInvoiceNo('')
 
-            alertify.set("notifier", "position", "top-right");
+            alertify.set("notifier", "position", "bottom-right");
             alertify.success("Suspended successfully");
+            
             setReferenceData(res.data)
-            let storage = JSON.parse(localStorage.getItem("auth"))
                   let newNotification = {
                     message: `${storage.name} suspended a sale with reference ${res.data.reference}`,
                     time: new Date().toISOString()
@@ -417,9 +457,9 @@ const Addsales = () => {
 
           }
           else {
-            alertify.set("notifier", "position", "top-right");
+            alertify.set("notifier", "position", "bottom-right");
             alertify.warning("Suspend unsuccessful");
-            let storage = JSON.parse(localStorage.getItem("auth"))
+           
             let newNotification = {
               message: `${storage.name} encountered an error with Suspend`,
               time: new Date().toISOString()
@@ -428,11 +468,11 @@ const Addsales = () => {
           }
         })
         .catch((error) => {
-          alertify.set("notifier", "position", "top-right");
-          alertify.error("Some error occured. Please contact admin");
-          let storage = JSON.parse(localStorage.getItem("auth"))
+          alertify.set("notifier", "position", "bottom-right");
+          alertify.error("Internal server error occured. Please contact admin");
+      
           let newNotification = {
-            message: `${storage.name} some error occured. Please contact admin`,
+            message: `${storage.name} Internal server error occured. Please contact admin`,
             time: new Date().toISOString()
           }
           setNotifications([...notifications, newNotification])
@@ -461,37 +501,57 @@ const Addsales = () => {
       amount: formData.quantity * price
     }
     // if (obj.amount < 1 || obj.unitPrice == '' || obj.name == '' || obj.quantity == '' || selectedCustomer == null) { 
-    //   alertify.set("notifier", "position", "top-right");
+    //   alertify.set("notifier", "position", "bottom-right");
     //   alertify.warning("Please make sure all fields are filled.");
     // }
     
     if (!obj.name) {
-      alertify.set("notifier", "position", "top-right");
+      alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please select a product.");
+      let newNotification = {
+        id: Math.ceil(Math.random()*1000000),
+        message: `${storage.name} Please select a product`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
       $('#selectedProduct').css('border', '1px solid red')
       // setTimeout(() => {
       //   $('#selectedProduct').css('border', '1px solid rgba(145, 158, 171, 0.32)')
       // }, 3000)
     }
 
-    if (selectedCustomer == '' || selectedCustomer == null) {
-      alertify.set("notifier", "position", "top-right");
+    else if (selectedCustomer == '' || selectedCustomer == null) {
+      alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please select a customer.");
+      let newNotification = {
+        id: Math.ceil(Math.random()*1000000),
+        message: `${storage.name} Please select a customer.`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
       $('#selectedCustomer').css('border', '1px solid red')
       // setTimeout(() => {
       //   $('#selectedCustomer').css('border', '1px solid rgba(145, 158, 171, 0.32)')
       // }, 3000)
     }
 
-     if ( obj.quantity == '') {
-      alertify.set("notifier", "position", "top-right");
+    else if ( obj.quantity == '') {
+      alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please enter quantity.");
+      let newNotification = {
+        id: Math.ceil(Math.random()*1000000),
+        message: `${storage.name} Please enter quantity.`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
       $('#quantity').css('border', '1px solid red')
       // setTimeout(() => {
       //   $('#quantity').css('border', '1px solid rgba(145, 158, 171, 0.32)')
       // }, 3000)
     }
 
+
+    
     else {
       setProductGridData([...productGridData, obj])
       setFormData({ quantity: '', amount: '', batchNumber: '', manuDate: '', expDate: '' })
@@ -531,7 +591,7 @@ const Addsales = () => {
         // //console.log(x)
          setFormData({ ...formData, batchNumber: x[0], manuDate: x[0].manufacturingDate, expDate: x[0].expireDate })
          setEditFormData({...editFormData, batchNumber: x[0], manuDate: x[0].manufacturingDate, expDate: x[0].expireDate})
-        retailpriceTypeRef.current.checked = true
+        //retailpriceTypeRef.current.checked = true
       }
     })
     $('#selectedProduct').css('border', '1px solid rgba(145, 158, 171, 0.32)')
@@ -547,9 +607,43 @@ const Addsales = () => {
   }, [formData.quantity])
 
 
+
   useEffect(() => {
+    if(selectedCustomer?.label.includes('Retail')){
+      retailpriceTypeRef.current.checked = true
+      wholesalepriceTypeRef.current.disabled = true
+      retailpriceTypeRef.current.disabled = false
+      // setSalesType('Retail')
+
+      setDisableUnselectedPrice({ wholesale: true, retail: false, special: true })
+    }
+    else if(selectedCustomer?.label.includes('Whole')){
+      wholesalepriceTypeRef.current.checked = true
+      retailpriceTypeRef.current.disabled = true
+      wholesalepriceTypeRef.current.disabled = false
+      // setSalesType('Wholesale')
+
+      setDisableUnselectedPrice({ wholesale: false, retail: true, special: true })
+    }
+    else if(selectedCustomer == null || selectedCustomer == undefined){
+      setPrice(0)
+    }
+
+    else if((!selectedCustomer?.label.includes('Whole')) && (!selectedCustomer?.label.includes('Retail'))){
+      console.log('Not a wholesale nor Retail')
+        wholesalepriceTypeRef.current.disabled = false
+        retailpriceTypeRef.current.disabled = false
+  
+        setDisableUnselectedPrice({ wholesale: false, retail: false, special: false })
+    }
+
+    
     $('#selectedCustomer').css('border', '1px solid rgba(145, 158, 171, 0.32)')
   }, [selectedCustomer])
+
+  useEffect(() => {
+    salesType == 'Retail' ? setPrice(selectedProduct.retailPrice) : salesType == "Wholesale" ? setPrice(selectedProduct.wholeSalePrice) : setPrice(selectedProduct.specialPrice)
+  }, [salesType])
 
 
   useEffect(() => {
@@ -806,7 +900,8 @@ const Addsales = () => {
                           <div className="input-group">
                             <div className="input-group-text">
                               <input className="form-check-input" type="radio" ref={retailpriceTypeRef} name="priceType" value={selectedProduct?.retailPrice}
-                                onChange={(e) => {
+                                onClick={(e) => {
+                                  console.log(e.target.value)
                                   setPrice(e.target.value)
                                   setDisableUnselectedPrice({ retail: false, wholesale: true, special: true })
                                 }} />
@@ -820,11 +915,10 @@ const Addsales = () => {
                           <div className="input-group">
                             <div className="input-group-text">
                               <input className="form-check-input" type="radio" ref={wholesalepriceTypeRef} name="priceType" value={selectedProduct?.wholeSalePrice}
-                                onChange={(e) => {
+                                onClick={(e) => {
                                   setPrice(e.target.value)
-                                  //setSalesType('Wholesale')
-                                  //retailRef.current.checked = false
-                                  //wholesaleRef.current.checked =true
+                                  console.log(e.target.value)
+                                 
                                   setDisableUnselectedPrice({ wholesale: false, retail: true, special: true })
                                 }
                                 } />
@@ -837,7 +931,7 @@ const Addsales = () => {
 
                           <div className="input-group">
                             <div className="input-group-text">
-                              <input className="form-check-input" type="radio" ref={specialpriceTypeRef} name="priceType" value={selectedProduct?.specialPrice} onChange={(e) => {
+                              <input className="form-check-input" type="radio" ref={specialpriceTypeRef} name="priceType" value={selectedProduct?.specialPrice} onClick={(e) => {
                                 setPrice(e.target.value)
                                 setDisableUnselectedPrice({ special: false, wholesale: true, retail: true })
                               }} />
@@ -864,8 +958,14 @@ const Addsales = () => {
                               setFormData({ ...formData, quantity: '' })
                             }
                             if (Number(e.target.value) > (selectedProduct?.remainingStock)) {
-                              alertify.set("notifier", "position", "top-right");
+                              alertify.set("notifier", "position", "bottom-right");
                               alertify.warning('Quantity can not be greater than quantity in stock')
+                              let newNotification = {
+                                id: Math.ceil(Math.random()*1000000),
+                                message: `${storage.name} Quantity can not be greater than quantity in stock.`,
+                                time: new Date().toISOString()
+                              }
+                              setNotifications([...notifications, newNotification])
                             }
                             else if (isValidNumber(e.target.value)) {
                               setFormData({ ...formData, quantity: Number(e.target.value) })
