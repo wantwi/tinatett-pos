@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -34,11 +34,12 @@ import jsPDF from "jspdf";
 import useCustomApi from "../../hooks/useCustomApi";
 import { BASE_URL } from "../../api/CustomAxios";
 import { useLocation } from "react-router-dom/cjs/react-router-dom.min";
+import { NotificationsContext } from "../../InitialPage/Sidebar/DefaultLayout";
 
 
 const EditTransfer = () => {
   const {state} = useLocation()
-  console.log("State", state)
+  // console.log("State", state)
   const [customerOptions, setCustomerOptions] = useState([])
   const [productOptions, setProductOptions] = useState([])
   const [startDate, setStartDate] = useState(transfer?.transferDate);
@@ -184,16 +185,49 @@ const EditTransfer = () => {
       amount:formData.quantity * price
 
     }
-    if (item.amount < 1 || formData.unitPrice == '' || item.productName == '') {
+    if (item.name == '' || item.name == null)  {
       alertify.set("notifier", "position", "bottom-right");
-      alertify.warning("Please make sure all fields are filled.");
-
+      alertify.warning("Please select a product.");
       let newNotification = {
         id: Math.ceil(Math.random()*1000000),
-        message: `${storage.name} Please make sure all fields are filled.`,
+        message: `${storage.name} Please select a product`,
         time: new Date().toISOString()
       }
       setNotifications([...notifications, newNotification])
+      $('#selectedProduct').css('border', '1px solid red')
+       setTimeout(() => {
+        $('#selectedProduct').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+      }, 3000)
+    }
+
+    else if (item.quantity == '' || item.quantity == null)  {
+      alertify.set("notifier", "position", "bottom-right");
+      alertify.warning("Please enter quantity.");
+      let newNotification = {
+        id: Math.ceil(Math.random()*1000000),
+        message: `${storage.name} Please enter quantity`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
+      $('#quantity').css('border', '1px solid red')
+       setTimeout(() => {
+        $('#quantity').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+      }, 3000)
+    }
+
+    else if (selectedCustomer == '' || selectedCustomer == null) {
+      alertify.set("notifier", "position", "bottom-right");
+      alertify.warning("Please select a branch.");
+      let newNotification = {
+        id: Math.ceil(Math.random()*1000000),
+        message: `${storage.name} Please select a branch.`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
+      $('#selectedCustomer').css('border', '1px solid red')
+      setTimeout(() => {
+        $('#selectedCustomer').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+      }, 3000)
     }
     else {
 
@@ -318,7 +352,7 @@ const EditTransfer = () => {
                     <div className="form-group">
                       <label>Branch Name</label>
                       <div className="row">
-                        <div className="col-lg-12 col-sm-12 col-12">
+                        <div className="col-lg-12 col-sm-12 col-12" id="selectedCustomer">
                         <Select2
                               className="select"
                               data={customerOptions}
@@ -349,7 +383,7 @@ const EditTransfer = () => {
                 <div className="col-12">
                   <div className="form-group">
                     <label>Product Name</label>
-                    <div className="input-groupicon">
+                    <div className="input-groupicon" id="selectedProduct">
                       <Select style={{width:'100%'}}
                           options={productOptions}
                           placeholder={'Select product'}
@@ -370,6 +404,7 @@ const EditTransfer = () => {
                         <label>Quantity Left</label>
                         <div className="input-groupicon">
                           <input
+                           
                             className="form-control"
                             type="text"
                             value={selectedProduct?.totalQuantity}
@@ -490,7 +525,8 @@ const EditTransfer = () => {
                       <label>Quantity</label>
                       <div className="input-groupicon">
                         <input
-                        className="form-control"
+                          id="quantity"
+                          className="form-control"
                           type="text"
                           value={formData?.quantity}
                           onChange={(e) => {

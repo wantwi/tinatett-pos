@@ -152,7 +152,7 @@ const AddTransfer = () => {
     }
 
 
-     if (item.productName == '') {
+     if (item.name == '' || item.name == null)  {
       alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please select a product.");
       let newNotification = {
@@ -162,9 +162,24 @@ const AddTransfer = () => {
       }
       setNotifications([...notifications, newNotification])
       $('#selectedProduct').css('border', '1px solid red')
-      // setTimeout(() => {
-      //   $('#selectedProduct').css('border', '1px solid rgba(145, 158, 171, 0.32)')
-      // }, 3000)
+       setTimeout(() => {
+        $('#selectedProduct').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+      }, 3000)
+    }
+
+    else if (item.quantity == '' || item.quantity == null)  {
+      alertify.set("notifier", "position", "bottom-right");
+      alertify.warning("Please enter quantity.");
+      let newNotification = {
+        id: Math.ceil(Math.random()*1000000),
+        message: `${storage.name} Please enter quantity`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
+      $('#quantity').css('border', '1px solid red')
+       setTimeout(() => {
+        $('#quantity').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+      }, 3000)
     }
 
     else if (selectedCustomer == '' || selectedCustomer == null) {
@@ -177,9 +192,9 @@ const AddTransfer = () => {
       }
       setNotifications([...notifications, newNotification])
       $('#selectedCustomer').css('border', '1px solid red')
-      // setTimeout(() => {
-      //   $('#selectedCustomer').css('border', '1px solid rgba(145, 158, 171, 0.32)')
-      // }, 3000)
+      setTimeout(() => {
+        $('#selectedCustomer').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+      }, 3000)
     }
 
 
@@ -202,6 +217,7 @@ const AddTransfer = () => {
 
   }
 
+
   const onSubmit = (hasInvoice) => {
 
     if (productGridData.length < 1) {
@@ -216,7 +232,7 @@ const AddTransfer = () => {
       setNotifications([...notifications, newNotification])
 
     }
-    if(selectedCustomer == ''){
+    else if(selectedCustomer == ''){
       alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please select a branch before saving.");
 
@@ -226,9 +242,9 @@ const AddTransfer = () => {
         time: new Date().toISOString()
       }
       setNotifications([...notifications, newNotification])
-      $('#branch').css('border', '1px solid red')
+      $('#selectedCustomer').css('border', '1px solid red')
       setTimeout(() => {
-        $('#branch').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+        $('#selectedCustomer').css('border', '1px solid rgba(145, 158, 171, 0.32)')
       }, 3000)
     }
     else {
@@ -328,9 +344,7 @@ const AddTransfer = () => {
     return <LoadingSpinner />
   }
 
-  // if(isLoading){
-  //   return <LoadingSpinner message="Saving Proforma.."/>
-  // }
+
 
   return (
     <div className="page-wrapper">
@@ -388,7 +402,6 @@ const AddTransfer = () => {
                     <label>Product Name</label>
                     <div className="input-groupicon" id="selectedProduct">
                       <Select style={{width:'100%'}}
-                          
                           options={productOptions}
                           placeholder={'Select product'}
                           value={selectedProduct}
@@ -530,7 +543,8 @@ const AddTransfer = () => {
                       <label>Quantity</label>
                       <div className="input-groupicon">
                         <input
-                        className="form-control"
+                         className="form-control"
+                          id="quantity"
                           type="text"
                           value={formData?.quantity}
                           onChange={(e) => {
