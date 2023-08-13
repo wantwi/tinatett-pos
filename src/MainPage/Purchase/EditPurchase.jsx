@@ -218,7 +218,7 @@ const EditPurchase = () => {
       alertify.set("notifier", "position", "bottom-right");
       alertify.success("Purchase updated successfully.");
       setTimeout(() => {
-        history.push('/tinatett-pos/purchase/purchaselist')
+        window.location.href = '/tinatett-pos/purchase/purchaselist'
       },1000)
     }
     else if(isError){
