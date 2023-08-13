@@ -76,11 +76,11 @@ const PurchaseList = () => {
       //     confirmButtonClass: "btn btn-danger",
       //   });
       // }
-      console.log(t)
+    //  console.log(t)
       if(t.isConfirmed){
         let data = await axios.delete(`/purchase/${id}`)
-        console.log(data)
-        if(data.response.data.success){
+        console.log(data, `{"success":true,"message":"Purchase deleted successfully."}`)
+        if(data.response.success){
           Swal.fire({
             type: "success",
             title: "Deleted!",
@@ -92,7 +92,7 @@ const PurchaseList = () => {
           Swal.fire({
             type: "danger",
             title: "Error!",
-            text: data.response.data.message,
+            text: data.response.message,
             confirmButtonClass: "btn btn-danger",
           });
         }
