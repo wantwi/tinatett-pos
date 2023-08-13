@@ -169,10 +169,10 @@ const AddTransfer = () => {
 
     else if (selectedCustomer == '' || selectedCustomer == null) {
       alertify.set("notifier", "position", "bottom-right");
-      alertify.warning("Please select a customer.");
+      alertify.warning("Please select a branch.");
       let newNotification = {
         id: Math.ceil(Math.random()*1000000),
-        message: `${storage.name} Please select a customer.`,
+        message: `${storage.name} Please select a branch.`,
         time: new Date().toISOString()
       }
       setNotifications([...notifications, newNotification])
@@ -442,7 +442,8 @@ const AddTransfer = () => {
                     <div className="form-group">
                       <label>Manufacturing Date</label>
                       <div className="input-groupicon">
-                        <DatePicker
+                      <input type="date" className="form-control" value={formData?.manuDate.substring(0, 10)} disabled/>
+                        {/* <DatePicker
                           selected={startDate}
                           value={formData?.manuDate.substring(0,10)}
                           disabled
@@ -450,7 +451,7 @@ const AddTransfer = () => {
                         />
                         <Link className="addonset">
                           <img src={Calendar} alt="img" />
-                        </Link>
+                        </Link> */}
                       </div>
                     </div>
                   </div>
@@ -459,7 +460,8 @@ const AddTransfer = () => {
                     <div className="form-group">
                       <label>Exp. Date</label>
                       <div className="input-groupicon">
-                      <DatePicker
+                      <input type="date" className="form-control" value={formData?.expDate.substring(0, 10)} disabled/>
+                      {/* <DatePicker
                           selected={startDate}
                           value={formData?.expDate.substring(0,10)}
                           disabled
@@ -467,7 +469,7 @@ const AddTransfer = () => {
                         />
                         <Link className="addonset">
                           <img src={Calendar} alt="img" />
-                        </Link>
+                        </Link> */}
                       </div>
                     </div>
                   </div>
@@ -475,7 +477,7 @@ const AddTransfer = () => {
 
                 <div className="col-12">
                   <div className="form-group">
-                    <label>Unit Price</label>
+                    <label>Product Value</label>
                     <div className="row">
                         
 
@@ -587,7 +589,7 @@ const AddTransfer = () => {
                         <th>#</th>
                         <th>Product Name</th>
                         <th>Quantity</th>
-                        <th>Unit Price</th>
+                        <th>Product Value</th>
                         <th>Amount</th>
                         <th>Batch #</th>
                         <th>Action</th>
@@ -765,7 +767,7 @@ const AddTransfer = () => {
                  
                     <div className="col-lg-6 col-sm-12 col-12">
                       <div className="form-group">
-                        <label>Unit Price</label>
+                        <label>Product Value</label>
                         <input type="text" value={editFormData?.unitPrice} 
                          disabled
                          onChange={(e) => {
