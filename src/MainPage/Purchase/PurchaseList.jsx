@@ -56,28 +56,65 @@ const PurchaseList = () => {
       cancelButtonClass: "btn btn-danger ml-1",
       buttonsStyling: !1,
     })
-    .then( async() => {
+    .then( async(t) => {
       //console.log('deleting...')
-      let data = await axios.delete(`/purchase/${id}`)
-      console.log(data.response.code)
-      if(data.response.data.success){
-        Swal.fire({
+      // let data = await axios.delete(`/purchase/${id}`)
+      // console.log(data.response.code)
+      // if(data.response.data.success){
+      //   Swal.fire({
+      //     type: "success",
+      //     title: "Deleted!",
+      //     text: "Your transaction has been deleted.",
+      //     confirmButtonClass: "btn btn-success",
+      //   });
+      // }
+      // else{
+      //   Swal.fire({
+      //     type: "danger",
+      //     title: "Error!",
+      //     text: data.response.data.message,
+      //     confirmButtonClass: "btn btn-danger",
+      //   });
+      // }
+      console.log(t)
+      if(t.isConfirmed){
+        let data = await axios.delete(`/purchase/${id}`)
+        console.log(data)
+        if(data.response.data.success){
+          Swal.fire({
+            type: "success",
+            title: "Deleted!",
+            text: "Your transaction has been deleted.",
+            confirmButtonClass: "btn btn-success",
+          });
+        }
+        else{
+          Swal.fire({
+            type: "danger",
+            title: "Error!",
+            text: data.response.data.message,
+            confirmButtonClass: "btn btn-danger",
+          });
+        }
+      }
+      
+      t.value
+      ? Swal.fire({
           type: "success",
           title: "Deleted!",
-          text: "Your transaction has been deleted.",
+          text: "Your file has been deleted.",
+          confirmButtonClass: "btn btn-success",
+        })
+      : t.dismiss === Swal.DismissReason.cancel &&
+        Swal.fire({
+          title: "Cancelled",
+          text: "You cancelled the delete action",
+          type: "error",
           confirmButtonClass: "btn btn-success",
         });
-      }
-      else{
-        Swal.fire({
-          type: "danger",
-          title: "Error!",
-          text: data.response.data.message,
-          confirmButtonClass: "btn btn-danger",
-        });
-      }
     })
     .catch( (error) => {
+      //console.log("Error:", error)
         Swal.fire({
           type: "danger",
           title: "Error!",
