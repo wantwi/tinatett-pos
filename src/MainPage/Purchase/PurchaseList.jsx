@@ -27,13 +27,41 @@ const PurchaseList = () => {
   const [data, setData] = useState([]);
   const axios = useCustomApi();
 
+  const onSuccess = (data) =>{
+    setData([])
+
+    let mappedData =  data?.data.map((purchase) => {
+      return {
+        id: purchase?.id,
+        supplier:{
+          id: purchase?.supplierId,
+          text: purchase?.supplierName,
+          value: purchase?.supplierId,
+        },
+        supplierName: purchase?.supplierName,
+        supplierId: purchase?.supplierId,
+        status: purchase?.status,
+        reference: purchase.purchaseRef,
+        numberOfProduct: purchase.numberOfProduct,
+        branch: loggedInUser?.branchName || '',
+        date: new Date(purchase.purchaseDate).toISOString().substring(0,10),
+        createdBy: "Admin",
+
+        
+      }
+    })
+  setData(mappedData)
+
+  }
+
 
   const {
     data: purchases,
     isError,
     isLoading,
     isSuccess,
-  } = useGet("purchases", "/purchase");
+    refetch
+  } = useGet("purchases", "/purchase",onSuccess);
 
   const [loggedInUser, setLoggedInUser] = useState({})
 
@@ -79,39 +107,37 @@ const PurchaseList = () => {
     //  console.log(t)
       if(t.isConfirmed){
         let data = await axios.delete(`/purchase/${id}`)
-        console.log(data, `{"success":true,"message":"Purchase deleted successfully."}`)
-        if(data.response.success){
+        console.log({responseData: data})
+        if(data.data.success){
           Swal.fire({
             type: "success",
             title: "Deleted!",
             text: "Your transaction has been deleted.",
             confirmButtonClass: "btn btn-success",
           });
+
+          refetch()
         }
         else{
           Swal.fire({
             type: "danger",
             title: "Error!",
-            text: data.response.message,
+            text: data.data.message,
             confirmButtonClass: "btn btn-danger",
           });
         }
       }
       
-      t.value
-      ? Swal.fire({
-          type: "success",
-          title: "Deleted!",
-          text: "Your file has been deleted.",
-          confirmButtonClass: "btn btn-success",
-        })
-      : t.dismiss === Swal.DismissReason.cancel &&
+     
+       t.dismiss === Swal.DismissReason.cancel &&
         Swal.fire({
           title: "Cancelled",
           text: "You cancelled the delete action",
           type: "error",
           confirmButtonClass: "btn btn-success",
         });
+
+        
     })
     .catch( (error) => {
       //console.log("Error:", error)

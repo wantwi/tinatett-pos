@@ -48,8 +48,8 @@ const AddTransfer = () => {
   const [selectedProductInfo, setSelectedProductInfo] = useState()
   const [selectedCustomer, setSelectedCustomer] = useState('')
   const [selectedCustomerPrint, setSelectedCustomerPrint] = useState('')
-  const [formData, setFormData] = useState({quantity:'', amount:'', batchNumber:{}, manuDate:'', expDate:''})
-  const [editFormData, setEditFormData] = useState({quantity:'', amount:'', batchNumber:{}, manuDate:'', expDate:''})
+  const [formData, setFormData] = useState({quantity:'', amount:'', batchNumber:{}, manuDate:'', expDate:'', saleValue:''})
+  const [editFormData, setEditFormData] = useState({quantity:'', amount:'', batchNumber:{}, manuDate:'', expDate:'', saleValue:''})
   const [productGridData, setProductGridData] = useState([])
   const [printGridData, setPrintGridData] = useState([])
   const [transDate, setTransDate] = useState(new Date().toISOString().slice(0, 10));
@@ -121,7 +121,7 @@ const AddTransfer = () => {
           return {value:item.batchNumber, label:item?.batchNumber + '-(' + item?.Quantity +')', expireDate:item?.expireDate, manufacturingDate: item?.manufacturingDate}
         })
         //console.log(x)
-        setFormData({...formData, batchNumber: x[0], manuDate: x[0].manufacturingDate, expDate: x[0].expireDate})
+        setFormData({...formData, batchNumber: x[0], manuDate: x[0].manufacturingDate, expDate: x[0].expireDate, saleValue:x[0].SaleValue})
         retailpriceTypeRef.current.checked = true
       }
     })
@@ -491,7 +491,8 @@ const AddTransfer = () => {
                 <div className="col-12">
                   <div className="form-group">
                     <label>Product Value</label>
-                    <div className="row">
+                    <input type="text" className="forn-control" disabled value={formData?.saleValue} />
+                    <div className="row" hidden>
                         
 
                           <div className="col-lg-4">
