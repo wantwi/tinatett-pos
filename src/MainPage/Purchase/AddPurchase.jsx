@@ -232,39 +232,75 @@ const AddPurchase = () => {
 
   const handleAddItem = () => {
     //console.log(productFormData)
-    if (productFormData.expireDate == '' || productFormData.manufacturingDate == '' || purDate == '' || selectedProduct == '' ) {
+
+    if(selectedProduct == '' || selectedProduct == null){
+      $('#productName').css('border', '1px solid red')
       alertify.set("notifier", "position", "bottom-right");
-      alertify.warning("Please make sure all fields are filled.");
+      alertify.warning("Please make sure you've selected a product");
       let newNotification = {
-        message: `${storage.name} Please make sure all fields are filled`,
+        message: `${storage.name} Please make sure you've selected a product.`,
         time: new Date().toISOString()
       }
       setNotifications([...notifications, newNotification])
     }
-    else if (productFormData.expireDate == '') {
-      $('#expiryDate').css('border', '1px solid red')
-    }
 
     else if (productFormData.manufacturingDate == '') {
       $('#manufacturingDate').css('border', '1px solid red')
+      alertify.set("notifier", "position", "bottom-right");
+      alertify.warning("Please enter Manufacturing Date.");
+      let newNotification = {
+        message: `${storage.name} Please enter Manufacturing Date`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
     }
 
-    else if (productFormData.quantity == '') {
-      $('#quantity').css('border', '1px solid red')
+    else if (productFormData.expireDate == '') {
+      $('#expiryDate').css('border', '1px solid red')
+      alertify.set("notifier", "position", "bottom-right");
+      alertify.warning("Please make sure you've provided expiry date.");
+      let newNotification = {
+        message: `${storage.name} Please make sure you've provided expiry date.`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
     }
 
     else if (productFormData.batchNumber == '') {
       $('#batchNumber').css('border', '1px solid red')
+      alertify.set("notifier", "position", "bottom-right");
+      alertify.warning("Please enter batch number.");
+      let newNotification = {
+        message: `${storage.name} Please enter batch number.`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
     }
+  
+
+    else if (productFormData.quantity == '') {
+      $('#quantity').css('border', '1px solid red')
+      alertify.set("notifier", "position", "bottom-right");
+      alertify.warning("Please enter quantity.");
+      let newNotification = {
+        message: `${storage.name} Please enter quantity`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
+    }
+
+   
 
     else if (productFormData.unitPrice == '') {
       $('#unitPrice').css('border', '1px solid red')
+      alertify.set("notifier", "position", "bottom-right");
+      alertify.warning("Please enter unit price.");
+      let newNotification = {
+        message: `${storage.name} Please enter unit price.`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
     }
-
-    else if(selectedProduct == '' || selectedProduct == null){
-      $('#productName').css('border', '1px solid red')
-    }
-    
     else {
       setManDate('')
       setExpDate('')

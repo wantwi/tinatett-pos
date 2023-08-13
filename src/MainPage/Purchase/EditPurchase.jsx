@@ -66,17 +66,108 @@ const EditPurchase = () => {
     setProductFormData({ ...productFormData, productName: e.label, productId: e.value })
 }
 
-  const handleAddItem = () => {
-    if(productFormData.expireDate == '' || productFormData.manufacturingDate == '' || manDate == '' || expDate == '' || productFormData.quantity == '' || productFormData.unitPrice == ''){
-      alertify.set("notifier", "position", "bottom-right");
-      alertify.warning("Please make sure all fields are filled.");
+useEffect(() => {
+  $('#unitPrice').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+}, [productFormData.unitPrice])
 
+useEffect(() => {
+  $('#batchNumber').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+}, [productFormData.batchNumber])
+
+useEffect(() => {
+  $('#quantity').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+}, [productFormData.quantity])
+
+useEffect(() => {
+  $('#manufacturingDate').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+}, [productFormData.manufacturingDate])
+
+useEffect(() => {
+  $('#expiryDate').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+}, [productFormData.expireDate])
+
+useEffect(() => {
+  $('#supplier').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+}, [supplier])
+
+useEffect(() => {
+  $('#productName').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+}, [selectedProduct])
+
+  const handleAddItem = () => {
+
+    if(selectedProduct == '' || selectedProduct == null){
+      $('#productName').css('border', '1px solid red')
+      alertify.set("notifier", "position", "bottom-right");
+      alertify.warning("Please make sure you've selected a product");
       let newNotification = {
-        message: `${storage.name} Please make sure all fields are filled.`,
+        message: `${storage.name} Please make sure you've selected a product.`,
         time: new Date().toISOString()
       }
       setNotifications([...notifications, newNotification])
     }
+
+    else if (productFormData.manufacturingDate == '') {
+      $('#manufacturingDate').css('border', '1px solid red')
+      alertify.set("notifier", "position", "bottom-right");
+      alertify.warning("Please enter Manufacturing Date.");
+      let newNotification = {
+        message: `${storage.name} Please enter Manufacturing Date`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
+    }
+
+    else if (productFormData.expireDate == '') {
+      $('#expiryDate').css('border', '1px solid red')
+      alertify.set("notifier", "position", "bottom-right");
+      alertify.warning("Please make sure you've provided expiry date.");
+      let newNotification = {
+        message: `${storage.name} Please make sure you've provided expiry date.`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
+    }
+
+    else if (productFormData.batchNumber == '') {
+      $('#batchNumber').css('border', '1px solid red')
+      alertify.set("notifier", "position", "bottom-right");
+      alertify.warning("Please enter batch number.");
+      let newNotification = {
+        message: `${storage.name} Please enter batch number.`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
+    }
+  
+
+    else if (productFormData.quantity == '') {
+      $('#quantity').css('border', '1px solid red')
+      alertify.set("notifier", "position", "bottom-right");
+      alertify.warning("Please enter quantity.");
+      let newNotification = {
+        message: `${storage.name} Please enter quantity`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
+    }
+
+   
+
+    else if (productFormData.unitPrice == '') {
+      $('#unitPrice').css('border', '1px solid red')
+      alertify.set("notifier", "position", "bottom-right");
+      alertify.warning("Please enter unit price.");
+      let newNotification = {
+        message: `${storage.name} Please enter unit price.`,
+        time: new Date().toISOString()
+      }
+      setNotifications([...notifications, newNotification])
+    }
+
+   
+    
+    
     else{
       
       let newList = [...productList]
@@ -377,7 +468,7 @@ const EditPurchase = () => {
                       <div className="form-group">
                         <label>Supplier Name</label>
                         <div className="row">
-                          <div className="col-lg-12 col-sm-12 col-12">
+                          <div className="col-lg-12 col-sm-12 col-12" id="supplier">
                           
                           {/* <input type="text" value={purchase?.supplierName}/> */}
                             <Select2
@@ -397,7 +488,7 @@ const EditPurchase = () => {
                       <div className="form-group">
                         <label>Purchase Date </label>
                         <div className="input-groupicon">
-                        <input type="date" className="form-control" value={purDate} disabled/>
+                        <input type="date" id="purDate"  className="form-control" value={purDate} disabled/>
                           {/* <DatePicker
                            selected={purDate}
                            disabled
@@ -422,6 +513,7 @@ const EditPurchase = () => {
                           <div className="form-group">
                             <label>Product Name (Designation)</label>
                             <Select
+                            id="productName"
                               className="select"
                               options={productsDropdown}
                               isLoading={productsIsLoading}
@@ -445,7 +537,7 @@ const EditPurchase = () => {
                           <div className="form-group">
                             <label>Manufacturing Date </label>
                             <div className="input-groupicon">
-                            <input type="date" className="form-control" value={manDate} onChange={(e) => {
+                            <input type="date" id="manufacturingDate"  className="form-control" value={manDate} onChange={(e) => {
                                   setManDate(e.target.value)
                                   setProductFormData({ ...productFormData, manufacturingDate: e.target.value })
                                 }}/>
@@ -468,7 +560,7 @@ const EditPurchase = () => {
                           <div className="form-group">
                             <label>Expiring Date </label>
                             <div className="input-groupicon">
-                            <input type="date" className="form-control" value={expDate} onChange={(e) => {
+                            <input type="date" id="expiryDate" className="form-control" value={expDate} onChange={(e) => {
                                   setExpDate(e.target.value)
                                   setProductFormData({ ...productFormData, expireDate: e.target.value })
                                 }}/>
@@ -491,7 +583,7 @@ const EditPurchase = () => {
                       <div className="col-lg-6 col-sm-6 col-12">
                       <div className="form-group">
                         <label>Batch No</label>
-                        <input type="text" className={`form-control `} disabled={selectedProduct?.ownershipType == "Tinatett" ? false : false}
+                        <input type="text" id="batchNumber" className={`form-control `} disabled={selectedProduct?.ownershipType == "Tinatett" ? false : false}
                           value={productFormData?.batchNumber}
                           onBlur={(e) => checkIfBatchNoExists(e.target.value,selectedProduct.id, )}
                           onChange={(e) => {
@@ -504,7 +596,7 @@ const EditPurchase = () => {
                         <div className="col-lg-6 col-sm-6 col-12">
                           <div className="form-group">
                             <label>Quantity</label>
-                            <input type="text" className={`form-control `}
+                            <input type="text" id="quantity"  className={`form-control `}
                               value={productFormData?.quantity}
                               onChange={(e) => {
                                 let qty = (e.target.value) 
@@ -518,7 +610,7 @@ const EditPurchase = () => {
                         <div className="col-lg-6 col-sm-6 col-12">
                           <div className="form-group">
                             <label>Unit Price</label>
-                            <input type="text" className={`form-control `}
+                            <input type="text" id="unitPrice" className={`form-control `}
                               value={productFormData?.unitPrice}
                               onChange={(e) => {
                               
@@ -538,6 +630,7 @@ const EditPurchase = () => {
                               <input
                                 type="text" className={`form-control `}
                                 placeholder=""
+                                id="amount"
                                 value={Number(productFormData?.amount).toFixed(2)}
                                 disabled
                               />
