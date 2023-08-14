@@ -79,6 +79,7 @@ const Addsales = () => {
   const [paymentInfo, setPaymentInfo] = useState(init)
   const [transactionType, setTransactionType] = useState('SP')
   const [recieptData, setReceiptData] = useState({})
+  const [receiptFile, setReceiptFile] = useState(null)
 
   const retailRef = useRef()
   const wholesaleRef = useRef()
@@ -229,7 +230,7 @@ const Addsales = () => {
       axios.post(`/sales/suspend`, payload)
         .then((res) => {
           if (res.data.success) {
-            console.log("Sales Ref", res.data)
+            //console.log("Sales Ref", res.data)
             setProductGridData([])
             setFormData({ quantity: '', amount: '', batchNumber: '', manuDate: '', expDate: '' })
             setSelectedProduct({ remainingStock: '', wholeSalePrice:'', retailPrice:'', specialPrice:'' })
@@ -383,11 +384,16 @@ const Addsales = () => {
     axios.get('/sales/getSaleReceipt/' + salesref)
       .then((res) => {
         
-        var base64 = res.data.base64
+        let base64 = res.data.base64
         const blob = base64ToBlob(base64, 'application/pdf');
+        const blobFile = `data:application/pdf;base64,${base64}`
         const url = URL.createObjectURL(blob);
-        const pdfWindow = window.open(url, "_blank", "width=800, height=800");
+        setReceiptFile(blobFile)
+        //window.open(url, "_blank", "width=600, height=600", 'modal=yes');
+        // var newWindow = window.open(url, "_blank", "width=800, height=800");  
         //pdfWindow.document.write("<iframe width='100%' height='100%' src='" + url + "'></iframe>");
+        
+        $('#pdfViewer').modal('show')
       })
 
     function base64ToBlob(base64, type = "application/octet-stream") {
@@ -439,7 +445,7 @@ const Addsales = () => {
 
       axios.post(`/sales/suspend`, payload)
         .then((res) => {
-          console.log("DDD", res.data)
+    
           if (res.data.success) {
             setProductGridData([])
             setFormData({ quantity: '', amount: '', batchNumber: '', manuDate: '', expDate: '' })
@@ -449,7 +455,7 @@ const Addsales = () => {
             alertify.set("notifier", "position", "bottom-right");
             alertify.success("Suspended successfully");
            
-            console.log("Sales Ref", res.data)
+       
             setReferenceData(res.data)
                   let newNotification = {
                     message: `${storage.name} suspended a sale with reference ${res.data.reference}`,
@@ -584,7 +590,7 @@ const Addsales = () => {
   }
 
   useEffect(() => {
-    console.log("Selected Prod", selectedProduct)
+    // console.log("Selected Prod", selectedProduct)
 
     axios.get(`${BASE_URL}/purchase/product/${selectedProduct?.value}`).then((res) => {
       setIsLoading(true)
@@ -2012,6 +2018,36 @@ const Addsales = () => {
                       </div>
                     </div>
               </form>
+                </div>
+                
+              </div>
+            </div>
+          </div>
+
+          
+{/* PDF Modal */}
+          <div
+            className="modal fade"
+            id="pdfViewer"
+            tabIndex={-1}
+            aria-labelledby="pdfViewer"
+            aria-hidden="true"
+          >
+            <div className="modal-dialog modal-lg modal-dialog-centered">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">Sales Receipt</h5>
+                  <button
+                    type="button"
+                    className="close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                  >
+                    <span aria-hidden="true">×</span>
+                  </button>
+                </div>
+                <div className="modal-body">
+                  <iframe width='100%' height='800px' src={receiptFile}></iframe>            
                 </div>
                 
               </div>

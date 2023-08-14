@@ -455,7 +455,7 @@ const AddTransfer = () => {
                     <div className="form-group">
                       <label>Manufacturing Date</label>
                       <div className="input-groupicon">
-                      <input type="date" className="form-control" value={formData?.manuDate.substring(0, 10)} disabled/>
+                      <input type="text" className="form-control" value={formData?.manuDate.substring(0, 10)} disabled/>
                         {/* <DatePicker
                           selected={startDate}
                           value={formData?.manuDate.substring(0,10)}
@@ -473,7 +473,7 @@ const AddTransfer = () => {
                     <div className="form-group">
                       <label>Exp. Date</label>
                       <div className="input-groupicon">
-                      <input type="date" className="form-control" value={formData?.expDate.substring(0, 10)} disabled/>
+                      <input type="text" className="form-control" value={formData?.expDate.substring(0, 10)} disabled/>
                       {/* <DatePicker
                           selected={startDate}
                           value={formData?.expDate.substring(0,10)}

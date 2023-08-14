@@ -33,6 +33,7 @@ import useCustomApi from "../../hooks/useCustomApi";
 import { NotificationsContext } from "../../InitialPage/Sidebar/DefaultLayout";
 
 
+
 const AddProforma = () => {
   const [customerOptions, setCustomerOptions] = useState([])
   const [productOptions, setProductOptions] = useState([])
@@ -54,6 +55,7 @@ const AddProforma = () => {
   const specialpriceTypeRef = useRef()
   const wholesalepriceTypeRef = useRef()
   const [isSaving, setIsSaving] = useState(false)
+  const [proformaFile, setProformaFile] = useState(null)
  
   const { notifications, setNotifications } = useContext(NotificationsContext)
   let storage = JSON.parse(localStorage.getItem("auth"))
@@ -201,6 +203,7 @@ const AddProforma = () => {
 
 
   const handleAddItem = () => {
+    
     let item =
     {
       id: productGridData.length + 1,
@@ -316,13 +319,16 @@ const AddProforma = () => {
           setTimeout(() => {
             let base64 = res.data.base64
             const blob = base64ToBlob(base64, 'application/pdf');
+            const blobFile = `data:application/pdf;base64,${base64}`
             const url = URL.createObjectURL(blob);
+            setProformaFile(blobFile)
             //window.open(url, "_blank", "width=600, height=600", 'modal=yes');
-            var newWindow = window.open(   
-             url, "_blank", "width=800, height=800");  
-          
+            // var newWindow = window.open(url, "_blank", "width=800, height=800");  
             //pdfWindow.document.write("<iframe width='100%' height='100%' src='" + url + "'></iframe>");
-          }, 1500)
+            
+            $('#pdfViewer').modal('show')
+      
+          }, 1000)
           
         }
         else{
@@ -600,7 +606,6 @@ const AddProforma = () => {
                     </div>
                   </div>
                 </div>
-
 
                 <div className="col-lg-12 col-sm-6 col-12">
                   <div className="form-group">
@@ -1048,6 +1053,35 @@ const AddProforma = () => {
                       </div>
                     </div>
               </form>
+                </div>
+                
+              </div>
+            </div>
+          </div>
+
+{/* PDF Modal */}
+<div
+            className="modal fade"
+            id="pdfViewer"
+            tabIndex={-1}
+            aria-labelledby="pdfViewer"
+            aria-hidden="true"
+          >
+            <div className="modal-dialog modal-lg modal-dialog-centered">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">Proforma Receipt</h5>
+                  <button
+                    type="button"
+                    className="close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                  >
+                    <span aria-hidden="true">×</span>
+                  </button>
+                </div>
+                <div className="modal-body">
+                  <iframe width='100%' height='800px' src={proformaFile}></iframe>            
                 </div>
                 
               </div>

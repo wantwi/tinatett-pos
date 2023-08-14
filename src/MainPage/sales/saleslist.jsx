@@ -35,6 +35,8 @@ const SalesList = () => {
   const [startDate, setStartDate] = useState(new Date());
   const [startDate1, setStartDate1] = useState(new Date());
   const [inputfilter, setInputfilter] = useState(false);
+  const [receiptFile, setReceiptFile] = useState(null)
+  const [isSaving, setIsSaving] = useState(false)
 
   const togglefilter = (value) => {
     setInputfilter(value);
@@ -241,7 +243,10 @@ const SalesList = () => {
            
                 <a href="javascript:void(0);"  
                 title="Download Invoice"
-                 onClick={() =>getInvoiceReceipt(record?.Reference)}>
+                 onClick={() => {
+                  setIsSaving(true)
+                  getInvoiceReceipt(record?.Reference)
+                  }}>
                   <img src={Download} className="me-2" alt="img"  />
                 
                 </a>
@@ -267,13 +272,21 @@ const SalesList = () => {
   const getInvoiceReceipt = (salesref) => {
     axios.get('/sales/getSaleReceipt/' + salesref)
       .then((res) => {
-        console.log(res.data)
-        var base64 = res.data.base64
+       // console.log(res.data)
+       if(res.data){
+        setIsSaving(false)
+       }
+        
+        let base64 = res.data.base64
         const blob = base64ToBlob(base64, 'application/pdf');
+        const blobFile = `data:application/pdf;base64,${base64}`
         const url = URL.createObjectURL(blob);
-        const pdfWindow = window.open("");
-        pdfWindow.document.write("<iframe width='100%' height='100%' src='" + url + "'></iframe>");
-        //window.print()
+        setReceiptFile(blobFile)
+        //window.open(url, "_blank", "width=600, height=600", 'modal=yes');
+        // var newWindow = window.open(url, "_blank", "width=800, height=800");  
+        //pdfWindow.document.write("<iframe width='100%' height='100%' src='" + url + "'></iframe>");
+        
+      $('#pdfViewer').modal('show')
       })
 
     function base64ToBlob(base64, type = "application/octet-stream") {
@@ -290,6 +303,10 @@ const SalesList = () => {
 
   if(isLoading){
     return (<LoadingSpinner message="Fetching Sales.."/>)
+  }
+
+  if (isSaving) {
+    return <LoadingSpinner message="Downloading...please wait" />
   }
 
   return (
@@ -606,6 +623,36 @@ const SalesList = () => {
             </div>
           </div>
         </div>
+
+         {/* PDF Modal */}
+         <div
+            className="modal fade"
+            id="pdfViewer"
+            tabIndex={-1}
+            aria-labelledby="pdfViewer"
+            aria-hidden="true"
+          >
+            <div className="modal-dialog modal-lg modal-dialog-centered">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">Sales Receipt</h5>
+                  <button
+                    type="button"
+                    className="close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                    onClick={() => $('.modal').modal('hide')}
+                  >
+                    <span aria-hidden="true">×</span>
+                  </button>
+                </div>
+                <div className="modal-body">
+                  <iframe width='100%' height='800px' src={receiptFile}></iframe>            
+                </div>
+                
+              </div>
+            </div>
+          </div>
       </>
     </>
   );

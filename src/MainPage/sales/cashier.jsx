@@ -50,11 +50,35 @@ const Cashier = () => {
   const [filter, setFilter] = useState('All')
   const [productGridData, setProductGridData] = useState([])
   const [isDeleting, setIsDeleting] = useState(false)
+  const [receiptFile, setReceiptFile] = useState(null)
+  const [isSaving, setIsSaving] = useState(false)
 
   const { notifications, setNotifications } = useContext(NotificationsContext)
   let storage = JSON.parse(localStorage.getItem("auth"))
 
 
+  const onSuccess = (data) =>{
+    
+    setData([])
+
+    let mappedData =  data?.data.map((sale) => {
+      return {
+        id: sale?.id,
+        Date: sale?.transDate,
+        Name: sale?.customer?.name || 'N/A',
+        Status: sale?.status,
+        Reference: sale?.salesRef,
+        Payment: sale?.paymentType,
+        Total: moneyInTxt(sale?.totalAmount),
+        Paid: sale?.changeAmt,
+        Due: sale?.balance,
+        Biller: sale?.salesPerson,
+        salestype: sale?.salesType
+      }
+    })
+  setData(mappedData)
+
+  }
 
   useEffect(() => {
    setPaymentInfo({...paymentInfo, amountPaid: Number(paymentInfo.cashAmount) + Number(paymentInfo.chequeAmount) + Number(paymentInfo.momoAmount)})
@@ -66,7 +90,7 @@ const Cashier = () => {
     isLoading,
     refetch,
     
-  } = useGet("suspend", "/sales/suspend");
+  } = useGet("suspend", "/sales/suspend", onSuccess);
   const [data, setData] = useState([])
 
 
@@ -124,6 +148,7 @@ const Cashier = () => {
   const axios = useCustomApi()
 
   const processPayment = (type, print) =>{
+    setIsSaving(true)
     if((Number(paymentInfo.cashAmount) + Number(paymentInfo.cashAmount) + Number(paymentInfo.cashAmount) > 0 ) || type == 'Credit'){
       let pType = ''
       if(paymentInfo.cashAmount > 0){
@@ -149,21 +174,22 @@ const Cashier = () => {
         ]
       }
   
+    
     // console.log(payload)
       axios.post('/sales',payload)
       .then((res) => {
+        
         console.log(res.data.success)
         if(res.data.success){
           if(print){
             getInvoiceReceipt(modalData.Reference)
           }
           alertify.set("notifier", "position", "bottom-right");
-          alertify.success("Sale completed.");
-          setTimeout(() => {
-            $('.modal').modal('hide')
-            window.location.reload()
-          }, 1500)
-          
+          alertify.success("Sale completed."); 
+          refetch()    
+          $('.modal').modal('hide')
+          $('body').removeClass('modal-open');
+          $('.modal-backdrop').remove();
         }
       })
       .catch((error) => {
@@ -179,6 +205,7 @@ const Cashier = () => {
         setNotifications([...notifications, newNotification])
       })
       .finally(() => {
+        setIsSaving(false)
         setIsCredit(false)
         setPaymentInfo({type:'',
         cashWaybill:'',
@@ -197,7 +224,6 @@ const Cashier = () => {
         amountPaid:''
        })
        
-        //
       })
      }
     else{
@@ -218,12 +244,16 @@ const Cashier = () => {
   const getInvoiceReceipt = (salesref) => {
     axios.get('/sales/getSaleReceipt/'+ salesref)
     .then((res) =>{
-    console.log(res.data)
-    var base64 = res.data.base64
-    const blob = base64ToBlob( base64, 'application/pdf' );
-    const url = URL.createObjectURL( blob );
-    const pdfWindow = window.open("");
-    pdfWindow.document.write("<iframe width='100%' height='100%' src='" + url + "'></iframe>");
+      let base64 = res.data.base64
+      const blob = base64ToBlob(base64, 'application/pdf');
+      const blobFile = `data:application/pdf;base64,${base64}`
+      const url = URL.createObjectURL(blob);
+      setReceiptFile(blobFile)
+      //window.open(url, "_blank", "width=600, height=600", 'modal=yes');
+      // var newWindow = window.open(url, "_blank", "width=800, height=800");  
+      //pdfWindow.document.write("<iframe width='100%' height='100%' src='" + url + "'></iframe>");
+      
+      $('#pdfViewer').modal('show')
     })
     
     function base64ToBlob( base64, type = "application/octet-stream" ) {
@@ -489,6 +519,10 @@ const Cashier = () => {
 
   if (isDeleting) {
     return (<LoadingSpinner message="Deleting.." />)
+  }
+
+  if (isSaving) {
+    return <LoadingSpinner message="Processing...please wait" />
   }
 
   return (
@@ -882,7 +916,7 @@ const Cashier = () => {
 
                 <div className="row mt-2">
                   <div className="col-lg-12" style={{ display: 'flex', justifyContent: 'flex-start' }} >
-                    {!isCredit && (<button className="btn btn-info me-2" onClick={() => processPayment("Paid", true)} style={{ width: '20%' }}>
+                    {!isCredit && (<button className="btn btn-info me-2"  onClick={() => processPayment("Paid", true)} style={{ width: '20%' }}>
                       Sell and Print
                     </button>)}
                     {!isCredit && (<button className="btn btn-warning me-2" onClick={() => processPayment("Paid", false)} style={{ width: '20%' }}>
@@ -1027,7 +1061,7 @@ const Cashier = () => {
               </div>
             </div>
           </div>
-        </div>
+         </div>
 
 
           {/* Credit Modal */}
@@ -1068,70 +1102,103 @@ const Cashier = () => {
                 </div>
             </div>
           </div>
-        </div>
+          </div>
     
 
         {/* View Products Modal */}
-        <div
-          className="modal fade"
-          id="showproducts"
-          tabIndex={-1}
-          aria-labelledby=""
-          aria-hidden="true"
-        >
-          <div className="modal-dialog modal-lg modal-dialog-centered">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">Sales Ref - {productGridData[0]?.salesRef || 'N/A'}</h5>
-                <button
-                  type="button"
-                  className="close"
-                  data-bs-dismiss="modal"
-                  aria-label="Close"
-                >
-                  <span aria-hidden="true">×</span>
-                </button>
-              </div>
-              <div className="modal-body">
-                <div className="row">
-                  <div className="table-responsive mb-3">
-                    <table className="table">
-                      <thead>
-                        <tr>
-                          <th>#</th>
-                          <th>Product Name</th>
-                          <th>Quantity</th>
-                          <th>Unit Price</th>
-                          <th>Amount</th>
-                         
-                        </tr>
-                      </thead>
-                      <tbody>
-                      { productGridData.length > 0  ? productGridData?.map((item, index) => {
-                          return (
-                            <tr key={index}>
-                              <td>{index + 1}</td>
-                              <td>
-                                <Link to="#">{item?.name}</Link>
-                              </td>
-                              <td>{item?.quantity}</td>
-                              <td>{item?.unitPrice}</td>
-                              <td>{item?.amount}</td>
+          <div
+            className="modal fade"
+            id="showproducts"
+            tabIndex={-1}
+            aria-labelledby=""
+            aria-hidden="true"
+          >
+            <div className="modal-dialog modal-lg modal-dialog-centered">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">Sales Ref - {productGridData[0]?.salesRef || 'N/A'}</h5>
+                  <button
+                    type="button"
+                    className="close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                  >
+                    <span aria-hidden="true">×</span>
+                  </button>
+                </div>
+                <div className="modal-body">
+                  <div className="row">
+                    <div className="table-responsive mb-3">
+                      <table className="table">
+                        <thead>
+                          <tr>
+                            <th>#</th>
+                            <th>Product Name</th>
+                            <th>Quantity</th>
+                            <th>Unit Price</th>
+                            <th>Amount</th>
+                          
+                          </tr>
+                        </thead>
+                        <tbody>
+                        { productGridData.length > 0  ? productGridData?.map((item, index) => {
+                            return (
+                              <tr key={index}>
+                                <td>{index + 1}</td>
+                                <td>
+                                  <Link to="#">{item?.name}</Link>
+                                </td>
+                                <td>{item?.quantity}</td>
+                                <td>{item?.unitPrice}</td>
+                                <td>{item?.amount}</td>
 
-                             
-                            </tr>
-                          )
-                        }): 'No Data'} 
+                              
+                              </tr>
+                            )
+                          }): 'No Data'} 
 
-                      </tbody>
-                    </table>
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
+                  
+                </div>
+              </div>
+            </div>
+
+          
+          </div>
+
+
+         {/* PDF Modal */}
+          <div
+            className="modal fade"
+            id="pdfViewer"
+            tabIndex={-1}
+            aria-labelledby="pdfViewer"
+            aria-hidden="true"
+          >
+            <div className="modal-dialog modal-lg modal-dialog-centered">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">Sales Receipt</h5>
+                  <button
+                    type="button"
+                    className="close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                    onClick={() => $('.modal').modal('hide')}
+                  >
+                    <span aria-hidden="true">×</span>
+                  </button>
+                </div>
+                <div className="modal-body">
+                  <iframe width='100%' height='800px' src={receiptFile}></iframe>            
                 </div>
                 
               </div>
             </div>
           </div>
-        </div>
       </>
     </>
   );
