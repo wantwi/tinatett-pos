@@ -42,7 +42,7 @@ const AddTransfer = () => {
 
   const { data: customers, isError, isLoading: isCustomerLoading, isSuccess } = useGet("branches", "/branch");
   const {data: products, isLoading: isProductsLoading, } = useGet("products", "/product");
-  const { isLoading, isError: isPostError, error, mutate } = usePost("/transfer");
+  const { data, isLoading, isError: isPostError, error, mutate } = usePost("/transfer");
 
   const [selectedProduct, setSelectedProduct] = useState({})
   const [selectedProductInfo, setSelectedProductInfo] = useState()
@@ -62,9 +62,12 @@ const AddTransfer = () => {
   const [wholesaleprice, setWholesalePrice] = useState('')
   const [specialprice, setSpecialPrice] = useState('')
   const [isSubmitSuccessful, setIsSubmitSuccessful] = useState(false)
+  const [receiptFile, setReceiptFile] = useState(null)
 
   const { notifications, setNotifications } = useContext(NotificationsContext)
   let storage = JSON.parse(localStorage.getItem("auth"))
+
+  const axios = useCustomApi()
 
   useEffect(() => {
     if (!isProductsLoading && !isCustomerLoading) {
@@ -111,7 +114,7 @@ const AddTransfer = () => {
     //console.log(e)
     
   }
-  const axios = useCustomApi()
+
 
   useEffect(() => {
     axios.get(`${BASE_URL}/purchase/product/${selectedProduct?.value}`).then((res) => {
@@ -218,6 +221,16 @@ const AddTransfer = () => {
   }
 
 
+  function base64ToBlob( base64, type = "application/octet-stream" ) {
+    const binStr = atob( base64 );
+    const len = binStr.length;
+    const arr = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+      arr[ i ] = binStr.charCodeAt( i );
+    }
+    return new Blob( [ arr ], { type: type } );
+  }
+
   const onSubmit = (hasInvoice) => {
 
     if (productGridData.length < 1) {
@@ -254,14 +267,21 @@ const AddTransfer = () => {
         products: productGridData
       }
 
-      mutate(postBody)
+      axios.post(`/transfer`, postBody)
+      .then((res) => {
+        if(hasInvoice){
+        let base64 = res.data.base64
+        const blob = base64ToBlob(base64, 'application/pdf');
+        const blobFile = `data:application/pdf;base64,${base64}`
+        const url = URL.createObjectURL(blob);
+        setReceiptFile(blobFile)      
+        $('#pdfViewer').modal('show')
+        }
+      })
       setSelectedProduct('')
       setProductGridData([])
       setIsSubmitSuccessful(true)
-      if(hasInvoice){
-        $('#invoice').modal('show');
-      }
-   
+    
     }
   }
 
@@ -678,7 +698,7 @@ const AddTransfer = () => {
                     data-bs-target="#create" >
                     Refresh
                   </Link> */}
-                  <button type="submit" className="btn btn-cancel me-2" ><FeatherIcon icon="" />
+                  <button type="submit" className="btn btn-cancel me-2" data-bs-toggle="modal" data-bs-target="#noconfirm"><FeatherIcon icon="" />
                     {"No Invoice"}
                   </button>
                 </div>
@@ -692,12 +712,50 @@ const AddTransfer = () => {
       </div>
 
 
-        {/* Confirm Modal */}
+        {/* Invoice Confirm Modal */}
         <div
         className="modal fade"
         id="confirm"
         tabIndex={-1}
         aria-labelledby="confirm"
+        aria-hidden="true">
+
+          <div className="modal-dialog modal-md modal-dialog-centered" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                    <h5 className="modal-title">Confirm</h5>
+                    <button
+                    type="button"
+                    className="close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                    >
+                    <span aria-hidden="true">×</span>
+                </button>
+              </div>
+              <div className="modal-body">
+                Are you sure you want to complete this transfer?
+              </div>
+              <div className="modal-footer">
+                  <Link to="#" className="btn btn-submit me-2" data-bs-dismiss="modal" onClick={() =>onSubmit(true)}>
+                    Yes
+                  </Link>
+                  <Link to="#" className="btn btn-cancel" data-bs-dismiss="modal">
+                    No
+                </Link>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+
+         {/* No Invoice Confirm Modal */}
+         <div
+        className="modal fade"
+        id="noconfirm"
+        tabIndex={-1}
+        aria-labelledby="noconfirm"
         aria-hidden="true">
 
           <div className="modal-dialog modal-md modal-dialog-centered" role="document">
@@ -809,6 +867,36 @@ const AddTransfer = () => {
                     Close
                   </button>
                 </div>
+              </div>
+            </div>
+          </div>
+
+           {/* PDF Modal */}
+           <div
+            className="modal fade"
+            id="pdfViewer"
+            tabIndex={-1}
+            aria-labelledby="pdfViewer"
+            aria-hidden="true"
+          >
+            <div className="modal-dialog modal-lg modal-dialog-centered">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">Transfer Receipt</h5>
+                  <button
+                    type="button"
+                    className="close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                    onClick={() => $('.modal').modal('hide')}
+                  >
+                    <span aria-hidden="true">×</span>
+                  </button>
+                </div>
+                <div className="modal-body">
+                  <iframe width='100%' height='800px' src={receiptFile}></iframe>            
+                </div>
+                
               </div>
             </div>
           </div>
