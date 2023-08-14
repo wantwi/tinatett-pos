@@ -59,8 +59,9 @@ const TransferList = () => {
       confirmButtonClass: "btn btn-primary",
       cancelButtonClass: "btn btn-danger ml-1",
       buttonsStyling: !1,
-    }) .then( async() => {
+    }) .then( async(t) => {
      
+      if(t.isConfirmed){
       let data = await axios.delete(`/transfer/${id}`)
       if(data.status < 205){
         Swal.fire({
@@ -82,6 +83,14 @@ const TransferList = () => {
           confirmButtonClass: "btn btn-danger",
         });
       }
+    }
+    t.dismiss === Swal.DismissReason.cancel &&
+    Swal.fire({
+      title: "Cancelled",
+      text: "You cancelled the delete action",
+      type: "error",
+      confirmButtonClass: "btn btn-success",
+    });
     })
     .catch( (error) => {
         Swal.fire({

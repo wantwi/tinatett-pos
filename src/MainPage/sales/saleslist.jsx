@@ -57,38 +57,50 @@ const SalesList = () => {
       confirmButtonClass: "btn btn-primary",
       cancelButtonClass: "btn btn-danger ml-1",
       buttonsStyling: !1,
-    }) .then( async() => {
-     
-      let data = await axios.delete(`/sales/${id}`)
-      if(data.status < 205){
+    }).then(async (t) => {
+
+      if (t.isConfirmed) {
+        let data = await axios.delete(`/sales/${id}`)
+        if (data.status < 205) {
+          Swal.fire({
+            type: "success",
+            title: "Deleted!",
+            text: "Your sales item has been deleted.",
+            confirmButtonClass: "btn btn-success",
+          });
+          setTimeout(() => {
+            window.location.reload()
+          }, 1000)
+
+        }
+        else {
+          Swal.fire({
+            type: "danger",
+            title: "Error!",
+            text: data.response.data.message,
+            confirmButtonClass: "btn btn-danger",
+          });
+        }
+      }
+
+      t.dismiss === Swal.DismissReason.cancel &&
         Swal.fire({
-          type: "success",
-          title: "Deleted!",
-          text: "Your sales item has been deleted.",
+          title: "Cancelled",
+          text: "You cancelled the delete action",
+          type: "error",
           confirmButtonClass: "btn btn-success",
         });
-        setTimeout(() => {
-          window.location.reload()
-        },1000)
-   
-      }
-      else{
-        Swal.fire({
-          type: "danger",
-          title: "Error!",
-          text: data.response.data.message,
-          confirmButtonClass: "btn btn-danger",
-        });
-      }
+
+
     })
-    .catch( (error) => {
+      .catch((error) => {
         Swal.fire({
           type: "danger",
           title: "Error!",
           text: error,
           confirmButtonClass: "btn btn-danger",
         });
-    });
+      });
   };
   const options = [
     { id: 1, text: "Completed", text: "Completed" },
@@ -99,7 +111,7 @@ const SalesList = () => {
     { id: 2, text: "Online", text: "Online" },
     { id: 2, text: "Inprogess", text: "Inprogess" },
   ];
- const [data, setData] = useState([])
+  const [data, setData] = useState([])
 
 
   const {
@@ -111,28 +123,28 @@ const SalesList = () => {
 
 
   useEffect(() => {
-    if(!isLoading){
-     
-      let mappedData =  sales?.data.map((sale) => {
+    if (!isLoading) {
+
+      let mappedData = sales?.data.map((sale) => {
         // console.log("Payment Infor:", (JSON.parse(sale?.paymentInfo)).type)
-          return {
-            id: sale?.id,
-            Date: sale?.transDate, 
-            Name: sale?.customerName,
-            Status: sale?.status,
-            Reference: sale?.salesRef,
-            // Payment: JSON.parse(sale?.paymentInfo).type,
-            Total: moneyInTxt(sale?.totalAmount) || '',
-            Paid: moneyInTxt(sale?.amountPaid),
-            Balance: moneyInTxt(sale?.balance),
-            Biller: sale?.salesPerson,
-          }
-        })
-      let sortedData = mappedData.sort((a,b) => new Date(b.Date) - new Date(a.Date))
+        return {
+          id: sale?.id,
+          Date: sale?.transDate,
+          Name: sale?.customerName,
+          Status: sale?.status,
+          Reference: sale?.salesRef,
+          // Payment: JSON.parse(sale?.paymentInfo).type,
+          Total: moneyInTxt(sale?.totalAmount) || '',
+          Paid: moneyInTxt(sale?.amountPaid),
+          Balance: moneyInTxt(sale?.balance),
+          Biller: sale?.salesPerson,
+        }
+      })
+      let sortedData = mappedData.sort((a, b) => new Date(b.Date) - new Date(a.Date))
       setData(sortedData)
       console.log('loaded..')
     }
-    else{
+    else {
       console.log('loading...')
     }
   }, [isLoading])
@@ -149,7 +161,7 @@ const SalesList = () => {
       dataIndex: "Name",
       sorter: (a, b) => a.Name.length - b.Name.length,
     },
-   
+
     {
       title: "Reference",
       dataIndex: "Reference",
@@ -166,7 +178,7 @@ const SalesList = () => {
           {text === "Suspended" && (
             <span className="badges bg-lightgreen">{"Suspended"}</span>
           )}
-           {text === "Credit" && (
+          {text === "Credit" && (
             <span className="badges bg-lightred">{"Credit"}</span>
           )}
         </>
@@ -178,9 +190,9 @@ const SalesList = () => {
     //   dataIndex: "Payment",
     //   render: (text, record) => (
     //     <>
-         
+
     //         <span className="badges bg-lightgreen">{(text)}</span>
-        
+
     //     </>
     //   ),
     //   sorter: (a, b) => a.Payment.length - b.Payment.length,
@@ -193,32 +205,32 @@ const SalesList = () => {
     {
       title: "Paid Amount (GHS)",
       dataIndex: "Paid",
-     
+
     },
     {
       title: "Balance (GHS)",
       dataIndex: "Balance",
-      
+
     },
-  
+
     {
       title: "Action",
       render: (text, record) => (
         <>
-         
-              {/* <li>
+
+          {/* <li>
                 <Link to="/tinatett-pos/sales/sales-details" className="dropdown-item">
                   <img src={Eye1} className="me-2" alt="img" />
                   Sale Detail
                 </Link>
               </li> */}
-              {/* <li>
+          {/* <li>
                 <Link to="/tinatett-pos/sales/edit-sales" className="dropdown-item">
                   <img src={EditIcon} className="me-2" alt="img" />
                   Edit Sale
                 </Link>
               </li> */}
-              {/* <li>
+          {/* <li>
                 <Link
                   to="#"
                   className="dropdown-item"
@@ -229,7 +241,7 @@ const SalesList = () => {
                   Show Payments
                 </Link>
               </li> */}
-              {/* <li>
+          {/* <li>
                 <Link
                   to="#"
                   className="dropdown-item"
@@ -240,19 +252,19 @@ const SalesList = () => {
                   Create Payment
                 </Link>
               </li> */}
-           
-                <a href="javascript:void(0);"  
-                title="Download Invoice"
-                 onClick={() => {
-                  setIsSaving(true)
-                  getInvoiceReceipt(record?.Reference)
-                  }}>
-                  <img src={Download} className="me-2" alt="img"  />
-                
-                </a>
-             
-            
-                {/* <Link
+
+          <a href="javascript:void(0);"
+            title="Download Invoice"
+            onClick={() => {
+              setIsSaving(true)
+              getInvoiceReceipt(record?.Reference)
+            }}>
+            <img src={Download} className="me-2" alt="img" />
+
+          </a>
+
+
+          {/* <Link
                   to="#"
                   className="confirm-text"
                   onClick={() => confirmText(record?.id)}
@@ -261,8 +273,8 @@ const SalesList = () => {
                   <img src={DeleteIcon} alt="img" />
                  
                 </Link> */}
-             
-           
+
+
         </>
       ),
     },
@@ -272,11 +284,11 @@ const SalesList = () => {
   const getInvoiceReceipt = (salesref) => {
     axios.get('/sales/getSaleReceipt/' + salesref)
       .then((res) => {
-       // console.log(res.data)
-       if(res.data){
-        setIsSaving(false)
-       }
-        
+        // console.log(res.data)
+        if (res.data) {
+          setIsSaving(false)
+        }
+
         let base64 = res.data.base64
         const blob = base64ToBlob(base64, 'application/pdf');
         const blobFile = `data:application/pdf;base64,${base64}`
@@ -285,8 +297,8 @@ const SalesList = () => {
         //window.open(url, "_blank", "width=600, height=600", 'modal=yes');
         // var newWindow = window.open(url, "_blank", "width=800, height=800");  
         //pdfWindow.document.write("<iframe width='100%' height='100%' src='" + url + "'></iframe>");
-        
-      $('#pdfViewer').modal('show')
+
+        $('#pdfViewer').modal('show')
       })
 
     function base64ToBlob(base64, type = "application/octet-stream") {
@@ -301,8 +313,8 @@ const SalesList = () => {
   }
 
 
-  if(isLoading){
-    return (<LoadingSpinner message="Fetching Sales.."/>)
+  if (isLoading) {
+    return (<LoadingSpinner message="Fetching Sales.." />)
   }
 
   if (isSaving) {
@@ -331,9 +343,9 @@ const SalesList = () => {
               <Tabletop inputfilter={inputfilter} togglefilter={togglefilter} />
               {/* /Filter */}
               <div
-                className={`card mb-0 ${ inputfilter ? "toggleCls" : ""}`}
+                className={`card mb-0 ${inputfilter ? "toggleCls" : ""}`}
                 id="filter_inputs"
-                style={{ display: inputfilter ? "block" :"none"}}
+                style={{ display: inputfilter ? "block" : "none" }}
               >
                 <div className="card-body pb-0">
                   <div className="row">
@@ -624,35 +636,35 @@ const SalesList = () => {
           </div>
         </div>
 
-         {/* PDF Modal */}
-         <div
-            className="modal fade"
-            id="pdfViewer"
-            tabIndex={-1}
-            aria-labelledby="pdfViewer"
-            aria-hidden="true"
-          >
-            <div className="modal-dialog modal-lg modal-dialog-centered">
-              <div className="modal-content">
-                <div className="modal-header">
-                  <h5 className="modal-title">Sales Receipt</h5>
-                  <button
-                    type="button"
-                    className="close"
-                    data-bs-dismiss="modal"
-                    aria-label="Close"
-                    onClick={() => $('.modal').modal('hide')}
-                  >
-                    <span aria-hidden="true">×</span>
-                  </button>
-                </div>
-                <div className="modal-body">
-                  <iframe width='100%' height='800px' src={receiptFile}></iframe>            
-                </div>
-                
+        {/* PDF Modal */}
+        <div
+          className="modal fade"
+          id="pdfViewer"
+          tabIndex={-1}
+          aria-labelledby="pdfViewer"
+          aria-hidden="true"
+        >
+          <div className="modal-dialog modal-lg modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Sales Receipt</h5>
+                <button
+                  type="button"
+                  className="close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                  onClick={() => $('.modal').modal('hide')}
+                >
+                  <span aria-hidden="true">×</span>
+                </button>
               </div>
+              <div className="modal-body">
+                <iframe width='100%' height='800px' src={receiptFile}></iframe>
+              </div>
+
             </div>
           </div>
+        </div>
       </>
     </>
   );
