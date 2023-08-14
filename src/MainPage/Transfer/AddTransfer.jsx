@@ -107,7 +107,7 @@ const AddTransfer = () => {
     setRetailPrice('(' + e.retailPrice + 'GHS)')
     setWholesalePrice('(' + e.wholeSalePrice  + 'GHS)')
     setSpecialPrice('(' + e.specialPrice  + 'GHS)')
-    setPrice(e.retailPrice) 
+    //setPrice(e.retailPrice) 
     //console.log(e)
     
   }
@@ -117,11 +117,11 @@ const AddTransfer = () => {
     axios.get(`${BASE_URL}/purchase/product/${selectedProduct?.value}`).then((res) => {
       if(res.data.success){
         setSelectedProductInfo(res.data.data)
-        let x = res.data.data.batchNumber?.map((item) => {
-          return {value:item.batchNumber, label:item?.batchNumber + '-(' + item?.Quantity +')', expireDate:item?.expireDate, manufacturingDate: item?.manufacturingDate}
+        let x = res.data.newProduct.batchNumber?.map((item) => {
+          return {value:item.batchNumber, label:item?.batchNumber + '-(' + item?.Quantity +')', expireDate:item?.expireDate, manufacturingDate: item?.manufacturingDate, SaleValue: item?.SaleValue}
         })
         //console.log(x)
-        setFormData({...formData, batchNumber: x[0], manuDate: x[0].manufacturingDate, expDate: x[0].expireDate, saleValue:x[0].SaleValue})
+        setFormData({...formData, batchNumber: x[0], manuDate: x[0]?.manufacturingDate, expDate: x[0]?.expireDate, saleValue: x[0].SaleValue || 0})
         retailpriceTypeRef.current.checked = true
       }
     })
@@ -146,8 +146,8 @@ const AddTransfer = () => {
       manufacturingDate: formData?.manuDate,
       expireDate: formData?.expDate,
       quantity: formData?.quantity,
-      unitPrice:price,
-      amount:formData.quantity * price
+      unitPrice: formData.saleValue,
+      amount:formData.quantity * formData.saleValue,
 
     }
 
@@ -203,7 +203,7 @@ const AddTransfer = () => {
 
       setProductGridData([...productGridData, item])
       setPrintGridData([...printGridData, item])
-      setFormData({quantity:'', amount:'', batchNumber:'', manuDate:'', expDate:''})
+      setFormData({quantity:'', amount:0, batchNumber:'', manuDate:'', expDate:''})
       setSelectedProduct({totalQuantity:''})
       retailpriceTypeRef.current.checked = false
       wholesalepriceTypeRef.current.checked = false
@@ -534,7 +534,7 @@ const AddTransfer = () => {
                             </div>
                           
                           </div>
-                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -569,7 +569,7 @@ const AddTransfer = () => {
                         <input
                           className="form-control"
                           type="text"
-                          value={formData.quantity ? formData.quantity * price : price * 1}  
+                          value={formData.quantity ? (formData.quantity * formData.saleValue ): formData.saleValue * 1}  
                         />
                         
                       </div>
@@ -783,13 +783,7 @@ const AddTransfer = () => {
                     <div className="col-lg-6 col-sm-12 col-12">
                       <div className="form-group">
                         <label>Product Value</label>
-                        <input type="text" value={editFormData?.unitPrice} 
-                         disabled
-                         onChange={(e) => {
-                          let unitP = parseInt(e.target.value) || 0
-                          let qty = parseInt(editFormData.quantity) || 0
-                          setEditFormData({ ...editFormData, unitPrice: e.target.value, amount: editFormData ? unitP * qty : unitP * 1 })
-                        }}
+                        <input type="text" value={editFormData?.unitPrice} disabled
                         />
                       </div>
                     </div>

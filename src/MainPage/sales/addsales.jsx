@@ -124,7 +124,7 @@ const Addsales = () => {
   
       axios.post(`/customer`,  payload)
       .then((res) => {
-        console.log(res.data)
+       // console.log(res.data)
         if(res.data.success){
           let addedCustomer =  {
               id: res.data.data?.id,
@@ -229,6 +229,7 @@ const Addsales = () => {
       axios.post(`/sales/suspend`, payload)
         .then((res) => {
           if (res.data.success) {
+            console.log("Sales Ref", res.data)
             setProductGridData([])
             setFormData({ quantity: '', amount: '', batchNumber: '', manuDate: '', expDate: '' })
             setSelectedProduct({ remainingStock: '', wholeSalePrice:'', retailPrice:'', specialPrice:'' })
@@ -294,7 +295,7 @@ const Addsales = () => {
               })
               .catch((error) => {
                 alertify.set("notifier", "position", "bottom-right");
-                alertify.error("Error...Could not complete transaction");
+                alertify.error(error.response.data.error);
 
                 let newNotification = {
                   id: Math.ceil(Math.random()*1000000),
@@ -341,8 +342,8 @@ const Addsales = () => {
           }
         })
         .catch((error) => {
-          alertify.set("notifier", "position", "bottom-right");
-          alertify.error("Internal server error occured. Please contact admin");
+          // alertify.set("notifier", "position", "bottom-right");
+          // alertify.error("Internal server error occured. Please contact admin");
 
           let newNotification = {
             id: Math.ceil(Math.random()*1000000),
@@ -438,17 +439,17 @@ const Addsales = () => {
 
       axios.post(`/sales/suspend`, payload)
         .then((res) => {
+          console.log("DDD", res.data)
           if (res.data.success) {
             setProductGridData([])
             setFormData({ quantity: '', amount: '', batchNumber: '', manuDate: '', expDate: '' })
             setSelectedProduct({ remainingStock: '', wholeSalePrice:'', retailPrice:'', specialPrice:'' })
-            //setSelectedCustomer(null)
             setInvoiceNo('')
 
             alertify.set("notifier", "position", "bottom-right");
             alertify.success("Suspended successfully");
-            retailpriceTypeRef.current.checked = true
-            
+           
+            console.log("Sales Ref", res.data)
             setReferenceData(res.data)
                   let newNotification = {
                     message: `${storage.name} suspended a sale with reference ${res.data.reference}`,
@@ -473,10 +474,10 @@ const Addsales = () => {
         })
         .catch((error) => {
           alertify.set("notifier", "position", "bottom-right");
-          alertify.error("Internal server error occured. Please contact admin");
-      
+          alertify.error(error.response.data.error);
+          console.log("Errror", error)
           let newNotification = {
-            message: `${storage.name} Internal server error occured. Please contact admin`,
+            message: `${storage.name} ${error.response.data.error};`,
             time: new Date().toISOString()
           }
           setNotifications([...notifications, newNotification])
@@ -484,6 +485,7 @@ const Addsales = () => {
         .finally(() => {
           setIsSaving(false)
           $('#reference').modal('show')
+           retailpriceTypeRef.current.checked = true
         }
         )
     }
@@ -497,8 +499,8 @@ const Addsales = () => {
       productId: selectedProduct.value,
       batchNumber: formData.batchNumber?.value,
       quantity: formData.quantity,
-      expireDate: formData.expDate.substring(0, 10),
-      manufacturingDate: formData.manuDate.substring(0, 10),
+      expireDate: formData?.expDate.substring(0, 10),
+      manufacturingDate: formData?.manuDate.substring(0, 10),
       unitPrice: price,
       // priceType: salesType,
       priceType: retailpriceTypeRef.current.checked == true ? 'retail' : 'wholesale',
@@ -559,7 +561,7 @@ const Addsales = () => {
     else {
       setProductGridData([...productGridData, obj])
       setFormData({ quantity: '', amount: '', batchNumber: '', manuDate: '', expDate: '' })
-      setSelectedProduct({ remainingStock: '' })
+      setSelectedProduct({ remainingStock: '', wholeSalePrice:'', retailPrice:'', specialPrice:'' })
       // retailpriceTypeRef.current.checked = false
       // wholesalepriceTypeRef.current.checked = false
       // specialpriceTypeRef.current.checked = false
@@ -582,19 +584,21 @@ const Addsales = () => {
   }
 
   useEffect(() => {
+    console.log("Selected Prod", selectedProduct)
+
     axios.get(`${BASE_URL}/purchase/product/${selectedProduct?.value}`).then((res) => {
       setIsLoading(true)
       if (res.data.success) {
         setIsLoading(false)
-        console.log(res.data.newProduct)
+        //console.log(res.data.newProduct)
         setSelectedProductInfo(res.data.newProduct)
         setSelectedProductInfoEditMode(res.data.newProduct)
         let x = res.data.newProduct.batchNumber?.map((item) => {
           return { value: item.batchNumber, label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')': item?.batchNumber + '-(' + item?.availablequantity + ')', expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
         })
-        // //console.log(x)
-         setFormData({ ...formData, batchNumber: x[0], manuDate: x[0].manufacturingDate, expDate: x[0].expireDate })
-         setEditFormData({...editFormData, batchNumber: x[0], manuDate: x[0].manufacturingDate, expDate: x[0].expireDate})
+        //  console.log("BatchInfo:", x)
+         setFormData({ ...formData, batchNumber: x[0], manuDate: (x[0]?.manufacturingDate).substring(0,10), expDate: (x[0]?.expireDate).substring(0,10) })
+         setEditFormData({...editFormData, batchNumber: x[0], manuDate: (x[0]?.manufacturingDate).substring(0,10), expDate: (x[0]?.expireDate).substring(0,10)})
         //retailpriceTypeRef.current.checked = true
       }
     })
@@ -670,7 +674,7 @@ const Addsales = () => {
         }
       })
       setCustomerList(mappedData)
-      console.log(customerList[0])
+      //console.log(customerList[0])
     
     
 
@@ -797,7 +801,6 @@ const Addsales = () => {
                             options={customerList}
                             value={selectedCustomer}
                             onChange={(e) => {
-                              console.log(e)
                               setSelectedCustomer(e)}}
                             isLoading={customersIsLoading}
                           />
@@ -839,6 +842,7 @@ const Addsales = () => {
                       <label>Quantity Left</label>
                       <div className="input-groupicon">
                         <input
+                          id = 'quantityLeft'
                           className="form-control"
                           type="text"
                           value={selectedProductInfo?.totalCount}
@@ -872,7 +876,7 @@ const Addsales = () => {
                     <div className="form-group">
                       <label>Manufacturing Date</label>
                       <div className="input-groupicon">
-                        <input type="date" className="form-control" value={formData?.manuDate.substring(0, 10)} disabled/>
+                        <input type="date" className="form-control" value={formData?.manuDate} disabled/>
                         {/* <DatePicker
                           selected={startDate}
                           value={formData?.manuDate.substring(0, 10)}
@@ -890,7 +894,7 @@ const Addsales = () => {
                     <div className="form-group">
                       <label>Exp. Date</label>
                       <div className="input-groupicon">
-                      <input type="date" className="form-control" value={formData?.expDate.substring(0, 10)} disabled/>
+                      <input type="date" className="form-control" value={formData?.expDate} disabled/>
                         {/* <DatePicker
                           selected={startDate}
                           value={formData?.expDate.substring(0, 10)}
@@ -915,8 +919,7 @@ const Addsales = () => {
                           <div className="input-group">
                             <div className="input-group-text">
                               <input className="form-check-input" type="radio" ref={retailpriceTypeRef} name="priceType" value={selectedProduct?.retailPrice}
-                                onClick={(e) => {
-                                  console.log(e.target.value)
+                                onClick={(e) => {                                
                                   setPrice(e.target.value)
                                   setDisableUnselectedPrice({ retail: false, wholesale: true, special: true })
                                 }} />
@@ -932,8 +935,6 @@ const Addsales = () => {
                               <input className="form-check-input" type="radio" ref={wholesalepriceTypeRef} name="priceType" value={selectedProduct?.wholeSalePrice}
                                 onClick={(e) => {
                                   setPrice(e.target.value)
-                                  console.log(e.target.value)
-                                 
                                   setDisableUnselectedPrice({ wholesale: false, retail: true, special: true })
                                 }
                                 } />

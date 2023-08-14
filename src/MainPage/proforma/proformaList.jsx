@@ -49,12 +49,38 @@ const ProformaList = () => {
   const [transDate, setTransDate] = useState(new Date().toISOString().slice(0, 10));
   const [loadingTransfer, setLoadingTransfer] = useState(false)
   const axios = useCustomApi()
+
+  const onSuccess = (data) =>{
+    
+    setData([])
+
+    let mappedData = data?.data.map((proforma) => {
+      return {
+        id: proforma?.id,
+        customerName: proforma.customerName,
+        customer: proforma?.customerId,
+        status: proforma?.status,
+        date: new Date(proforma.createdAt).toISOString().substring(0, 10),
+        proformaRef: proforma?.proformaRef,
+        numberOfProduct: proforma?.numberOfProduct,
+        createdBy: proforma?.createdBy || 'N/A',
+      }
+    })
+    let sortedData = mappedData.sort((a,b) => new Date(b.date) - new Date(a.date))
+    setData(sortedData)
+
+  }
+
   const {
     data: proformas,
     isError,
     isLoading,
     isSuccess,
-  } = useGet("proformas", "/proforma");
+    refetch
+  } = useGet("proformas", "/proforma", onSuccess);
+
+
+  
 
   const handleCustomerSelect = (e) => {
     if (customers && !isCustomerLoading) {
@@ -97,35 +123,6 @@ const ProformaList = () => {
     })
     .finally(() => setLoadingTransfer(false))
   }
-
-// const getProformaProductsBatchNumbers = () => {
-//     //console.log("Proformas", proformas)
-//     let proformaProducts
-//     proformas.data.forEach((proforma, index) => {
-//       //get proforma products
-//       axios.get(`/proforma/products/${proforma.id}`)
-//       .then((res) => {
-//       proformaProducts = (res.data?.data)
-//       console.log("Proforma Item", index+1, proformaProducts)
-//       })
-//       //get the details of each product
-//       .then(() => {
-//         proformaProducts.forEach((product) => console.log("Product Details", product))
-//       })
-//       //get the batchNumber for each product
-//       .then(() => {
-//           proformaProducts.forEach((product) => {
-//             axios.get(`/purchase/product/${product.productId}`).then((res) => {
-//                 console.log("Batch Number", res.data.data)
-//           })
-//        })
-//     })
-
-//   })
-
-// }
-
-
 
   useEffect(() => {
     if (!isLoading) {
@@ -193,9 +190,32 @@ const ProformaList = () => {
       confirmButtonClass: "btn btn-primary",
       cancelButtonClass: "btn btn-danger ml-1",
       buttonsStyling: !1,
-    }) .then( async() => {
+    }) .then( async(t) => {
      
-      let data = await axios.delete(`/proforma/${id}`)
+    //   let data = await axios.delete(`/proforma/${id}`)
+    //   if(data.status < 205){
+    //     Swal.fire({
+    //       type: "success",
+    //       title: "Deleted!",
+    //       text: "Your Proforma item has been deleted.",
+    //       confirmButtonClass: "btn btn-success",
+    //     });
+    //     setTimeout(() => {
+    //       window.location.reload()
+    //     },1000)
+   
+    //   }
+    //   else{
+    //     Swal.fire({
+    //       type: "danger",
+    //       title: "Error!",
+    //       text: data.response.data.message,
+    //       confirmButtonClass: "btn btn-danger",
+    //     });
+    //   }
+    // })
+    if(t.isConfirmed){
+        let data = await axios.delete(`/proforma/${id}`)
       if(data.status < 205){
         Swal.fire({
           type: "success",
@@ -203,9 +223,7 @@ const ProformaList = () => {
           text: "Your Proforma item has been deleted.",
           confirmButtonClass: "btn btn-success",
         });
-        setTimeout(() => {
-          window.location.reload()
-        },1000)
+        refetch()
    
       }
       else{
@@ -216,7 +234,20 @@ const ProformaList = () => {
           confirmButtonClass: "btn btn-danger",
         });
       }
-    })
+  }
+    
+    
+   
+     t.dismiss === Swal.DismissReason.cancel &&
+      Swal.fire({
+        title: "Cancelled",
+        text: "You cancelled the delete action",
+        type: "error",
+        confirmButtonClass: "btn btn-success",
+      });
+
+      
+  })
     .catch( (error) => {
         Swal.fire({
           type: "danger",
