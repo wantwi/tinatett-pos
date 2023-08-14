@@ -165,9 +165,6 @@ const AddTransfer = () => {
       }
       setNotifications([...notifications, newNotification])
       $('#selectedProduct').css('border', '1px solid red')
-       setTimeout(() => {
-        $('#selectedProduct').css('border', '1px solid rgba(145, 158, 171, 0.32)')
-      }, 3000)
     }
 
     else if (item.quantity == '' || item.quantity == null)  {
@@ -180,9 +177,6 @@ const AddTransfer = () => {
       }
       setNotifications([...notifications, newNotification])
       $('#quantity').css('border', '1px solid red')
-       setTimeout(() => {
-        $('#quantity').css('border', '1px solid rgba(145, 158, 171, 0.32)')
-      }, 3000)
     }
 
     else if (selectedCustomer == '' || selectedCustomer == null) {
@@ -195,9 +189,6 @@ const AddTransfer = () => {
       }
       setNotifications([...notifications, newNotification])
       $('#selectedCustomer').css('border', '1px solid red')
-      setTimeout(() => {
-        $('#selectedCustomer').css('border', '1px solid rgba(145, 158, 171, 0.32)')
-      }, 3000)
     }
 
 
@@ -256,9 +247,7 @@ const AddTransfer = () => {
       }
       setNotifications([...notifications, newNotification])
       $('#selectedCustomer').css('border', '1px solid red')
-      setTimeout(() => {
-        $('#selectedCustomer').css('border', '1px solid rgba(145, 158, 171, 0.32)')
-      }, 3000)
+    
     }
     else {
       let postBody = {
@@ -358,6 +347,17 @@ const AddTransfer = () => {
     }
   }, [formData.quantity])
 
+  useEffect(() => {
+    $('#quantity').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+  }, [formData.quantity])
+
+  useEffect(() => {
+    $('#selectedCustomer').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+  }, [selectedCustomer])
+
+  useEffect(() => {
+    $('#selectedProduct').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+  }, [selectedProduct])
 
 
   if (isProductsLoading && isCustomerLoading) {
