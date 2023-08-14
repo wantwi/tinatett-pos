@@ -148,7 +148,7 @@ const Cashier = () => {
   const axios = useCustomApi()
 
   const processPayment = (type, print) =>{
-    setIsSaving(true)
+   
     if((Number(paymentInfo.cashAmount) + Number(paymentInfo.cashAmount) + Number(paymentInfo.cashAmount) > 0 ) || type == 'Credit'){
       let pType = ''
       if(paymentInfo.cashAmount > 0){
@@ -174,7 +174,7 @@ const Cashier = () => {
         ]
       }
   
-    
+      setIsSaving(true)
     // console.log(payload)
       axios.post('/sales',payload)
       .then((res) => {
@@ -1178,7 +1178,7 @@ const Cashier = () => {
             aria-labelledby="pdfViewer"
             aria-hidden="true"
           >
-            <div className="modal-dialog modal-lg modal-dialog-centered">
+            <div className="modal-dialog modal-xl modal-dialog-centered">
               <div className="modal-content">
                 <div className="modal-header">
                   <h5 className="modal-title">Sales Receipt</h5>
