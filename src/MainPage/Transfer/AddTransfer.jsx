@@ -197,7 +197,7 @@ const AddTransfer = () => {
 
       setProductGridData([...productGridData, item])
       setPrintGridData([...printGridData, item])
-      setFormData({quantity:'', amount:0, batchNumber:'', manuDate:'', expDate:''})
+      setFormData({quantity:'', amount:'', batchNumber:'', manuDate:'', expDate:'', saleValue:''})
       setSelectedProduct({totalQuantity:''})
       retailpriceTypeRef.current.checked = false
       wholesalepriceTypeRef.current.checked = false
@@ -589,7 +589,7 @@ const AddTransfer = () => {
                         <input
                           className="form-control"
                           type="text"
-                          value={formData.quantity ? (formData.quantity * formData.saleValue ): formData.saleValue * 1}  
+                          value={formData.quantity ? (formData.quantity * formData.saleValue ): (formData.saleValue * 1) || 0 }  
                         />
                         
                       </div>
