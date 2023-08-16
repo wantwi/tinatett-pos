@@ -26,7 +26,7 @@ import { NotificationsContext } from "../../InitialPage/Sidebar/DefaultLayout";
 const AddExpense = () => {
   const [expenseDate, setExpenseDate] = useState(new Date().toISOString().substring(0, 10));
   const [formData, setFormData] = useState({ expenseFor: '', description: '', amount: '', category: '' })
-  const [editFormData, setEditFormData] = useState({ amount: '', quantity: '', price: '' })
+  const [editFormData, setEditFormData] = useState({ expenseFor: '', description: '', amount: '', category: '' })
   const [isLoading, setIsLoading] = useState(false)
   const [listData, setProductGridData] = useState([])
   const options = [
@@ -63,6 +63,10 @@ const AddExpense = () => {
   const shopRef = useRef()
   const companyRef = useRef()
   const productionRef = useRef()
+  const editdirectorRef = useRef()
+  const editshopRef = useRef()
+  const editcompanyRef = useRef()
+  const editproductionRef = useRef()
 
   const axios = useCustomApi();
 
@@ -71,6 +75,10 @@ const AddExpense = () => {
 
   const handleTypeChange = (e) => {
     setFormData({ ...formData, category: e.target.value })
+  }
+
+  const handleEditTypeChange = (e) => {
+    setEditFormData({ ...editFormData, category: e.target.value})
   }
 
   const handleAddItem = () => {
@@ -146,6 +154,35 @@ const AddExpense = () => {
     }
   }
 
+  const handleUpdateList = () => {
+    let updated = {...editFormData, expenseFor: editFormData.expenseFor.label}
+    //console.log(updated)
+    let listCopy = [...listData]
+    let index = listData.findIndex(item => item.id == updated.id)
+    listCopy[index] = updated
+    setProductGridData(listCopy)
+    $('.modal').modal('hide')
+  }
+
+  const handleGetSelected = (item) => {
+    // console.log(item)
+    if(item.category == 'Shop Related'){
+      editshopRef.current.checked = true
+    }
+    else if(item.category == 'Production'){
+      editproductionRef.current.checked = true
+    }
+    if(item.category == 'Company'){
+      editcompanyRef.current.checked = true
+    }
+    if(item.category == 'Director'){
+      editdirectorRef.current.checked = true
+    }
+    let expenseFor = options.find((x) => x.label == item.expenseFor)
+    console.log({...item, expenseFor: expenseFor })
+    setEditFormData({...item, expenseFor: expenseFor })
+  }
+
   const deleteRow = (record) => {
     let newGridData = listData.filter((item) => item.id !== record.id)
     setProductGridData(newGridData)
@@ -196,7 +233,6 @@ const AddExpense = () => {
       })
       .finally(() => {
         setFormData({ amount: '', description: '', expenseFor: '', category: '' })
-        setStartDate(new Date().toISOString().substring(0, 10))
         setIsLoading(false)
       })
     }
@@ -381,6 +417,7 @@ const AddExpense = () => {
                           <th>#</th>
                           <th>Date</th>
                           <th>Type of Expense</th>
+                          <th>Category</th>
                           <th>Amount</th>
                           <th>Action</th>
                         </tr>
@@ -394,11 +431,12 @@ const AddExpense = () => {
                                 <Link to="#">{item?.expenseDate}</Link>
                               </td>
                               <td>{item?.expenseFor}</td>
+                              <td>{item?.category}</td>
                               <td>{moneyInTxt(item?.amount)}</td>
                               <td>
-                                {/* <Link to="#" className="me-2">
-                                    <img src={EditIcon} alt="svg" data-bs-toggle="modal" data-bs-target="#editproduct" onClick={() => setEditFormData(item)}/>
-                                  </Link> */}
+                                <Link to="#" className="me-2">
+                                          <img src={EditIcon} alt="svg" data-bs-toggle="modal" data-bs-target="#editexpense" onClick={() => handleGetSelected(item)} />
+                                        </Link>
                                 <Link to="#" className="delete-set" onClick={() => deleteRow(item)}>
                                   <img src={DeleteIcon} alt="svg" />
                                 </Link>
@@ -449,6 +487,155 @@ const AddExpense = () => {
 
         </div>
       </div>
+
+
+      {/* Edit Modal */}
+      <div
+            className="modal fade"
+            id="editexpense"
+            tabIndex={-1}
+            aria-labelledby="editexpense"
+            aria-hidden="true"
+          >
+            <div className="modal-dialog modal-md modal-dialog-centered">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">Edit Expense</h5>
+                  <button
+                    type="button"
+                    className="close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                  >
+                    <span aria-hidden="true">×</span>
+                  </button>
+                </div>
+                <div className="modal-body">
+                <div className="row">
+                  <div className="col-lg-12 col-sm-12 col-12">
+                    <div className="form-group">
+                      <label>Expense Category</label>
+                      <div className="row" id="category">
+                        <div className="col-lg-6">
+                          <div className="input-group">
+                            <div className="input-group-text">
+                              <input className="form-check-input" type="radio" ref={editshopRef} name="category" value={'Shop Related'} onChange={handleEditTypeChange} />
+                            </div>
+                            <input type="text" className="form-control" aria-label="Text input with radio button" value={'Shop Related'} />
+                          </div>
+                        </div>
+
+                        <div className="col-lg-6">
+                          <div className="input-group">
+                            <div className="input-group-text">
+                              <input className="form-check-input" type="radio" ref={editcompanyRef} name="category" value={'Company'} onChange={handleEditTypeChange} />
+                            </div>
+                            <input type="text" className="form-control" aria-label="Text input with radio button" value={'Company'} />
+                          </div>
+                        </div>
+
+                        <br /><br />
+
+                        <div className="col-lg-6">
+
+                          <div className="input-group">
+                            <div className="input-group-text">
+                              <input className="form-check-input" type="radio" ref={editproductionRef} name="category" value={'Production'} onChange={handleEditTypeChange} />
+                            </div>
+                            <input type="text" className="form-control" aria-label="Text input with radio button" value={'Production'} />
+                          </div>
+
+                        </div>
+
+                        <div className="col-lg-6">
+                          <div className="input-group">
+                            <div className="input-group-text">
+                              <input className="form-check-input" type="radio" ref={editdirectorRef} name="category" value={'Director'} onChange={handleEditTypeChange} />
+                            </div>
+                            <input type="text" className="form-control" aria-label="Text input with radio button" value={'Director'} />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+
+
+                <div className="row">
+
+                  <div className="form-group">
+                    <label>Type of Expense</label>
+                    <div className="row">
+                      <div className="col-lg-12 col-sm-12 col-12">
+                        <Select style={{ width: '100%' }}
+                          id="expenseFor"
+                          className="select"
+                          options={options}
+                          value={editFormData.expenseFor}
+                          onChange={(e) => setEditFormData({ ...editFormData, expenseFor: e })}
+
+                        />
+                      </div>
+
+                    </div>
+                  </div>
+
+                </div>
+
+
+                <div className="row">
+                  <div className="col-lg-12">
+                    <div className="form-group">
+                      <label>Description</label>
+                      <textarea id="description" className="form-control" value={editFormData.description} onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })} />
+                    </div>
+                  </div>
+
+                  <div className="row" style={{}}>
+                    <div className="col-lg-12 col-sm-6 col-12">
+                      <div className="form-group">
+                        <label>Amount</label>
+                        <div className="input-groupicon">
+                          <input type="text"
+                            id="amount"
+                            value={editFormData?.amount}
+                            onChange={(e) => {
+                              if (e.target.value == '') {
+                                setEditFormData({ ...editFormData, amount: '' })
+                              }
+                              else if (isValidNumber(e.target.value)) {
+                                let amt = parseInt(e.target.value)
+                                setEditFormData({ ...editFormData, amount: amt })
+                              }
+                            }}
+                          />
+
+                        </div>
+                      </div>
+                    </div>
+
+                   
+                  </div>
+
+
+                </div>
+                </div>
+                <div className="modal-footer" style={{justifyContent:'flex-end'}}>
+                  <button type="button" className="btn btn-submit" onClick={handleUpdateList}>
+                    Update
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-cancel"
+                    data-bs-dismiss="modal"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
     </>
   );
 };
