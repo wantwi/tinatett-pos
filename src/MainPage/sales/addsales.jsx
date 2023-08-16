@@ -148,9 +148,9 @@ const Addsales = () => {
           let newNotification = {
             id: Math.ceil(Math.random()*1000000),
             message: `${storage.name} Error..could not save customer`,
-            time: new Date().toISOString()
+            time: new Date().toISOString(),  type: 'error'
           }
-          setNotifications([...notifications, newNotification])
+          setNotifications([newNotification, ...notifications])
         }
         
       })
@@ -176,14 +176,14 @@ const Addsales = () => {
 
     if (productGridData.length < 1) {
       alertify.set("notifier", "position", "bottom-right");
-      alertify.message("Please add at least one item to list before saving.");
+      alertify.warning("Please add at least one item to list before saving.");
 
       let newNotification = {
         id: Math.ceil(Math.random()*1000000),
         message: `${storage.name} Please add at least one item to list before saving.`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(), type: 'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
     }
     // else if ((paymentInfo.amountPaid == '' || paymentInfo.amountPaid < 1 || paymentInfo.amountPaid == null) && (transactionType == 'CP' || transactionType == 'CO') ) {
     //   alertify.set("notifier", "position", "bottom-right");
@@ -192,14 +192,14 @@ const Addsales = () => {
 
     else if( (transactionType == 'SP' || transactionType == 'SO') && paymentInfo.amountPaid < (productGridData.reduce((total, item) => total + item.amount, 0))){
       alertify.set("notifier", "position", "bottom-right");
-      alertify.message("Please provide full payment amount before saving.");
+      alertify.warning("Please provide full payment amount before saving.");
 
       let newNotification = {
         id: Math.ceil(Math.random()*1000000),
         message: `${storage.name} Please provide full payment amount before saving.`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(),  type: 'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
     }
     else {
       $('#payment').modal('hide')
@@ -286,9 +286,9 @@ const Addsales = () => {
 
                   let newNotification = {
                     message: `${storage.name} completed a sale with reference ${payload.salesRef}`,
-                    time: new Date().toISOString()
+                    time: new Date().toISOString(),  type: 'success'
                   }
-                  setNotifications([...notifications, newNotification])
+                  setNotifications([newNotification, ...notifications])
                   retailpriceTypeRef.current.checked = true
                   setSelectedCustomer(customerList[0])
 
@@ -301,9 +301,9 @@ const Addsales = () => {
                 let newNotification = {
                   id: Math.ceil(Math.random()*1000000),
                   message: `${storage.name} Error...Could not complete transaction`,
-                  time: new Date().toISOString()
+                  time: new Date().toISOString(),  type: 'error'
                 }
-                setNotifications([...notifications, newNotification])
+                setNotifications([newNotification, ...notifications])
               })
               .finally(() => {
                 setPaymentInfo({
@@ -332,14 +332,14 @@ const Addsales = () => {
           }
           else {
             alertify.set("notifier", "position", "bottom-right");
-            alertify.message("Unsuccessful, please try again");
+            alertify.error("Unsuccessful, please try again");
 
             let newNotification = {
               id: Math.ceil(Math.random()*1000000),
               message: `${storage.name} Unsuccessful, please try saving sales again`,
-              time: new Date().toISOString()
+              time: new Date().toISOString(),  type: 'error'
             }
-            setNotifications([...notifications, newNotification])
+            setNotifications([newNotification, ...notifications])
           }
         })
         .catch((error) => {
@@ -349,9 +349,9 @@ const Addsales = () => {
           let newNotification = {
             id: Math.ceil(Math.random()*1000000),
             message: `${storage.name} Internal server error occured. Please contact admin`,
-            time: new Date().toISOString()
+            time: new Date().toISOString(),  type: 'error'
           }
-          setNotifications([...notifications, newNotification])
+          setNotifications([newNotification, ...notifications])
         })
         .finally(() => {
           setIsSaving(false)
@@ -411,14 +411,14 @@ const Addsales = () => {
 
     if (productGridData.length < 1) {
       alertify.set("notifier", "position", "bottom-right");
-      alertify.message("Please add at least one item to list before saving.");
+      alertify.warning("Please add at least one item to list before saving.");
 
       let newNotification = {
         id: Math.ceil(Math.random()*1000000),
         message: `${storage.name} Please add at least one item to list before saving.`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(),  type: 'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
     }
     else {
       setIsSaving(true)
@@ -459,9 +459,9 @@ const Addsales = () => {
             setReferenceData(res.data)
                   let newNotification = {
                     message: `${storage.name} suspended a sale with reference ${res.data.reference}`,
-                    time: new Date().toISOString()
+                    time: new Date().toISOString(),  type: 'success'
                   }
-                  setNotifications([...notifications, newNotification])
+                  setNotifications([newNotification, ...notifications])
 
             //emit suspend
             socket.emit("suspend", {room: auth?.branchId})
@@ -473,9 +473,9 @@ const Addsales = () => {
            
             let newNotification = {
               message: `${storage.name} encountered an error with Suspend`,
-              time: new Date().toISOString()
+              time: new Date().toISOString(),  type: 'error'
             }
-            setNotifications([...notifications, newNotification])
+            setNotifications([newNotification, ...notifications])
           }
         })
         .catch((error) => {
@@ -484,9 +484,9 @@ const Addsales = () => {
           console.log("Errror", error)
           let newNotification = {
             message: `${storage.name} ${error.response.data.error};`,
-            time: new Date().toISOString()
+            time: new Date().toISOString(),  type: 'error'
           }
-          setNotifications([...notifications, newNotification])
+          setNotifications([newNotification, ...notifications])
         })
         .finally(() => {
           setIsSaving(false)
@@ -523,9 +523,9 @@ const Addsales = () => {
       let newNotification = {
         id: Math.ceil(Math.random()*1000000),
         message: `${storage.name} Please select a product`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(),  type: 'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
       $('#selectedProduct').css('border', '1px solid red')
       // setTimeout(() => {
       //   $('#selectedProduct').css('border', '1px solid rgba(145, 158, 171, 0.32)')
@@ -538,9 +538,9 @@ const Addsales = () => {
       let newNotification = {
         id: Math.ceil(Math.random()*1000000),
         message: `${storage.name} Please select a customer.`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(),  type: 'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
       $('#selectedCustomer').css('border', '1px solid red')
       // setTimeout(() => {
       //   $('#selectedCustomer').css('border', '1px solid rgba(145, 158, 171, 0.32)')
@@ -553,9 +553,9 @@ const Addsales = () => {
       let newNotification = {
         id: Math.ceil(Math.random()*1000000),
         message: `${storage.name} Please enter quantity.`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(),  type: 'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
       $('#quantity').css('border', '1px solid red')
       // setTimeout(() => {
       //   $('#quantity').css('border', '1px solid rgba(145, 158, 171, 0.32)')
@@ -985,9 +985,10 @@ const Addsales = () => {
                               let newNotification = {
                                 id: Math.ceil(Math.random()*1000000),
                                 message: `${storage.name} Quantity can not be greater than quantity in stock.`,
-                                time: new Date().toISOString()
+                                time: new Date().toISOString(),
+                                type: 'warning'
                               }
-                              setNotifications([...notifications, newNotification])
+                              setNotifications([newNotification, ...notifications])
                             }
                             else if (isValidNumber(e.target.value)) {
                               setFormData({ ...formData, quantity: Number(e.target.value) })

@@ -259,9 +259,9 @@ const TransferProformaItems = () => {
       let newNotification = {
         id: Math.ceil(Math.random()*1000000),
         message: `${storage.name} Please make sure all fields are filled.`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(), type:'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
     }
     else {
 
@@ -300,9 +300,9 @@ const TransferProformaItems = () => {
         let newNotification = {
           id: Math.ceil(Math.random()*1000000),
           message: `${storage.name} Please provide a batch number before saving.`,
-          time: new Date().toISOString()
+          time: new Date().toISOString(), type:'warning'
         }
-        setNotifications([...notifications, newNotification])
+        setNotifications([newNotification, ...notifications])
         return
       }
     })
@@ -313,9 +313,9 @@ const TransferProformaItems = () => {
       let newNotification = {
         id: Math.ceil(Math.random()*1000000),
         message: `${storage.name} Please add at least one item to list before saving.`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(), type:'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
     }
     if(selectedCustomer == ''){
       alertify.set("notifier", "position", "bottom-right");
@@ -324,9 +324,9 @@ const TransferProformaItems = () => {
       let newNotification = {
         id: Math.ceil(Math.random()*1000000),
         message: `${storage.name} Please select a branch before saving.`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(), type:'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
       $('#branch').css('border', '1px solid red')
       setTimeout(() => {
         $('#branch').css('border', '1px solid rgba(145, 158, 171, 0.32)')
@@ -352,9 +352,9 @@ const TransferProformaItems = () => {
           let newNotification = {
             id: Math.ceil(Math.random()*1000000),
             message: `${storage.name} Transfer completed successfully.`,
-            time: new Date().toISOString()
+            time: new Date().toISOString(), type: 'success'
           }
-          setNotifications([...notifications, newNotification])
+          setNotifications([newNotification, ...notifications])
           
            //delete proforma
            axios.delete(`/proforma/${id}`).then((res) => console.log(res))
@@ -373,9 +373,9 @@ const TransferProformaItems = () => {
           let newNotification = {
             id: Math.ceil(Math.random()*1000000),
             message: `${storage.name} Error...Could not complete transfer.`,
-            time: new Date().toISOString()
+            time: new Date().toISOString(), type: 'error'
           }
-          setNotifications([...notifications, newNotification])
+          setNotifications([newNotification, ...notifications])
         }
       })
       .catch((error) => {
@@ -386,9 +386,9 @@ const TransferProformaItems = () => {
         let newNotification = {
           id: Math.ceil(Math.random()*1000000),
           message: `${storage.name} Error...Could not complete transfer.`,
-          time: new Date().toISOString()
+          time: new Date().toISOString(), type: 'error'
         }
-        setNotifications([...notifications, newNotification])
+        setNotifications([newNotification, ...notifications])
         
         
       })
@@ -422,9 +422,9 @@ const TransferProformaItems = () => {
       let newNotification = {
         id: Math.ceil(Math.random()*1000000),
         message: `${storage.name} You can not transfer more than stock available.`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(), type:'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
       setFormData(({...formData, quantity:''}))
     }
 

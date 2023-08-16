@@ -198,11 +198,13 @@ const Header = (props) => {
                         let data = [...notifications]
                         let filtered = data.filter((item) => item.message != notification.message)   
                         //data.forEach(item => console.log(item, notification))
-                        console.log("Filtered:", filtered)
                         setNotifications(filtered)
                       }}>
                         <Link to="#">
                           <div className="media d-flex">
+                            <span className="avatar flex-shrink-0" style={{background: notification.type == 'success' ? '#008179' : notification.type == 'warning' ? 'orange' : notification.type == 'error' ? 'darkred' : '#45b6fe'}}>
+                              <i className="far fa-bell" />
+                            </span>
                             <div className="media-body flex-grow-1">
                               <p className="noti-details">
                                 <span className="noti-title">{notification.message.split(' ').slice(0,2)}</span> {notification.message.split(' ').slice(2).join(' ')}

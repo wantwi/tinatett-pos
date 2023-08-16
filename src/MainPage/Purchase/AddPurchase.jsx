@@ -130,9 +130,9 @@ const AddPurchase = () => {
           let newNotification = {
             id: Math.ceil(Math.random()*1000000),
             message: `${storage.name} ${res.data.message}`,
-            time: new Date().toISOString()
+            time: new Date().toISOString(), type: 'warning'
           }
-          setNotifications([...notifications, newNotification])
+          setNotifications([newNotification, ...notifications])
           setProductFormData({ ...productFormData, batchNumber: '' })
         }
       })
@@ -195,9 +195,9 @@ const AddPurchase = () => {
           alertify.error("Error...Could not save supplier.");
           let newNotification = {
             message: `${storage.name} Error...Could not save supplier.`,
-            time: new Date().toISOString()
+            time: new Date().toISOString(),  type: 'error'
           }
-          setNotifications([...notifications, newNotification])
+          setNotifications([newNotification, ...notifications])
         }
 
       })
@@ -239,9 +239,9 @@ const AddPurchase = () => {
       alertify.warning("Please make sure you've selected a product");
       let newNotification = {
         message: `${storage.name} Please make sure you've selected a product.`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(),  type: 'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
     }
 
     else if (productFormData.manufacturingDate == '') {
@@ -250,9 +250,9 @@ const AddPurchase = () => {
       alertify.warning("Please enter Manufacturing Date.");
       let newNotification = {
         message: `${storage.name} Please enter Manufacturing Date`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(),  type: 'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
     }
 
     else if (productFormData.expireDate == '') {
@@ -261,9 +261,9 @@ const AddPurchase = () => {
       alertify.warning("Please make sure you've provided expiry date.");
       let newNotification = {
         message: `${storage.name} Please make sure you've provided expiry date.`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(),  type: 'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
     }
 
     else if (productFormData.batchNumber == '') {
@@ -272,9 +272,9 @@ const AddPurchase = () => {
       alertify.warning("Please enter batch number.");
       let newNotification = {
         message: `${storage.name} Please enter batch number.`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(),  type: 'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
     }
   
 
@@ -284,9 +284,9 @@ const AddPurchase = () => {
       alertify.warning("Please enter quantity.");
       let newNotification = {
         message: `${storage.name} Please enter quantity`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(),  type: 'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
     }
 
    
@@ -297,9 +297,9 @@ const AddPurchase = () => {
       alertify.warning("Please enter unit price.");
       let newNotification = {
         message: `${storage.name} Please enter unit price.`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(),  type: 'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
     }
     else {
       setManDate('')
@@ -321,9 +321,9 @@ const AddPurchase = () => {
       alertify.warning("Please add items to your cart");
       let newNotification = {
         message: `${storage.name} Please add items to your cart.`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(),  type: 'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
     }
     else if (supplier == '') {
       alertify.set("notifier", "position", "bottom-right");
@@ -331,9 +331,9 @@ const AddPurchase = () => {
 
       let newNotification = {
         message: `${storage.name} Please make sure Supplier was selected.`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(),  type: 'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
       $('#supplier').css('border', '1px solid red')
     }
     else if (purDate == '') {
@@ -341,9 +341,9 @@ const AddPurchase = () => {
       alertify.warning("Please make sure purchase date was selected.");
       let newNotification = {
         message: `${storage.name} Please make sure purchase date was selected.`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(),  type: 'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
 
       $('#purDate').css('border', '1px solid red')
       setTimeout(() => {
@@ -409,9 +409,9 @@ const AddPurchase = () => {
       
       let newNotification = {
         message: `${storage.name} Purchase added successfully.`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(),  type: 'success'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
       
     }
     else if (isError) {
@@ -420,9 +420,9 @@ const AddPurchase = () => {
   
       let newNotification = {
         message: `${storage.name} An error occured. Could not save purchase transaction.`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(),  type: 'error'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
     }
    
 

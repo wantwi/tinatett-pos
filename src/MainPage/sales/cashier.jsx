@@ -200,9 +200,9 @@ const Cashier = () => {
         let newNotification = {
           id: Math.ceil(Math.random()*1000000),
           message: `${storage.name} ${error.response.data.error}`,
-          time: new Date().toISOString()
+          time: new Date().toISOString(),  type: 'error'
         }
-        setNotifications([...notifications, newNotification])
+        setNotifications([newNotification, ...notifications])
       })
       .finally(() => {
         setIsSaving(false)
@@ -233,9 +233,9 @@ const Cashier = () => {
       let newNotification = {
         id: Math.ceil(Math.random()*1000000),
         message: `${storage.name} Please enter an amount first`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(),  type: 'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
     }
     
 

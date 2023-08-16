@@ -29,52 +29,52 @@ import { NotificationsContext } from "../../InitialPage/Sidebar/DefaultLayout";
 const AddExpense = () => {
   const { state } = useLocation()
   // console.log(state)
-  const [formData, setFormData] = useState({})
-  // const [startDate, setStartDate] = useState(state?.expenseDate);
-  // const [isLoading, setIsLoading] = useState(false)
-  // const [otherCategory, setOtherCategory] = useState('')
+
 
   const [expenseDate, setExpenseDate] = useState(state?.expenseDate);
-  //const [formData, setFormData] = useState({expenseFor:'', description:'', amount:'', category:''})
+  const [formData, setFormData] = useState({expenseFor:'', description:'', amount:'', category:''})
   const [editFormData, setEditFormData] = useState({ amount: '', quantity: '', price: '' })
   const [isLoading, setIsLoading] = useState(false)
   const [listData, setProductGridData] = useState([])
   const { data: expenseDetails, isLoading: isListLoading } = useGet("expense-details", `/expense/items/${state?.id}`);
   const options = [
-    // { id: textbel: "Cho", value: "" },
-    { id: 2, text: "Fuel", value: "Fuel" },
-    { id: 3, text: "Electric Power", value: "Electric Power" },
-    { id: 4, text: "Poly Bag", value: "Poly Bag" },
-    { id: 5, text: "Drinking Water", value: "Drinking Water " },
-    { id: 6, text: "Stationery", value: "Stationery" },
-    { id: 7, text: "Printing and Photocopies", value: "Printing and Photocopies" },
-    { id: 8, text: "Detergent and Toiletries", value: "Detergent and Toiletries" },
-    { id: 9, text: "Sanitation", value: "Sanitation" },
-    { id: 10, text: "Plastic Tables and Chairs", value: "Plastic Tables and Chairs" },
-    { id: 11, text: "Repairs and Maintenance", value: "Repairs and Maintenance" },
-    { id: 12, text: "Deliveries", value: "Deliveries" },
-    { id: 13, text: "Refund", value: "Refund" },
-    { id: 14, text: "Printer cartriage", value: "Printer cartriage" },
-    { id: 15, text: "Fire extinguisher", value: "Fire extinguisher" },
-    { id: 16, text: "Business Operations Permit", value: "Business Operations Permit" },
-    { id: 17, text: "Head Potters", value: "Head Potters" },
-    { id: 18, text: "Loading fee", value: "Loading fee" },
-    { id: 19, text: "Battery", value: "Battery" },
-    { id: 20, text: "Water bill", value: "Water bill" },
-    { id: 21, text: "Payment to Supplier", value: "Payment to Supplier" },
-    { id: 22, text: "Advertisement and Radio Show", value: "Advertisement and Radio Show" },
-    { id: 23, text: "Accomodation (rent for staff)", value: "Accomodation (rent for staff)" },
-    { id: 24, text: "FDA", value: "FDA" },
-    { id: 25, text: "MOH", value: "MOH" },
-    { id: 26, text: "Assembly Levy", value: "Assembly Levy" },
-    { id: 27, text: "Other", value: "Other" },
+    // { id: 1, label: "Cho", value: "" },
+    { id: 2, label: "Fuel", value: "Fuel" },
+    { id: 3, label: "Electric Power", value: "Electric Power" },
+    { id: 4, label: "Poly Bag", value: "Poly Bag" },
+    { id: 5, label: "Drinking Water", value: "Drinking Water " },
+    { id: 6, label: "Stationery", value: "Stationery" },
+    { id: 7, label: "Printing and Photocopies", value: "Printing and Photocopies" },
+    { id: 8, label: "Detergent and Toiletries", value: "Detergent and Toiletries" },
+    { id: 9, label: "Sanitation", value: "Sanitation" },
+    { id: 10, label: "Plastic Tables and Chairs", value: "Plastic Tables and Chairs" },
+    { id: 11, label: "Repairs and Maintenance", value: "Repairs and Maintenance" },
+    { id: 12, label: "Deliveries", value: "Deliveries" },
+    { id: 13, label: "Refund", value: "Refund" },
+    { id: 14, label: "Printer cartriage", value: "Printer cartriage" },
+    { id: 15, label: "Fire extinguisher", value: "Fire extinguisher" },
+    { id: 16, label: "Business Operations Permit", value: "Business Operations Permit" },
+    { id: 17, label: "Head Potters", value: "Head Potters" },
+    { id: 18, label: "Loading fee", value: "Loading fee" },
+    { id: 19, label: "Battery", value: "Battery" },
+    { id: 20, label: "Water bill", value: "Water bill" },
+    { id: 21, label: "Payment to Supplier", value: "Payment to Supplier" },
+    { id: 22, label: "Advertisement and Radio Show", value: "Advertisement and Radio Show" },
+    { id: 23, label: "Accomodation (rent for staff)", value: "Accomodation (rent for staff)" },
+    { id: 24, label: "FDA", value: "FDA" },
+    { id: 25, label: "MOH", value: "MOH" },
+    { id: 26, label: "Assembly Levy", value: "Assembly Levy" },
+    { id: 27, label: "Other", value: "Other" },
   ];
-
 
   const directorRef = useRef()
   const shopRef = useRef()
   const companyRef = useRef()
   const productionRef = useRef()
+  const editdirectorRef = useRef()
+  const editshopRef = useRef()
+  const editcompanyRef = useRef()
+  const editproductionRef = useRef()
 
   const { notifications, setNotifications } = useContext(NotificationsContext)
 
@@ -86,16 +86,152 @@ const AddExpense = () => {
     setFormData({ ...formData, category: e.target.value })
   }
 
-  const handleUpdate = () => {
-    let payload = {
+  const handleEditTypeChange = (e) => {
+    setEditFormData({ ...editFormData, category: e.target.value})
+  }
+
+  const handleAddItem = () => {
+    let item = {
+      id: listData.length + 1,
       expenseDate: expenseDate,
       category: formData.category,
-      expenseFor: formData.expenseFor,
+      expenseFor: formData.expenseFor.label,
       description: formData?.description,
       amount: formData.amount
     }
+    // console.log(item)
 
-    // console.log(payload)
+    if (item.category == '' || item.category == undefined) {
+      alertify.set("notifier", "position", "bottom-right");
+      alertify.warning("Please make sure category is selected.");
+      $('#category').css('border', '1px solid red')
+
+      let storage = JSON.parse(localStorage.getItem("auth"))
+      let newNotification = {
+        id: Math.ceil(Math.random() * 1000000),
+        message: `${storage.name} Please make sure category is selected.`,
+        time: new Date().toISOString(),
+        type: 'warning'
+      }
+      setNotifications([newNotification, ...notifications])
+    }
+    else if (formData.amount < 1 || formData.amount == "" || item.amount == undefined) {
+      alertify.set("notifier", "position", "bottom-right");
+      alertify.warning("Please make you enter amount.");
+      $('#amount').css('border', '1px solid red')
+
+      let storage = JSON.parse(localStorage.getItem("auth"))
+      let newNotification = {
+        id: Math.ceil(Math.random() * 1000000),
+        message: `${storage.name} Please make you enter amount.`,
+        time: new Date().toISOString(),
+        type: 'warning'
+      }
+      setNotifications([newNotification, ...notifications])
+    }
+    else if (item.expenseDate == '' || item.expenseDate == undefined) {
+      alertify.set("notifier", "position", "bottom-right");
+      alertify.warning("Please make sure you select a date.");
+      $('#expenseDate').css('border', '1px solid red')
+
+      let storage = JSON.parse(localStorage.getItem("auth"))
+      let newNotification = {
+        id: Math.ceil(Math.random() * 1000000),
+        message: `${storage.name} Please make sure you select a date.`,
+        time: new Date().toISOString(),
+        type: 'warning'
+      }
+      setNotifications([newNotification, ...notifications])
+    }
+    else if (item.expenseFor == '' || item.expenseFor == undefined) {
+      alertify.set("notifier", "position", "bottom-right");
+      alertify.warning("Please make sure you selected type of expense");
+      $('#expenseFor').css('border', '1px solid red')
+
+      let storage = JSON.parse(localStorage.getItem("auth"))
+      let newNotification = {
+        id: Math.ceil(Math.random() * 1000000),
+        message: `${storage.name} Please make sure you selected type of expense.`,
+        time: new Date().toISOString(),
+        type: 'warning'
+      }
+      setNotifications([newNotification, ...notifications])
+    }
+
+    else {
+      setProductGridData([...listData, item])
+      setFormData({ expenseFor: '', description: '', amount: '', category: '' })
+      directorRef.current.checked = false
+      productionRef.current.checked = false
+      shopRef.current.checked = false
+      companyRef.current.checked = false
+    }
+  }
+
+  const handleUpdateList = () => {
+    let updated = {...editFormData, expenseFor: editFormData.expenseFor.label}
+    //console.log(updated)
+    let listCopy = [...listData]
+    let index = listData.findIndex(item => item.id == updated.id)
+    listCopy[index] = updated
+    setProductGridData(listCopy)
+    $('.modal').modal('hide')
+  }
+  
+  const handleGetSelected = (item) => {
+    // console.log(item)
+    if(item.category == 'Shop Related'){
+      editshopRef.current.checked = true
+    }
+    else if(item.category == 'Production'){
+      editproductionRef.current.checked = true
+    }
+    if(item.category == 'Company'){
+      editcompanyRef.current.checked = true
+    }
+    if(item.category == 'Director'){
+      editdirectorRef.current.checked = true
+    }
+    let expenseFor = options.find((x) => x.label == item.expenseFor)
+    console.log({...item, expenseFor: expenseFor })
+    setEditFormData({...item, expenseFor: expenseFor })
+  }
+
+  const deleteRow = (record) => {
+    let newGridData = listData.filter((item) => item.id !== record.id)
+    setProductGridData(newGridData)
+  }
+
+  const handleUpdate = () => {
+
+    let payload = {
+      amount: listData.reduce((total, item) => item.amount + total, 0),
+      expenseDate: expenseDate,
+      expenseList: listData.map((item) => {
+        return {
+          "category": item.category,
+          "expenseDate": item.expenseDate,
+          "amount": item.amount,
+          "expenseFor": item.expenseFor || '',
+          "description": item.description || ''
+        }
+      })
+    }
+
+    if (!listData.length > 0) {
+      alertify.set("notifier", "position", "bottom-right");
+      alertify.warning("Please make sure you've added expenses.");
+      let storage = JSON.parse(localStorage.getItem("auth"))
+      let newNotification = {
+        id: Math.ceil(Math.random() * 1000000),
+        message: `${storage.name} Please make sure you've added expenses.`,
+        time: new Date().toISOString(),
+        type: 'warning'
+      }
+      setNotifications([newNotification, ...notifications])
+    }
+
+    //  console.log(payload)
     setIsLoading(true)
     axios.put(`/expense/${state?.id}`, payload)
       .then((res) => {
@@ -115,14 +251,6 @@ const AddExpense = () => {
       .finally(() => setIsLoading(false))
   }
 
-  const deleteRow = (record) => {
-    // console.log(record)
-    // console.log(productGridData)
-    let newGridData = listData.filter((item) => item.id !== record.id)
-    //console.log(newGridData)
-    setProductGridData(newGridData)
-  };
-
   useEffect(() => {
     let mappedData = expenseDetails?.data.map((item, index) => {
       return {
@@ -140,78 +268,22 @@ const AddExpense = () => {
   }, [expenseDetails])
 
 
-  const handleAddItem = () => {
-    let item = {
-      id: listData.length + 1,
-      expenseDate: expenseDate,
-      category: formData.category,
-      expenseFor: formData.expenseFor.label,
-      description: formData?.description,
-      amount: formData.amount
-    }
-    //console.log(item)
 
-    if (item.category == '' || item.category == undefined) {
-      alertify.set("notifier", "position", "bottom-right");
-      alertify.warning("Please make sure category is selected.");
-      $('#category').css('border', '1px solid red')
+  useEffect(() => {
+    $('#amount').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+  }, [formData.amount])
 
-      let storage = JSON.parse(localStorage.getItem("auth"))
-      let newNotification = {
-        id: Math.ceil(Math.random()*1000000),
-        message: `${storage.name} Please make sure category is selected.`,
-        time: new Date().toISOString()
-      }
-      setNotifications([...notifications, newNotification])
-    }
-    else if (item.expenseDate == '') {
-      alertify.set("notifier", "position", "bottom-right");
-      alertify.warning("Please make sure you select a date.");
-      $('#expenseDate').css('border', '1px solid red')
+  useEffect(() => {
+    $('#category').css('border', 'none')
+  }, [formData.category])
 
-      let storage = JSON.parse(localStorage.getItem("auth"))
-      let newNotification = {
-        id: Math.ceil(Math.random()*1000000),
-        message: `${storage.name} Please make sure you select a date.`,
-        time: new Date().toISOString()
-      }
-      setNotifications([...notifications, newNotification])
-    }
-    else if (item.expenseFor == '' || item.expenseFor == undefined) {
-      alertify.set("notifier", "position", "bottom-right");
-      alertify.warning("Please make sure you selected type of expense");
-      $('#expenseFor').css('border', '1px solid red')
+  useEffect(() => {
+    $('#expenseDate').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+  }, [expenseDate])
 
-      let storage = JSON.parse(localStorage.getItem("auth"))
-      let newNotification = {
-        id: Math.ceil(Math.random()*1000000),
-        message: `${storage.name} Please make sure you selected type of expense.`,
-        time: new Date().toISOString()
-      }
-      setNotifications([...notifications, newNotification])
-    }
-    else if (formData.amount < 1 || formData.amount == "") {
-      alertify.set("notifier", "position", "bottom-right");
-      alertify.warning("Please make you enter amount.");
-      $('#amount').css('border', '1px solid red')
-
-      let storage = JSON.parse(localStorage.getItem("auth"))
-      let newNotification = {
-        id: Math.ceil(Math.random()*1000000),
-        message: `${storage.name} Please make you enter amount.`,
-        time: new Date().toISOString()
-      }
-      setNotifications([...notifications, newNotification])
-    }
-    else {
-      setProductGridData([...listData, item])
-      setFormData({ expenseFor: '', description: '', amount: '', category: '' })
-      directorRef.current.checked = false
-      productionRef.current.checked = false
-      shopRef.current.checked = false
-      companyRef.current.checked = false
-    }
-  }
+  useEffect(() => {
+    $('#expenseFor').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+  }, [formData.expenseFor])
 
 
   if (isLoading) {
@@ -307,15 +379,15 @@ const AddExpense = () => {
                     <label>Type of Expense</label>
                     <div className="row">
                       <div className="col-lg-12 col-sm-12 col-12">
-                        <Select2 style={{ width: '100%' }}
+                      <Select style={{ width: '100%' }}
                           id="expenseFor"
                           className="select"
-                          data={options}
+                          options={options}
                           value={formData.expenseFor}
-                          onChange={(e) => setFormData({ ...formData, expenseFor: e.target.value })}
-                        // onChange={(e) => console.log(e.target.value)}
+                          onChange={(e) => setFormData({ ...formData, expenseFor: e })}
 
                         />
+
                       </div>
 
                     </div>
@@ -355,10 +427,10 @@ const AddExpense = () => {
                       </div>
                     </div>
 
-                    <div className="col-lg-6" style={{display:'flex', justifyContent:'flex-end'}}>
-                            <button style={{height:50,  marginTop:30}} className="btn btn-submit me-2" onClick={handleAddItem}>Add Expenses</button>
-                    
-                        </div>
+                    <div className="col-lg-6" style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                      <button style={{ height: 50, marginTop: 30 }} className="btn btn-submit me-2" onClick={handleAddItem}>Add Expenses</button>
+
+                    </div>
                   </div>
 
 
@@ -383,7 +455,7 @@ const AddExpense = () => {
                             <thead>
                               <tr>
                                 <th>#</th>
-                                <th>Expense For</th>
+                                <th>Type of Expense</th>
                                 <th>Category</th>
                                 <th>Description</th>
                                 <th>Amount</th>
@@ -405,7 +477,7 @@ const AddExpense = () => {
                                       <td>{item?.amount}</td>
                                       <td>
                                         <Link to="#" className="me-2">
-                                          <img src={EditIcon} alt="svg" data-bs-toggle="modal" data-bs-target="#editproduct" onClick={() => setEditFormData(item)} />
+                                          <img src={EditIcon} alt="svg" data-bs-toggle="modal" data-bs-target="#editexpense" onClick={() => handleGetSelected(item)} />
                                         </Link>
                                         <Link to="#" className="delete-set" onClick={() => deleteRow(item)}>
                                           <img src={DeleteIcon} alt="svg" />
@@ -419,17 +491,17 @@ const AddExpense = () => {
 
                             </tbody>
                           </table>
-                       
+
                         </div>
                       </div>
                     </div>
 
-                    <div className="col-lg-12" style={{textAlign: 'right'}}>
-                            <button className="btn btn-submit me-2" onClick={() => handleUpdate()}>Update</button>
-                            <Link to="/tinatett-pos/expense/expenselist" className="btn btn-cancel">
-                              Cancel
-                            </Link>
-                          </div>
+                    <div className="col-lg-12" style={{ textAlign: 'right' }}>
+                      <button className="btn btn-submit me-2" onClick={() => handleUpdate()}>Update</button>
+                      <Link to="/tinatett-pos/expense/expenselist" className="btn btn-cancel">
+                        Cancel
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -441,6 +513,155 @@ const AddExpense = () => {
 
 
         </div>
+      </div>
+
+
+       {/* Edit Modal */}
+       <div
+            className="modal fade"
+            id="editexpense"
+            tabIndex={-1}
+            aria-labelledby="editexpense"
+            aria-hidden="true"
+          >
+            <div className="modal-dialog modal-md modal-dialog-centered">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">Edit Expense</h5>
+                  <button
+                    type="button"
+                    className="close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                  >
+                    <span aria-hidden="true">×</span>
+                  </button>
+                </div>
+                <div className="modal-body">
+                <div className="row">
+                  <div className="col-lg-12 col-sm-12 col-12">
+                    <div className="form-group">
+                      <label>Expense Category</label>
+                      <div className="row" id="category">
+                        <div className="col-lg-6">
+                          <div className="input-group">
+                            <div className="input-group-text">
+                              <input className="form-check-input" type="radio" ref={editshopRef} name="category" value={'Shop Related'} onChange={handleEditTypeChange} />
+                            </div>
+                            <input type="text" className="form-control" aria-label="Text input with radio button" value={'Shop Related'} />
+                          </div>
+                        </div>
+
+                        <div className="col-lg-6">
+                          <div className="input-group">
+                            <div className="input-group-text">
+                              <input className="form-check-input" type="radio" ref={editcompanyRef} name="category" value={'Company'} onChange={handleEditTypeChange} />
+                            </div>
+                            <input type="text" className="form-control" aria-label="Text input with radio button" value={'Company'} />
+                          </div>
+                        </div>
+
+                        <br /><br />
+
+                        <div className="col-lg-6">
+
+                          <div className="input-group">
+                            <div className="input-group-text">
+                              <input className="form-check-input" type="radio" ref={editproductionRef} name="category" value={'Production'} onChange={handleEditTypeChange} />
+                            </div>
+                            <input type="text" className="form-control" aria-label="Text input with radio button" value={'Production'} />
+                          </div>
+
+                        </div>
+
+                        <div className="col-lg-6">
+                          <div className="input-group">
+                            <div className="input-group-text">
+                              <input className="form-check-input" type="radio" ref={editdirectorRef} name="category" value={'Director'} onChange={handleEditTypeChange} />
+                            </div>
+                            <input type="text" className="form-control" aria-label="Text input with radio button" value={'Director'} />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+
+
+                <div className="row">
+
+                  <div className="form-group">
+                    <label>Type of Expense</label>
+                    <div className="row">
+                      <div className="col-lg-12 col-sm-12 col-12">
+                      <Select style={{ width: '100%' }}
+                          id="expenseFor"
+                          className="select"
+                          options={options}
+                          value={editFormData.expenseFor}
+                          onChange={(e) => setEditFormData({ ...editFormData, expenseFor: e })}
+
+                        />
+                      </div>
+
+                    </div>
+                  </div>
+
+                </div>
+
+
+                <div className="row">
+                  <div className="col-lg-12">
+                    <div className="form-group">
+                      <label>Description</label>
+                      <textarea id="description" className="form-control" value={editFormData.description} onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })} />
+                    </div>
+                  </div>
+
+                  <div className="row" style={{}}>
+                    <div className="col-lg-12 col-sm-6 col-12">
+                      <div className="form-group">
+                        <label>Amount</label>
+                        <div className="input-groupicon">
+                          <input type="text"
+                            id="amount"
+                            value={editFormData?.amount}
+                            onChange={(e) => {
+                              if (e.target.value == '') {
+                                setEditFormData({ ...editFormData, amount: '' })
+                              }
+                              else if (isValidNumber(e.target.value)) {
+                                let amt = parseInt(e.target.value)
+                                setEditFormData({ ...editFormData, amount: amt })
+                              }
+                            }}
+                          />
+
+                        </div>
+                      </div>
+                    </div>
+
+                   
+                  </div>
+
+
+                </div>
+                </div>
+                <div className="modal-footer" style={{justifyContent:'flex-end'}}>
+                  <button type="button" className="btn btn-submit" onClick={handleUpdateList}>
+                    Update
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-cancel"
+                    data-bs-dismiss="modal"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
       </div>
     </>
   );

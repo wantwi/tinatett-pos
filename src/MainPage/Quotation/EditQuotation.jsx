@@ -138,9 +138,9 @@ const EditQuotation = () => {
       let newNotification = {
         id: Math.ceil(Math.random()*1000000),
         message: `${storage.name} Please select a product first`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(),  type: 'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
     }
     if(productFormData?.qty == ''){
       alertify.set("notifier", "position", "bottom-right");
@@ -149,9 +149,9 @@ const EditQuotation = () => {
       let newNotification = {
         id: Math.ceil(Math.random()*1000000),
         message: `${storage.name} Please provide a quantity first.`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(),  type: 'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
     }
     else{
       setProductGridData([...productGridData, productFormData])
@@ -171,9 +171,9 @@ const EditQuotation = () => {
       let newNotification = {
         id: Math.ceil(Math.random()*1000000),
         message: `${storage.name} Please add at least one product to the list.`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(),  type: 'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
     }else{
       setLoading(true)
       const payload = {
@@ -203,9 +203,9 @@ const EditQuotation = () => {
         let newNotification = {
           id: Math.ceil(Math.random()*1000000),
           message: `${storage.name} Failed to update request due to an error.`,
-          time: new Date().toISOString()
+          time: new Date().toISOString(),  type: 'error'
         }
-        setNotifications([...notifications, newNotification])
+        setNotifications([newNotification, ...notifications])
       })
       .finally(() => setLoading(false))
     }
@@ -304,9 +304,9 @@ const EditQuotation = () => {
                               let newNotification = {
                                 id: Math.ceil(Math.random()*1000000),
                                 message: `${storage.name} Amount can not be greater than amount in stock.`,
-                                time: new Date().toISOString()
+                                time: new Date().toISOString(),  type: 'warning'
                               }
-                              setNotifications([...notifications, newNotification])
+                              setNotifications([newNotification, ...notifications])
                             }
                             else{
                               let qty = parseInt(e.target.value) || 0

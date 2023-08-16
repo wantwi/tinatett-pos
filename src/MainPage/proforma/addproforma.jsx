@@ -110,9 +110,10 @@ const AddProforma = () => {
         let newNotification = {
           id: Math.ceil(Math.random()*1000000),
           message: `${storage.name} Error..could not save customer`,
-          time: new Date().toISOString()
+          time: new Date().toISOString(),
+          type: 'error'
         }
-        setNotifications([...notifications, newNotification])
+        setNotifications([newNotification, ...notifications])
       }
       
     })
@@ -243,9 +244,10 @@ const AddProforma = () => {
       let newNotification = {
         id: Math.ceil(Math.random()*1000000),
         message: `${storage.name} Please make sure all fields are filled`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(),
+        type: 'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
     }
     else {
 
@@ -277,9 +279,10 @@ const AddProforma = () => {
       let newNotification = {
         id: Math.ceil(Math.random()*1000000),
         message: `${storage.name} Please add at least one item to list before saving`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(),
+        type: 'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
     }
     else {
       setIsSaving(true)
@@ -306,9 +309,10 @@ const AddProforma = () => {
           let storage = JSON.parse(localStorage.getItem("auth"))
           let newNotification = {
             message: `${storage.name} added a Proforma successfully.`,
-            time: new Date().toISOString()
+            time: new Date().toISOString(),
+            type: 'success'
           }
-          setNotifications([...notifications, newNotification])
+          setNotifications([newNotification, ...notifications])
 
           setSelectedCustomer({})
           setSelectedProduct({})
@@ -337,9 +341,10 @@ const AddProforma = () => {
           let newNotification = {
             id: Math.ceil(Math.random()*1000000),
             message: `${storage.name} Error. Could not save Proforma`,
-            time: new Date().toISOString()
+            time: new Date().toISOString(),
+            type: 'error'
           }
-          setNotifications([...notifications, newNotification])
+          setNotifications([newNotification, ...notifications])
         }
      }).finally(() => setIsSaving(false))
 
@@ -489,9 +494,10 @@ const AddProforma = () => {
                                   let newNotification = {
                                     id: Math.ceil(Math.random()*1000000),
                                     message: `${storage.name} Please select a product first`,
-                                    time: new Date().toISOString()
+                                    time: new Date().toISOString(),
+                                    type: 'warning'
                                   }
-                                  setNotifications([...notifications, newNotification])
+                                  setNotifications([newNotification, ...notifications])
                                   retailpriceTypeRef.current.checked = false
                                 } else {
                                   setFormData({ ...formData, price: selectedProduct.retailPrice, amount: formData.quantity ? selectedProduct?.retailPrice * formData.quantity : selectedProduct?.retailPrice * 1 })
@@ -516,9 +522,10 @@ const AddProforma = () => {
                                   let newNotification = {
                                     id: Math.ceil(Math.random()*1000000),
                                     message: `${storage.name} Please select a product first`,
-                                    time: new Date().toISOString()
+                                    time: new Date().toISOString(),
+                                    type: 'warning'
                                   }
-                                  setNotifications([...notifications, newNotification])
+                                  setNotifications([newNotification, ...notifications])
                                   wholesalepriceTypeRef.current.checked = false
                                 } else {
                                   setFormData({ ...formData, price: selectedProduct.wholeSalePrice, amount: formData.quantity ? selectedProduct.wholeSalePrice * formData.quantity : selectedProduct.wholeSalePrice * 1 })
@@ -545,9 +552,10 @@ const AddProforma = () => {
                                   let newNotification = {
                                     id: Math.ceil(Math.random()*1000000),
                                     message: `${storage.name} Please select a product first`,
-                                    time: new Date().toISOString()
+                                    time: new Date().toISOString(),
+                                    type: 'warning'
                                   }
-                                  setNotifications([...notifications, newNotification])
+                                  setNotifications([newNotification, ...notifications])
                                   specialpriceTypeRef.current.checked = false
                                 } else {
                                   setFormData({ ...formData, price: selectedProduct.specialPrice, amount: formData.quantity ? selectedProduct.specialPrice * formData.quantity : selectedProduct.specialPrice * 1 })

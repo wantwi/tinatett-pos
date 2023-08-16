@@ -191,9 +191,9 @@ const EditTransfer = () => {
       let newNotification = {
         id: Math.ceil(Math.random()*1000000),
         message: `${storage.name} Please select a product`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(), type:'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
       $('#selectedProduct').css('border', '1px solid red')
        setTimeout(() => {
         $('#selectedProduct').css('border', '1px solid rgba(145, 158, 171, 0.32)')
@@ -206,9 +206,9 @@ const EditTransfer = () => {
       let newNotification = {
         id: Math.ceil(Math.random()*1000000),
         message: `${storage.name} Please enter quantity`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(), type:'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
       $('#quantity').css('border', '1px solid red')
        setTimeout(() => {
         $('#quantity').css('border', '1px solid rgba(145, 158, 171, 0.32)')
@@ -221,9 +221,9 @@ const EditTransfer = () => {
       let newNotification = {
         id: Math.ceil(Math.random()*1000000),
         message: `${storage.name} Please select a branch.`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(), type:'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
       $('#selectedCustomer').css('border', '1px solid red')
       setTimeout(() => {
         $('#selectedCustomer').css('border', '1px solid rgba(145, 158, 171, 0.32)')
@@ -256,9 +256,9 @@ const EditTransfer = () => {
       let newNotification = {
         id: Math.ceil(Math.random()*1000000),
         message: `${storage.name} Please add at least one item to list before saving.`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(), type:'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
     }
     else {
       let postBody = {
@@ -283,9 +283,9 @@ const EditTransfer = () => {
 
       let newNotification = {
         message: `${storage.name} Transfer updated successfully.`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(), type:'success'
       }
-  setNotifications([...notifications, newNotification])
+  setNotifications([newNotification, ...notifications])
       // $('#create').modal('show');
     }
     else if (isPostError) {
@@ -294,9 +294,9 @@ const EditTransfer = () => {
 
       let newNotification = {
         message: `${storage.name} could not process Transfer Update.`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(), type:'error'
       }
-  setNotifications([...notifications, newNotification])
+  setNotifications([newNotification, ...notifications])
     }
 
     return () => { };

@@ -116,9 +116,9 @@ const EditSales = () => {
       let newNotification = {
         id: Math.ceil(Math.random()*1000000),
         message: `${storage.name} Please add at least one item to list before saving.`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(),  type: 'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
     }
     if (paymentInfo.amountPaid == '' || paymentInfo.amountPaid < 1 || paymentInfo.amountPaid == null) {
       alertify.set("notifier", "position", "bottom-right");
@@ -127,10 +127,10 @@ const EditSales = () => {
       let newNotification = {
         id: Math.ceil(Math.random()*1000000),
         message: `${storage.name} Please provide payment amount before saving.`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(),  type: 'warning'
 
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
     }
     else {
 
@@ -203,9 +203,9 @@ const EditSales = () => {
                   let newNotification = {
                     id: Math.ceil(Math.random()*1000000),
                     message: `${storage.name} Sale completed with reference ${payload.salesRef}`,
-                    time: new Date().toISOString()
+                    time: new Date().toISOString(), type:'success'
                   }
-                  setNotifications([...notifications, newNotification])
+                  setNotifications([newNotification, ...notifications])
                 }
               })
               .catch((error) => {
@@ -215,9 +215,9 @@ const EditSales = () => {
                 let newNotification = {
                   id: Math.ceil(Math.random()*1000000),
                   message: `${storage.name} Error...Could not complete transaction`,
-                  time: new Date().toISOString()
+                  time: new Date().toISOString(), type:'error'
                 }
-                setNotifications([...notifications, newNotification])
+                setNotifications([newNotification, ...notifications])
               })
               .finally(() => {
                 setPaymentInfo({
@@ -251,9 +251,9 @@ const EditSales = () => {
             let newNotification = {
               id: Math.ceil(Math.random()*1000000),
               message: `${storage.name} Unsuccessful, please try again.`,
-              time: new Date().toISOString()
+              time: new Date().toISOString(), type:'warning'
             }
-            setNotifications([...notifications, newNotification])
+            setNotifications([newNotification, ...notifications])
           }
         })
         .catch((error) => {
@@ -263,9 +263,9 @@ const EditSales = () => {
           let newNotification = {
             id: Math.ceil(Math.random()*1000000),
             message: `${storage.name} Internal server error occured. Please contact admin.`,
-            time: new Date().toISOString()
+            time: new Date().toISOString(), type:'error'
           }
-          setNotifications([...notifications, newNotification])
+          setNotifications([newNotification, ...notifications])
         })
         .finally(() => {
           setIsSaving(false)
@@ -342,9 +342,9 @@ const EditSales = () => {
       let newNotification = {
         id: Math.ceil(Math.random()*1000000),
         message: `${storage.name} please add at least one item to list before saving.`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(), type:'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
     }
     else {
       setIsSaving(true)
@@ -391,9 +391,9 @@ const EditSales = () => {
             let newNotification = {
               id: Math.ceil(Math.random()*1000000),
               message: `${storage.name} Suspend update unsuccessful.`,
-              time: new Date().toISOString()
+              time: new Date().toISOString(), type:'warning'
             }
-            setNotifications([...notifications, newNotification])
+            setNotifications([newNotification, ...notifications])
           }
         })
         .catch((error) => {
@@ -403,9 +403,9 @@ const EditSales = () => {
           let newNotification = {
             id: Math.ceil(Math.random()*1000000),
             message: `${storage.name} Internal server error occured. Please contact admin`,
-            time: new Date().toISOString()
+            time: new Date().toISOString(), type:'error'
           }
-          setNotifications([...notifications, newNotification])
+          setNotifications([newNotification, ...notifications])
         })
         .finally(() => {
           setIsSaving(false)
@@ -439,7 +439,7 @@ const EditSales = () => {
         message: `${storage.name} Please make sure all fields are filled.`,
         time: new Date().toISOString()
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
     }
     else {
       setProductGridData([...productGridData, obj])

@@ -78,7 +78,7 @@ const AddExpense = () => {
   }
 
   const handleEditTypeChange = (e) => {
-    setEditFormData({ ...editFormData, category: e.target.value})
+    setEditFormData({ ...editFormData, category: e.target.value })
   }
 
   const handleAddItem = () => {
@@ -99,11 +99,12 @@ const AddExpense = () => {
 
       let storage = JSON.parse(localStorage.getItem("auth"))
       let newNotification = {
-        id: Math.ceil(Math.random()*1000000),
+        id: Math.ceil(Math.random() * 1000000),
         message: `${storage.name} Please make sure category is selected.`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(),
+        type: 'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
     }
     else if (item.expenseDate == '') {
       alertify.set("notifier", "position", "bottom-right");
@@ -112,11 +113,12 @@ const AddExpense = () => {
 
       let storage = JSON.parse(localStorage.getItem("auth"))
       let newNotification = {
-        id: Math.ceil(Math.random()*1000000),
+        id: Math.ceil(Math.random() * 1000000),
         message: `${storage.name} Please make sure you select a date.`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(),
+        type: 'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
     }
     else if (item.expenseFor == '' || item.expenseFor == undefined) {
       alertify.set("notifier", "position", "bottom-right");
@@ -125,11 +127,12 @@ const AddExpense = () => {
 
       let storage = JSON.parse(localStorage.getItem("auth"))
       let newNotification = {
-        id: Math.ceil(Math.random()*1000000),
+        id: Math.ceil(Math.random() * 1000000),
         message: `${storage.name} Please make sure you selected type of expense.`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(),
+        type: 'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
     }
     else if (formData.amount < 1 || formData.amount == "") {
       alertify.set("notifier", "position", "bottom-right");
@@ -138,11 +141,12 @@ const AddExpense = () => {
 
       let storage = JSON.parse(localStorage.getItem("auth"))
       let newNotification = {
-        id: Math.ceil(Math.random()*1000000),
+        id: Math.ceil(Math.random() * 1000000),
         message: `${storage.name} Please make you enter amount.`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(),
+        type: 'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
     }
     else {
       setProductGridData([...listData, item])
@@ -155,7 +159,7 @@ const AddExpense = () => {
   }
 
   const handleUpdateList = () => {
-    let updated = {...editFormData, expenseFor: editFormData.expenseFor.label}
+    let updated = { ...editFormData, expenseFor: editFormData.expenseFor.label }
     //console.log(updated)
     let listCopy = [...listData]
     let index = listData.findIndex(item => item.id == updated.id)
@@ -166,21 +170,21 @@ const AddExpense = () => {
 
   const handleGetSelected = (item) => {
     // console.log(item)
-    if(item.category == 'Shop Related'){
+    if (item.category == 'Shop Related') {
       editshopRef.current.checked = true
     }
-    else if(item.category == 'Production'){
+    else if (item.category == 'Production') {
       editproductionRef.current.checked = true
     }
-    if(item.category == 'Company'){
+    if (item.category == 'Company') {
       editcompanyRef.current.checked = true
     }
-    if(item.category == 'Director'){
+    if (item.category == 'Director') {
       editdirectorRef.current.checked = true
     }
     let expenseFor = options.find((x) => x.label == item.expenseFor)
-    console.log({...item, expenseFor: expenseFor })
-    setEditFormData({...item, expenseFor: expenseFor })
+    console.log({ ...item, expenseFor: expenseFor })
+    setEditFormData({ ...item, expenseFor: expenseFor })
   }
 
   const deleteRow = (record) => {
@@ -203,38 +207,39 @@ const AddExpense = () => {
       })
     }
 
-    if(!listData.length > 0){
+    if (!listData.length > 0) {
       alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please make sure you've added expenses.");
       let storage = JSON.parse(localStorage.getItem("auth"))
       let newNotification = {
-        id: Math.ceil(Math.random()*1000000),
+        id: Math.ceil(Math.random() * 1000000),
         message: `${storage.name} Please make sure you've added expenses.`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(),
+        type: 'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
     }
-    else{
-    setIsLoading(true)
-    axios.post('/expense', payload)
-      .then((res) => {
+    else {
+      setIsLoading(true)
+      axios.post('/expense', payload)
+        .then((res) => {
 
-        if (res.data.success) {
+          if (res.data.success) {
+            alertify.set("notifier", "position", "bottom-right");
+            alertify.success("Expense successfully added.");
+            setIsLoading(false)
+            setProductGridData([])
+          }
+        })
+        .catch((error) => {
           alertify.set("notifier", "position", "bottom-right");
-          alertify.success("Expense successfully added.");
+          alertify.error("Error...Could not complete transaction");
           setIsLoading(false)
-          setProductGridData([])
-        }
-      })
-      .catch((error) => {
-        alertify.set("notifier", "position", "bottom-right");
-        alertify.error("Error...Could not complete transaction");
-        setIsLoading(false)
-      })
-      .finally(() => {
-        setFormData({ amount: '', description: '', expenseFor: '', category: '' })
-        setIsLoading(false)
-      })
+        })
+        .finally(() => {
+          setFormData({ amount: '', description: '', expenseFor: '', category: '' })
+          setIsLoading(false)
+        })
     }
   }
 
@@ -415,9 +420,9 @@ const AddExpense = () => {
                       <thead>
                         <tr>
                           <th>#</th>
-                          <th>Date</th>
                           <th>Type of Expense</th>
                           <th>Category</th>
+                          <th>Description</th>
                           <th>Amount</th>
                           <th>Action</th>
                         </tr>
@@ -427,16 +432,17 @@ const AddExpense = () => {
                           return (
                             <tr key={item?.id}>
                               <td>{index + 1}</td>
-                              <td>
+                              {/* <td>
                                 <Link to="#">{item?.expenseDate}</Link>
-                              </td>
+                              </td> */}
                               <td>{item?.expenseFor}</td>
                               <td>{item?.category}</td>
+                              <td>{item?.description}</td>
                               <td>{moneyInTxt(item?.amount)}</td>
                               <td>
                                 <Link to="#" className="me-2">
-                                          <img src={EditIcon} alt="svg" data-bs-toggle="modal" data-bs-target="#editexpense" onClick={() => handleGetSelected(item)} />
-                                        </Link>
+                                  <img src={EditIcon} alt="svg" data-bs-toggle="modal" data-bs-target="#editexpense" onClick={() => handleGetSelected(item)} />
+                                </Link>
                                 <Link to="#" className="delete-set" onClick={() => deleteRow(item)}>
                                   <img src={DeleteIcon} alt="svg" />
                                 </Link>
@@ -491,151 +497,151 @@ const AddExpense = () => {
 
       {/* Edit Modal */}
       <div
-            className="modal fade"
-            id="editexpense"
-            tabIndex={-1}
-            aria-labelledby="editexpense"
-            aria-hidden="true"
-          >
-            <div className="modal-dialog modal-md modal-dialog-centered">
-              <div className="modal-content">
-                <div className="modal-header">
-                  <h5 className="modal-title">Edit Expense</h5>
-                  <button
-                    type="button"
-                    className="close"
-                    data-bs-dismiss="modal"
-                    aria-label="Close"
-                  >
-                    <span aria-hidden="true">×</span>
-                  </button>
-                </div>
-                <div className="modal-body">
-                <div className="row">
-                  <div className="col-lg-12 col-sm-12 col-12">
-                    <div className="form-group">
-                      <label>Expense Category</label>
-                      <div className="row" id="category">
-                        <div className="col-lg-6">
-                          <div className="input-group">
-                            <div className="input-group-text">
-                              <input className="form-check-input" type="radio" ref={editshopRef} name="category" value={'Shop Related'} onChange={handleEditTypeChange} />
-                            </div>
-                            <input type="text" className="form-control" aria-label="Text input with radio button" value={'Shop Related'} />
-                          </div>
-                        </div>
-
-                        <div className="col-lg-6">
-                          <div className="input-group">
-                            <div className="input-group-text">
-                              <input className="form-check-input" type="radio" ref={editcompanyRef} name="category" value={'Company'} onChange={handleEditTypeChange} />
-                            </div>
-                            <input type="text" className="form-control" aria-label="Text input with radio button" value={'Company'} />
-                          </div>
-                        </div>
-
-                        <br /><br />
-
-                        <div className="col-lg-6">
-
-                          <div className="input-group">
-                            <div className="input-group-text">
-                              <input className="form-check-input" type="radio" ref={editproductionRef} name="category" value={'Production'} onChange={handleEditTypeChange} />
-                            </div>
-                            <input type="text" className="form-control" aria-label="Text input with radio button" value={'Production'} />
-                          </div>
-
-                        </div>
-
-                        <div className="col-lg-6">
-                          <div className="input-group">
-                            <div className="input-group-text">
-                              <input className="form-check-input" type="radio" ref={editdirectorRef} name="category" value={'Director'} onChange={handleEditTypeChange} />
-                            </div>
-                            <input type="text" className="form-control" aria-label="Text input with radio button" value={'Director'} />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                </div>
-
-
-                <div className="row">
-
+        className="modal fade"
+        id="editexpense"
+        tabIndex={-1}
+        aria-labelledby="editexpense"
+        aria-hidden="true"
+      >
+        <div className="modal-dialog modal-md modal-dialog-centered">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title">Edit Expense</h5>
+              <button
+                type="button"
+                className="close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">×</span>
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="row">
+                <div className="col-lg-12 col-sm-12 col-12">
                   <div className="form-group">
-                    <label>Type of Expense</label>
-                    <div className="row">
-                      <div className="col-lg-12 col-sm-12 col-12">
-                        <Select style={{ width: '100%' }}
-                          id="expenseFor"
-                          className="select"
-                          options={options}
-                          value={editFormData.expenseFor}
-                          onChange={(e) => setEditFormData({ ...editFormData, expenseFor: e })}
-
-                        />
+                    <label>Expense Category</label>
+                    <div className="row" id="category">
+                      <div className="col-lg-6">
+                        <div className="input-group">
+                          <div className="input-group-text">
+                            <input className="form-check-input" type="radio" ref={editshopRef} name="category" value={'Shop Related'} onChange={handleEditTypeChange} />
+                          </div>
+                          <input type="text" className="form-control" aria-label="Text input with radio button" value={'Shop Related'} />
+                        </div>
                       </div>
 
-                    </div>
-                  </div>
+                      <div className="col-lg-6">
+                        <div className="input-group">
+                          <div className="input-group-text">
+                            <input className="form-check-input" type="radio" ref={editcompanyRef} name="category" value={'Company'} onChange={handleEditTypeChange} />
+                          </div>
+                          <input type="text" className="form-control" aria-label="Text input with radio button" value={'Company'} />
+                        </div>
+                      </div>
 
-                </div>
+                      <br /><br />
 
+                      <div className="col-lg-6">
 
-                <div className="row">
-                  <div className="col-lg-12">
-                    <div className="form-group">
-                      <label>Description</label>
-                      <textarea id="description" className="form-control" value={editFormData.description} onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })} />
-                    </div>
-                  </div>
+                        <div className="input-group">
+                          <div className="input-group-text">
+                            <input className="form-check-input" type="radio" ref={editproductionRef} name="category" value={'Production'} onChange={handleEditTypeChange} />
+                          </div>
+                          <input type="text" className="form-control" aria-label="Text input with radio button" value={'Production'} />
+                        </div>
 
-                  <div className="row" style={{}}>
-                    <div className="col-lg-12 col-sm-6 col-12">
-                      <div className="form-group">
-                        <label>Amount</label>
-                        <div className="input-groupicon">
-                          <input type="text"
-                            id="amount"
-                            value={editFormData?.amount}
-                            onChange={(e) => {
-                              if (e.target.value == '') {
-                                setEditFormData({ ...editFormData, amount: '' })
-                              }
-                              else if (isValidNumber(e.target.value)) {
-                                let amt = parseInt(e.target.value)
-                                setEditFormData({ ...editFormData, amount: amt })
-                              }
-                            }}
-                          />
+                      </div>
 
+                      <div className="col-lg-6">
+                        <div className="input-group">
+                          <div className="input-group-text">
+                            <input className="form-check-input" type="radio" ref={editdirectorRef} name="category" value={'Director'} onChange={handleEditTypeChange} />
+                          </div>
+                          <input type="text" className="form-control" aria-label="Text input with radio button" value={'Director'} />
                         </div>
                       </div>
                     </div>
+                  </div>
+                </div>
 
-                   
+              </div>
+
+
+              <div className="row">
+
+                <div className="form-group">
+                  <label>Type of Expense</label>
+                  <div className="row">
+                    <div className="col-lg-12 col-sm-12 col-12">
+                      <Select style={{ width: '100%' }}
+                        id="expenseFor"
+                        className="select"
+                        options={options}
+                        value={editFormData.expenseFor}
+                        onChange={(e) => setEditFormData({ ...editFormData, expenseFor: e })}
+
+                      />
+                    </div>
+
+                  </div>
+                </div>
+
+              </div>
+
+
+              <div className="row">
+                <div className="col-lg-12">
+                  <div className="form-group">
+                    <label>Description</label>
+                    <textarea id="description" className="form-control" value={editFormData.description} onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })} />
+                  </div>
+                </div>
+
+                <div className="row" style={{}}>
+                  <div className="col-lg-12 col-sm-6 col-12">
+                    <div className="form-group">
+                      <label>Amount</label>
+                      <div className="input-groupicon">
+                        <input type="text"
+                          id="amount"
+                          value={editFormData?.amount}
+                          onChange={(e) => {
+                            if (e.target.value == '') {
+                              setEditFormData({ ...editFormData, amount: '' })
+                            }
+                            else if (isValidNumber(e.target.value)) {
+                              let amt = parseInt(e.target.value)
+                              setEditFormData({ ...editFormData, amount: amt })
+                            }
+                          }}
+                        />
+
+                      </div>
+                    </div>
                   </div>
 
 
                 </div>
-                </div>
-                <div className="modal-footer" style={{justifyContent:'flex-end'}}>
-                  <button type="button" className="btn btn-submit" onClick={handleUpdateList}>
-                    Update
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-cancel"
-                    data-bs-dismiss="modal"
-                  >
-                    Close
-                  </button>
-                </div>
+
+
               </div>
             </div>
+            <div className="modal-footer" style={{ justifyContent: 'flex-end' }}>
+              <button type="button" className="btn btn-submit" onClick={handleUpdateList}>
+                Update
+              </button>
+              <button
+                type="button"
+                className="btn btn-cancel"
+                data-bs-dismiss="modal"
+              >
+                Close
+              </button>
+            </div>
           </div>
+        </div>
+      </div>
     </>
   );
 };

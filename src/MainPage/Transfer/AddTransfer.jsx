@@ -161,9 +161,9 @@ const AddTransfer = () => {
       let newNotification = {
         id: Math.ceil(Math.random()*1000000),
         message: `${storage.name} Please select a product`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(), type:'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
       $('#selectedProduct').css('border', '1px solid red')
     }
 
@@ -173,9 +173,9 @@ const AddTransfer = () => {
       let newNotification = {
         id: Math.ceil(Math.random()*1000000),
         message: `${storage.name} Please enter quantity`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(), type:'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
       $('#quantity').css('border', '1px solid red')
     }
 
@@ -185,9 +185,9 @@ const AddTransfer = () => {
       let newNotification = {
         id: Math.ceil(Math.random()*1000000),
         message: `${storage.name} Please select a branch.`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(), type:'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
       $('#selectedCustomer').css('border', '1px solid red')
     }
 
@@ -231,9 +231,9 @@ const AddTransfer = () => {
       let newNotification = {
         id: Math.ceil(Math.random()*1000000),
         message: `${storage.name} Please add at least one item to list before saving.`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(), type:'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
 
     }
     else if(selectedCustomer == ''){
@@ -243,9 +243,9 @@ const AddTransfer = () => {
       let newNotification = {
         id: Math.ceil(Math.random()*1000000),
         message: `${storage.name} Please select a branch before saving.`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(), type:'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
       $('#selectedCustomer').css('border', '1px solid red')
     
     }
@@ -282,9 +282,9 @@ const AddTransfer = () => {
 
           let newNotification = {
             message: `${storage.name} made a successful Transfer Request.`,
-            time: new Date().toISOString()
+            time: new Date().toISOString(), type:'success'
           }
-          setNotifications([...notifications, newNotification])
+          setNotifications([newNotification, ...notifications])
   
     }
     else if (isPostError) {
@@ -293,9 +293,9 @@ const AddTransfer = () => {
    
           let newNotification = {
             message: `${storage.name} could not process Transfer Request.`,
-            time: new Date().toISOString()
+            time: new Date().toISOString(), type:'error'
           }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
     }
 
     return () => { };
@@ -340,9 +340,9 @@ const AddTransfer = () => {
       let newNotification = {
         id: Math.ceil(Math.random()*1000000),
         message: `${storage.name} you can not transfer more than stock available.`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(), type:'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
       setFormData(({...formData, quantity:''}))
     }
   }, [formData.quantity])

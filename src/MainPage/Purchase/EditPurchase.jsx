@@ -102,9 +102,9 @@ useEffect(() => {
       alertify.warning("Please make sure you've selected a product");
       let newNotification = {
         message: `${storage.name} Please make sure you've selected a product.`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(),  type: 'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
     }
 
     else if (productFormData.manufacturingDate == '') {
@@ -113,9 +113,9 @@ useEffect(() => {
       alertify.warning("Please enter Manufacturing Date.");
       let newNotification = {
         message: `${storage.name} Please enter Manufacturing Date`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(), type: 'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
     }
 
     else if (productFormData.expireDate == '') {
@@ -124,9 +124,9 @@ useEffect(() => {
       alertify.warning("Please make sure you've provided expiry date.");
       let newNotification = {
         message: `${storage.name} Please make sure you've provided expiry date.`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(),  type: 'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
     }
 
     else if (productFormData.batchNumber == '') {
@@ -135,9 +135,9 @@ useEffect(() => {
       alertify.warning("Please enter batch number.");
       let newNotification = {
         message: `${storage.name} Please enter batch number.`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(),  type: 'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
     }
   
 
@@ -147,9 +147,9 @@ useEffect(() => {
       alertify.warning("Please enter quantity.");
       let newNotification = {
         message: `${storage.name} Please enter quantity`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(),  type: 'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
     }
 
    
@@ -160,9 +160,9 @@ useEffect(() => {
       alertify.warning("Please enter unit price.");
       let newNotification = {
         message: `${storage.name} Please enter unit price.`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(),  type: 'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
     }
 
    
@@ -212,9 +212,9 @@ useEffect(() => {
 
         let newNotification = {
           message: `${storage.name} ${res.data.message}`,
-          time: new Date().toISOString()
+          time: new Date().toISOString(),  type: 'warning'
         }
-        setNotifications([...notifications, newNotification])
+        setNotifications([newNotification, ...notifications])
         setProductFormData({ ...productFormData, batchNumber:'' })
       }
     })
@@ -314,13 +314,13 @@ useEffect(() => {
     }
     else if(isError){
       alertify.set("notifier", "position", "bottom-right");
-      alertify.warning("Failed to update");
+      alertify.error("Failed to update");
 
       let newNotification = {
         message: `${storage.name} Failed to update.`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(),  type: 'error'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
     }
     return () => {};
   }, [isError, isSubmitSuccessful]);

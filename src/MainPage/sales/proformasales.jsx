@@ -90,7 +90,7 @@ const ProformaSales = () => {
 
   const [transactionType, setTransactionType] = useState('SP')
   const [recieptData, setReceiptData] = useState({})
-
+  const [receiptFile, setReceiptFile] = useState(null)
 
   const retailRef = useRef()
   const wholesaleRef = useRef()
@@ -203,19 +203,19 @@ const ProformaSales = () => {
       let newNotification = {
         id: Math.ceil(Math.random()*1000000),
         message: `${storage.name} Please add at least one item to list before saving.`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(), type:'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
     }
-    if (paymentInfo.amountPaid == '' || paymentInfo.amountPaid < 1 || paymentInfo.amountPaid == null) {
+    else if( (transactionType == 'SP' || transactionType == 'SO') && paymentInfo.amountPaid < (productGridData.reduce((total, item) => total + item.amount, 0))){
       alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please provide payment amount before saving.");
       let newNotification = {
         id: Math.ceil(Math.random()*1000000),
         message: `${storage.name} Please provide payment amount before saving.`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(), type:'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
     }
 
     else {
@@ -299,9 +299,9 @@ const ProformaSales = () => {
                  
                   let newNotification = {
                     message: `${storage.name} completed a sale with reference ${payload.salesRef}`,
-                    time: new Date().toISOString()
+                    time: new Date().toISOString(), type:'success'
                   }
-                  setNotifications([...notifications, newNotification])
+                  setNotifications([newNotification, ...notifications])
 
                 }
               })
@@ -311,9 +311,9 @@ const ProformaSales = () => {
                 let newNotification = {
                   id: Math.ceil(Math.random()*1000000),
                   message: `${storage.name} Error...Could not complete transaction.`,
-                  time: new Date().toISOString()
+                  time: new Date().toISOString(), type:'error'
                 }
-                setNotifications([...notifications, newNotification])
+                setNotifications([newNotification, ...notifications])
               })
               .finally(() => {
                 setPaymentInfo({
@@ -346,9 +346,9 @@ const ProformaSales = () => {
             let newNotification = {
               id: Math.ceil(Math.random()*1000000),
               message: `${storage.name} Unsuccessful, please try again.`,
-              time: new Date().toISOString()
+              time: new Date().toISOString(), type:'warning'
             }
-            setNotifications([...notifications, newNotification])
+            setNotifications([newNotification, ...notifications])
           }
         })
         .catch((error) => {
@@ -357,9 +357,9 @@ const ProformaSales = () => {
           let newNotification = {
             id: Math.ceil(Math.random()*1000000),
             message: `${storage.name} Internal server error occured. Please contact admin.`,
-            time: new Date().toISOString()
+            time: new Date().toISOString(), type:'error'
           }
-          setNotifications([...notifications, newNotification])
+          setNotifications([newNotification, ...notifications])
         })
         .finally(() => {
           setIsSaving(false)
@@ -388,12 +388,12 @@ const ProformaSales = () => {
   const getInvoiceReceipt = (salesref) => {
     axios.get('/sales/getSaleReceipt/' + salesref)
       .then((res) => {
-        console.log(res.data)
-        var base64 = res.data.base64
+        let base64 = res.data.base64
         const blob = base64ToBlob(base64, 'application/pdf');
+        const blobFile = `data:application/pdf;base64,${base64}`
         const url = URL.createObjectURL(blob);
-        const pdfWindow = window.open("");
-        pdfWindow.document.write("<iframe width='100%' height='100%' src='" + url + "'></iframe>");
+        setReceiptFile(blobFile)
+        $('#pdfViewer').modal('show')
       })
 
     function base64ToBlob(base64, type = "application/octet-stream") {
@@ -462,9 +462,9 @@ const ProformaSales = () => {
     
           let newNotification = {
             message: `${storage.name} completed a sale with reference ${res.data.reference}`,
-            time: new Date().toISOString()
+            time: new Date().toISOString(), type:'success'
           }
-          setNotifications([...notifications, newNotification])
+          setNotifications([newNotification, ...notifications])
 
         }
         else {
@@ -474,9 +474,9 @@ const ProformaSales = () => {
           let newNotification = {
             id: Math.ceil(Math.random()*1000000),
             message: `${storage.name} Suspend unsuccessful`,
-            time: new Date().toISOString()
+            time: new Date().toISOString(), type:'warning'
           }
-          setNotifications([...notifications, newNotification])
+          setNotifications([newNotification, ...notifications])
         }
       })
       .catch((error) => {
@@ -486,9 +486,9 @@ const ProformaSales = () => {
         let newNotification = {
           id: Math.ceil(Math.random()*1000000),
           message: `${storage.name} Internal server error occured. Please contact admin.`,
-          time: new Date().toISOString()
+          time: new Date().toISOString(), type:'error'
         }
-        setNotifications([...notifications, newNotification])
+        setNotifications([newNotification, ...notifications])
       })
       .finally(() => {
         setIsSaving(false)
@@ -518,9 +518,9 @@ const ProformaSales = () => {
       let newNotification = {
         id: Math.ceil(Math.random()*1000000),
         message: `${storage.name} Please select a product`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(), type:'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
       $('#selectedProduct').css('border', '1px solid red')
       // setTimeout(() => {
       //   $('#selectedProduct').css('border', '1px solid rgba(145, 158, 171, 0.32)')
@@ -533,9 +533,9 @@ const ProformaSales = () => {
       let newNotification = {
         id: Math.ceil(Math.random()*1000000),
         message: `${storage.name} Please select a customer.`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(), type:'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
       $('#selectedCustomer').css('border', '1px solid red')
       // setTimeout(() => {
       //   $('#selectedCustomer').css('border', '1px solid rgba(145, 158, 171, 0.32)')
@@ -548,9 +548,9 @@ const ProformaSales = () => {
       let newNotification = {
         id: Math.ceil(Math.random()*1000000),
         message: `${storage.name} Please enter quantity.`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(), type:'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
       $('#quantity').css('border', '1px solid red')
       // setTimeout(() => {
       //   $('#quantity').css('border', '1px solid rgba(145, 158, 171, 0.32)')
@@ -1577,6 +1577,36 @@ const ProformaSales = () => {
           </div>
         </div>
       </div>
+
+      {/* PDF Modal */}
+      <div
+            className="modal fade"
+            id="pdfViewer"
+            tabIndex={-1}
+            aria-labelledby="pdfViewer"
+            aria-hidden="true"
+          >
+            <div className="modal-dialog modal-xl modal-dialog-centered">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">Sales Receipt</h5>
+                  <button
+                    type="button"
+                    className="close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                  >
+                    <span aria-hidden="true">×</span>
+                  </button>
+                </div>
+                <div className="modal-body">
+                  <iframe width='100%' height='800px' src={receiptFile}></iframe>            
+                </div>
+                
+              </div>
+            </div>
+      </div>
+    
     </div>
 
   );

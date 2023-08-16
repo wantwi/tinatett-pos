@@ -101,9 +101,9 @@ const AddQuotation = () => {
       let newNotification = {
         id: Math.ceil(Math.random()*1000000),
         message: `${storage.name} Please select a product first`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(),  type: 'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
     }
     else if(productFormData?.qty == ''){
       alertify.set("notifier", "position", "bottom-right");
@@ -111,9 +111,9 @@ const AddQuotation = () => {
       let newNotification = {
         id: Math.ceil(Math.random()*1000000),
         message: `${storage.name} Please provide a quantity first.`,
-        time: new Date().toISOString()
+        time: new Date().toISOString(),  type: 'warning'
       }
-      setNotifications([...notifications, newNotification])
+      setNotifications([newNotification, ...notifications])
     }
     else{
       setProductGridData([...productGridData, productFormData])
@@ -151,9 +151,9 @@ const AddQuotation = () => {
         let newNotification = {
           id: Math.ceil(Math.random()*1000000),
           message: `${storage.name} Please add at least one product to the list.`,
-          time: new Date().toISOString()
+          time: new Date().toISOString(),  type: 'warning'
         }
-        setNotifications([...notifications, newNotification])
+        setNotifications([newNotification, ...notifications])
       }
     else{
       setLoading(true)
@@ -177,9 +177,9 @@ const AddQuotation = () => {
           let newNotification = {
             id: Math.ceil(Math.random()*1000000),
             message: `${storage.name} Request successfully sent.`,
-            time: new Date().toISOString()
+            time: new Date().toISOString(),  type: 'success'
           }
-          setNotifications([...notifications, newNotification])
+          setNotifications([newNotification, ...notifications])
           setProductGridData([])
         }
       })

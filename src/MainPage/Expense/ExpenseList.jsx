@@ -68,36 +68,45 @@ const ExpenseList = () => {
       confirmButtonClass: "btn btn-primary",
       cancelButtonClass: "btn btn-danger ml-1",
       buttonsStyling: !1,
-    }).then(function (t) {
+    }).then(async function (t) {
      // t.value &&
 
-     axios.delete(`/expense/${id}`)
-     .then((res) => {
-      console.log(res)
-      if(res.status < 205){
-        Swal.fire({
-          type: "success",
-          title: "Deleted!",
-          text: "Your record has been deleted.",
-          confirmButtonClass: "btn btn-success",
-        });
-        setTimeout(() => {
-          window.location.reload()
-        }, 1000)
+      if(t.isConfirmed){
+        axios.delete(`/expense/${id}`)
+      .then((res) => {
+        
+          if(res.status < 205){
+            Swal.fire({
+              type: "success",
+              title: "Deleted!",
+              text: "Your record has been deleted.",
+              confirmButtonClass: "btn btn-success",
+            });
+            setTimeout(() => {
+              window.location.reload()
+            }, 1000)
+          }
+          else{
+            Swal.fire({
+              type: "error",
+              title: "Error!",
+              text: "Your record could not be deleted.",
+              confirmButtonClass: "btn btn-danger",
+            });
+          }
+      })   
       }
-      else{
-        Swal.fire({
-          type: "error",
-          title: "Error!",
-          text: "Your record could not be deleted.",
-          confirmButtonClass: "btn btn-danger",
-        });
-      }
-     })
 
-       
-    });
-  };
+      t.dismiss === Swal.DismissReason.cancel &&
+      Swal.fire({
+        title: "Cancelled",
+        text: "You cancelled the delete action",
+        type: "error",
+        confirmButtonClass: "btn btn-success",
+      });
+  });
+}
+
   const togglefilter = (value) => {
     setInputfilter(value);
   };
