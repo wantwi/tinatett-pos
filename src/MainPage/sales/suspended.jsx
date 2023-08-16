@@ -250,7 +250,7 @@ const Suspended = () => {
           ...sale,
           id: sale?.id,
           Date: sale?.transDate,
-          Name: sale?.customer?.name || 'N/A',
+          Name: sale?.customer_name || 'N/A',
           Status: sale?.status,
           Reference: sale?.salesRef,
           Payment: sale?.paymentType,

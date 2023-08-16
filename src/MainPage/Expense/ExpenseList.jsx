@@ -110,31 +110,15 @@ const ExpenseList = () => {
       sorter: (a, b) => a.expenseDate.length - b.expenseDate.length,
     },
     {
-      title: "Category Name",
-      dataIndex: "category",
-      sorter: (a, b) => a.category.length - b.category.length,
+      title: "Expense Ref",
+      dataIndex: "expenseref",
+      sorter: (a, b) => a.expenseref.length - b.expenseref.length,
     },
     {
-      title: "Expense For",
-      dataIndex: "expenseFor",
-      sorter: (a, b) => a.expenseFor.length - b.expenseFor.length,
+      title: "Number of Items",
+      dataIndex: "numberOfItem",
+      sorter: (a, b) => a.numberOfItem.length - b.numberOfItem.length,
     },
-    {
-      title: "Description",
-      dataIndex: "description",
-      sorter: (a, b) => a.description.length - b.description.length,
-    },
-   
-    // {
-    //   title: "Amount",
-    //   dataIndex: "amount",
-    //   render: (text, record) => (
-    //     <span className={"badges bg-lightgreen"}>
-    //       {text}
-    //     </span>
-    //   ),
-    //   sorter: (a, b) => a.amount.length - b.amount.length,
-    // },
     {
       title: "Amount",
       dataIndex: "amount",
@@ -142,6 +126,12 @@ const ExpenseList = () => {
       render: (text) => <span>{moneyInTxt(text)}</span>,
       width: "125px",
     },
+    {
+      title: "Created By",
+      dataIndex: "createdBy",
+      
+    },
+   
     {
       title: "Action",
       render: (a,record) => (

@@ -153,6 +153,8 @@ const AddExpense = () => {
 
   const handleSubmit = () => {
     let payload = {
+      amount: listData.reduce((total, item) => item.amount + total, 0),
+      expenseDate: expenseDate,
       expenseList: listData.map((item) => {
         return {
           "category": item.category,
