@@ -80,6 +80,7 @@ const Addsales = () => {
   const [transactionType, setTransactionType] = useState('SP')
   const [recieptData, setReceiptData] = useState({})
   const [receiptFile, setReceiptFile] = useState(null)
+  const [isBatchLoading, setIsBatchLoading] = useState(false)
 
   const retailRef = useRef()
   const wholesaleRef = useRef()
@@ -586,7 +587,7 @@ const Addsales = () => {
     setWholesalePrice('(' + e.wholeSalePrice + 'GHS)')
     setSpecialPrice('(' + e.specialPrice + 'GHS)')
     salesType == 'Retail' ? setPrice(e.retailPrice) : salesType == "Wholesale" ? setPrice(e.wholeSalePrice) : setPrice(e.specialPrice)
-    //console.log(e)
+    setIsBatchLoading(true)
   }
 
   useEffect(() => {
@@ -602,7 +603,7 @@ const Addsales = () => {
         let x = res.data.newProduct.batchNumber?.map((item) => {
           return { value: item.batchNumber, label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')': item?.batchNumber + '-(' + item?.availablequantity + ')', expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
         })
-        //  console.log("BatchInfo:", x)
+        setIsBatchLoading(false)
          setFormData({ ...formData, batchNumber: x[0], manuDate: (x[0]?.manufacturingDate).substring(0,10), expDate: (x[0]?.expireDate).substring(0,10) })
          setEditFormData({...editFormData, batchNumber: x[0], manuDate: (x[0]?.manufacturingDate).substring(0,10), expDate: (x[0]?.expireDate).substring(0,10)})
         //retailpriceTypeRef.current.checked = true
@@ -861,7 +862,12 @@ const Addsales = () => {
 
                   <div className="col-12">
                     <div className="form-group">
-                      <label>Batch No.</label>
+                      <div style={{display:'flex', justifyContent: 'space-between'}}>
+                          <label>Batch No.</label> 
+                          {isBatchLoading && <div className="spinner-border text-primary me-1" role="status" style={{height:20, width:20}}>
+                            <span className="sr-only">Loading...</span>
+                          </div>}
+                        </div>
                       <div className="input-groupicon">
                         <Select
                           isLoading={isLoading}
@@ -1455,7 +1461,12 @@ const Addsales = () => {
 
                 <div className="col-12">
                     <div className="form-group">
-                      <label>Batch No.</label>
+                     <div style={{display:'flex', justifyContent: 'space-between'}}>
+                          <label>Batch No.</label> 
+                          {isBatchLoading && <div className="spinner-border text-primary me-1" role="status" style={{height:20, width:20}}>
+                            <span className="sr-only">Loading...</span>
+                          </div>}
+                        </div>
                       <div className="input-groupicon">
                       <input type="text" value={editFormData?.batchNumber} onChange={(e) => setEditFormData({...editFormData, batchNumber: e.target.value})}/>
                         {/* <Select

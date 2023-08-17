@@ -91,6 +91,7 @@ const ProformaSales = () => {
   const [transactionType, setTransactionType] = useState('SP')
   const [recieptData, setReceiptData] = useState({})
   const [receiptFile, setReceiptFile] = useState(null)
+  const [isBatchLoading, setIsBatchLoading] = useState(false)
 
   const retailRef = useRef()
   const wholesaleRef = useRef()
@@ -577,11 +578,13 @@ const ProformaSales = () => {
     setRetailPrice('(' + e.retailPrice + 'GHS)')
     setWholesalePrice('(' + e.wholeSalePrice + 'GHS)')
     setSpecialPrice('(' + e.specialPrice + 'GHS)')
+    setIsBatchLoading(true)
     salesType == 'Retail' ? setPrice(e.retailPrice) : salesType == "Wholesale" ? setPrice(e.wholeSalePrice) : setPrice(e.specialPrice)
     //console.log(e)
   }
 
   const handleProductSelectEditMode = (e) => {
+    setIsBatchLoading(true)
     setSelectedProductEditMode(e)
   }
 
@@ -598,7 +601,7 @@ const ProformaSales = () => {
         if (x.length > 0) {
           setFormData({ ...formData, batchNumber: x[0], manuDate: x[0].manufacturingDate, expDate: x[0].expireDate })
         }
-
+        setIsBatchLoading(false)
         retailpriceTypeRef.current.checked = true
       }
     })
@@ -806,7 +809,12 @@ const ProformaSales = () => {
 
                   <div className="col-12">
                     <div className="form-group">
-                      <label>Batch No.</label>
+                       <div style={{display:'flex', justifyContent: 'space-between'}}>
+                          <label>Batch No.</label> 
+                          {isBatchLoading && <div className="spinner-border text-primary me-1" role="status" style={{height:20, width:20}}>
+                            <span className="sr-only">Loading...</span>
+                          </div>}
+                        </div>
                       <div className="input-groupicon">
                         <Select
                           isLoading={isLoading}
@@ -1167,7 +1175,10 @@ const ProformaSales = () => {
                   </div>
                   <div className="col-12">
                     <div className="form-group">
-                      <label>Batch No.</label>
+                      <div style={{display:'flex', justifyContent: 'space-between'}}>
+                          <label>Batch No.</label> 
+                         
+                        </div>
                       <div className="input-groupicon">
                         <Select
                           options={selectedProductInfoEditMode?.batchNumber?.map((item) => {

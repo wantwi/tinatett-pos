@@ -73,6 +73,7 @@ const TransferProformaItems = () => {
   const [wholesaleprice, setWholesalePrice] = useState('')
   const [specialprice, setSpecialPrice] = useState('')
   const [isSaving, setIsSaving] = useState(false)
+  const [isBatchLoading, setIsBatchLoading] = useState(false)
 
   const { notifications, setNotifications } = useContext(NotificationsContext)
   let storage = JSON.parse(localStorage.getItem("auth"))
@@ -171,11 +172,12 @@ const TransferProformaItems = () => {
     setWholesalePrice('(' + e.wholeSalePrice  + 'GHS)')
     setSpecialPrice('(' + e.specialPrice  + 'GHS)')
     setPrice(e.retailPrice) 
-    //console.log(e)
+    setIsBatchLoading(true)
     
   }
 
   const handleProductSelectEditMode = (e) => {
+    setIsBatchLoading(true)
     setSelectedProductEditMode(e)
   }
 
@@ -195,7 +197,7 @@ const TransferProformaItems = () => {
         let x = res.data.data.batchNumber?.map((item) => {
           return {value:item.batchNumber, label:item?.batchNumber + '-(' + item?.Quantity +')', expireDate:item?.expireDate, manufacturingDate: item?.manufacturingDate}
         })
-        //console.log(x)
+        setIsBatchLoading(false)
         setEditFormData({...editFormData, ...item, batchNumber: x[0],  manufacturingDate: x[0].manufacturingDate, expireDate: x[0].expireDate})
       }
     }).finally(() => setIsLoadingDetails(false))
@@ -526,7 +528,12 @@ const TransferProformaItems = () => {
 
                     <div className="col-6">
                       <div className="form-group">
-                        <label>Batch No.</label>
+                       <div style={{display:'flex', justifyContent: 'space-between'}}>
+                          <label>Batch No.</label> 
+                          {isBatchLoading && <div className="spinner-border text-primary me-1" role="status" style={{height:20, width:20}}>
+                            <span className="sr-only">Loading...</span>
+                          </div>}
+                        </div>
                         <div className="input-groupicon">
                           <Select
                             options={selectedProductInfo?.batchNumber?.map((item) => {
@@ -869,7 +876,12 @@ const TransferProformaItems = () => {
                    
                     <div className="col-12">
                       <div className="form-group">
-                        <label>Batch No.</label>
+                       <div style={{display:'flex', justifyContent: 'space-between'}}>
+                          <label>Batch No.</label> 
+                          {isBatchLoading && <div className="spinner-border text-primary me-1" role="status" style={{height:20, width:20}}>
+                            <span className="sr-only">Loading...</span>
+                          </div>}
+                        </div>
                         <div className="input-groupicon">
                           <Select
                             options={selectedProductInfoEditMode?.batchNumber?.map((item) => {

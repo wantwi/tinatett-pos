@@ -78,6 +78,7 @@ const EditSales = () => {
   })
   const [transactionType, setTransactionType] = useState('SP')
   const [receiptFile, setReceiptFile] = useState(null)
+  const [isBatchLoading, setIsBatchLoading] = useState(false)
 
 
   const retailRef = useRef()
@@ -463,7 +464,7 @@ const EditSales = () => {
     setWholesalePrice('(' + e.wholeSalePrice + 'GHS)')
     setSpecialPrice('(' + e.specialPrice + 'GHS)')
     salesType == 'Retail' ? setPrice(e.retailPrice) : salesType == "Wholesale" ? setPrice(e.wholeSalePrice) : setPrice(e.specialPrice)
-    //console.log(e)
+    setIsBatchLoading(true)
   }
 
   useEffect(() => {
@@ -475,7 +476,7 @@ const EditSales = () => {
         let x = res.data.data.batchNumber?.map((item) => {
           return { value: item.batchNumber, label: item?.batchNumber + '-(' + item?.Quantity + ')', expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
         })
-        //console.log(x)
+        setIsBatchLoading(false)
         setFormData({ ...formData, batchNumber: x[0], manuDate: x[0].manufacturingDate, expDate: x[0].expireDate })
         // retailpriceTypeRef.current.checked = true
       }
@@ -696,7 +697,12 @@ const EditSales = () => {
 
                   <div className="col-12">
                     <div className="form-group">
-                      <label>Batch No.</label>
+                     <div style={{display:'flex', justifyContent: 'space-between'}}>
+                          <label>Batch No.</label> 
+                          {isBatchLoading && <div className="spinner-border text-primary me-1" role="status" style={{height:20, width:20}}>
+                            <span className="sr-only">Loading...</span>
+                          </div>}
+                        </div>
                       <div className="input-groupicon">
                         <Select
                           isLoading={isLoading}

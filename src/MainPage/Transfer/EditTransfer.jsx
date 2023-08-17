@@ -70,6 +70,7 @@ const EditTransfer = () => {
   const [wholesaleprice, setWholesalePrice] = useState('')
   const [specialprice, setSpecialPrice] = useState('')
   const [isSubmitSuccessful, setIsSubmitSuccessful] = useState(false)
+  const [isBatchLoading, setIsBatchLoading] = useState(false)
 
   const { notifications, setNotifications } = useContext(NotificationsContext)
   let storage = JSON.parse(localStorage.getItem("auth"))
@@ -134,7 +135,7 @@ const EditTransfer = () => {
     setWholesalePrice('(' + e.wholeSalePrice  + 'GHS)')
     setSpecialPrice('(' + e.specialPrice  + 'GHS)')
     // setPrice(e.retailPrice) 
-    //console.log(e)
+    setIsBatchLoading(true)
     
   }
 
@@ -155,7 +156,7 @@ const EditTransfer = () => {
         let x = res.data.newProduct.batchNumber?.map((item) => {
           return {value:item.batchNumber, label:item?.batchNumber + '-(' + item?.Quantity +')', expireDate:item?.expireDate, manufacturingDate: item?.manufacturingDate, SaleValue: item?.SaleValue}
         })
-        //console.log(x)
+        setIsBatchLoading(false)
         setFormData({...formData, batchNumber: x[0], manuDate: x[0]?.manufacturingDate, expDate: x[0]?.expireDate, saleValue: x[0].SaleValue || 0})
         retailpriceTypeRef.current.checked = true
       }
@@ -425,7 +426,12 @@ const EditTransfer = () => {
 
                     <div className="col-6">
                       <div className="form-group">
-                        <label>Batch No.</label>
+                        <div style={{display:'flex', justifyContent: 'space-between'}}>
+                          <label>Batch No.</label> 
+                          {isBatchLoading && <div className="spinner-border text-primary me-1" role="status" style={{height:20, width:20}}>
+                            <span className="sr-only">Loading...</span>
+                          </div>}
+                        </div>
                         <div className="input-groupicon">
                           <Select
                             options={selectedProductInfo?.batchNumber?.map((item) => {
