@@ -56,8 +56,8 @@ const EditTransfer = () => {
   const [selectedProductInfo, setSelectedProductInfo] = useState()
   const [selectedCustomer, setSelectedCustomer] = useState(state?.destinationBranchId)
   const [selectedCustomerPrint, setSelectedCustomerPrint] = useState('')
-  const [formData, setFormData] = useState({quantity:'', amount:'', batchNumber:{}, manuDate:'', expDate:''})
-  const [editFormData, setEditFormData] = useState({quantity:'', amount:'', batchNumber:{}, manuDate:'', expDate:''})
+  const [formData, setFormData] = useState({quantity:'', amount:'', batchNumber:{}, manuDate:'', expDate:'', saleValue:''})
+  const [editFormData, setEditFormData] = useState({quantity:'', amount:'', batchNumber:{}, manuDate:'', expDate:'', saleValue:''})
   const [productGridData, setProductGridData] = useState([])
   const [printGridData, setPrintGridData] = useState([])
   const [transDate, setTransDate] = useState(new Date().toISOString().slice(0, 10));
@@ -133,7 +133,7 @@ const EditTransfer = () => {
     setRetailPrice('(' + e.retailPrice + 'GHS)')
     setWholesalePrice('(' + e.wholeSalePrice  + 'GHS)')
     setSpecialPrice('(' + e.specialPrice  + 'GHS)')
-    setPrice(e.retailPrice) 
+    // setPrice(e.retailPrice) 
     //console.log(e)
     
   }
@@ -152,11 +152,11 @@ const EditTransfer = () => {
     axios.get(`${BASE_URL}/purchase/product/${selectedProduct?.value}`).then((res) => {
       if(res.data.success){
         setSelectedProductInfo(res.data.data)
-        let x = res.data.data.batchNumber?.map((item) => {
-          return {value:item.batchNumber, label:item?.batchNumber + '-(' + item?.Quantity +')', expireDate:item?.expireDate, manufacturingDate: item?.manufacturingDate}
+        let x = res.data.newProduct.batchNumber?.map((item) => {
+          return {value:item.batchNumber, label:item?.batchNumber + '-(' + item?.Quantity +')', expireDate:item?.expireDate, manufacturingDate: item?.manufacturingDate, SaleValue: item?.SaleValue}
         })
         //console.log(x)
-        setFormData({...formData, batchNumber: x[0], manuDate: x[0].manufacturingDate, expDate: x[0].expireDate})
+        setFormData({...formData, batchNumber: x[0], manuDate: x[0]?.manufacturingDate, expDate: x[0]?.expireDate, saleValue: x[0].SaleValue || 0})
         retailpriceTypeRef.current.checked = true
       }
     })
@@ -181,8 +181,8 @@ const EditTransfer = () => {
       manufacturingDate: formData?.manuDate,
       expireDate: formData?.expDate,
       quantity: formData?.quantity,
-      unitPrice:price,
-      amount:formData.quantity * price
+      unitPrice: formData.saleValue,
+      amount:formData.quantity * formData.saleValue,
 
     }
     if (item.name == '' || item.name == null)  {
@@ -359,6 +359,14 @@ const EditTransfer = () => {
                               value={selectedCustomer}      
                               disabled      
                             />
+                             {/* <Select
+                            className="select"
+                            options={customerOptions}
+                            onChange={handleCustomerSelect}
+                            value={selectedCustomer}
+                            id="selectedCustomer"
+
+                          /> */}
                         </div>
 
                       </div>
@@ -438,42 +446,24 @@ const EditTransfer = () => {
                   <div className="col-6">
                     <div className="form-group">
                       <label>Manufacturing Date</label>
-                      <div className="input-groupicon">
-                        <DatePicker
-                          selected={startDate}
-                          value={formData?.manuDate.substring(0,10)}
-                          disabled
-
-                        />
-                        <Link className="addonset">
-                          <img src={Calendar} alt="img" />
-                        </Link>
-                      </div>
+                      <input type="text" className="form-control" value={formData?.manuDate.substring(0, 10)} disabled/>
+                      
                     </div>
                   </div>
 
                   <div className="col-6">
                     <div className="form-group">
                       <label>Exp. Date</label>
-                      <div className="input-groupicon">
-                      <DatePicker
-                          selected={startDate}
-                          value={formData?.expDate.substring(0,10)}
-                          disabled
-
-                        />
-                        <Link className="addonset">
-                          <img src={Calendar} alt="img" />
-                        </Link>
-                      </div>
+                      <input type="text" className="form-control" value={formData?.expDate.substring(0, 10)} disabled/>
                     </div>
                   </div>
                 </div>
 
                 <div className="col-12">
                   <div className="form-group">
-                    <label>Unit Price</label>
-                    <div className="row">
+                   <label>Product Value</label>
+                    <input type="text" className="forn-control" disabled value={formData?.saleValue} />
+                    <div className="row" hidden>
                         
 
                           <div className="col-lg-4">
@@ -550,7 +540,7 @@ const EditTransfer = () => {
                         <input
                           className="form-control"
                           type="text"
-                          value={formData.quantity ? formData.quantity * price : price * 1}  
+                          value={formData.quantity ? (formData.quantity * formData.saleValue ): (formData.saleValue * 1) || 0 }  
                         />
                         
                       </div>
@@ -715,7 +705,7 @@ const EditTransfer = () => {
                           else if (isValidNumber(e.target.value)) {
                             let qty = parseInt(e.target.value) || 0
                             let unitP = parseInt(editFormData.unitPrice) || 0
-                            setEditFormData({ ...editFormData, quantity: e.target.value, amount: editFormData.quantity ? unitP * qty : unitP * 1 })
+                            setEditFormData({ ...editFormData, quantity: e.target.value, amount: unitP * qty || unitP * 1  })
                           }
                         }
                         }/>

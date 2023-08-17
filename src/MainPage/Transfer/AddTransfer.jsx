@@ -831,7 +831,7 @@ const AddTransfer = () => {
                           else if (isValidNumber(e.target.value)) {
                             let qty = parseInt(e.target.value) || 0
                             let unitP = parseInt(editFormData.unitPrice) || 0
-                            setEditFormData({ ...editFormData, quantity: e.target.value, amount: editFormData.quantity ? unitP * qty : unitP * 1 })
+                            setEditFormData({ ...editFormData, quantity: e.target.value, amount: unitP * qty || unitP * 1 })
                           }
                         }
                         }/>
