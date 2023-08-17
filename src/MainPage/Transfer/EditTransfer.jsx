@@ -248,6 +248,14 @@ const EditTransfer = () => {
 
   }
 
+  const deleteRow = (record) => {
+    console.log(record)
+    // console.log(productGridData)
+    let newGridData = productGridData.filter((item) => item.productId !== record.productId)
+    //console.log(newGridData)
+    setProductGridData(newGridData)
+  };
+
   const onSubmit = () => {
 
     if (productGridData.length < 1) {
