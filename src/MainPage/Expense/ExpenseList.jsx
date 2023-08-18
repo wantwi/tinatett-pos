@@ -25,7 +25,25 @@ import { moneyInTxt } from "../../utility";
 const ExpenseList = () => {
   const [inputfilter, setInputfilter] = useState(false);
   const [data, setData] = useState([])
-  const {data: expenses, isError, isLoading, isSuccess} = useGet("expenses", "/expense");
+
+
+
+  const onSuccess = (data) =>{
+    
+    setData([])
+
+    let mappedData =  data?.data.map((expense) => {
+      return {
+        ...expense, expenseDate: expense?.expenseDate.substring(0,10) || expense.expenseDate
+      }
+    })
+    let sortedData = mappedData.sort((a,b) => new Date(b.expenseDate) - new Date(a.expenseDate))
+    setData(sortedData)
+
+  }
+  const {data: expenses, isLoading, refetch} = useGet("expenses", "/expense", onSuccess);
+
+ 
 
 
   useEffect(() => {
@@ -82,9 +100,7 @@ const ExpenseList = () => {
               text: "Your record has been deleted.",
               confirmButtonClass: "btn btn-success",
             });
-            setTimeout(() => {
-              window.location.reload()
-            }, 1000)
+            refetch()
           }
           else{
             Swal.fire({

@@ -23,6 +23,25 @@ import useCustomApi from "../../hooks/useCustomApi";
 
 const TransferList = () => {
   const [inputfilter, setInputfilter] = useState(false);
+  
+  const [data, setData] = useState([])
+
+
+  const onSuccess = (data) =>{
+    
+    setData([])
+
+    let sortedData = data?.data?.sort((a,b) => new Date(b.transferDate) - new Date(a.transferDate))
+      setData(sortedData)
+  }
+
+  const {
+    data: transfers,
+    isError,
+    isLoading,
+    refetch,
+  } = useGet("transfers", "/transfer", onSuccess);
+  
 
   const options = [
     { id: 1, text: "Choose Product", text: "Choose Product" },
@@ -70,9 +89,7 @@ const TransferList = () => {
           text: "Your Transfer item has been deleted.",
           confirmButtonClass: "btn btn-success",
         });
-        setTimeout(() => {
-          window.location.reload()
-        },1000)
+       refetch()
    
       }
       else{
@@ -168,15 +185,6 @@ const TransferList = () => {
   ];
 
 
-  const [data, setData] = useState([])
-
-
-  const {
-    data: transfers,
-    isError,
-    isLoading,
-    isSuccess,
-  } = useGet("transfers", "/transfer");
 
   useEffect(() => {
     if (!isLoading) {

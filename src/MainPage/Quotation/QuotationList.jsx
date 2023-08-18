@@ -18,12 +18,33 @@ import useCustomApi from "../../hooks/useCustomApi";
 
 const QuotationList = () => {
   const [inputfilter, setInputfilter] = useState(false);
+
+
+  const onSuccess = (data) =>{
+    
+    setData([])
+
+    let mappedData = data?.data?.map((productRequest) => {
+      return {
+        id: productRequest?.id,
+        reference: productRequest?.reference,
+        status: productRequest?.status,
+        requestDate: new Date(productRequest.requestDate).toISOString().substring(0, 10),
+        numberOfItems: productRequest?.numberOfItems,
+        createdBy: productRequest?.createdBy || 'N/A',
+      }
+    })
+
+    let sortedData = mappedData.sort((a,b) => new Date(b.requestDate) - new Date(a.requestDate))
+    setData(sortedData)
+
+  }
   const {
     data: productRequests,
     isError,
     isLoading,
-    isSuccess,
-  } = useGet("productRequests", "/productRequest");
+    refetch,
+  } = useGet("productRequests", "/productRequest", onSuccess);
   const [data, setData] = useState([])
 
 
@@ -66,7 +87,7 @@ const QuotationList = () => {
       buttonsStyling: !1,
     }).then(function (t) {
      // t.value &&
-
+     if(t.isConfirmed){
      axios.delete(`/productRequest/${id}`)
      .then((res) => {
       if(res.status < 205){
@@ -76,9 +97,7 @@ const QuotationList = () => {
           text: "Your record has been deleted.",
           confirmButtonClass: "btn btn-success",
         });
-        setTimeout(() => {
-          window.location.reload()
-        }, 1000)
+        refetch()
       }
       else{
         Swal.fire({
@@ -89,6 +108,15 @@ const QuotationList = () => {
         });
       }
      })
+    }
+
+    t.dismiss === Swal.DismissReason.cancel &&
+    Swal.fire({
+      title: "Cancelled",
+      text: "You cancelled the delete action",
+      type: "error",
+      confirmButtonClass: "btn btn-success",
+    });
 
        
     });

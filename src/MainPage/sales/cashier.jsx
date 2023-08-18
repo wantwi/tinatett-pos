@@ -110,40 +110,52 @@ const Cashier = () => {
       confirmButtonClass: "btn btn-primary",
       cancelButtonClass: "btn btn-danger ml-1",
       buttonsStyling: !1,
-    }) .then( async() => {
-     setIsDeleting(true)
-      let data = await axios.delete(`/sales/suspend/${id}`)
-      if(data.status < 205){
-        Swal.fire({
-          type: "success",
-          title: "Deleted!",
-          text: "Your suspended item has been deleted.",
-          confirmButtonClass: "btn btn-success",
-        });
-        setTimeout(() => {
-          window.location.reload()
-        },1000)
-   
-      }
-      else{
-        Swal.fire({
-          type: "danger",
-          title: "Error!",
-          text: data.response.data.message,
-          confirmButtonClass: "btn btn-danger",
-        });
-      }
-    })
-    .catch( (error) => {
-        Swal.fire({
-          type: "danger",
-          title: "Error!",
-          text: error,
-          confirmButtonClass: "btn btn-danger",
-        })
-    })
-    .finally(() => setIsDeleting(false))
-  };
+    }) .then( async(t) => {
+
+          if(t.isConfirmed){
+            setIsDeleting(true)
+
+
+            let data = await axios.delete(`/sales/suspend/${id}`)
+            if(data.status < 205){
+              setIsDeleting(false)
+              Swal.fire({
+                type: "success",
+                title: "Deleted!",
+                text: "Your suspended item has been deleted.",
+                confirmButtonClass: "btn btn-success",
+              });
+              refetch()
+        
+            }
+            else{
+              Swal.fire({
+                type: "danger",
+                title: "Error!",
+                text: data.response.data.message,
+                confirmButtonClass: "btn btn-danger",
+              });
+            }
+          }
+     
+
+    t.dismiss === Swal.DismissReason.cancel &&
+    Swal.fire({
+      title: "Cancelled",
+      text: "You cancelled the delete action",
+      type: "error",
+      confirmButtonClass: "btn btn-success",
+    });
+  })
+  .catch( (error) => {
+      Swal.fire({
+        type: "danger",
+        title: "Error!",
+        text: error,
+        confirmButtonClass: "btn btn-danger",
+      });
+  });
+};
 
   const axios = useCustomApi()
 

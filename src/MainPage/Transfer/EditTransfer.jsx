@@ -176,6 +176,7 @@ const EditTransfer = () => {
     let item =
 
     {
+      id: productGridData.length + 1,
       productId: selectedProduct.id,
       name: selectedProduct.label,
       batchNumber: formData.batchNumber?.value,
@@ -249,10 +250,7 @@ const EditTransfer = () => {
   }
 
   const deleteRow = (record) => {
-    console.log(record)
-    // console.log(productGridData)
-    let newGridData = productGridData.filter((item) => item.productId !== record.productId)
-    //console.log(newGridData)
+    let newGridData = productGridData.filter((item) => item.id !== record.id)
     setProductGridData(newGridData)
   };
 
@@ -273,7 +271,17 @@ const EditTransfer = () => {
       let postBody = {
         destinationBranchId: selectedCustomer,
         transferDate: transDate,
-        products: productGridData
+        products: productGridData.map((item) => {
+          return{
+            "productId": item.productId,
+            "name": item.name,
+            "batchNumber": item.batchNumber,
+            "manufacturingDate": item.manufacturingDate,
+            "expireDate": item.expireDate,
+            "quantity": item.quantity,
+            "unitPrice": item.unitPrice
+          }
+        })
       }
 
       mutate(postBody)

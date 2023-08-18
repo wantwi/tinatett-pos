@@ -68,9 +68,7 @@ const SalesList = () => {
             text: "Your sales item has been deleted.",
             confirmButtonClass: "btn btn-success",
           });
-          setTimeout(() => {
-            window.location.reload()
-          }, 1000)
+        
 
         }
         else {

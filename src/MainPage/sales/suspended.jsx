@@ -71,12 +71,38 @@ const Suspended = () => {
     setPaymentInfo({ ...paymentInfo, amountPaid: Number(paymentInfo.cashAmount) + Number(paymentInfo.chequeAmount) + Number(paymentInfo.momoAmount) })
   }, [paymentInfo.cashAmount, paymentInfo.chequeAmount, paymentInfo.momoAmount])
 
+
+  const onSuccess = (data) =>{
+    
+    setData([])
+
+    let mappedData = data?.data.map((sale) => {
+      return {
+        ...sale,
+        id: sale?.id,
+        Date: sale?.transDate,
+        Name: sale?.customer_name || 'N/A',
+        Status: sale?.status,
+        Reference: sale?.salesRef,
+        Payment: sale?.paymentType,
+        Total: moneyInTxt(sale?.totalAmount),
+        Paid: sale?.changeAmt,
+        Due: sale?.balance,
+        Biller: sale?.salesPerson,
+        salestype: sale?.salesType
+      }
+    })
+    let sortedData = mappedData.sort((a,b) => new Date(b.Date) - new Date(a.Date))
+    setData(sortedData)
+
+  }
+
   const {
     data: sales,
     isError,
     isLoading,
-    isSuccess,
-  } = useGet("suspend", "/sales/suspend");
+    refetch,
+  } = useGet("suspend", "/sales/suspend", onSuccess);
   const [data, setData] = useState([])
 
   const axios = useCustomApi()
@@ -97,29 +123,37 @@ const Suspended = () => {
       confirmButtonClass: "btn btn-primary",
       cancelButtonClass: "btn btn-danger ml-1",
       buttonsStyling: !1,
-    }) .then( async() => {
+    }) .then( async(t) => {
      
-      let data = await axios.delete(`/sales/suspend/${id}`)
-      if(data.status < 205){
+      if(t.isConfirmed){
+          let data = await axios.delete(`/sales/suspend/${id}`)
+          if(data.status < 205){
+            Swal.fire({
+              type: "success",
+              title: "Deleted!",
+              text: "Your suspended sale item has been deleted.",
+              confirmButtonClass: "btn btn-success",
+            });
+          refetch()
+      
+          }
+          else{
+            Swal.fire({
+              type: "danger",
+              title: "Error!",
+              text: data.response.data.message,
+              confirmButtonClass: "btn btn-danger",
+            });
+          }
+        }
+
+        t.dismiss === Swal.DismissReason.cancel &&
         Swal.fire({
-          type: "success",
-          title: "Deleted!",
-          text: "Your suspended sale item has been deleted.",
+          title: "Cancelled",
+          text: "You cancelled the delete action",
+          type: "error",
           confirmButtonClass: "btn btn-success",
         });
-        setTimeout(() => {
-          window.location.reload()
-        },1000)
-   
-      }
-      else{
-        Swal.fire({
-          type: "danger",
-          title: "Error!",
-          text: data.response.data.message,
-          confirmButtonClass: "btn btn-danger",
-        });
-      }
     })
     .catch( (error) => {
         Swal.fire({
@@ -193,7 +227,7 @@ const Suspended = () => {
           })
           setTimeout(() => {
             $('.modal').modal('hide')
-            //window.location.reload()
+            
           }, 1500)
           //
         })

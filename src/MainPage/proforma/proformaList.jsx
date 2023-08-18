@@ -192,28 +192,7 @@ const ProformaList = () => {
       buttonsStyling: !1,
     }) .then( async(t) => {
      
-    //   let data = await axios.delete(`/proforma/${id}`)
-    //   if(data.status < 205){
-    //     Swal.fire({
-    //       type: "success",
-    //       title: "Deleted!",
-    //       text: "Your Proforma item has been deleted.",
-    //       confirmButtonClass: "btn btn-success",
-    //     });
-    //     setTimeout(() => {
-    //       window.location.reload()
-    //     },1000)
-   
-    //   }
-    //   else{
-    //     Swal.fire({
-    //       type: "danger",
-    //       title: "Error!",
-    //       text: data.response.data.message,
-    //       confirmButtonClass: "btn btn-danger",
-    //     });
-    //   }
-    // })
+  
     if(t.isConfirmed){
         let data = await axios.delete(`/proforma/${id}`)
       if(data.status < 205){
