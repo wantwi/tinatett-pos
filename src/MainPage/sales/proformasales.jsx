@@ -334,10 +334,7 @@ const ProformaSales = () => {
                   transactionID: '',
                   amountPaid: ''
                 })
-                setTimeout(() => {
-                  $('.modal').modal('hide')
-                }, 1500)
-                //
+                
               })
 
           }
