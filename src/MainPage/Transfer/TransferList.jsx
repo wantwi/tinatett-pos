@@ -135,17 +135,12 @@ const TransferList = () => {
       sorter: (a, b) => a.transferRef.length - b.transferRef.length,
     },
     {
-      title: "From",
+      title: "To",
       dataIndex: "branchName",
       sorter: (a, b) => a.branchName.length - b.branchName.length,
       render: (text, record) => (<span>{text}{' Branch'}</span>)
     },
-    {
-      title: "To",
-      dataIndex: "destinationBranch",
-      sorter: (a, b) => a.destinationBranch.length - b.padestinationBranchid.length,
-      render: (text, record) => (<span>{text}{' Branch'}</span>)
-    },
+   
     {
       title: "No of Items",
       dataIndex: "numberOfProduct",
