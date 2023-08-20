@@ -50,13 +50,13 @@ const Dashboard = (props) => {
     {
       title: "Manufacturing Date",
       dataIndex: "manufacturingDate",
-      render: (text, record) => <div style={{ fontSize: "14px" }}>{text.substring(0,10)}</div>,
+      render: (text, record) => <div style={{ fontSize: "14px" }}>{text ? text.substring(0,10) : new Date('2023-01-01').toISOString().substring(0,10)}</div>,
       sorter: (a, b) => a.manufacturingDate.length - b.manufacturingDate.length,
     },
     {
       title: "Expiry Date",
       dataIndex: "expireDate",
-      render: (text, record) => <div style={{ fontSize: "14px" }}>{text.substring(0,10)}</div>,
+      render: (text, record) => <div style={{ fontSize: "14px" }}>{text ? text.substring(0,10) : new Date('2023-01-01').toISOString().substring(0,10)}</div>,
       sorter: (a, b) => a.expireDate.length - b.expireDate.length,
     },
     {

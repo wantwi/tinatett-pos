@@ -20,16 +20,20 @@ import {
 } from "../../EntryFile/imagePath";
 import { Link } from "react-router-dom";
 import { io } from 'socket.io-client';
-export const socket = io.connect("https://backendapi.akwaabaevolution.com")
+import { BASE_URL } from "../../api/CustomAxios";
+export const socket = io.connect(BASE_URL)
 import { NotificationsContext } from "./DefaultLayout";
 import { notification } from "antd";
 import { timeAgo } from "../../utility";
+
+
 
 const Header = (props) => {
   const [searchBar, SetSearchBar] = useState(false);
   const [toggle, SetToggle] = useState(false);
   const [dateState, setDateState] = useState(new Date());
   const [loggedInUser, setLoggedInUser] = useState({})
+
 
   const { notifications, setNotifications } = useContext(NotificationsContext)
 

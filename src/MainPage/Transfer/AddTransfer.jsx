@@ -127,7 +127,7 @@ const AddTransfer = () => {
         })
         setIsBatchLoading(false)
         //console.log(x)
-        setFormData({...formData, batchNumber: x[0], manuDate: x[0]?.manufacturingDate, expDate: x[0]?.expireDate, saleValue: x[0].SaleValue || 0})
+        setFormData({...formData, batchNumber: x[0], manuDate: x[0]?.manufacturingDate || new Date().toISOString(), expDate: x[0]?.expireDate || new Date().toISOString(), saleValue: x[0].SaleValue || 0})
         retailpriceTypeRef.current.checked = true
       }
     })
@@ -493,7 +493,7 @@ const AddTransfer = () => {
                     <div className="form-group">
                       <label>Manufacturing Date</label>
                       <div className="input-groupicon">
-                      <input type="text" className="form-control" value={formData?.manuDate.substring(0, 10)} disabled/>
+                      <input type="text" className="form-control" value={(formData?.manuDate).substring(0,10)} disabled/>
                         {/* <DatePicker
                           selected={startDate}
                           value={formData?.manuDate.substring(0,10)}
@@ -511,7 +511,7 @@ const AddTransfer = () => {
                     <div className="form-group">
                       <label>Exp. Date</label>
                       <div className="input-groupicon">
-                      <input type="text" className="form-control" value={formData?.expDate.substring(0, 10)} disabled/>
+                      <input type="text" className="form-control" value={(formData?.expDate).substring(0,10)} disabled/>
                       {/* <DatePicker
                           selected={startDate}
                           value={formData?.expDate.substring(0,10)}

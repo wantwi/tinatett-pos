@@ -21,7 +21,7 @@ import "react-select2-wrapper/css/select2.css";
 import { useEffect } from "react";
 import { useGet } from "../../hooks/useGet";
 import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
-import { isValidNumber, moneyInTxt } from "../../utility";
+import { base64ToBlob, isValidNumber, moneyInTxt } from "../../utility";
 import alertify from "alertifyjs";
 import "../../../node_modules/alertifyjs/build/css/alertify.css";
 import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
@@ -39,14 +39,14 @@ const TransferProformaItems = () => {
   // console.log("State", state)
   let href = window.location.search;
   let urlParams = new URLSearchParams(href)
-  let id = urlParams.get('id' );
+  let id = urlParams.get('id');
 
   const [customerOptions, setCustomerOptions] = useState([])
   const [productOptions, setProductOptions] = useState([])
   const [startDate, setStartDate] = useState(transfer?.transferDate);
 
   const { data: customers, isError, isLoading: isCustomerLoading, isSuccess } = useGet("branches", "/branch");
-  const {data: products, isLoading: isProductsLoading, } = useGet("products", "/product");
+  const { data: products, isLoading: isProductsLoading, } = useGet("products", "/product");
   const [stateId] = useState(id);
   const { data: proformaItems, isLoading: proformaIsLoading } = useGet("transfer-product-details", `/proforma/products/${stateId}`);
   const { data: transfer, isLoading: transferIsLoading } = useGet("transfer-info", `/transfer/${stateId}`);
@@ -59,12 +59,12 @@ const TransferProformaItems = () => {
   const [selectedProductInfoEditMode, setSelectedProductInfoEditMode] = useState()
   const [selectedCustomer, setSelectedCustomer] = useState('')
   const [selectedCustomerPrint, setSelectedCustomerPrint] = useState('')
-  const [formData, setFormData] = useState({quantity:'', amount:'', batchNumber:{}, manuDate:'', expDate:''})
-  const [editFormData, setEditFormData] = useState({quantity:'', amount:'', batchNumber:{}, manufacturingDate:'', expireDate:''})
+  const [formData, setFormData] = useState({ quantity: '', amount: '', batchNumber: {}, manuDate: '', expDate: '', saleValue:'' })
+  const [editFormData, setEditFormData] = useState({ quantity: '', amount: '', batchNumber: {}, manufacturingDate: '', expireDate: '', saleValue:'' })
   const [productGridData, setProductGridData] = useState([])
   const [printGridData, setPrintGridData] = useState([])
   const [transDate, setTransDate] = useState(new Date().toISOString().slice(0, 10));
-  const [disabledUnselectedPrice,setDisableUnselectedPrice] = useState({retail: false, wholesale:false, special:false})
+  const [disabledUnselectedPrice, setDisableUnselectedPrice] = useState({ retail: false, wholesale: false, special: false })
   const retailpriceTypeRef = useRef()
   const specialpriceTypeRef = useRef()
   const wholesalepriceTypeRef = useRef()
@@ -74,14 +74,12 @@ const TransferProformaItems = () => {
   const [specialprice, setSpecialPrice] = useState('')
   const [isSaving, setIsSaving] = useState(false)
   const [isBatchLoading, setIsBatchLoading] = useState(false)
+  const [receiptFile, setReceiptFile] = useState(null)
 
   const { notifications, setNotifications } = useContext(NotificationsContext)
   let storage = JSON.parse(localStorage.getItem("auth"))
 
-  //draggable modal
-  // $(".modal").draggable({
-  //   handle: ".modal-header"
-  // });
+
 
 
 
@@ -116,24 +114,9 @@ const TransferProformaItems = () => {
       })
       setProductOptions(mappedData2)
 
-
-      // let mappedData3 = proformaItems?.data.map((item) =>{
-      //   return {
-      //     productId: item?.productId,
-      //     name: item?.product.name,
-      //     batchNumber: item?.batchNumber,
-      //     manufacturingDate: item?.manufacturingDate,
-      //     expireDate: item?.expireDate,
-      //     quantity: item?.quantity,
-      //     unitPrice:item?.unitPrice,
-      //     amount:item?.amount
-      //   }
-      // })
-      // setProductGridData(mappedData3)
-
     }
 
- 
+
 
   }, [isCustomerLoading, isProductsLoading, proformaIsLoading])
 
@@ -141,26 +124,26 @@ const TransferProformaItems = () => {
     //get the batchNumber for each product
     let list = []
     if (!proformaIsLoading && !transferIsLoading) {
-        proformaItems.data.map((product) => {
-          axios.get(`/purchase/product/${product.productId}`)
+      proformaItems.data.map((product) => {
+        axios.get(`/purchase/product/${product.productId}`)
           .then((res) => {
-              console.log("Batch Number", res.data.data)
-              let mapped = {
-                ...product,
-                name:product.product.name,
-                batchNumber: res.data.data.batchNumber[0].batchNumber, 
-                expireDate: res.data.data.batchNumber[0].expireDate, 
-              }
-              //console.log(mapped)
-              list =[...list, mapped]
-              console.log('mappedList', list)
-             
+            console.log("Batch Number", res.data.data)
+            let mapped = {
+              ...product,
+              name: product.product.name,
+              batchNumber: res.data.data.batchNumber[0].batchNumber,
+              expireDate: res.data.data.batchNumber[0].expireDate,
+            }
+            //console.log(mapped)
+            list = [...list, mapped]
+            console.log('mappedList', list)
+
           })
-          .finally(() =>  setProductGridData(list))
-        })
-       
-      }
-  } 
+          .finally(() => setProductGridData(list))
+      })
+
+    }
+  }
 
   useEffect(() => {
     getProformaProductsBatchNumbers()
@@ -169,15 +152,15 @@ const TransferProformaItems = () => {
   const handleProductSelect = (e) => {
     setSelectedProduct(e)
     setRetailPrice('(' + e.retailPrice + 'GHS)')
-    setWholesalePrice('(' + e.wholeSalePrice  + 'GHS)')
-    setSpecialPrice('(' + e.specialPrice  + 'GHS)')
-    setPrice(e.retailPrice) 
+    setWholesalePrice('(' + e.wholeSalePrice + 'GHS)')
+    setSpecialPrice('(' + e.specialPrice + 'GHS)')
+    setPrice(e.retailPrice)
     setIsBatchLoading(true)
-    
+
   }
 
   const handleProductSelectEditMode = (e) => {
-    setIsBatchLoading(true)
+    //setIsBatchLoading(true)
     setSelectedProductEditMode(e)
   }
 
@@ -188,47 +171,49 @@ const TransferProformaItems = () => {
     let product = productOptions.find((product) => product.id == item.productId)
     //console.log("Product", product)
     setSelectedProductEditMode(product)
-  
+
 
     //get batch number
     axios.get(`${BASE_URL}/purchase/product/${item.productId}`).then((res) => {
-      if(res.data.success){
+      if (res.data.success) {
         setSelectedProductInfoEditMode(res.data.data)
         let x = res.data.data.batchNumber?.map((item) => {
-          return {value:item.batchNumber, label:item?.batchNumber + '-(' + item?.Quantity +')', expireDate:item?.expireDate, manufacturingDate: item?.manufacturingDate}
+          return {value:item.batchNumber, label:item?.batchNumber + '-(' + item?.Quantity +')', expireDate:item?.expireDate, manufacturingDate: item?.manufacturingDate, SaleValue: item?.SaleValue}
         })
         setIsBatchLoading(false)
-        setEditFormData({...editFormData, ...item, batchNumber: x[0],  manufacturingDate: x[0].manufacturingDate, expireDate: x[0].expireDate})
+        setEditFormData({ ...editFormData, ...item, batchNumber: x[0], manufacturingDate: x[0].manufacturingDate, expireDate: x[0].expireDate, saleValue: x[0].SaleValue || 0 })
       }
     }).finally(() => setIsLoadingDetails(false))
-    
+
   }
 
-  const handleUpdate = ()=> {
+  const handleUpdate = () => {
     //console.log("Updated", editFormData)
-    let updated = {...editFormData, batchNumber: editFormData?.batchNumber?.value}
+    let updated = { ...editFormData, batchNumber: editFormData?.batchNumber?.value }
     let listCopy = [...productGridData]
     let index = productGridData.findIndex(item => item.productId == updated.productId)
     listCopy[index] = updated
     setProductGridData(listCopy)
-    setEditFormData({quantity:'', amount:'', batchNumber:{}, manufacturingDate:'', expireDate:''})
+    setEditFormData({ quantity: '', amount: '', batchNumber: {}, manufacturingDate: '', expireDate: '' })
     $('.modal').modal('hide')
   }
   const axios = useCustomApi()
 
   useEffect(() => {
     axios.get(`${BASE_URL}/purchase/product/${selectedProduct?.value}`).then((res) => {
-      if(res.data.success){
+      if (res.data.success) {
         setSelectedProductInfo(res.data.data)
-        let x = res.data.data.batchNumber?.map((item) => {
-          return {value:item.batchNumber, label:item?.batchNumber + '-(' + item?.Quantity +')', expireDate:item?.expireDate, manufacturingDate: item?.manufacturingDate}
+        let x = res.data.newProduct.batchNumber?.map((item) => {
+          return {value:item.batchNumber, label:item?.batchNumber + '-(' + item?.Quantity +')', expireDate:item?.expireDate, manufacturingDate: item?.manufacturingDate, SaleValue: item?.SaleValue}
         })
-        if(x.length>0){
-          setFormData({...formData, batchNumber: x[0], manuDate: x[0].manufacturingDate, expDate: x[0].expireDate})
+        setIsBatchLoading(false)
+        if (x.length > 0) {
+          setFormData({...formData, batchNumber: x[0], manuDate: x[0]?.manufacturingDate || new Date().toISOString(), expDate: x[0]?.expireDate || new Date().toISOString(), saleValue: x[0]?.SaleValue || 0})
         }
         retailpriceTypeRef.current.checked = true
       }
     })
+
 
   }, [selectedProduct])
 
@@ -250,8 +235,8 @@ const TransferProformaItems = () => {
       manufacturingDate: formData?.manuDate,
       expireDate: formData?.expDate,
       quantity: formData?.quantity,
-      unitPrice:price,
-      amount:formData.quantity * price
+      unitPrice: formData.saleValue,
+      amount:formData.quantity * formData.saleValue,
 
     }
     if (item.amount < 1 || formData.unitPrice == '' || item.productName == '') {
@@ -259,9 +244,9 @@ const TransferProformaItems = () => {
       alertify.warning("Please make sure all fields are filled.");
 
       let newNotification = {
-        id: Math.ceil(Math.random()*1000000),
+        id: Math.ceil(Math.random() * 1000000),
         message: `${storage.name} Please make sure all fields are filled.`,
-        time: new Date().toISOString(), type:'warning'
+        time: new Date().toISOString(), type: 'warning'
       }
       setNotifications([newNotification, ...notifications])
     }
@@ -269,8 +254,8 @@ const TransferProformaItems = () => {
 
 
       setProductGridData([...productGridData, item])
-      setFormData({quantity:'', amount:'', batchNumber:'', manuDate:'', expDate:''})
-      setSelectedProduct({totalQuantity:''})
+      setFormData({ quantity: '', amount: '', batchNumber: '', manuDate: '', expDate: '', saleValue:'' })
+      setSelectedProduct({ totalQuantity: '' })
       retailpriceTypeRef.current.checked = false
       wholesalepriceTypeRef.current.checked = false
       specialpriceTypeRef.current.checked = false
@@ -285,24 +270,25 @@ const TransferProformaItems = () => {
 
   const deleteRow = (record) => {
     console.log(record)
-   // console.log(productGridData)
-   let newGridData = productGridData.filter((item) => item.productId !== record.productId)
-   //console.log(newGridData)
-   setProductGridData(newGridData)
- };
+    // console.log(productGridData)
+    let newGridData = productGridData.filter((item) => item.productId !== record.productId)
+    //console.log(newGridData)
+    setProductGridData(newGridData)
+  };
 
 
   const onSubmit = (hasInvoice) => {
-    
+
+
     productGridData.forEach((item) => {
-      if(item.batchNumber == undefined || item.batchNumber == 'undefined' || item.batchNumber == ''){
+      if (item.batchNumber == undefined || item.batchNumber == 'undefined' || item.batchNumber == '') {
         alertify.set("notifier", "position", "bottom-right");
         alertify.warning("Please provide a batch number before saving.");
 
         let newNotification = {
-          id: Math.ceil(Math.random()*1000000),
+          id: Math.ceil(Math.random() * 1000000),
           message: `${storage.name} Please provide a batch number before saving.`,
-          time: new Date().toISOString(), type:'warning'
+          time: new Date().toISOString(), type: 'warning'
         }
         setNotifications([newNotification, ...notifications])
         return
@@ -313,128 +299,130 @@ const TransferProformaItems = () => {
       alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please add at least one item to list before saving.");
       let newNotification = {
-        id: Math.ceil(Math.random()*1000000),
+        id: Math.ceil(Math.random() * 1000000),
         message: `${storage.name} Please add at least one item to list before saving.`,
-        time: new Date().toISOString(), type:'warning'
+        time: new Date().toISOString(), type: 'warning'
       }
       setNotifications([newNotification, ...notifications])
     }
-    if(selectedCustomer == ''){
+    else if (selectedCustomer == '') {
       alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please select a branch before saving.");
 
       let newNotification = {
-        id: Math.ceil(Math.random()*1000000),
+        id: Math.ceil(Math.random() * 1000000),
         message: `${storage.name} Please select a branch before saving.`,
-        time: new Date().toISOString(), type:'warning'
+        time: new Date().toISOString(), type: 'warning'
       }
       setNotifications([newNotification, ...notifications])
       $('#branch').css('border', '1px solid red')
-      setTimeout(() => {
-        $('#branch').css('border', '1px solid rgba(145, 158, 171, 0.32)')
-      }, 3000)
     }
-    
+
     else {
-      setIsSaving(true)
+      //setIsSaving(true)
+      
       let postBody = {
         destinationBranchId: selectedCustomer.id,
         transferDate: transDate,
         products: productGridData
       }
 
+      
       //console.log(postBody)
       //mutate(postBody)
       axios.post('/transfer', postBody)
-      .then((res) => {
-        if(res.data.success){
-          alertify.set("notifier", "position", "bottom-right");
-          alertify.success("Transfer completed successfully.");
+        .then((res) => {
+          setSelectedProduct('')
+          setProductGridData([])
+          if (res.data.success) {
+           
 
-          let newNotification = {
-            id: Math.ceil(Math.random()*1000000),
-            message: `${storage.name} Transfer completed successfully.`,
-            time: new Date().toISOString(), type: 'success'
-          }
-          setNotifications([newNotification, ...notifications])
-          
-           //delete proforma
-           axios.delete(`/proforma/${id}`).then((res) => console.log(res))
-          setTimeout(() => {
+            if (hasInvoice) {
+              //alert("Has Invoice")
+              let base64 = res.data.base64
+              const blob = base64ToBlob(base64, 'application/pdf');
+              const blobFile = `data:application/pdf;base64,${base64}`
+              const url = URL.createObjectURL(blob);
+              //console.log(blobFile)
+              setReceiptFile(blobFile)
+              $('#pdfViewer').modal('show')
+            }
+
             setSelectedProduct('')
             setProductGridData([])
-            if(hasInvoice){
-              $('#invoice').modal('show');
+            alertify.set("notifier", "position", "bottom-right");
+            alertify.success("Transfer completed successfully.");
+
+            let newNotification = {
+              id: Math.ceil(Math.random() * 1000000),
+              message: `${storage.name} Transfer completed successfully.`,
+              time: new Date().toISOString(), type: 'success'
             }
-          }, 500)
-        }
-        else{
+            setNotifications([newNotification, ...notifications])
+
+            //delete proforma
+             axios.delete(`/proforma/${id}`).then((res) => console.log(res))
+            
+          }
+          else {
+            alertify.set("notifier", "position", "bottom-right");
+            alertify.error("Error...Could not complete transfer.");
+
+            let newNotification = {
+              id: Math.ceil(Math.random() * 1000000),
+              message: `${storage.name} Error...Could not complete transfer.`,
+              time: new Date().toISOString(), type: 'error'
+            }
+            setNotifications([newNotification, ...notifications])
+          }
+        })
+        .catch((error) => {
+          console.log(error)
           alertify.set("notifier", "position", "bottom-right");
           alertify.error("Error...Could not complete transfer.");
 
           let newNotification = {
-            id: Math.ceil(Math.random()*1000000),
+            id: Math.ceil(Math.random() * 1000000),
             message: `${storage.name} Error...Could not complete transfer.`,
             time: new Date().toISOString(), type: 'error'
           }
           setNotifications([newNotification, ...notifications])
-        }
-      })
-      .catch((error) => {
-        console.log(error)
-        alertify.set("notifier", "position", "bottom-right");
-        alertify.error("Error...Could not complete transfer.");
 
-        let newNotification = {
-          id: Math.ceil(Math.random()*1000000),
-          message: `${storage.name} Error...Could not complete transfer.`,
-          time: new Date().toISOString(), type: 'error'
-        }
-        setNotifications([newNotification, ...notifications])
-        
-        
-      })
-      .finally(() => setIsSaving(false))
-      
+
+        })
+        .finally(() => setIsSaving(false))
+
     }
   }
 
 
+useEffect(() => {
+  
+    $('#branch').css('border', '1px solid rgba(145, 158, 171, 0.32)')
 
-  const printReport = () => {
-    let printContents = document.getElementById('printArea').innerHTML
-    let originalContents = document.body.innerHTML
-    document.body.innerHTML = printContents
-    window.print(printContents)
-
-    document.body.innerHTML = originalContents
-    location.reload()
-  }
-
-
- 
+}, [selectedCustomer])
 
 
   useEffect(() => {
     setFormData({ ...formData, amount: Number(formData.price) * Number(formData.quantity) || '' })
-    if(Number(formData?.quantity) > selectedProduct?.totalQuantity){
+    if (Number(formData?.quantity) > selectedProduct?.totalQuantity) {
       alertify.set("notifier", "position", "bottom-right");
       alertify.warning("You can not transfer more than stock available.");
 
       let newNotification = {
-        id: Math.ceil(Math.random()*1000000),
+        id: Math.ceil(Math.random() * 1000000),
         message: `${storage.name} You can not transfer more than stock available.`,
-        time: new Date().toISOString(), type:'warning'
+        time: new Date().toISOString(), type: 'warning'
       }
       setNotifications([newNotification, ...notifications])
-      setFormData(({...formData, quantity:''}))
+      setFormData(({ ...formData, quantity: '' }))
     }
 
   }, [formData.quantity])
 
 
-  if(isSaving){
-    return <LoadingSpinner message="Processing...please wait"/>
+  if (isSaving) {
+    return <LoadingSpinner message="Processing...please wait" />
   }
 
   if (isProductsLoading && isCustomerLoading) {
@@ -464,7 +452,8 @@ const TransferProformaItems = () => {
                       <label>Branch Name</label>
                       <div className="row">
                         <div className="col-lg-12 col-sm-12 col-12">
-                        <Select
+                          <Select
+                            
                             className="select"
                             options={customerOptions}
                             onChange={handleCustomerSelect}
@@ -496,66 +485,66 @@ const TransferProformaItems = () => {
                   <div className="form-group">
                     <label>Product Name</label>
                     <div className="input-groupicon">
-                      <Select style={{width:'100%'}}
-                          options={productOptions}
-                          placeholder={'Select product'}
-                          value={selectedProduct}
-                          onChange={handleProductSelect}
-                          isSearchable= {true}
-                          isLoading={isProductsLoading}
-                          
-                       />
-                      
+                      <Select style={{ width: '100%' }}
+                        options={productOptions}
+                        placeholder={'Select product'}
+                        value={selectedProduct}
+                        onChange={handleProductSelect}
+                        isSearchable={true}
+                        isLoading={isProductsLoading}
+
+                      />
+
                     </div>
                   </div>
                 </div>
 
                 <div className="row">
-                    <div className="col-6">
-                      <div className="form-group">
-                        <label>Quantity Left</label>
-                        <div className="input-groupicon">
-                          <input
-                            className="form-control"
-                            type="text"
-                            value={selectedProduct?.totalQuantity}
-                            disabled
-                          />
-                          
-                        </div>
-                      </div>
-                    </div>
+                  <div className="col-6">
+                    <div className="form-group">
+                      <label>Quantity Left</label>
+                      <div className="input-groupicon">
+                        <input
+                          className="form-control"
+                          type="text"
+                          value={selectedProduct?.totalQuantity}
+                          disabled
+                        />
 
-                    <div className="col-6">
-                      <div className="form-group">
-                       <div style={{display:'flex', justifyContent: 'space-between'}}>
-                          <label>Batch No.</label> 
-                          {isBatchLoading && <div className="spinner-border text-primary me-1" role="status" style={{height:20, width:20}}>
-                            <span className="sr-only">Loading...</span>
-                          </div>}
-                        </div>
-                        <div className="input-groupicon">
-                          <Select
-                            options={selectedProductInfo?.batchNumber?.map((item) => {
-                              return {value:item.batchNumber, label:item?.batchNumber + '-(' + item?.Quantity +')', expireDate:item?.expireDate, manufacturingDate: item?.manufacturingDate}
-                            })}
-                            placeholder=""
-                            value={formData.batchNumber}
-                            onChange={(e) => setFormData({...formData, batchNumber: (e), manuDate: e.manufacturingDate, expDate: e.expireDate})}
-                            //onChange={(e) => console.log(e)}
-                          />
-                          
-                        </div>
                       </div>
                     </div>
+                  </div>
+
+                  <div className="col-6">
+                    <div className="form-group">
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <label>Batch No.</label>
+                        {isBatchLoading && <div className="spinner-border text-primary me-1" role="status" style={{ height: 20, width: 20 }}>
+                          <span className="sr-only">Loading...</span>
+                        </div>}
+                      </div>
+                      <div className="input-groupicon">
+                        <Select
+                          options={selectedProductInfo?.batchNumber?.map((item) => {
+                            return { value: item.batchNumber, label: item?.batchNumber + '-(' + item?.Quantity + ')', expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
+                          })}
+                          placeholder=""
+                          value={formData.batchNumber}
+                          onChange={(e) => setFormData({ ...formData, batchNumber: (e), manuDate: e.manufacturingDate, expDate: e.expireDate })}
+                        //onChange={(e) => console.log(e)}
+                        />
+
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                
+
                 <div className="row">
                   <div className="col-6">
                     <div className="form-group">
                       <label>Manufacturing Date</label>
                       <div className="input-groupicon">
-                      <input type="date" className="form-control" value={formData?.manuDate.substring(0, 10)} disabled/>
+                        <input type="date" className="form-control" value={formData?.manuDate.substring(0, 10)} disabled />
                         {/* <DatePicker
                           selected={startDate}
                           value={formData?.manuDate.substring(0,10)}
@@ -573,8 +562,8 @@ const TransferProformaItems = () => {
                     <div className="form-group">
                       <label>Exp. Date</label>
                       <div className="input-groupicon">
-                      <input type="date" className="form-control" value={formData?.expDate.substring(0, 10)} disabled/>
-                      {/* <DatePicker
+                        <input type="date" className="form-control" value={formData?.expDate.substring(0, 10)} disabled />
+                        {/* <DatePicker
                           selected={startDate}
                           value={formData?.expDate.substring(0,10)}
                           disabled
@@ -591,49 +580,49 @@ const TransferProformaItems = () => {
                 <div className="col-12">
                   <div className="form-group">
                     <label>Product Value</label>
-                    <div className="row">
-                        
+                    <input type="text" className="forn-control" disabled value={formData?.saleValue} />
+                    <div className="row" hidden>
+                      <div className="col-lg-4" >
 
-                          <div className="col-lg-4">
-
-                            <div className="input-group">
-                              <div className="input-group-text">
-                                <input className="form-check-input" type="radio" ref={retailpriceTypeRef} name="priceType" value={selectedProduct?.retailPrice} onChange={(e) => {
-                                  setPrice(e.target.value)
-                                  setDisableUnselectedPrice({retail:false, wholesale:true, special:true})
-                                }}/>
-                              </div>
-                              <input type="text" className="form-control" aria-label="Text input with radio button"  placeholder={`Retail ${retailprice}`} disabled={disabledUnselectedPrice.retail}/>
-                            </div>
-                          
+                        <div className="input-group">
+                          <div className="input-group-text">
+                            <input className="form-check-input" type="radio" ref={retailpriceTypeRef} name="priceType" value={selectedProduct?.retailPrice} onChange={(e) => {
+                              setPrice(e.target.value)
+                              setDisableUnselectedPrice({ retail: false, wholesale: true, special: true })
+                            }} />
                           </div>
-
-                          <div className="col-lg-4">
-                            <div className="input-group">
-                              <div className="input-group-text">
-                                <input className="form-check-input" type="radio" ref={wholesalepriceTypeRef} name="priceType" value={selectedProduct?.wholeSalePrice} onChange={(e) => {
-                                  setPrice(e.target.value)
-                                  setDisableUnselectedPrice({wholesale:false, retail:true, special:true})}
-                                 } />
-                              </div>
-                              <input type="text" className="form-control" aria-label="Text input with radio button" placeholder={`Wholesale ${wholesaleprice}`} disabled={disabledUnselectedPrice.wholesale}/>
-                            </div>
+                          <input type="text" className="form-control" aria-label="Text input with radio button" placeholder={`Retail ${retailprice}`} disabled={disabledUnselectedPrice.retail} />
                         </div>
 
-                          <div className="col-lg-4">
-
-                            <div className="input-group">
-                              <div className="input-group-text">
-                                <input className="form-check-input" type="radio" ref={specialpriceTypeRef} name="priceType" value={selectedProduct?.specialPrice} onChange={(e) => {
-                                  setPrice(e.target.value)
-                                  setDisableUnselectedPrice({special:false, wholesale:true, retail:true})
-                                } }/>
-                              </div>
-                              <input type="text" className="form-control" aria-label="Text input with radio button" placeholder={`Special ${specialprice}`} disabled={disabledUnselectedPrice.special} />
-                            </div>
-                          
-                          </div>
                       </div>
+
+                      <div className="col-lg-4">
+                        <div className="input-group">
+                          <div className="input-group-text">
+                            <input className="form-check-input" type="radio" ref={wholesalepriceTypeRef} name="priceType" value={selectedProduct?.wholeSalePrice} onChange={(e) => {
+                              setPrice(e.target.value)
+                              setDisableUnselectedPrice({ wholesale: false, retail: true, special: true })
+                            }
+                            } />
+                          </div>
+                          <input type="text" className="form-control" aria-label="Text input with radio button" placeholder={`Wholesale ${wholesaleprice}`} disabled={disabledUnselectedPrice.wholesale} />
+                        </div>
+                      </div>
+
+                      <div className="col-lg-4">
+
+                        <div className="input-group">
+                          <div className="input-group-text">
+                            <input className="form-check-input" type="radio" ref={specialpriceTypeRef} name="priceType" value={selectedProduct?.specialPrice} onChange={(e) => {
+                              setPrice(e.target.value)
+                              setDisableUnselectedPrice({ special: false, wholesale: true, retail: true })
+                            }} />
+                          </div>
+                          <input type="text" className="form-control" aria-label="Text input with radio button" placeholder={`Special ${specialprice}`} disabled={disabledUnselectedPrice.special} />
+                        </div>
+
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -643,23 +632,23 @@ const TransferProformaItems = () => {
                       <label>Quantity</label>
                       <div className="input-groupicon">
                         <input
-                        className="form-control"
+                          className="form-control"
                           type="text"
                           value={formData?.quantity}
                           onChange={(e) => {
-                            if(e.target.value == ''){
-                              setFormData({...formData, quantity: ''})
+                            if (e.target.value == '') {
+                              setFormData({ ...formData, quantity: '' })
                             }
-                            else if(isValidNumber(e.target.value)){
-                              setFormData({...formData, quantity: Number(e.target.value)})
+                            else if (isValidNumber(e.target.value)) {
+                              setFormData({ ...formData, quantity: Number(e.target.value) })
                             }
                           }}
                         />
-                        
+
                       </div>
                     </div>
                   </div>
-              
+
                   <div className="col-6">
                     <div className="form-group">
                       <label>Amount</label>
@@ -667,9 +656,9 @@ const TransferProformaItems = () => {
                         <input
                           className="form-control"
                           type="text"
-                          value={formData.quantity ? formData.quantity * price : price * 1}  
+                          value={formData.quantity ? (formData.quantity * formData.saleValue ): (formData.saleValue * 1) || 0 }
                         />
-                        
+
                       </div>
                     </div>
                   </div>
@@ -776,7 +765,7 @@ const TransferProformaItems = () => {
                     data-bs-target="#create" >
                     Refresh
                   </Link> */}
-                  <button type="submit" className="btn btn-cancel me-2" ><FeatherIcon icon="" />
+                  <button type="submit" className="btn btn-cancel me-2" data-bs-toggle="modal" data-bs-target="#noconfirm"><FeatherIcon icon="" />
                     {"No Invoice"}
                   </button>
                 </div>
@@ -791,182 +780,48 @@ const TransferProformaItems = () => {
 
 
 
-       {/* Confirm Modal */}
-       <div
+      {/* PDF Modal */}
+      <div
+        className="modal fade"
+        id="pdfViewer"
+        tabIndex={-1}
+        aria-labelledby="pdfViewer"
+        aria-hidden="true"
+      >
+        <div className="modal-dialog modal-lg modal-dialog-centered">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title">Transfer Receipt</h5>
+              <button
+                type="button"
+                className="close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+                onClick={() => $('.modal').modal('hide')}
+              >
+                <span aria-hidden="true">×</span>
+              </button>
+            </div>
+            <div className="modal-body">
+              <iframe width='100%' height='800px' src={receiptFile}></iframe>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      {/* Invoice Confirm Modal */}
+      <div
         className="modal fade"
         id="confirm"
         tabIndex={-1}
         aria-labelledby="confirm"
         aria-hidden="true">
 
-          <div className="modal-dialog modal-md modal-dialog-centered" role="document">
-            <div className="modal-content">
-              <div className="modal-header">
-                    <h5 className="modal-title">Confirm</h5>
-                    <button
-                    type="button"
-                    className="close"
-                    data-bs-dismiss="modal"
-                    aria-label="Close"
-                    >
-                    <span aria-hidden="true">×</span>
-                </button>
-              </div>
-              <div className="modal-body">
-                Are you sure you want to complete this transfer?
-              </div>
-              <div className="modal-footer">
-                  <Link to="#" className="btn btn-submit me-2" data-bs-dismiss="modal" onClick={() =>onSubmit(false)}>
-                    Yes
-                  </Link>
-                  <Link to="#" className="btn btn-cancel" data-bs-dismiss="modal">
-                    No
-                </Link>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-
-
-       {/* Edit Modal */}
-  
-         <div
-            className="modal fade"
-            id="editproduct"
-            tabIndex={-1}
-            aria-labelledby="editproduct"
-            aria-hidden="true"
-            draggable
-          >
-            <div className="modal-dialog modal-md modal-dialog-centered">
-              <div className="modal-content">
-                <div className="modal-header">
-                  <h5 className="modal-title">Edit Product</h5>
-                  <button
-                    type="button"
-                    className="close"
-                    data-bs-dismiss="modal"
-                    aria-label="Close"
-                  >
-                    <span aria-hidden="true">×</span>
-                  </button>
-                </div>
-                {isLoadingDetails ?  <LoadingOutlined  style={{color: "green", margin:50}}/> : (<div className="modal-body">
-                  <div className="row">
-                    <div className="col-lg-12 col-sm-12 col-12">
-                      <div className="form-group">
-                      <label>Product Name</label>
-                      <div className="input-groupicon">
-                        <Select style={{width:'100%'}}
-                            options={productOptions}
-                            placeholder={'Select product'}
-                            value={selectedProductEditMode}
-                            onChange={handleProductSelectEditMode}
-                            isSearchable= {true}
-                            isLoading={isProductsLoading}
-                            
-                        />
-                        
-                      </div>
-                       
-                      </div>
-                    </div>
-                   
-                    <div className="col-12">
-                      <div className="form-group">
-                       <div style={{display:'flex', justifyContent: 'space-between'}}>
-                          <label>Batch No.</label> 
-                          {isBatchLoading && <div className="spinner-border text-primary me-1" role="status" style={{height:20, width:20}}>
-                            <span className="sr-only">Loading...</span>
-                          </div>}
-                        </div>
-                        <div className="input-groupicon">
-                          <Select
-                            options={selectedProductInfoEditMode?.batchNumber?.map((item) => {
-                              return {value:item.batchNumber, label:item?.batchNumber + '-(' + item?.Quantity +')', expireDate:item?.expireDate, manufacturingDate: item?.manufacturingDate}
-                            })}
-                            placeholder=""
-                            value={editFormData.batchNumber}
-                            onChange={(e) => setEditFormData({...editFormData, batchNumber: (e), manufacturingDate: e.manufacturingDate, expireDate: e.expireDate})}
-                          
-                          />
-                          
-                        </div>
-                      </div>
-                    </div>
-                    <div className="col-lg-6 col-sm-12 col-12">
-                      <div className="form-group">
-                        <label>Quantity</label>
-                        <input type="text" value={editFormData?.quantity}
-                         onChange={(e) => {
-                          if(e.target.value == ''){
-                            setEditFormData({...editFormData, quantity: ''})
-                          }
-                          else if (isValidNumber(e.target.value)) {
-                            let qty = parseInt(e.target.value) || 0
-                            let unitP = parseInt(editFormData.unitPrice) || 0
-                            setEditFormData({ ...editFormData, quantity: e.target.value, amount: editFormData.quantity ? unitP * qty : unitP * 1 })
-                          }
-                        }
-                        }/>
-                      </div>
-                    </div>
-                 
-                    <div className="col-lg-6 col-sm-12 col-12">
-                      <div className="form-group">
-                        <label>Product Value</label>
-                        <input type="text" value={editFormData?.unitPrice} 
-                         onChange={(e) => {
-                          let unitP = parseInt(e.target.value) || 0
-                          let qty = parseInt(editFormData.quantity) || 0
-                          setEditFormData({ ...editFormData, unitPrice: e.target.value, amount: editFormData ? unitP * qty : unitP * 1 })
-                        }}
-                        />
-                      </div>
-                    </div>
-                    <div className="col-lg-6 col-sm-12 col-12">
-                      <div className="form-group">
-                        <label>Amount</label>
-                        <input type="text" value={editFormData?.amount} />
-                      </div>
-                    </div>
-                   
-                   
-                  </div>
-                </div>)}
-                <div className="modal-footer" style={{justifyContent:'flex-end'}}>
-                  <button type="button" className="btn btn-submit" onClick={handleUpdate}>
-                    Update
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-cancel"
-                    data-bs-dismiss="modal"
-                  >
-                    Close
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-
-      <div
-        className="modal fade"
-        id="create"
-        tabIndex={-1}
-        aria-labelledby="create"
-        aria-hidden="true"
-      >
-        <div
-          className="modal-dialog modal-lg modal-dialog-centered"
-          role="document"
-        >
+        <div className="modal-dialog modal-md modal-dialog-centered" role="document">
           <div className="modal-content">
             <div className="modal-header">
-              <h5 className="modal-title">Print Preview</h5>
+              <h5 className="modal-title">Confirm</h5>
               <button
                 type="button"
                 className="close"
@@ -977,74 +832,178 @@ const TransferProformaItems = () => {
               </button>
             </div>
             <div className="modal-body">
+              Are you sure you want to complete this transfer?
+            </div>
+            <div className="modal-footer">
+              <Link to="#" className="btn btn-submit me-2" data-bs-dismiss="modal" onClick={() => onSubmit(true)}>
+                Yes
+              </Link>
+              <Link to="#" className="btn btn-cancel" data-bs-dismiss="modal">
+                No
+              </Link>
+            </div>
+          </div>
+        </div>
 
-              <div id="printArea">
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                  <h5 style={{ textAlign: 'center', fontWeight: 900 }}>TINATETT HERBAL MANUFACTURING AND MARKKETING COMPANY LIMITED</h5>
-                  <span style={{ textAlign: 'center' }}>P.O. BOC CO 2699, TEMA-ACCRA, WHOLESALE AND RETAIL OF HERBAL MEDICINE </span>
-                  <span style={{ textAlign: 'center' }}>KOTOBABI SPINTEX - FACTORY WEARHOUSE, 02081660807, tinatettonline@gmail.com</span>
-                  <h5 style={{ textAlign: 'center', textDecoration: 'underline', fontWeight: 700 }}>PROFORMA INVOICE</h5>
-                  <h6 style={{ fontWeight: 700 }}>Customer Info: </h6>
-                  <span>Customer Name : {selectedCustomerPrint?.label}</span>
-                  <span>Email: {selectedCustomerPrint?.email}</span>
-                  <span>Contact: {selectedCustomerPrint?.contact}</span>
-                  <span>Address: {selectedCustomerPrint?.location}</span>
-                </div>
-                <div className="row mt-3">
-                  <div class="table-responsive mb-3">
-                    <table class="table">
-                      <thead>
-                        <tr>
-                          <th>#</th><th>Product Name</th><th>Quantity</th><th>Unit Price</th><th>Amount</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {printGridData?.map((item, index) => {
-                          return (
-                            <tr key={index}>
-                              <td>{index + 1}</td>
-                              <td>
-                                <Link to="#">{item?.productName}</Link>
-                              </td>
-                              <td>{item?.quantity}</td>
-                              <td>{item?.unitPrice}</td>
-                              <td>{item?.amount}</td>
-                            </tr>
-                          )
-                        })}
-                      </tbody>
-                    </table>
+      </div>
+
+
+      {/* No Invoice Confirm Modal */}
+      <div
+        className="modal fade"
+        id="noconfirm"
+        tabIndex={-1}
+        aria-labelledby="noconfirm"
+        aria-hidden="true">
+
+        <div className="modal-dialog modal-md modal-dialog-centered" role="document">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title">Confirm</h5>
+              <button
+                type="button"
+                className="close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">×</span>
+              </button>
+            </div>
+            <div className="modal-body">
+              Are you sure you want to complete this transfer?
+            </div>
+            <div className="modal-footer">
+              <Link to="#" className="btn btn-submit me-2" data-bs-dismiss="modal" onClick={() => onSubmit(false)}>
+                Yes
+              </Link>
+              <Link to="#" className="btn btn-cancel" data-bs-dismiss="modal">
+                No
+              </Link>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+
+
+      {/* Edit Modal */}
+
+      <div
+        className="modal fade"
+        id="editproduct"
+        tabIndex={-1}
+        aria-labelledby="editproduct"
+        aria-hidden="true"
+        draggable
+      >
+        <div className="modal-dialog modal-md modal-dialog-centered">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title">Edit Product</h5>
+              <button
+                type="button"
+                className="close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">×</span>
+              </button>
+            </div>
+            {isLoadingDetails ? <LoadingOutlined style={{ color: "green", margin: 50 }} /> : (<div className="modal-body">
+              <div className="row">
+                <div className="col-lg-12 col-sm-12 col-12">
+                  <div className="form-group">
+                    <label>Product Name</label>
+                    <div className="input-groupicon">
+                      <Select style={{ width: '100%' }}
+                        options={productOptions}
+                        placeholder={'Select product'}
+                        value={selectedProductEditMode}
+                        onChange={handleProductSelectEditMode}
+                        isSearchable={true}
+                        isLoading={isProductsLoading}
+
+                      />
+
+                    </div>
+
                   </div>
                 </div>
 
+                <div className="col-12">
+                  <div className="form-group">
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <label>Batch No.</label>
+                      {isBatchLoading && <div className="spinner-border text-primary me-1" role="status" style={{ height: 20, width: 20 }}>
+                        <span className="sr-only">Loading...</span>
+                      </div>}
+                    </div>
+                    <div className="input-groupicon">
+                      <Select
+                        options={selectedProductInfoEditMode?.batchNumber?.map((item) => {
+                          return { value: item.batchNumber, label: item?.batchNumber + '-(' + item?.Quantity + ')', expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
+                        })}
+                        placeholder=""
+                        value={editFormData.batchNumber}
+                        onChange={(e) => setEditFormData({ ...editFormData, batchNumber: (e), manufacturingDate: e.manufacturingDate, expireDate: e.expireDate })}
 
-                <div className="row mt-3">
-                  <div className="col-lg-6" style={{ textAlign: 'right' }}></div>
-                  <div className="col-lg-6 " style={{ textAlign: 'right' }}>
-                    <div className="total-order w-100 max-widthauto m-auto mb-4">
-                      <ul>
+                      />
 
-                        <li className="total" >
-                          <h4>Grand Total</h4>
-                          <h5>GHS {moneyInTxt(
-                            printGridData.reduce((total, item) => total + item.amount, 0)
-                          )}</h5>
-                        </li>
-                      </ul>
                     </div>
                   </div>
                 </div>
+                <div className="col-lg-6 col-sm-12 col-12">
+                  <div className="form-group">
+                    <label>Quantity</label>
+                    <input type="text" value={editFormData?.quantity}
+                      onChange={(e) => {
+                        if (e.target.value == '') {
+                          setEditFormData({ ...editFormData, quantity: '' })
+                        }
+                        else if (isValidNumber(e.target.value)) {
+                          let qty = parseInt(e.target.value) || 0
+                          let unitP = parseInt(editFormData.unitPrice) || 0
+                          setEditFormData({ ...editFormData, quantity: e.target.value, amount: editFormData.quantity ? unitP * qty : unitP * 1 })
+                        }
+                      }
+                      } />
+                  </div>
+                </div>
+
+                <div className="col-lg-6 col-sm-12 col-12">
+                  <div className="form-group">
+                    <label>Product Value</label>
+                    <input type="text" value={editFormData?.unitPrice}
+                      onChange={(e) => {
+                        let unitP = parseInt(e.target.value) || 0
+                        let qty = parseInt(editFormData.quantity) || 0
+                        setEditFormData({ ...editFormData, unitPrice: e.target.value, amount: editFormData ? unitP * qty : unitP * 1 })
+                      }}
+                    />
+                  </div>
+                </div>
+                <div className="col-lg-6 col-sm-12 col-12">
+                  <div className="form-group">
+                    <label>Amount</label>
+                    <input type="text" value={editFormData?.amount} />
+                  </div>
+                </div>
+
 
               </div>
-
-              <div className="col-lg-12" style={{ textAlign: 'right' }}>
-                <Link to="#" className="btn btn-submit me-2" data-bs-dismiss="modal" onClick={() => printReport()}>
-                  <FeatherIcon icon="printer" /> Print
-                </Link>
-                <Link to="#" className="btn btn-cancel" data-bs-dismiss="modal">
-                  Cancel
-                </Link>
-              </div>
+            </div>)}
+            <div className="modal-footer" style={{ justifyContent: 'flex-end' }}>
+              <button type="button" className="btn btn-submit" onClick={handleUpdate}>
+                Update
+              </button>
+              <button
+                type="button"
+                className="btn btn-cancel"
+                data-bs-dismiss="modal"
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>
