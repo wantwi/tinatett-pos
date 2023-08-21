@@ -26,17 +26,23 @@ import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import { useGet } from "../../hooks/useGet";
 import { NotificationsContext } from "../../InitialPage/Sidebar/DefaultLayout";
 
-const AddExpense = () => {
-  const { state } = useLocation()
-  // console.log(state)
+const EditExpense = () => {
+  //const { state } = useLocation()
+  //console.log(state)
+
+  
+  let href = window.location.search;
+  let urlParams = new URLSearchParams(href)
+  let id = urlParams.get('id');
 
 
-  const [expenseDate, setExpenseDate] = useState(state?.expenseDate);
+
+  const [expenseDate, setExpenseDate] = useState(new Date().toISOString().substring(0,10));
   const [formData, setFormData] = useState({expenseFor:'', description:'', amount:'', category:''})
   const [editFormData, setEditFormData] = useState({ amount: '', quantity: '', price: '' })
   const [isLoading, setIsLoading] = useState(false)
   const [listData, setProductGridData] = useState([])
-  const { data: expenseDetails, isLoading: isListLoading } = useGet("expense-details", `/expense/items/${state?.id}`);
+  const { data: expenseDetails, isLoading: isListLoading } = useGet("expense-details", `/expense/items/${id}`);
   const options = [
     // { id: 1, label: "Cho", value: "" },
     { id: 2, label: "Fuel", value: "Fuel" },
@@ -81,6 +87,7 @@ const AddExpense = () => {
   const axios = useCustomApi();
 
   const history = useHistory()
+
 
   const handleTypeChange = (e) => {
     setFormData({ ...formData, category: e.target.value })
@@ -233,7 +240,7 @@ const AddExpense = () => {
 
     //  console.log(payload)
     setIsLoading(true)
-    axios.put(`/expense/${state?.id}`, payload)
+    axios.put(`/expense/${id}`, payload)
       .then((res) => {
 
         if (res.data.success) {
@@ -263,6 +270,11 @@ const AddExpense = () => {
       }
     })
 
+    setTimeout(() => {
+      console.log(mappedData[0])
+      setExpenseDate(mappedData[0]?.expenseDate.substring(0,10))
+    },500)
+    //console.log(mappedData)
     setProductGridData(mappedData)
 
   }, [expenseDetails])
@@ -476,9 +488,9 @@ const AddExpense = () => {
                                       <td>{item?.description}</td>
                                       <td>{item?.amount}</td>
                                       <td>
-                                        <Link to="#" className="me-2">
+                                        <a href="#" className="me-2">
                                           <img src={EditIcon} alt="svg" data-bs-toggle="modal" data-bs-target="#editexpense" onClick={() => handleGetSelected(item)} />
-                                        </Link>
+                                        </a>
                                         <Link to="#" className="delete-set" onClick={() => deleteRow(item)}>
                                           <img src={DeleteIcon} alt="svg" />
                                         </Link>
@@ -667,4 +679,4 @@ const AddExpense = () => {
   );
 };
 
-export default AddExpense;
+export default EditExpense;

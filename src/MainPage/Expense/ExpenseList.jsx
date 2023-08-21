@@ -161,9 +161,11 @@ const ExpenseList = () => {
       title: "Action",
       render: (a,record) => (
         <>
-          <Link className="me-3"  to={{pathname:"/tinatett-pos/expense/editexpense", state:record}} >
+          {/* <Link className="me-3"  to={{pathname:"/tinatett-pos/expense/editexpense", state:record}} > */}
+          <a href={`/tinatett-pos/expense/editexpense?id=${record.id}`} >
             <img src={EditIcon} alt="img" />
-          </Link>
+          </a>
+          {/* </Link> */}
           <Link className="confirm-text" to="#" onClick={() => confirmText(record.id)}>
             <img src={DeleteIcon} alt="img" />
           </Link>
