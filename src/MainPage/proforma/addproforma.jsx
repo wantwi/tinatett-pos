@@ -146,6 +146,7 @@ const AddProforma = () => {
         }
       })
       setCustomerOptions(mappedData)
+  
 
       let mappedData2 = products?.data.map((product) => {
         return {
@@ -158,6 +159,7 @@ const AddProforma = () => {
         }
       })
       setProductOptions(mappedData2)
+      retailpriceTypeRef.current.checked = true
    
     }
    
@@ -237,6 +239,10 @@ const AddProforma = () => {
       // }, 3000)
     }
 
+    if(formData.price == '' || formData.price == null){
+      $('#priceType').css('border', '1px solid red')
+    }
+
     if (item.amount < 1 || item.amount == '' || item.quantity == '' || formData.unitPrice == '' || item.productName == '' || selectedCustomer == '') {
       alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please make sure all fields are filled.");
@@ -256,9 +262,9 @@ const AddProforma = () => {
       setPrintGridData([...printGridData, item])
       setFormData({ quantity: '', amount: '' })
       setSelectedProduct('')
-      retailpriceTypeRef.current.checked = false
-      wholesalepriceTypeRef.current.checked = false
-      specialpriceTypeRef.current.checked = false
+      //retailpriceTypeRef.current.checked = true
+      // wholesalepriceTypeRef.current.checked = false
+      // specialpriceTypeRef.current.checked = false
 
     }
 
@@ -268,6 +274,55 @@ const AddProforma = () => {
   useEffect(() => {
     $('#quantity').css('border', '1px solid rgba(145, 158, 171, 0.32)')
   }, [formData.quantity])
+
+  useEffect(() => {
+    $('#priceType').css('border', 'none')
+  }, [formData.price])
+
+  useEffect(() => {
+    setSelectedCustomer(customerOptions[0])
+    console.log(selectedCustomer)
+  }, [customerOptions])
+
+
+  useEffect(() => {
+    if(selectedCustomer && selectedCustomer?.label.includes('Retail')){
+      retailpriceTypeRef.current.checked = true
+      wholesalepriceTypeRef.current.disabled = true
+      retailpriceTypeRef.current.disabled = false
+    }
+    else if(selectedCustomer && selectedCustomer?.label.includes('Whole')){
+      wholesalepriceTypeRef.current.checked = true
+      retailpriceTypeRef.current.disabled = true
+      wholesalepriceTypeRef.current.disabled = false
+     }
+
+    else if((selectedCustomer && !selectedCustomer?.label.includes('Whole')) && (!selectedCustomer?.label.includes('Retail'))){
+      console.log('Not a wholesale nor Retail')
+        wholesalepriceTypeRef.current.disabled = false
+        retailpriceTypeRef.current.disabled = false
+  
+        //setDisableUnselectedPrice({ wholesale: false, retail: false, special: false })
+    }
+
+    console.log(selectedCustomer)
+    $('#selectedCustomer').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+  }, [selectedCustomer])
+
+
+  useEffect(() => {
+    if($('#retailPriceType').prop('checked')){
+      setFormData({...formData, price: selectedProduct.retailPrice, amount: formData.quantity ? selectedProduct?.retailPrice * formData.quantity : selectedProduct?.retailPrice * 1 })
+    }
+    else if($('#wholeSaleType').prop('checked')){
+      setFormData({...formData, price: selectedProduct.wholeSalePrice, amount: formData.quantity ? selectedProduct?.wholeSalePrice * formData.quantity : selectedProduct?.wholeSalePrice * 1 })
+    }
+    else{
+      setFormData({...formData, price: selectedProduct.specialPrice, amount: formData.quantity ? selectedProduct?.specialPrice * formData.quantity : selectedProduct?.specialPrice * 1 })
+    }
+
+  }, [selectedProduct, selectedCustomer])
+
 
 
 
@@ -314,10 +369,11 @@ const AddProforma = () => {
           }
           setNotifications([newNotification, ...notifications])
 
-          setSelectedCustomer({})
+          //setSelectedCustomer(customerOptions[0])
           setSelectedProduct({})
           setFormData({ amount: '', quantity: '', price: '' })
           setProductGridData([])
+          
           //setTransDate('')
 
           setTimeout(() => {
@@ -346,7 +402,11 @@ const AddProforma = () => {
           }
           setNotifications([newNotification, ...notifications])
         }
-     }).finally(() => setIsSaving(false))
+     }).finally(() => {
+      setIsSaving(false)
+      retailpriceTypeRef.current.checked =  true
+      setSelectedCustomer(customerOptions[0])
+    })
 
 
       //base 64 function
@@ -391,10 +451,6 @@ const AddProforma = () => {
   }, [formData.quantity])
 
 
-  useEffect(() => {
-  
-    console.log(selectedCustomer)
-  }, [selectedCustomer])
 
   if (isProductLoading && isCustomerLoading) {
     return <LoadingSpinner />
@@ -477,17 +533,17 @@ const AddProforma = () => {
                 </div>
 
 
-                <div className="col-lg-12 col-sm-12 col-12">
+                <div className="col-lg-12 col-sm-12 col-12" id="priceType">
                   <div className="form-group">
                     <label>Unit Price </label>
-                    <div className="row">
+                    <div className="row" >
 
                       <div class="col-lg-6">
 
                         <div class="input-group">
                           <div class="input-group-text">
-                            <input className="form-check-input" type="radio" name="customerType" value={selectedProduct?.retailPrice} ref={retailpriceTypeRef}
-                              onChange={(e) => {
+                            <input className="form-check-input" id="retailPriceType" type="radio" name="customerType" value={selectedProduct?.retailPrice} ref={retailpriceTypeRef}
+                              onClick={(e) => {
                                 if (selectedProduct == '') {
                                   alertify.set("notifier", "position", "bottom-right");
                                   alertify.warning("Please select a product first.");
@@ -498,7 +554,7 @@ const AddProforma = () => {
                                     type: 'warning'
                                   }
                                   setNotifications([newNotification, ...notifications])
-                                  retailpriceTypeRef.current.checked = false
+                                  //retailpriceTypeRef.current.checked = false
                                 } else {
                                   setFormData({ ...formData, price: selectedProduct.retailPrice, amount: formData.quantity ? selectedProduct?.retailPrice * formData.quantity : selectedProduct?.retailPrice * 1 })
                                   //console.log(selectedProduct?.retailPrice, formData.quantity, formData.amount)
@@ -514,8 +570,8 @@ const AddProforma = () => {
                       <div class="col-lg-6">
                         <div class="input-group">
                           <div class="input-group-text">
-                            <input className="form-check-input" type="radio" name="customerType" value={selectedProduct?.wholeSalePrice} ref={wholesalepriceTypeRef}
-                              onChange={(e) => {
+                            <input className="form-check-input" id="wholeSaleType" type="radio" name="customerType" value={selectedProduct?.wholeSalePrice} ref={wholesalepriceTypeRef}
+                              onClick={(e) => {
                                 if (selectedProduct == '') {
                                   alertify.set("notifier", "position", "bottom-right");
                                   alertify.warning("Please select a product first.");
@@ -526,7 +582,7 @@ const AddProforma = () => {
                                     type: 'warning'
                                   }
                                   setNotifications([newNotification, ...notifications])
-                                  wholesalepriceTypeRef.current.checked = false
+                                  //wholesalepriceTypeRef.current.checked = false
                                 } else {
                                   setFormData({ ...formData, price: selectedProduct.wholeSalePrice, amount: formData.quantity ? selectedProduct.wholeSalePrice * formData.quantity : selectedProduct.wholeSalePrice * 1 })
                                   //console.log(selectedProduct?.wholeSalePrice, formData.quantity, formData.amount)
@@ -544,8 +600,8 @@ const AddProforma = () => {
 
                         <div class="input-group">
                           <div class="input-group-text">
-                            <input className="form-check-input" type="radio" name="customerType" value={selectedProduct?.specialPrice} ref={specialpriceTypeRef}
-                              onChange={(e) => {
+                            <input className="form-check-input" id="specialPriceType" type="radio" name="customerType" value={selectedProduct?.specialPrice} ref={specialpriceTypeRef}
+                              onClick={(e) => {
                                 if (selectedProduct == '') {
                                   alertify.set("notifier", "position", "bottom-right");
                                   alertify.warning("Please select a product first.");
@@ -556,7 +612,7 @@ const AddProforma = () => {
                                     type: 'warning'
                                   }
                                   setNotifications([newNotification, ...notifications])
-                                  specialpriceTypeRef.current.checked = false
+                                  //specialpriceTypeRef.current.checked = false
                                 } else {
                                   setFormData({ ...formData, price: selectedProduct.specialPrice, amount: formData.quantity ? selectedProduct.specialPrice * formData.quantity : selectedProduct.specialPrice * 1 })
                                   //console.log(selectedProduct?.specialPrice, formData.quantity, formData.amount)
@@ -603,7 +659,7 @@ const AddProforma = () => {
                       <label>Amount</label>
                       <div className="input-groupicon">
                         <input
-                          type="text"
+                          type="number"
                           className="form-control"
                           disabled
                           value={formData.amount}

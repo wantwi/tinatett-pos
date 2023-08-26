@@ -55,6 +55,7 @@ const AddPurchase = () => {
   const { isLoading, data, isError, error, mutate } = usePost("/purchase");
   const [isSubmitSuccessful, setIsSubmitSuccessful] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [isExpired, setIsExpired] = useState(false)
   const { notifications, setNotifications } = useContext(NotificationsContext)
   let storage = JSON.parse(localStorage.getItem("auth"))
 
@@ -144,6 +145,26 @@ const AddPurchase = () => {
     setProductFormData({ ...productFormData, amount: productFormData.quantity * productFormData.unitPrice })
   }, [productFormData.quantity, productFormData.unitPrice])
 
+  useEffect(() => {
+    console.log(productFormData.manufacturingDate, productFormData.expireDate)
+    let noOfDays = ((new Date(productFormData.expireDate) - new Date(productFormData.manufacturingDate)) / 86400000)
+    if(noOfDays < 1){
+      alertify.set("notifier", "position", "bottom-right");
+      alertify.warning("Expiry Date can not be less than Manufacturing Date");
+      $('#expiryDate').css('border', '1px solid red')
+      let newNotification = {
+        id: Math.ceil(Math.random()*1000000),
+        message: `${storage.name} ${'Expiry Date can not be less than Manufacturing Date'}`,
+        time: new Date().toISOString(), type: 'warning'
+      }
+      setIsExpired(true)
+      setNotifications([newNotification, ...notifications])
+    }
+    else{
+      setIsExpired(false)
+      $('#expiryDate').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+    }
+  }, [productFormData.expireDate])
 
   //save adhoc supplier
   const onSubmit = (data) => {
@@ -226,9 +247,7 @@ const AddPurchase = () => {
     $('#manufacturingDate').css('border', '1px solid rgba(145, 158, 171, 0.32)')
   }, [productFormData.manufacturingDate])
 
-  useEffect(() => {
-    $('#expiryDate').css('border', '1px solid rgba(145, 158, 171, 0.32)')
-  }, [productFormData.expireDate])
+
 
   const handleAddItem = () => {
     //console.log(productFormData)
@@ -298,6 +317,17 @@ const AddPurchase = () => {
       let newNotification = {
         message: `${storage.name} Please enter unit price.`,
         time: new Date().toISOString(),  type: 'warning'
+      }
+      setNotifications([newNotification, ...notifications])
+    }
+    else if(isExpired){
+      alertify.set("notifier", "position", "bottom-right");
+      alertify.warning("Expiry Date can not be less than Manufacturing Date");
+      $('#expiryDate').css('border', '1px solid red')
+      let newNotification = {
+        id: Math.ceil(Math.random()*1000000),
+        message: `${storage.name} ${'Expiry Date can not be less than Manufacturing Date'}`,
+        time: new Date().toISOString(), type: 'warning'
       }
       setNotifications([newNotification, ...notifications])
     }

@@ -185,59 +185,77 @@ const Cashier = () => {
           {"type":"Cheque", waybill: paymentInfo.chequeWaybill,  chequeNo: paymentInfo.chequeNo, chequeReceiptNo: paymentInfo.chequeReceiptNo, amountPaid: paymentInfo.chequeAmount, waybill: paymentInfo.chequeWaybill}
         ]
       }
-  
-      setIsSaving(true)
-    // console.log(payload)
-      axios.post('/sales',payload)
-      .then((res) => {
-        
-        console.log(res.data.success)
-        if(res.data.success){
-          if(print){
-            getInvoiceReceipt(modalData.Reference)
-          }
-          alertify.set("notifier", "position", "bottom-right");
-          alertify.success("Sale completed."); 
-          refetch()    
-          $('.modal').modal('hide')
-          $('body').removeClass('modal-open');
-          $('.modal-backdrop').remove();
-        }
-      })
-      .catch((error) => {
-        console.log(error)
-        alertify.set("notifier", "position", "bottom-right");
-        alertify.error(error.response.data.error);
 
+
+      if( (type == 'Paid') && payload.amount < modalData?.Total){
+        alertify.set("notifier", "position", "bottom-right");
+        alertify.warning("Please provide full payment amount before saving.");
+  
         let newNotification = {
           id: Math.ceil(Math.random()*1000000),
-          message: `${storage.name} ${error.response.data.error}`,
-          time: new Date().toISOString(),  type: 'error'
+          message: `${storage.name} Please provide full payment amount before saving.`,
+          time: new Date().toISOString(),  type: 'warning'
         }
         setNotifications([newNotification, ...notifications])
-      })
-      .finally(() => {
-        setIsSaving(false)
-        setIsCredit(false)
-        setPaymentInfo({type:'',
-        cashWaybill:'',
-        cashReceiptNo:'',
-        cashAmount:'',
-        chequeNo:'',
-        chequeReceiptNo:'',
-        chequeAmount:'',
-        chequeWaybill:'',
-        dueDate:'',
-        bank:'',
-        momoName:'',
-        momoReceiptNo:'',
-        momoAmount:'' ,
-        transactionID:'',
-        amountPaid:''
-       })
-       
-      })
-     }
+      }
+
+
+      else{
+        setIsSaving(true)
+        // console.log(payload)
+          axios.post('/sales',payload)
+          .then((res) => {
+            
+            console.log(res.data.success)
+            if(res.data.success){
+              if(print){
+                getInvoiceReceipt(modalData.Reference)
+              }
+              alertify.set("notifier", "position", "bottom-right");
+              alertify.success("Sale completed."); 
+              refetch()    
+              $('.modal').modal('hide')
+              $('body').removeClass('modal-open');
+              $('.modal-backdrop').remove();
+            }
+          })
+          .catch((error) => {
+            console.log(error)
+            alertify.set("notifier", "position", "bottom-right");
+            alertify.error(error.response.data.error);
+    
+            let newNotification = {
+              id: Math.ceil(Math.random()*1000000),
+              message: `${storage.name} ${error.response.data.error}`,
+              time: new Date().toISOString(),  type: 'error'
+            }
+            setNotifications([newNotification, ...notifications])
+          })
+          .finally(() => {
+            setIsSaving(false)
+            setIsCredit(false)
+            setPaymentInfo({type:'',
+            cashWaybill:'',
+            cashReceiptNo:'',
+            cashAmount:'',
+            chequeNo:'',
+            chequeReceiptNo:'',
+            chequeAmount:'',
+            chequeWaybill:'',
+            dueDate:'',
+            bank:'',
+            momoName:'',
+            momoReceiptNo:'',
+            momoAmount:'' ,
+            transactionID:'',
+            amountPaid:''
+           })
+           
+          })
+         }
+    
+      }
+  
     else{
       alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please enter an amount first");
@@ -931,15 +949,15 @@ const Cashier = () => {
                     {!isCredit && (<button className="btn btn-info me-2"  onClick={() => processPayment("Paid", true)} style={{ width: '20%' }}>
                       Sell and Print
                     </button>)}
-                    {!isCredit && (<button className="btn btn-warning me-2" onClick={() => processPayment("Paid", false)} style={{ width: '20%' }}>
+                    {/* {!isCredit && (<button className="btn btn-warning me-2" onClick={() => processPayment("Paid", false)} style={{ width: '20%' }}>
                       Sell Only
-                    </button>)}
+                    </button>)} */}
                     <button className="btn btn-danger me-2" style={{ width: '20%' }} onClick={() => processPayment("Credit", true)} >
                       Credit and Print
                     </button>
-                    <button className="btn btn-cancel" style={{ width: '20%' }} onClick={() => processPayment("Credit", false)}>
+                    {/* <button className="btn btn-cancel" style={{ width: '20%' }} onClick={() => processPayment("Credit", false)}>
                       Credit Only
-                    </button>
+                    </button> */}
 
                   </div>
                 </div>
@@ -1064,9 +1082,9 @@ const Cashier = () => {
                     {!isCredit && (<button className="btn btn-info me-2" onClick={() => processPayment("Paid", true)} style={{ width: '20%' }}>
                       Sell and Print
                     </button>)}
-                    {!isCredit && (<button className="btn btn-warning me-2" onClick={() => processPayment("Paid", false)} style={{ width: '20%' }}>
+                    {/* {!isCredit && (<button className="btn btn-warning me-2" onClick={() => processPayment("Paid", false)} style={{ width: '20%' }}>
                       Sell Only
-                    </button>)}
+                    </button>)} */}
 
                   </div>
                 </div>

@@ -307,6 +307,7 @@ const Addsales = () => {
                 setNotifications([newNotification, ...notifications])
               })
               .finally(() => {
+                //setSelectedCustomer(customerList[0])
                 setPaymentInfo({
                   type: '',
                   cashWaybill: '',
@@ -455,6 +456,7 @@ const Addsales = () => {
 
             alertify.set("notifier", "position", "bottom-right");
             alertify.success("Suspended successfully");
+            //setSelectedCustomer(customerList[0])
            
        
             setReferenceData(res.data)
@@ -492,6 +494,9 @@ const Addsales = () => {
         .finally(() => {
           setIsSaving(false)
           $('#reference').modal('show')
+          if(customerList){
+            setSelectedCustomer(customerList[0])
+          }
            retailpriceTypeRef.current.checked = true
         }
         )
@@ -626,7 +631,7 @@ const Addsales = () => {
 
 
   useEffect(() => {
-    if(selectedCustomer?.label.includes('Retail')){
+    if(selectedCustomer && selectedCustomer?.label.includes('Retail')){
       retailpriceTypeRef.current.checked = true
       wholesalepriceTypeRef.current.disabled = true
       retailpriceTypeRef.current.disabled = false
@@ -636,7 +641,7 @@ const Addsales = () => {
        
       setDisableUnselectedPrice({ wholesale: true, retail: false, special: true })
     }
-    else if(selectedCustomer?.label.includes('Whole')){
+    else if(selectedCustomer && selectedCustomer?.label.includes('Whole')){
       wholesalepriceTypeRef.current.checked = true
       retailpriceTypeRef.current.disabled = true
       wholesalepriceTypeRef.current.disabled = false
@@ -652,7 +657,7 @@ const Addsales = () => {
       setPrice(0)
     }
 
-    else if((!selectedCustomer?.label.includes('Whole')) && (!selectedCustomer?.label.includes('Retail'))){
+    else if(selectedCustomer && (!selectedCustomer?.label.includes('Whole')) && (!selectedCustomer?.label.includes('Retail'))){
       console.log('Not a wholesale nor Retail')
         wholesalepriceTypeRef.current.disabled = false
         retailpriceTypeRef.current.disabled = false
