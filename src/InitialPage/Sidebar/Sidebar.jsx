@@ -887,6 +887,74 @@ const Sidebar = (props) => {
                   ""
                 )}
               </li>) : null }
+
+
+                {/* Users */}
+              {userType == 'admin' || userType == 'supervisor' ? (<li className="submenu">
+                <Link
+                  to="#"
+                  className={
+                    pathname.includes("/tinatett-pos/users")
+                      ? "subdrop active"
+                      : "" || isSideMenu == "Users"
+                        ? "subdrop active"
+                        : ""
+                  }
+                  onClick={() =>
+                    toggleSidebar(isSideMenu == "Users" ? "" : "Users")
+                  }
+                >
+                  {/* <img src={Users1} alt="img" /> */}
+                  <i className="fa fa-cog" />
+                  <span> Admin</span> <span className="menu-arrow" />
+                </Link>
+                {isSideMenu == "Users" ? (
+                  <ul>
+                    <li>
+                      <Link
+                        to="/tinatett-pos/users/newuser"
+                        className={
+                          pathname.includes("newuser") ? "active" : ""
+                        }
+                      >
+                        New User{" "}
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        to="/tinatett-pos/users/userlists"
+                        className={
+                          pathname.includes("userlists") ? "active" : ""
+                        }
+                      >
+                        Users List
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        to="/tinatett-pos/users/new-branch"
+                        className={
+                          pathname.includes("new-branch") ? "active" : ""
+                        }
+                      >
+                        Add Branch
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        to="/tinatett-pos/users/branch-list"
+                        className={
+                          pathname.includes("branch-list") ? "active" : ""
+                        }
+                      >
+                        Branch List
+                      </Link>
+                    </li>
+                  </ul>
+                ) : (
+                  ""
+                )}
+              </li>) :  null} 
               {/* <li className="submenu">
                   <a
                     href="#"
@@ -1698,51 +1766,7 @@ const Sidebar = (props) => {
 
              
 
-              {/* Users */}
-              {/* <li className="submenu">
-                <Link
-                  to="#"
-                  className={
-                    pathname.includes("/tinatett-pos/users")
-                      ? "subdrop active"
-                      : "" || isSideMenu == "Users"
-                        ? "subdrop active"
-                        : ""
-                  }
-                  onClick={() =>
-                    toggleSidebar(isSideMenu == "Users" ? "" : "Users")
-                  }
-                >
-                  <img src={Users1} alt="img" />
-                  <span> Users</span> <span className="menu-arrow" />
-                </Link>
-                {isSideMenu == "Users" ? (
-                  <ul>
-                    <li>
-                      <Link
-                        to="/tinatett-pos/users/newuser"
-                        className={
-                          pathname.includes("newuser") ? "active" : ""
-                        }
-                      >
-                        New User{" "}
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="/tinatett-pos/users/userlists"
-                        className={
-                          pathname.includes("userlists") ? "active" : ""
-                        }
-                      >
-                        Users List
-                      </Link>
-                    </li>
-                  </ul>
-                ) : (
-                  ""
-                )}
-              </li> */}
+            
 
 
               {/* Settings */}
