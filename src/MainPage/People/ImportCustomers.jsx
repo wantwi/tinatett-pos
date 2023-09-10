@@ -12,7 +12,7 @@ import { usePost } from '../../hooks/usePost';
 import LoadingSpinner from '../../InitialPage/Sidebar/LoadingSpinner';
 //import {excelFile} from '../../assets/xcelTemplates/Template.xlsx'
 
-const ImportProduct = () => {
+const ImportCustomers = () => {
 
   const onDrop = useCallback((acceptedFiles) => {
 
@@ -223,11 +223,11 @@ const ImportProduct = () => {
   }
 
 
-  const { isLoading, mutate } = usePost("/product/bulk", 'uploadProducts', onSuccess, onError);
+  const { isLoading, mutate } = usePost("/customer/bulk", 'uploadCustomers', onSuccess, onError);
 
   const columns = [
     {
-      title: "Product Name",
+      title: "Customer Name",
       dataIndex: "name",
       render: (text, record) => (
         <div className="productimgname">
@@ -286,7 +286,7 @@ const ImportProduct = () => {
 
   const submit = () => {
       let payload = {
-        products: productsList
+        customers: productsList
       }
 
       if(selectedSheet == ''){
@@ -322,8 +322,8 @@ const ImportProduct = () => {
         <div className="content" >
           <div className="page-header">
             <div className="page-title">
-              <h4>Import Products</h4>
-              <h6>Bulk upload your products</h6>
+              <h4>Import Customers</h4>
+              <h6>Bulk upload your customers</h6>
             </div>
           </div>
           {/* /product list */}
@@ -381,19 +381,19 @@ const ImportProduct = () => {
                     <div className="productdetails productdetailnew">
                       <ul className="product-bar">
                         <li>
-                          <h4>Product Name</h4>
+                          <h4>Customer Name</h4>
                           <h6 className="manitorygreen">This Field is required</h6>
                         </li>
                         <li>
-                          <h4>Retail Price</h4>
+                          <h4>Contact</h4>
                           <h6 className="manitorygreen">This Field is required</h6>
                         </li>
                         <li>
-                          <h4>Wholesale Price</h4>
+                          <h4>Email</h4>
                           <h6 className="manitorygreen">This Field is required</h6>
                         </li>
                         <li>
-                          <h4>Special Price</h4>
+                          <h4>Location</h4>
                           <h6 className="manitorygreen">This Field is required</h6>
                         </li>
                        
@@ -435,4 +435,4 @@ const ImportProduct = () => {
   )
 }
 
-export default ImportProduct;
+export default ImportCustomers;

@@ -12,7 +12,7 @@ import { usePost } from '../../hooks/usePost';
 import LoadingSpinner from '../../InitialPage/Sidebar/LoadingSpinner';
 //import {excelFile} from '../../assets/xcelTemplates/Template.xlsx'
 
-const ImportProduct = () => {
+const ImportSuppliers = () => {
 
   const onDrop = useCallback((acceptedFiles) => {
 
@@ -223,65 +223,42 @@ const ImportProduct = () => {
   }
 
 
-  const { isLoading, mutate } = usePost("/product/bulk", 'uploadProducts', onSuccess, onError);
+  const { isLoading, mutate } = usePost("/supplier/bulk", 'uploadSuppliers', onSuccess, onError);
 
   const columns = [
     {
-      title: "Product Name",
+      title: "Supplier Name",
       dataIndex: "name",
       render: (text, record) => (
         <div className="productimgname">
-          {/* <Link className="product-img">
-            <img alt="" src={record.image} />
-          </Link> */}
-          <Link style={{ fontSize: "15px", marginLeft: "10px" }}>
-            {record.name}
-          </Link>
+          <Link to="#">{text}</Link>
         </div>
       ),
       sorter: (a, b) => a.name.length - b.name.length,
+      width: "250px",
     },
     {
-      title: "Retail Price",
-      dataIndex: "retailPrice",
-      sorter: (a, b) => a.retailPrice - b.retailPrice,
-      render: (text, record) => <p>{moneyInTxt(record?.retailPrice)}</p> 
+      title: "Email",
+      dataIndex: "email",
+      sorter: (a, b) => a.email.length - b.email.length,
     },
     {
-      title: "Wholesale Price",
-      dataIndex: "wholeSalePrice",
-      sorter: (a, b) => a.wholeSalePrice - b.wholeSalePrice,
-      render: (text, record) => <p>{moneyInTxt(record?.wholeSalePrice)}</p> 
+      title: "Location",
+      dataIndex: "location",
+      sorter: (a, b) => a.location.length - b.location.length,
     },
     {
-      title: "Special Price",
-      dataIndex: "specialPrice",
-      sorter: (a, b) => a.specialPrice - b.specialPrice,
-      render: (text, record) => <p>{moneyInTxt(record?.specialPrice)}</p> 
+      title: "Phone",
+      dataIndex: "contact",
+      sorter: (a, b) => a.contact.length - b.contact.length,
     },
     {
-      title: "Alert",
-      dataIndex: "alert",
+      title: "Status",
+      dataIndex: "status",
+      sorter: (a, b) => a.status.length - b.status.length,
+      render: (text, record) => (record.status == 1 ? <span className="badges bg-lightgreen">Active</span> : <span className="badges bg-lightred">Inctive</span> )
+
     },
-   
-    // {
-    //   title: "Action",
-    //   render: (text, record) => (
-    //     <>
-    //       <>
-    //         {/* <Link className="me-3" to="/tinatett-pos/product/product-details">
-    //           <img src={EyeIcon} alt="img" />
-    //         </Link> */}
-    //         <Link className="me-3" to={{ pathname:`/tinatett-pos/product/editproduct`, state:record}} title="Edit Product">
-    //           <img src={EditIcon} alt="img" />
-    //         </Link>
-    //         {/* <Link className="confirm-text" to="#" onClick={confirmText} title="Delete Product">
-    //           <img src={DeleteIcon} alt="img" />
-    //         </Link> */}
-    //       </>
-    //     </>
-    //   ),
-    // },
   ];
 
   const submit = () => {
@@ -322,8 +299,8 @@ const ImportProduct = () => {
         <div className="content" >
           <div className="page-header">
             <div className="page-title">
-              <h4>Import Products</h4>
-              <h6>Bulk upload your products</h6>
+              <h4>Import Suppliers</h4>
+              <h6>Bulk upload your suppliers</h6>
             </div>
           </div>
           {/* /product list */}
@@ -381,21 +358,18 @@ const ImportProduct = () => {
                     <div className="productdetails productdetailnew">
                       <ul className="product-bar">
                         <li>
-                          <h4>Product Name</h4>
+                          <h4>Supplier Name</h4>
                           <h6 className="manitorygreen">This Field is required</h6>
                         </li>
                         <li>
-                          <h4>Retail Price</h4>
+                          <h4>Contact</h4>
                           <h6 className="manitorygreen">This Field is required</h6>
                         </li>
                         <li>
-                          <h4>Wholesale Price</h4>
+                          <h4>Products Supplied</h4>
                           <h6 className="manitorygreen">This Field is required</h6>
                         </li>
-                        <li>
-                          <h4>Special Price</h4>
-                          <h6 className="manitorygreen">This Field is required</h6>
-                        </li>
+                      
                        
                       </ul>
                     </div>
@@ -435,4 +409,4 @@ const ImportProduct = () => {
   )
 }
 
-export default ImportProduct;
+export default ImportSuppliers;

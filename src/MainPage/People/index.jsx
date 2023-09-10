@@ -12,14 +12,18 @@ import EditUser from './EditUser';
 import StoreList from './StoreList';
 import AddStore from './AddStore';
 import EditStore from './EditStore';
+import ImportCustomers from './ImportCustomers';
+import ImportSuppliers from './ImportSuppliers';
 
 const PeopleIndex = ({ match}) =>(
     <Switch>
         <Redirect exact from={`${match.url}/`} to={`${match.url}/customerlist`} />
         <Route path={`${match.url}/customerlist`} component={CustomerList} />
+        <Route path={`${match.url}/importcustomers`} component={ImportCustomers} />
         <Route path={`${match.url}/addcustomer`} component={AddCustomer} />
         <Route path={`${match.url}/editcustomer`} component={EditCustomer} />
         <Route path={`${match.url}/supplierlist`} component={SupplierList} />
+        <Route path={`${match.url}/importsuppliers`} component={ImportSuppliers} />
         <Route path={`${match.url}/addsupplier`} component={AddSupplier} />
         <Route path={`${match.url}/editsupplier`} component={EditSupplier} />
         <Route path={`${match.url}/userlist-people`} component={UserList} />

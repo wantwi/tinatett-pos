@@ -121,6 +121,16 @@ const Sidebar = (props) => {
                         Product List
                       </Link>
                     </li>
+                    <li>
+                        <Link
+                          className={
+                            pathname.includes("importproduct-") ? "active" : ""
+                          }
+                          to="/tinatett-pos/product/importproduct"
+                        >
+                          Import Products
+                        </Link>
+                      </li>
                    
                     {/* <li>
                         <Link
@@ -184,16 +194,7 @@ const Sidebar = (props) => {
                           Add Brand
                         </Link>
                       </li>
-                      <li>
-                        <Link
-                          className={
-                            pathname.includes("importproduct-") ? "active" : ""
-                          }
-                          to="/tinatett-pos/product/importproduct-product"
-                        >
-                          Import Product
-                        </Link>
-                      </li>
+                      
                       <li>
                         <Link
                           className={
@@ -251,6 +252,16 @@ const Sidebar = (props) => {
                         Customer List
                       </Link>
                     </li>
+                    <li>
+                        <Link
+                          className={
+                            pathname.includes("importproduct-") ? "active" : ""
+                          }
+                          to="/tinatett-pos/people/importcustomers"
+                        >
+                          Import Customers
+                        </Link>
+                      </li>
                    
                     
                    
@@ -341,6 +352,16 @@ const Sidebar = (props) => {
                         Supplier List
                       </Link>
                     </li>
+                    <li>
+                        <Link
+                          className={
+                            pathname.includes("importproduct-") ? "active" : ""
+                          }
+                          to="/tinatett-pos/people/importsuppliers"
+                        >
+                          Import Suppliers
+                        </Link>
+                      </li>
                    
                     {/* <li>
                         <Link
