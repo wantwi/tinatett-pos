@@ -10,7 +10,7 @@ import "../../../node_modules/alertifyjs/build/css/alertify.css";
 import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
 import { usePost } from '../../hooks/usePost';
 import LoadingSpinner from '../../InitialPage/Sidebar/LoadingSpinner';
-//import {excelFile} from '../../assets/xcelTemplates/Template.xlsx'
+// import {excelFile} from '../../../public/xcelTemplates/ProductsTemplate.xlsx'
 
 const ImportProduct = () => {
 
@@ -336,7 +336,7 @@ const ImportProduct = () => {
                 <div className="row">
                   <div className="col-lg-12 col-sm-6 col-12">
                     <div className="form-group">
-                      <a href={`../public/xcelTemplates/Template.xlsx`} className="btn btn-submit w-100">Download Sample File</a>
+                      <a href={`https://akwaabaevolution.com/xcelTemplates/ProductsTemplate.xlsx`} className="btn btn-submit w-100">Download Sample File</a>
                     </div>
                   </div>
                   <div className="col-lg-12">

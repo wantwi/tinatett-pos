@@ -130,31 +130,51 @@ const ImportSuppliers = () => {
       let col3 = keys.filter((item) => item.Column === 'C')
       let col4 = keys.filter((item) => item.Column === 'D')
       let col5 = keys.filter((item) => item.Column === 'E')
+      let col6 = keys.filter((item) => item.Column === 'F')
+      let col7 = keys.filter((item) => item.Column === 'G')
+      let col8 = keys.filter((item) => item.Column === 'H')
+      let col9 = keys.filter((item) => item.Column === 'I')
+      let col10 = keys.filter((item) => item.Column === 'J')
+      let col11 = keys.filter((item) => item.Column === 'K')
 
       // console.log(col1, col2, col3, col4, col5)
 
 
-      let ItemsNameArr = []
-      let RetailPriceArr = []
-      let WholesalePriceArr = []
-      let SpecialPriceArr = []
-      let AlertArr = []
+      let NamesArr = []
+      let EmailsArr = []
+      let ContactArr = []
+      let OtherContactArr = []
+      let LocationArr = []
+      let GPSAddressArr = []
+      let ProductsArr = []
+      let CreditPeriodArr = []
+      let CashDetailsArr = []
+      let BankDetailsArr = []
+      let MomoDetailsArr = []
+ 
 
 
-      col1.forEach((name) => ItemsNameArr.push(name.Value))
-      col2.forEach((retail) => RetailPriceArr.push(retail.Value))
-      col3.forEach((wholesale) => WholesalePriceArr.push(wholesale.Value))
-      col4.forEach((special) => SpecialPriceArr.push(special.Value))
-      col5.forEach((alert) => AlertArr.push(alert.Value))
+      col1.forEach((item) => NamesArr.push(item.Value))
+      col2.forEach((item) => EmailsArr.push(item.Value))
+      col3.forEach((item) => ContactArr.push(item.Value))
+      col4.forEach((item) => OtherContactArr.push(item.Value))
+      col5.forEach((item) => LocationArr.push(item.Value))
+      col6.forEach((item) => GPSAddressArr.push(item.Value))
+      col7.forEach((item) => ProductsArr.push(item.Value))
+      col8.forEach((item) => CreditPeriodArr.push(item.Value))
+      col9.forEach((item) => CashDetailsArr.push(item.Value))
+      col10.forEach((item) => BankDetailsArr.push(item.Value))
+      col11.forEach((item) => MomoDetailsArr.push(item.Value))
     
 
       let finalData = []
       finalData.push(
-        ItemsNameArr,
-        RetailPriceArr,
-        WholesalePriceArr,
-        SpecialPriceArr,
-        AlertArr,
+        NamesArr,
+        EmailsArr,
+        ContactArr,
+        OtherContactArr,
+        LocationArr,
+        GPSAddressArr, ProductsArr, CreditPeriodArr, CashDetailsArr, BankDetailsArr, MomoDetailsArr
       )
 
     // console.log(finalData, "DATA")
@@ -175,7 +195,7 @@ const ImportSuppliers = () => {
       }
 
       
-      let chunkSize = 5
+      let chunkSize = 11
       let chunks = []
       for (let i = 0; i < res.length; i += chunkSize) {
         const chunk = res.slice(i, i + chunkSize)
@@ -195,11 +215,29 @@ const ImportSuppliers = () => {
 
     
       const renderData = results.map((value) => ({
-        name: value.PRODUCT_NAME,
-        retailPrice: value.RETAIL_PRICE,
-        wholeSalePrice: value.WHOLESALE_PRICE,
-        specialPrice: value.SPECIAL_PRICE,
-        alert: value.ALERT
+        name: value.SupplierName,
+        email: value.Email,
+        contact: value.Contact,
+        otherContact: value.OtherContact,
+        location: value.Location,
+        customerType: 0,
+        gpsAddress: value.GhanaPostAddress,
+        creditPeriod: value.CreditPeriod,
+        product: value.ProductSupplied,
+        paymentInfo: [
+          {
+            type: 'cash',
+            details: value.CashDetails
+          },
+          {
+            type: 'momo',
+            details: value.MomoDetails
+          },
+          {
+            type: 'bank',
+            details: value.BankDetails
+          },
+        ]
       }))
 
       console.log(renderData, "Results")
@@ -213,13 +251,13 @@ const ImportSuppliers = () => {
   const onSuccess = (data) => {
     if(data)
     alertify.set("notifier", "position", "bottom-right");
-    alertify.success("Products uploaded successfully.");
+    alertify.success("Suppliers uploaded successfully.");
     setProductsList([])
   }
 
   const onError = () => {
     alertify.set("notifier", "position", "bottom-right");
-    alertify.error("Unable to upload products.");
+    alertify.error("Unable to upload suppliers.");
   }
 
 
@@ -263,7 +301,7 @@ const ImportSuppliers = () => {
 
   const submit = () => {
       let payload = {
-        products: productsList
+        suppliers: productsList
       }
 
       if(selectedSheet == ''){
@@ -313,7 +351,7 @@ const ImportSuppliers = () => {
                 <div className="row">
                   <div className="col-lg-12 col-sm-6 col-12">
                     <div className="form-group">
-                      <a href={`../public/xcelTemplates/Template.xlsx`} className="btn btn-submit w-100">Download Sample File</a>
+                      <a href={`https://akwaabaevolution.com/xcelTemplates/SuppliersTemplate.xlsx`} className="btn btn-submit w-100">Download Sample File</a>
                     </div>
                   </div>
                   <div className="col-lg-12">

@@ -155,7 +155,7 @@ const CustomerList = () => {
       title: "Status",
       dataIndex: "status",
       sorter: (a, b) => a.code.length - b.code.length,
-      render: (text, record) => (record.status == 1 ? <span className="badges bg-lightgreen">Active</span> : <span className="badges bg-lightred">Inctive</span> )
+      render: (text, record) => (record.status == 1 ? <span className="badges bg-lightgreen">Active</span> : <span className="badges bg-lightred">Inactive</span> )
     },
     {
       title: "Action",

@@ -130,31 +130,35 @@ const ImportCustomers = () => {
       let col3 = keys.filter((item) => item.Column === 'C')
       let col4 = keys.filter((item) => item.Column === 'D')
       let col5 = keys.filter((item) => item.Column === 'E')
+      let col6 = keys.filter((item) => item.Column === 'F')
 
       // console.log(col1, col2, col3, col4, col5)
 
 
-      let ItemsNameArr = []
-      let RetailPriceArr = []
-      let WholesalePriceArr = []
-      let SpecialPriceArr = []
-      let AlertArr = []
+      let NamesArr = []
+      let EmailsArr = []
+      let ContactArr = []
+      let OtherContactArr = []
+      let LocationArr = []
+      let GPSAddressArr = []
 
 
-      col1.forEach((name) => ItemsNameArr.push(name.Value))
-      col2.forEach((retail) => RetailPriceArr.push(retail.Value))
-      col3.forEach((wholesale) => WholesalePriceArr.push(wholesale.Value))
-      col4.forEach((special) => SpecialPriceArr.push(special.Value))
-      col5.forEach((alert) => AlertArr.push(alert.Value))
+      col1.forEach((name) => NamesArr.push(name.Value))
+      col2.forEach((retail) => EmailsArr.push(retail.Value))
+      col3.forEach((wholesale) => ContactArr.push(wholesale.Value))
+      col4.forEach((special) => OtherContactArr.push(special.Value))
+      col5.forEach((alert) => LocationArr.push(alert.Value))
+      col6.forEach((alert) => GPSAddressArr.push(alert.Value))
     
 
       let finalData = []
       finalData.push(
-        ItemsNameArr,
-        RetailPriceArr,
-        WholesalePriceArr,
-        SpecialPriceArr,
-        AlertArr,
+        NamesArr,
+        EmailsArr,
+        ContactArr,
+        OtherContactArr,
+        LocationArr,
+        GPSAddressArr
       )
 
     // console.log(finalData, "DATA")
@@ -175,7 +179,7 @@ const ImportCustomers = () => {
       }
 
       
-      let chunkSize = 5
+      let chunkSize = 6
       let chunks = []
       for (let i = 0; i < res.length; i += chunkSize) {
         const chunk = res.slice(i, i + chunkSize)
@@ -195,11 +199,15 @@ const ImportCustomers = () => {
 
     
       const renderData = results.map((value) => ({
-        name: value.PRODUCT_NAME,
-        retailPrice: value.RETAIL_PRICE,
-        wholeSalePrice: value.WHOLESALE_PRICE,
-        specialPrice: value.SPECIAL_PRICE,
-        alert: value.ALERT
+        name: value.CustomerName,
+        email: value.Email,
+        contact: value.Contact,
+        otherContact: value.OtherContact,
+        location: value.Location,
+        customerType: 0,
+        gpsAddress: value.GhanaPostAddress
+        
+        
       }))
 
       console.log(renderData, "Results")
@@ -213,13 +221,13 @@ const ImportCustomers = () => {
   const onSuccess = (data) => {
     if(data)
     alertify.set("notifier", "position", "bottom-right");
-    alertify.success("Products uploaded successfully.");
+    alertify.success("Customers uploaded successfully.");
     setProductsList([])
   }
 
   const onError = () => {
     alertify.set("notifier", "position", "bottom-right");
-    alertify.error("Unable to upload products.");
+    alertify.error("Unable to upload customers.");
   }
 
 
@@ -227,61 +235,25 @@ const ImportCustomers = () => {
 
   const columns = [
     {
-      title: "Customer Name",
-      dataIndex: "name",
-      render: (text, record) => (
-        <div className="productimgname">
-          {/* <Link className="product-img">
-            <img alt="" src={record.image} />
-          </Link> */}
-          <Link style={{ fontSize: "15px", marginLeft: "10px" }}>
-            {record.name}
-          </Link>
-        </div>
-      ),
-      sorter: (a, b) => a.name.length - b.name.length,
+      title: "Customer",
+      dataIndex: "name",    
     },
     {
-      title: "Retail Price",
-      dataIndex: "retailPrice",
-      sorter: (a, b) => a.retailPrice - b.retailPrice,
-      render: (text, record) => <p>{moneyInTxt(record?.retailPrice)}</p> 
+      title: "Location",
+      dataIndex: "location",
+      sorter: (a, b) => a.customer.length - b.customer.length,
     },
     {
-      title: "Wholesale Price",
-      dataIndex: "wholeSalePrice",
-      sorter: (a, b) => a.wholeSalePrice - b.wholeSalePrice,
-      render: (text, record) => <p>{moneyInTxt(record?.wholeSalePrice)}</p> 
+      title: "Phone",
+      dataIndex: "contact",
+      sorter: (a, b) => a.contact.length - b.contact.length,
     },
     {
-      title: "Special Price",
-      dataIndex: "specialPrice",
-      sorter: (a, b) => a.specialPrice - b.specialPrice,
-      render: (text, record) => <p>{moneyInTxt(record?.specialPrice)}</p> 
+      title: "Email",
+      dataIndex: "email",
+      sorter: (a, b) => a.email.length - b.email.length,
     },
-    {
-      title: "Alert",
-      dataIndex: "alert",
-    },
-   
-    // {
-    //   title: "Action",
-    //   render: (text, record) => (
-    //     <>
-    //       <>
-    //         {/* <Link className="me-3" to="/tinatett-pos/product/product-details">
-    //           <img src={EyeIcon} alt="img" />
-    //         </Link> */}
-    //         <Link className="me-3" to={{ pathname:`/tinatett-pos/product/editproduct`, state:record}} title="Edit Product">
-    //           <img src={EditIcon} alt="img" />
-    //         </Link>
-    //         {/* <Link className="confirm-text" to="#" onClick={confirmText} title="Delete Product">
-    //           <img src={DeleteIcon} alt="img" />
-    //         </Link> */}
-    //       </>
-    //     </>
-    //   ),
-    // },
+
   ];
 
   const submit = () => {
@@ -336,7 +308,7 @@ const ImportCustomers = () => {
                 <div className="row">
                   <div className="col-lg-12 col-sm-6 col-12">
                     <div className="form-group">
-                      <a href={`../public/xcelTemplates/Template.xlsx`} className="btn btn-submit w-100">Download Sample File</a>
+                      <a href={`https://akwaabaevolution.com/xcelTemplates/CustomersTemplate.xlsx`} className="btn btn-submit w-100">Download Sample File</a>
                     </div>
                   </div>
                   <div className="col-lg-12">
