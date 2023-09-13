@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Table from "../../EntryFile/datatable";
 import { Link } from "react-router-dom";
 import DatePicker from "react-datepicker";
@@ -18,6 +18,7 @@ import {
 } from "../../EntryFile/imagePath";
 import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
+import { useGet } from "../../hooks/useGet";
 
 const UserLists = () => {
   const [startDate, setStartDate] = useState(new Date());
@@ -29,157 +30,60 @@ const UserLists = () => {
   const togglefilter = (value) => {
     setInputfilter(value);
   };
-  const [data] = useState([
-    {
-      name: "Thomas",
-      Phone: "+12163547758",
-      email: "thomas@example.com",
-      Role: "Admin",
-      On: "3/15/2022",
-      Status: "Active",
-    },
-    {
-      name: "504Benjamin",
-      Phone: "123-456-888",
-      email: "customer@example.com",
-      Role: "Manager",
-      On: "2/27/2022",
-      Status: "Restricted",
-    },
-    {
-      name: "James 524",
-      Phone: "+12163547758",
-      email: "james@example.com",
-      Role: "Salesman",
-      On: "2/27/2022",
-      Status: "Restricted",
-    },
-    {
-      name: "James 524",
-      Phone: "+12163547758",
-      email: "james@example.com",
-      Role: "Salesman",
-      On: "2/27/2022",
-      Status: "Restricted",
-    },
-    {
-      name: "Bruklin2022",
-      Phone: "123-456-888",
-      email: "bruklin@example.com",
-      Role: "Delivery Biker",
-      On: "2/27/2022",
-      Status: "Active",
-    },
-    {
-      name: "BeverlyWIN25",
-      Phone: "+12163547758",
-      email: "bruklin@example.com",
-      Role: "Delivery Biker",
-      On: "2/27/2022",
-      Status: "Active",
-    },
-    {
-      name: "BHR256",
-      Phone: "123-456-888",
-      email: "Huber@example.com",
-      Role: "Sales Executive",
-      On: "3/15/2022",
-      Status: "Active",
-    },
-    {
-      name: "Thomas",
-      Phone: "+12163547758",
-      email: "thomas@example.com",
-      Role: "Admin",
-      On: "3/15/2022",
-      Status: "Active",
-    },
-    {
-      name: "504Benjamin",
-      Phone: "123-456-888",
-      email: "customer@example.com",
-      Role: "Manager",
-      On: "2/27/2022",
-      Status: "Restricted",
-    },
-    {
-      name: "James 524",
-      Phone: "+12163547758",
-      email: "james@example.com",
-      Role: "Salesman",
-      On: "2/27/2022",
-      Status: "Restricted",
-    },
-    {
-      name: "James 524",
-      Phone: "+12163547758",
-      email: "james@example.com",
-      Role: "Salesman",
-      On: "2/27/2022",
-      Status: "Restricted",
-    },
-    {
-      name: "Bruklin2022",
-      Phone: "123-456-888",
-      email: "bruklin@example.com",
-      Role: "Delivery Biker",
-      On: "2/27/2022",
-      Status: "Active",
-    },
-    {
-      name: "BeverlyWIN25",
-      Phone: "+12163547758",
-      email: "bruklin@example.com",
-      Role: "Delivery Biker",
-      On: "2/27/2022",
-      Status: "Active",
-    },
-    {
-      name: "BHR256",
-      Phone: "123-456-888",
-      email: "Huber@example.com",
-      Role: "Sales Executive",
-      On: "3/15/2022",
-      Status: "Active",
-    },
-  ]);
+
+  const [data, setData] = useState([])
+
+  const {
+    data: userList,
+    isError,
+    isLoading,
+    isSuccess,
+  } = useGet("users", "/user");
+
+
+  useEffect(() => {
+    if(!isLoading){
+     // console.log(branchList)
+      setData(userList.data)
+      console.log('loaded..')
+    }
+    else{
+      console.log('loading...')
+    }
+  }, [isLoading])
 
   const columns = [
     {
       title: "User Name",
-      dataIndex: "name",
-      sorter: (a, b) => a.name.length - b.name.length,
+      dataIndex: "userName",
+    
     },
     {
-      title: "Phone",
-      dataIndex: "Phone",
-      sorter: (a, b) => a.Phone.length - b.Phone.length,
+      title: "First Name",
+      dataIndex: "firstName",
+    
     },
     {
-      title: "email",
-      dataIndex: "email",
-      sorter: (a, b) => a.email.length - b.email.length,
+      title: "Last Name",
+      dataIndex: "lastName",
+     
     },
     {
       title: "Role",
-      dataIndex: "Role",
+      dataIndex: "role",
       sorter: (a, b) => a.Role.length - b.Role.length,
     },
-    {
-      title: "Created On",
-      dataIndex: "On",
-      sorter: (a, b) => a.On.length - b.On.length,
-    },
+    
     {
       title: "Status",
-      dataIndex: "Status",
+      dataIndex: "status",
       render: (text, record) => (
         <>
-          {text === "Active" && (
-            <span className="badges bg-lightgreen">{text}</span>
+          {text == "1" && (
+            <span className="badges bg-lightgreen">{'Active'}</span>
           )}
-          {text === "Restricted" && (
-            <span className="badges bg-lightred">{text}</span>
+          {text == "0" && (
+            <span className="badges bg-lightred">{'Inactive'}</span>
           )}
         </>
       ),
@@ -209,7 +113,7 @@ const UserLists = () => {
             <h6>Manage your User</h6>
           </div>
           <div className="page-btn">
-            <Link to="/dream-pos/people/adduser-people" className="btn btn-added">
+            <Link to="/tinatett-pos/users/newuser" className="btn btn-added">
               <img src={PlusIcon} alt="img" className="me-2" />
               Add User
             </Link>
