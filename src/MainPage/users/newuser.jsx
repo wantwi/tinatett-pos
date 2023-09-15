@@ -63,6 +63,9 @@ const Newuser = () => {
   const onSubmit = (data) => {
    
     mutate({...data, role: role.value})
+    alertify.set("notifier", "position", "bottom-right");
+    alertify.success("User successfully created");
+    reset()
    
   };
 

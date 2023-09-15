@@ -3,6 +3,7 @@ import Table from "../../EntryFile/datatable";
 import { Link } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import Swal from "sweetalert2";
 import {
   ClosesIcon,
   Excel,
@@ -19,6 +20,8 @@ import {
 import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
 import { useGet } from "../../hooks/useGet";
+import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
+import useCustomApi from "../../hooks/useCustomApi";
 
 const UserLists = () => {
   const [startDate, setStartDate] = useState(new Date());
@@ -93,16 +96,83 @@ const UserLists = () => {
       title: "Action",
       render: (text, record) => (
         <>
-          <Link className="me-3" to="newuseredit">
+          <Link to= {{pathname:"/tinatett-pos/users/newuseredit", state: record}} className="me-3" >
             <img src={EditIcon} alt="img" />
           </Link>
-          <Link className="me-3 confirm-text" to="#">
+          <Link className="me-3 confirm-text" to="#" onClick={() => confirmText(record.id)}>
             <img src={DeleteIcon} alt="img" />
           </Link>
         </>
       ),
     },
   ];
+
+
+  const axios = useCustomApi()
+
+  const confirmText = (id) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      type: "warning",
+      showCancelButton: !0,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+      confirmButtonClass: "btn btn-primary",
+      cancelButtonClass: "btn btn-danger ml-1",
+      buttonsStyling: !1,
+    }) .then( async(t) => {
+     
+  
+    if(t.isConfirmed){
+        let data = await axios.delete(`/user/${id}`)
+      if(data.status < 205){
+        Swal.fire({
+          type: "success",
+          title: "Deleted!",
+          text: "User has been deleted.",
+          confirmButtonClass: "btn btn-success",
+        });
+        refetch()
+   
+      }
+      else{
+        Swal.fire({
+          type: "danger",
+          title: "Error!",
+          text: data.response.data.message,
+          confirmButtonClass: "btn btn-danger",
+        });
+      }
+  }
+    
+    
+   
+     t.dismiss === Swal.DismissReason.cancel &&
+      Swal.fire({
+        title: "Cancelled",
+        text: "You cancelled the delete action",
+        type: "error",
+        confirmButtonClass: "btn btn-success",
+      });
+
+      
+  })
+    .catch( (error) => {
+        Swal.fire({
+          type: "danger",
+          title: "Error!",
+          text: error,
+          confirmButtonClass: "btn btn-danger",
+        });
+    });
+  };
+
+
+  if(isLoading){
+    return <LoadingSpinner/>
+  }
 
   return (
     <div className="page-wrapper">

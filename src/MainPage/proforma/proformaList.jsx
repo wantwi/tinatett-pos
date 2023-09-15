@@ -66,7 +66,7 @@ const ProformaList = () => {
         createdBy: proforma?.createdBy || 'N/A',
       }
     })
-    let sortedData = mappedData.sort((a,b) => new Date(b.date) - new Date(a.date))
+    let sortedData = mappedData?.sort((a,b) => new Date(b.date) - new Date(a.date))
     setData(sortedData)
 
   }
