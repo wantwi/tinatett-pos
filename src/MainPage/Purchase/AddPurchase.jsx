@@ -710,8 +710,8 @@ const AddPurchase = () => {
                           //step={0.01}
                           value={productFormData?.unitPrice}
                           onChange={(e) => {
-                            let unitP = parseInt(e.target.value) || 0
-                            let qty = parseInt(productFormData.quantity) || 0
+                            let unitP = Number(e.target.value) || 0
+                            let qty = Number(productFormData.quantity) || 0
                             setProductFormData({ ...productFormData, unitPrice: e.target.value, amount: productFormData ? unitP * qty : unitP * 1 })
                           }
                           } />
@@ -726,7 +726,7 @@ const AddPurchase = () => {
                             type="text" className={`form-control `}
                             id="amount"
                             placeholder=""
-                            value={productFormData?.amount}
+                            value={(Number(productFormData?.amount).toFixed(2))}
                             disabled
                           />
 
@@ -885,7 +885,7 @@ const AddPurchase = () => {
                     <div className="col-lg-6 col-sm-12 col-12">
                       <div className="form-group">
                         <label>Amount</label>
-                        <input type="text" value={editFormData?.amount} />
+                        <input type="text" value={Number(editFormData?.amount).toFixed(2)} />
                       </div>
                     </div>
 
