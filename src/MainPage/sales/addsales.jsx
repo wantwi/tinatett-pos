@@ -81,6 +81,7 @@ const Addsales = () => {
   const [recieptData, setReceiptData] = useState({})
   const [receiptFile, setReceiptFile] = useState(null)
   const [isBatchLoading, setIsBatchLoading] = useState(false)
+  const [userType, setUserType] = useState('')
 
   const retailRef = useRef()
   const wholesaleRef = useRef()
@@ -117,6 +118,12 @@ const Addsales = () => {
    });
  
 
+   useEffect(() => {
+    let userRole = localStorage.getItem('auth')
+    let obj =JSON.parse(userRole)
+    console.log("Role:", obj.role)
+    setUserType(obj.role)
+  }, [])
 
   const axios = useCustomApi()
 
@@ -1405,7 +1412,7 @@ const Addsales = () => {
                   </div>
                 </div>
 
-                <div className="row mt-2">
+                {userType !== 'sales' && <div className="row mt-2">
                   <div className="col-lg-12" style={{ display: 'flex', justifyContent: 'space-between' }} >
                     <button className="btn btn-info me-2" data-bs-toggle="modal" data-bs-target="#payment" onClick={() => setTransactionType("SP")} style={{ width: '20%' }}>
                       Sell and Print
@@ -1421,7 +1428,7 @@ const Addsales = () => {
                     </button>
 
                   </div>
-                </div>
+                </div>}
               </div>
             </div>
 

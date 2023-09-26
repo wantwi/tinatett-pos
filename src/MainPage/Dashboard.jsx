@@ -154,6 +154,8 @@ const Dashboard = (props) => {
   const [topcustomersData, settopcustomersData] = useState([])
   const [alertListData, setAlerListData] = useState([])
   const [profitMarginData, setprofitMarginData] = useState([])
+
+  const [userType, setUserType] = useState('')
  // const [summaryData, setSummaryData] = useState([])
   
   const {data: salesAndpurchase,isLoading} = useGet("salesAndpurchase", "/dashboard/salesAndpurchase");
@@ -164,6 +166,12 @@ const Dashboard = (props) => {
   const {data: profitmargin, isLoading: profitmarginLoading} = useGet("profitmargin", "/dashboard/product/profitmargin");
   const {data: alertList, isLoading: alertListLoading} = useGet("productalert", "/dashboard/product/alert");
 
+  useEffect(() => {
+    let userRole = localStorage.getItem('auth')
+    let obj =JSON.parse(userRole)
+    console.log("Role:", obj.role)
+    setUserType(obj.role)
+  }, [])
 
   useEffect(() => {
     if (!isLoading && !expLoading && !topcustomersLoading && !topproductsLoading && !profitmarginLoading && !alertListLoading) {
@@ -191,7 +199,7 @@ const Dashboard = (props) => {
         </Helmet>
      
         <div className="content">
-          <div className="row">
+        {userType !== 'sales' && <div className="row">
             <div className="col-lg-3 col-sm-6 col-12">
               <div className="dash-widget">
                 <div className="dash-widgetimg">
@@ -228,6 +236,7 @@ const Dashboard = (props) => {
                 </div>
               </div>
             </div>
+
             <div className="col-lg-3 col-sm-6 col-12">
               <div className="dash-widget dash1">
                 <div className="dash-widgetimg">
@@ -246,6 +255,7 @@ const Dashboard = (props) => {
                 </div>
               </div>
             </div>
+
             <div className="col-lg-3 col-sm-6 col-12">
               <div className="dash-widget dash3">
                 <div className="dash-widgetimg">
@@ -337,7 +347,7 @@ const Dashboard = (props) => {
                 </div>
               </div>
             </div>
-            <div className="col-lg-3 col-sm-6 col-12">
+            {userType !== 'cashier' && (<div className="col-lg-3 col-sm-6 col-12">
               <div className="dash-widget dash3">
                 <div className="dash-widgetimg">
                   <span>
@@ -354,8 +364,8 @@ const Dashboard = (props) => {
                   <h6>Total Profit Margin (Daily)</h6>
                 </div>
               </div>
-            </div>
-            <div className="col-lg-3 col-sm-6 col-12">
+            </div>)}
+            {userType !== 'cashier' && (<div className="col-lg-3 col-sm-6 col-12">
               <div className="dash-widget dash3">
                 <div className="dash-widgetimg">
                   <span>
@@ -372,7 +382,7 @@ const Dashboard = (props) => {
                   <h6>Total Profit Margin (Monthly)</h6>
                 </div>
               </div>
-            </div>
+            </div>)}
          
            
             <div className="col-lg-3 col-sm-6 col-12">
@@ -455,7 +465,7 @@ const Dashboard = (props) => {
                 </div>
               </div>
             </div> */}
-          </div>
+          </div>}
 
           <div className="row">
             <div className="col-lg-4 col-sm-12 col-12 d-flex">

@@ -701,7 +701,7 @@ const Sidebar = (props) => {
                 </li>) :null}
 
              {/* Expense */}
-             {userType == 'admin' || userType == 'supervisor' ? (<li className="submenu">
+             {userType == 'admin' || userType == 'supervisor' || userType == 'cashier' ? (<li className="submenu">
                   <a
                     href="#"
                     className={
