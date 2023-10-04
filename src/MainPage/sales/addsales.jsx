@@ -1499,7 +1499,7 @@ const Addsales = () => {
                 <div className="col-lg-6 col-sm-12 col-12">
                   <div className="form-group">
                     <label>Quantity</label>
-                    <input type="number" value={editFormData?.quantity}
+                    <input type="number" className="form-control" value={editFormData?.quantity}
                       onChange={(e) => {
                         if (e.target.value == '') {
                           setEditFormData({ ...editFormData, quantity: '' })
@@ -1533,7 +1533,7 @@ const Addsales = () => {
                 <div className="col-lg-6 col-sm-12 col-12">
                   <div className="form-group">
                     <label>Amount</label>
-                    <input  type="number" value={editFormData?.amount} />
+                    <input  type="number" className="form-control"value={editFormData?.amount} />
                   </div>
                 </div>
 
