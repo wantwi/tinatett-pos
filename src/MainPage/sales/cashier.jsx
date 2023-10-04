@@ -681,14 +681,15 @@ const Cashier = () => {
                                 <label>Amount </label>
                                 <div className="input-groupicon">
                                   <input
-                                    type="text"
+                                    type="number"
+                                    className="form-control"
                                     placeholder=""
                                     value={paymentInfo.cashAmount}
                                     onChange={(e) => {
                                       if(e.target.value == ''){
                                         setPaymentInfo({...paymentInfo, cashAmount: ''})
                                       }
-                                      else if(isValidNumber(e.target.value)){
+                                      else {
                                         setPaymentInfo({...paymentInfo, cashAmount: Number(e.target.value)})
                                       }
                                      
@@ -803,15 +804,16 @@ const Cashier = () => {
                                 <label>Amount</label>
                                 <div className="input-groupicon">
                                   <input
-                                    type="text"
+                                    type="number"
                                     placeholder=""
+                                    className="form-control"
                                     value={paymentInfo.chequeAmount}
                                     
                                     onChange={(e) => {
                                       if(e.target.value == ''){
                                         setPaymentInfo({...paymentInfo, chequeAmount: ''})
                                       }
-                                      else if(isValidNumber(e.target.value)){
+                                      else {
                                         setPaymentInfo({...paymentInfo, chequeAmount: Number(e.target.value)})
                                       }
                               
@@ -862,14 +864,15 @@ const Cashier = () => {
                                 <label>Amount</label>
                                 <div className="input-groupicon">
                                   <input
-                                    type="text"
+                                    type="number"
+                                    className="form-control"
                                     placeholder=""
                                     value={paymentInfo.momoAmount}
                                     onChange={(e) => {
                                       if(e.target.value == ''){
                                         setPaymentInfo({...paymentInfo, momoAmount: ''})
                                       }
-                                      else if(isValidNumber(e.target.value)){
+                                      else {
                                         setPaymentInfo({...paymentInfo, momoAmount: Number(e.target.value)})
                                       }
                               
@@ -1009,7 +1012,8 @@ const Cashier = () => {
                                 <label>Amount </label>
                                 <div className="input-groupicon">
                                   <input
-                                    type="text"
+                                    type="number"
+                                    className="form-control"
                                     placeholder=""
                                     value={paymentInfo.cashAmount}
                                     onChange={(e) => {

@@ -991,7 +991,7 @@ const Addsales = () => {
                         <input
                           id="quantity"
                           className="form-control"
-                          type="text"
+                          type="number"
                           value={formData?.quantity}
                           onChange={(e) => {
                             if (e.target.value == '') {
@@ -1008,7 +1008,7 @@ const Addsales = () => {
                               }
                               setNotifications([newNotification, ...notifications])
                             }
-                            else if (isValidNumber(e.target.value)) {
+                            else {
                               setFormData({ ...formData, quantity: Number(e.target.value) })
                             }
                           }}
@@ -1025,7 +1025,7 @@ const Addsales = () => {
                         <input
                           className="form-control"
                           type="text"
-                          value={formData.quantity ? formData.quantity * price : price * 1 || 0}
+                          value={formData.quantity ? Number(formData.quantity * price).toFixed(2) : Number(price * 1).toFixed(2) || 0}
                         />
 
                       </div>
@@ -1499,14 +1499,14 @@ const Addsales = () => {
                 <div className="col-lg-6 col-sm-12 col-12">
                   <div className="form-group">
                     <label>Quantity</label>
-                    <input type="text" value={editFormData?.quantity}
+                    <input type="number" value={editFormData?.quantity}
                       onChange={(e) => {
                         if (e.target.value == '') {
                           setEditFormData({ ...editFormData, quantity: '' })
                         }
-                        else if (isValidNumber(e.target.value)) {
-                          let qty = parseInt(e.target.value) || 0
-                          let unitP = parseInt(editFormData.unitPrice) || 0
+                        else {
+                          let qty = Number(e.target.value) || 0
+                          let unitP = Number(editFormData.unitPrice) || 0
                           //console.log(qty, unitP)
 
                           setEditFormData({ ...editFormData, quantity: e.target.value, amount: unitP * qty || unitP * 1 })
@@ -1533,7 +1533,7 @@ const Addsales = () => {
                 <div className="col-lg-6 col-sm-12 col-12">
                   <div className="form-group">
                     <label>Amount</label>
-                    <input type="text" value={editFormData?.amount} />
+                    <input  type="number" value={editFormData?.amount} />
                   </div>
                 </div>
 
@@ -1618,14 +1618,15 @@ const Addsales = () => {
                                 <label>Amount </label>
                                 <div className="input-groupicon">
                                   <input
-                                    type="text"
+                                    type="number"
                                     placeholder=""
+                                    className="form-control"
                                     value={paymentInfo.cashAmount}
                                     onChange={(e) => {
                                       if(e.target.value == ''){
                                         setPaymentInfo({...paymentInfo, cashAmount: ''})
                                       }
-                                      else if(isValidNumber(e.target.value)){
+                                      else {
                                         setPaymentInfo({...paymentInfo, cashAmount: Number(e.target.value)})
                                       }
                                      
@@ -1678,6 +1679,7 @@ const Addsales = () => {
                                   <input
                                     type="text"
                                     placeholder=""
+                                    className="form-control"
                                     value={paymentInfo.chequeNo}
                                     onChange={(e) => setPaymentInfo({...paymentInfo, chequeNo: e.target.value})}
                                   />
@@ -1694,6 +1696,7 @@ const Addsales = () => {
                                   <input
                                     type="text"
                                     placeholder=""
+                                    className="form-control"
                                     value={paymentInfo.chequeReceiptNo}
                                     onChange={(e) => setPaymentInfo({...paymentInfo, chequeReceiptNo: e.target.value})}
                                   />
@@ -1740,14 +1743,15 @@ const Addsales = () => {
                                 <label>Amount</label>
                                 <div className="input-groupicon">
                                   <input
-                                    type="text"
+                                    type="number"
                                     placeholder=""
+                                    className="form-control"
                                     value={paymentInfo.chequeAmount}
                                     onChange={(e) => {
                                       if(e.target.value == ''){
                                         setPaymentInfo({...paymentInfo, chequeAmount: ''})
                                       }
-                                      else if(isValidNumber(e.target.value)){
+                                      else {
                                         setPaymentInfo({...paymentInfo, chequeAmount: Number(e.target.value)})
                                       }
                               
@@ -1798,14 +1802,14 @@ const Addsales = () => {
                                 <label>Amount</label>
                                 <div className="input-groupicon">
                                   <input
-                                    type="text"
+                                    type="number"
                                     placeholder=""
                                     value={paymentInfo.momoAmount}
                                     onChange={(e) => {
                                       if(e.target.value == ''){
                                         setPaymentInfo({...paymentInfo, momoAmount: ''})
                                       }
-                                      else if(isValidNumber(e.target.value)){
+                                      else {
                                         setPaymentInfo({...paymentInfo, momoAmount: Number(e.target.value)})
                                       }
                               
