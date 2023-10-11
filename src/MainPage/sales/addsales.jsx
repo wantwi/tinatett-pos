@@ -581,8 +581,14 @@ const Addsales = () => {
       setProductGridData([...productGridData, obj])
       setFormData({ quantity: '', amount: '', batchNumber: '', manuDate: '', expDate: '' })
       setSelectedProduct({ remainingStock: '', wholeSalePrice:'', retailPrice:'', specialPrice:'' })
-      // retailpriceTypeRef.current.checked = false
-      // wholesalepriceTypeRef.current.checked = false
+
+      if(salesType == 'Retail'){
+        retailpriceTypeRef.current.checked = true
+      }
+      else{
+        wholesalepriceTypeRef.current.checked = true
+      }
+     
       // specialpriceTypeRef.current.checked = false
       setWholesalePrice('')
       setSpecialPrice('')
