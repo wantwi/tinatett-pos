@@ -94,9 +94,8 @@ const AddPurchase = () => {
 
 
   const deleteRow = (record) => {
-    // console.log(record)
-    // console.log(productGridData)
-    let newGridData = productGridData.filter((item) => item.productId !== record.productId)
+
+    let newGridData = productGridData.filter((item) => item.id !== record.id)
     //console.log(newGridData)
     setProductGridData(newGridData)
   };
@@ -365,7 +364,8 @@ const AddPurchase = () => {
     else {
       setManDate('')
       setExpDate('')
-      setProductGridData([...productGridData, productFormData])
+      let obj = {...productFormData, id: Math.ceil(Math.random() * 1000000)}
+      setProductGridData([...productGridData, obj])
       setProductFormData({ unitPrice: '', quantity: '', amount: '', manufacturingDate: '', expireDate: '', batchNumber: '' })
       setSelectedProduct('')
     }

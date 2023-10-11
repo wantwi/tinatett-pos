@@ -513,7 +513,7 @@ const Addsales = () => {
     
     //console.log(selectedProduct)
     let obj = {
-      id: productGridData.length + 1,
+      id: Math.ceil(Math.random() * 1000000),
       name: selectedProduct.label,
       productId: selectedProduct.value,
       batchNumber: formData.batchNumber?.value,
