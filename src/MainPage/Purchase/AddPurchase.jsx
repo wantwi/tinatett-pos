@@ -138,6 +138,31 @@ const AddPurchase = () => {
         }
       })
       .finally(() => setLoading(false))
+
+      checkIfBatchNoIsInBasket(batchNumber)
+  }
+
+  const checkIfBatchNoIsInBasket = (batchNumber) => {
+
+    productGridData.forEach((item) => {
+      if(item.batchNumber == batchNumber){
+        $('#batchNumber').css('border', '1px solid red')
+            setTimeout(() => {
+              $('#batchNumber').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+          }, 3000)
+          
+          alertify.set("notifier", "position", "bottom-right");
+          alertify.warning("Batch Number is currently already in the Basket");
+
+          let newNotification = {
+            id: Math.ceil(Math.random()*1000000),
+            message: `${storage.name} ${'Batch Number is currently already in the Basket'}`,
+            time: new Date().toISOString(), type: 'warning'
+          }
+          setNotifications([newNotification, ...notifications])
+          setProductFormData({ ...productFormData, batchNumber: '' })
+      }
+    })
   }
 
 
