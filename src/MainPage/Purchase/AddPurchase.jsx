@@ -139,28 +139,34 @@ const AddPurchase = () => {
       })
       .finally(() => setLoading(false))
 
-      checkIfBatchNoIsInBasket(batchNumber)
+      checkIfBatchNoIsInBasket(batchNumber, productId)
   }
 
-  const checkIfBatchNoIsInBasket = (batchNumber) => {
+  const checkIfBatchNoIsInBasket = (batchNumber, productId) => {
 
     productGridData.forEach((item) => {
       if(item.batchNumber == batchNumber){
-        $('#batchNumber').css('border', '1px solid red')
+        console.log(item, productId)
+        if(item.productId != productId){
+            $('#batchNumber').css('border', '1px solid red')
             setTimeout(() => {
               $('#batchNumber').css('border', '1px solid rgba(145, 158, 171, 0.32)')
-          }, 3000)
-          
-          alertify.set("notifier", "position", "bottom-right");
-          alertify.warning("Batch Number is currently already in the Basket");
+            }, 3000)
+        
+            alertify.set("notifier", "position", "bottom-right");
+            alertify.warning("Batch Number is already added to the Basket");
 
-          let newNotification = {
-            id: Math.ceil(Math.random()*1000000),
-            message: `${storage.name} ${'Batch Number is currently already in the Basket'}`,
-            time: new Date().toISOString(), type: 'warning'
-          }
-          setNotifications([newNotification, ...notifications])
-          setProductFormData({ ...productFormData, batchNumber: '' })
+            let newNotification = {
+              id: Math.ceil(Math.random()*1000000),
+              message: `${storage.name} ${'Batch Number is already added to the Basket'}`,
+              time: new Date().toISOString(), type: 'warning'
+            }
+            setNotifications([newNotification, ...notifications])
+            setProductFormData({ ...productFormData, batchNumber: '' })
+        }else{
+          //allow
+        }
+        
       }
     })
   }
