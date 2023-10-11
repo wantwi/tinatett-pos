@@ -21,6 +21,14 @@ const EditProduct = () => {
   const [data, setData] = useState(state)
 
   const [ownershipType, setOwnershipType] = useState(state?.ownershipType)
+  const [userType, setUserType] = useState(null)
+
+  useEffect(() => {
+    let userRole = localStorage.getItem('auth')
+    let obj =JSON.parse(userRole)
+    //console.log("Role:", obj.role)
+    setUserType(obj.role)
+  }, [])
 
 
   const validationSchema = Yup.object().shape({
@@ -101,7 +109,7 @@ const EditProduct = () => {
                 <div className="col-lg-6 col-sm-6 col-12">
                   <div className="form-group">
                     <label>Product Name</label>
-                    <input type="text"  {...register("name")} disabled/>
+                    <input type="text"  {...register("name")} disabled={userType == 'admin' || userType == 'supervisor' ? false : true}/>
                   </div>
                 </div>
                 <div className="col-lg-6 col-sm-6 col-12">

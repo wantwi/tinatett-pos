@@ -17,9 +17,17 @@ import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 
 const EditCustomer = () => {
   const {state} = useLocation()
-console.log(state)
+
   const [formData, setFormData] = useState(state)
   const [customerType, setCustomerType] = useState(formData?.customerType)
+  const [userType, setUserType] = useState(null)
+
+  useEffect(() => {
+    let userRole = localStorage.getItem('auth')
+    let obj =JSON.parse(userRole)
+    //console.log("Role:", obj.role)
+    setUserType(obj.role)
+  }, [])
 
 
   const validationSchema = Yup.object().shape({
@@ -95,7 +103,7 @@ console.log(state)
                   <div className="col-lg-4 col-sm-6 col-12">
                     <div className="form-group">
                       <label>Customer Name</label>
-                      <input type="text"  {...register("name")} disabled/>
+                      <input type="text"  {...register("name")} disabled={userType == 'admin' || userType == 'supervisor' ? false : true}/>
                     </div>
                   </div>
 
