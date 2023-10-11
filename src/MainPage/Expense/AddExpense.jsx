@@ -59,6 +59,19 @@ const AddExpense = () => {
     { id: 27, label: "Other", value: "Other" },
   ];
 
+  let sortedOptions = options.sort(function (a, b) {
+    if (a.label < b.label) {
+      return -1;
+    }
+    if (a.label > b.label) {
+      return 1;
+    }
+    return 0;
+  });
+  
+
+
+
   const directorRef = useRef()
   const shopRef = useRef()
   const companyRef = useRef()
@@ -352,7 +365,7 @@ const AddExpense = () => {
                         <Select style={{ width: '100%' }}
                           id="expenseFor"
                           className="select"
-                          options={options}
+                          options={sortedOptions}
                           value={formData.expenseFor}
                           onChange={(e) => setFormData({ ...formData, expenseFor: e })}
 
@@ -378,17 +391,12 @@ const AddExpense = () => {
                       <div className="form-group">
                         <label>Amount</label>
                         <div className="input-groupicon">
-                          <input type="text"
+                          <input type="number"
+                            className="form-control"
                             id="amount"
                             value={formData?.amount}
                             onChange={(e) => {
-                              if (e.target.value == '') {
-                                setFormData({ ...formData, amount: '' })
-                              }
-                              else if (isValidNumber(e.target.value)) {
-                                let amt = parseInt(e.target.value)
-                                setFormData({ ...formData, amount: amt })
-                              }
+                              setFormData({ ...formData, amount: e.target.value })
                             }}
                           />
 
@@ -604,16 +612,11 @@ const AddExpense = () => {
                       <label>Amount</label>
                       <div className="input-groupicon">
                         <input type="text"
+                          className="form-control"
                           id="amount"
                           value={editFormData?.amount}
                           onChange={(e) => {
-                            if (e.target.value == '') {
-                              setEditFormData({ ...editFormData, amount: '' })
-                            }
-                            else if (isValidNumber(e.target.value)) {
-                              let amt = parseInt(e.target.value)
-                              setEditFormData({ ...editFormData, amount: amt })
-                            }
+                            setEditFormData({ ...editFormData, amount: e.target.value })
                           }}
                         />
 
