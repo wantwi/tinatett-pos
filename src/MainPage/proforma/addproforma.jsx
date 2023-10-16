@@ -766,7 +766,7 @@ const AddProforma = () => {
                   </div>
                 </div>
                 <div className="col-lg-12" style={{ textAlign: 'right' }}>
-                  <button type="submit" className="btn btn-submit me-2" onClick={onSubmitProforma}><FeatherIcon icon="save" />
+                  <button type="submit" className="btn btn-submit me-2" data-bs-toggle="modal" data-bs-target="#confirm"><FeatherIcon icon="save" />
                     {" Generate Proforma"}
                   </button>
                   {/* <Link id="printModalClick" to="#" className="btn btn-cancel me-2" style={{ backgroundColor: '#FF9F43' }} data-bs-toggle="modal"
@@ -1123,6 +1123,44 @@ const AddProforma = () => {
             </div>
           </div>
 
+            {/* Confirm Modal */}
+
+       <div
+        className="modal fade"
+        id="confirm"
+        tabIndex={-1}
+        aria-labelledby="confirm"
+        aria-hidden="true">
+
+          <div className="modal-dialog modal-md modal-dialog-centered" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                    <h5 className="modal-title">Confirm</h5>
+                    <button
+                    type="button"
+                    className="close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                    >
+                    <span aria-hidden="true">×</span>
+                </button>
+              </div>
+              <div className="modal-body">
+                Are you sure you want to generate this Proforma?
+              </div>
+              <div className="modal-footer">
+                  <Link to="#" className="btn btn-submit me-2" data-bs-dismiss="modal"  onClick={onSubmitProforma}>
+                    Yes
+                  </Link>
+                  <Link to="#" className="btn btn-cancel" data-bs-dismiss="modal">
+                    No
+                </Link>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
 {/* PDF Modal */}
 <div
             className="modal fade"
@@ -1152,6 +1190,9 @@ const AddProforma = () => {
             </div>
           </div>
     </div>
+
+
+
   );
 };
 

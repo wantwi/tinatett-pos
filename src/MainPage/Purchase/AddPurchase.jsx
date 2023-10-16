@@ -423,7 +423,7 @@ const AddPurchase = () => {
       mutate(postBody)
       setManDate('')
       setExpDate('')
-      //setPurDate('')
+      setPurDate(new Date().toISOString().substring(0,10))
       setSelectedProduct('')
       setSupplier('')
       setProductGridData([])
@@ -824,7 +824,7 @@ const AddPurchase = () => {
 
 
                   <div className="col-lg-12" style={{ textAlign: 'right' }}>
-                    <button className="btn btn-submit me-2" type="submit" onClick={onSubmitPurchase}><FeatherIcon icon="save" />Save</button>
+                    <button className="btn btn-submit me-2" type="submit" data-bs-toggle="modal" data-bs-target="#confirm"><FeatherIcon icon="save" />Save</button>
                     <Link to="/tinatett-pos/purchase/purchaselist" className="btn btn-cancel">
                       Cancel
                     </Link>
@@ -904,7 +904,7 @@ const AddPurchase = () => {
                       <div className="form-group">
                         <label>Unit Price</label>
                         <input type="text" value={editFormData?.unitPrice}
-                          disabled
+                          
                           onChange={(e) => {
                             let unitP = Number(e.target.value) || 0
                             let qty = Number(editFormData.quantity) || 0
@@ -1128,6 +1128,44 @@ const AddPurchase = () => {
           </div>
         </div>
       </div>
+
+      {/* Confirm Modal */}
+
+       <div
+        className="modal fade"
+        id="confirm"
+        tabIndex={-1}
+        aria-labelledby="confirm"
+        aria-hidden="true">
+
+          <div className="modal-dialog modal-md modal-dialog-centered" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                    <h5 className="modal-title">Confirm</h5>
+                    <button
+                    type="button"
+                    className="close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                    >
+                    <span aria-hidden="true">×</span>
+                </button>
+              </div>
+              <div className="modal-body">
+                Are you sure you want to complete this purchase?
+              </div>
+              <div className="modal-footer">
+                  <Link to="#" className="btn btn-submit me-2" data-bs-dismiss="modal" onClick={onSubmitPurchase}>
+                    Yes
+                  </Link>
+                  <Link to="#" className="btn btn-cancel" data-bs-dismiss="modal">
+                    No
+                </Link>
+              </div>
+            </div>
+          </div>
+
+        </div>
 
     </>
   );

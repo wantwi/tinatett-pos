@@ -778,16 +778,16 @@ const Suspended = () => {
 
                 <div className="row mt-2">
                   <div className="col-lg-12" style={{ display: 'flex', justifyContent: 'space-between' }} >
-                    <button className="btn btn-info me-2" onClick={() => processPayment("Paid", true)} style={{ width: '20%' }}>
+                    <button className="btn btn-info me-2" style={{ width: '20%' }}  data-bs-toggle="modal" data-bs-target="#confirmPaymentSellPrint">
                       Sell and Print
                     </button>
-                    <button className="btn btn-warning me-2" onClick={() => processPayment("Paid", false)} style={{ width: '20%' }}>
+                    <button className="btn btn-warning me-2"  style={{ width: '20%' }}  data-bs-toggle="modal" data-bs-target="#confirmPaymentSellOnly">
                       Sell Only
                     </button>
-                    <button className="btn btn-danger me-2" style={{ width: '20%' }} onClick={() => processPayment("Credit", true)} >
+                    <button className="btn btn-danger me-2" style={{ width: '20%' }}  data-bs-toggle="modal" data-bs-target="#confirmPaymentCreditPrint">
                       Credit and Print
                     </button>
-                    <button className="btn btn-cancel" style={{ width: '20%' }} onClick={() => processPayment("Credit", false)}>
+                    <button className="btn btn-cancel" style={{ width: '20%' }}  data-bs-toggle="modal" data-bs-target="#confirmPaymentCreditOnly">
                       Credit Only
                     </button>
 
@@ -797,6 +797,155 @@ const Suspended = () => {
             </div>
           </div>
         </div>
+
+         {/* Payment Confirm Modal */}
+
+    <div
+        className="modal fade"
+        id="confirmPaymentSellPrint"
+        tabIndex={-1}
+        aria-labelledby="confirmPaymentSellPrint"
+        aria-hidden="true">
+
+          <div className="modal-dialog modal-md modal-dialog-centered" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                    <h5 className="modal-title">Confirm</h5>
+                    <button
+                    type="button"
+                    className="close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                    >
+                    <span aria-hidden="true">×</span>
+                </button>
+              </div>
+              <div className="modal-body">
+                Are you sure you want to save this payment Transaction?
+              </div>
+              <div className="modal-footer">
+                  <Link to="#" className="btn btn-submit me-2" data-bs-dismiss="modal"  onClick={() => processPayment("Paid", true)}>
+                    Yes
+                  </Link>
+                  <Link to="#" className="btn btn-cancel" data-bs-dismiss="modal">
+                    No
+                </Link>
+              </div>
+            </div>
+          </div>
+
+    </div>
+
+
+    <div
+        className="modal fade"
+        id="confirmPaymentSellOnly"
+        tabIndex={-1}
+        aria-labelledby="confirmPaymentSellOnly"
+        aria-hidden="true">
+
+          <div className="modal-dialog modal-md modal-dialog-centered" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                    <h5 className="modal-title">Confirm</h5>
+                    <button
+                    type="button"
+                    className="close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                    >
+                    <span aria-hidden="true">×</span>
+                </button>
+              </div>
+              <div className="modal-body">
+                Are you sure you want to save this payment Transaction?
+              </div>
+              <div className="modal-footer">
+                  <Link to="#" className="btn btn-submit me-2" data-bs-dismiss="modal" onClick={() => processPayment("Paid", false)}>
+                    Yes
+                  </Link>
+                  <Link to="#" className="btn btn-cancel" data-bs-dismiss="modal">
+                    No
+                </Link>
+              </div>
+            </div>
+          </div>
+
+    </div>
+
+
+    <div
+        className="modal fade"
+        id="confirmPaymentCreditOnly"
+        tabIndex={-1}
+        aria-labelledby="confirmPaymentCreditOnly"
+        aria-hidden="true">
+
+          <div className="modal-dialog modal-md modal-dialog-centered" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                    <h5 className="modal-title">Confirm</h5>
+                    <button
+                    type="button"
+                    className="close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                    >
+                    <span aria-hidden="true">×</span>
+                </button>
+              </div>
+              <div className="modal-body">
+                Are you sure you want to save this payment Transaction?
+              </div>
+              <div className="modal-footer">
+                  <Link to="#" className="btn btn-submit me-2" data-bs-dismiss="modal"  onClick={() => processPayment("Credit", false)}>
+                    Yes
+                  </Link>
+                  <Link to="#" className="btn btn-cancel" data-bs-dismiss="modal">
+                    No
+                </Link>
+              </div>
+            </div>
+          </div>
+
+    </div>
+
+
+    <div
+        className="modal fade"
+        id="confirmPaymentCreditPrint"
+        tabIndex={-1}
+        aria-labelledby="confirmPaymentCreditPrint"
+        aria-hidden="true">
+
+          <div className="modal-dialog modal-md modal-dialog-centered" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                    <h5 className="modal-title">Confirm</h5>
+                    <button
+                    type="button"
+                    className="close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                    >
+                    <span aria-hidden="true">×</span>
+                </button>
+              </div>
+              <div className="modal-body">
+                Are you sure you want to save this payment Transaction?
+              </div>
+              <div className="modal-footer">
+                  <Link to="#" className="btn btn-submit me-2" data-bs-dismiss="modal"  onClick={() => processPayment("Credit", true)}>
+                    Yes
+                  </Link>
+                  <Link to="#" className="btn btn-cancel" data-bs-dismiss="modal">
+                    No
+                </Link>
+              </div>
+            </div>
+          </div>
+
+    </div>
         {/* show payment Modal */}
         {/* show payment Modal */}
         <div
