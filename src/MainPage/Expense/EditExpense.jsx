@@ -70,8 +70,24 @@ const EditExpense = () => {
     { id: 24, label: "FDA", value: "FDA" },
     { id: 25, label: "MOH", value: "MOH" },
     { id: 26, label: "Assembly Levy", value: "Assembly Levy" },
-    { id: 27, label: "Other", value: "Other" },
+    { id: 27, label: "Allowance", value:"Allowance" },
+    { id: 28, label: "Special Bonus", value: "Special Bonus"},
+    { id: 29, label: "Transportation", value: "Transportation" }, 
+    { id: 30, label: "Refuse Collection", value:  "Refuse Collection"},
+    { id: 31, label: "Salary", value:  "Salary"},
+    { id: 32, label: "Other", value: "Other" },
   ];
+
+
+  let sortedOptions = options.sort(function (a, b) {
+    if (a.label < b.label) {
+      return -1;
+    }
+    if (a.label > b.label) {
+      return 1;
+    }
+    return 0;
+  });
 
   const directorRef = useRef()
   const shopRef = useRef()
@@ -394,7 +410,7 @@ const EditExpense = () => {
                       <Select style={{ width: '100%' }}
                           id="expenseFor"
                           className="select"
-                          options={options}
+                          options={sortedOptions}
                           value={formData.expenseFor}
                           onChange={(e) => setFormData({ ...formData, expenseFor: e })}
 
@@ -610,7 +626,7 @@ const EditExpense = () => {
                       <Select style={{ width: '100%' }}
                           id="expenseFor"
                           className="select"
-                          options={options}
+                          options={sortedOptions}
                           value={editFormData.expenseFor}
                           onChange={(e) => setEditFormData({ ...editFormData, expenseFor: e })}
 
