@@ -682,6 +682,7 @@ const Cashier = () => {
                                 <div className="input-groupicon">
                                   <input
                                     type="number"
+                                    min={0}
                                     className="form-control"
                                     placeholder=""
                                     value={paymentInfo.cashAmount}
@@ -805,6 +806,7 @@ const Cashier = () => {
                                 <div className="input-groupicon">
                                   <input
                                     type="number"
+                                    min={0}
                                     placeholder=""
                                     className="form-control"
                                     value={paymentInfo.chequeAmount}
@@ -865,6 +867,7 @@ const Cashier = () => {
                                 <div className="input-groupicon">
                                   <input
                                     type="number"
+                                    min={0}
                                     className="form-control"
                                     placeholder=""
                                     value={paymentInfo.momoAmount}
@@ -1013,6 +1016,7 @@ const Cashier = () => {
                                 <div className="input-groupicon">
                                   <input
                                     type="number"
+                                    min={0}
                                     className="form-control"
                                     placeholder=""
                                     value={paymentInfo.cashAmount}

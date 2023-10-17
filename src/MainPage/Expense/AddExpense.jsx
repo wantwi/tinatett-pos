@@ -397,6 +397,7 @@ const AddExpense = () => {
                         <label>Amount</label>
                         <div className="input-groupicon">
                           <input type="number"
+                          min={0}
                             className="form-control"
                             id="amount"
                             value={formData?.amount}
@@ -491,7 +492,7 @@ const AddExpense = () => {
                 </div>
 
                 <div className="col-lg-12" style={{ textAlign: 'right' }}>
-                  <button type="submit" className="btn btn-submit me-2" onClick={handleSubmit}><FeatherIcon icon="save" />
+                  <button type="submit" className="btn btn-submit me-2" data-bs-toggle="modal" data-bs-target="#confirm"><FeatherIcon icon="save" />
                     {" Save Expenses"}
                   </button>
 
@@ -650,6 +651,46 @@ const AddExpense = () => {
           </div>
         </div>
       </div>
+
+     {/*  Confirm Modal */}
+
+    <div
+        className="modal fade"
+        id="confirm"
+        tabIndex={-1}
+        aria-labelledby="confirm"
+        aria-hidden="true">
+
+          <div className="modal-dialog modal-md modal-dialog-centered" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                    <h5 className="modal-title">Confirm</h5>
+                    <button
+                    type="button"
+                    className="close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                    >
+                    <span aria-hidden="true">×</span>
+                </button>
+              </div>
+              <div className="modal-body">
+                Are you sure you want to save this Expense Transaction?
+              </div>
+              <div className="modal-footer">
+                  <Link to="#" className="btn btn-submit me-2" data-bs-dismiss="modal" onClick={handleSubmit}>
+                    Yes
+                  </Link>
+                  <Link to="#" className="btn btn-cancel" data-bs-dismiss="modal">
+                    No
+                </Link>
+              </div>
+            </div>
+          </div>
+
+    </div>
+
+      
     </>
   );
 };

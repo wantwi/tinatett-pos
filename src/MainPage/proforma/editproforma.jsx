@@ -428,7 +428,8 @@ const EditProforma = () => {
                       <label>Amount</label>
                       <div className="input-groupicon">
                         <input
-                          type="text"
+                          type="number"
+                          min={0}
                           className="form-control"
                           disabled
                           value={formData.amount}

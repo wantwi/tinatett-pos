@@ -1599,8 +1599,8 @@ body[data-theme=dark] .table tbody tr td a {
 }
 
 .alertify-notifier .ajs-message {
-  background-color: #FFCC00;
-  border-color: #FFCC00;
+  background-color: #FF9F43;
+  border-color: #FF9F43;
   color: #fff;
   text-shadow: none !important;
 }
@@ -1613,8 +1613,8 @@ body[data-theme=dark] .table tbody tr td a {
   border-color: #f62d51;
 }
 .alertify-notifier .ajs-message.ajs-warning {
-  background-color: #FFCC00;
-  border-color: #FFCC00;
+  background-color: #FF9F43;
+  border-color: #FF9F43;
 }
 .alertify-notifier.ajs-right {
   right: 10px;

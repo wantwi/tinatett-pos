@@ -737,7 +737,7 @@ const AddPurchase = () => {
                     <div className="col-lg-6 col-sm-6 col-12">
                       <div className="form-group">
                         <label>Unit Price</label>
-                        <input type="text" id="unitPrice" className={`form-control `}
+                        <input type="number" min={0} id="unitPrice" className={`form-control `}
                           //step={0.01}
                           value={productFormData?.unitPrice}
                           onChange={(e) => {
@@ -880,7 +880,7 @@ const AddPurchase = () => {
                     <div className="col-lg-6 col-sm-12 col-12">
                       <div className="form-group">
                         <label>Quantity</label>
-                        <input type="number" className="form-control" value={editFormData?.quantity}
+                        <input type="number" min={0} className="form-control" value={editFormData?.quantity}
                           onChange={(e) => {
                             if (e.target.value == '') {
                               setEditFormData({ ...editFormData, quantity: '' })
@@ -903,7 +903,7 @@ const AddPurchase = () => {
                     <div className="col-lg-6 col-sm-12 col-12">
                       <div className="form-group">
                         <label>Unit Price</label>
-                        <input type="text" value={editFormData?.unitPrice}
+                        <input type="number" min={0} value={editFormData?.unitPrice}
                           
                           onChange={(e) => {
                             let unitP = Number(e.target.value) || 0

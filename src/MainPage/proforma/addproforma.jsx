@@ -44,6 +44,7 @@ const AddProforma = () => {
   // const { isLoading, isError: isPostError, error, mutate } = usePost("/proforma");
 
   const [selectedProduct, setSelectedProduct] = useState('')
+  // const [selectedProductEdit, setSelectedProductEdit] = useState('')
   const [selectedCustomer, setSelectedCustomer] = useState('')
   const [selectedCustomerPrint, setSelectedCustomerPrint] = useState('')
   const [formData, setFormData] = useState({ amount: '', quantity: '', price: '' })
@@ -54,8 +55,12 @@ const AddProforma = () => {
   const retailpriceTypeRef = useRef()
   const specialpriceTypeRef = useRef()
   const wholesalepriceTypeRef = useRef()
+  const editretailpriceTypeRef = useRef()
+  const editspecialpriceTypeRef = useRef()
+  const editwholesalepriceTypeRef = useRef()
   const [isSaving, setIsSaving] = useState(false)
   const [proformaFile, setProformaFile] = useState(null)
+  const [priceType, setPriceType] = useState('')
  
   const { notifications, setNotifications } = useContext(NotificationsContext)
   let storage = JSON.parse(localStorage.getItem("auth"))
@@ -160,6 +165,7 @@ const AddProforma = () => {
       })
       setProductOptions(mappedData2)
       retailpriceTypeRef.current.checked = true
+      editretailpriceTypeRef.current.checked = true
    
     }
    
@@ -170,6 +176,7 @@ const AddProforma = () => {
     if (products && !isProductLoading) {
       // let item = products?.data.find((product) => product.id == e.target.value)
       setSelectedProduct(e)
+      setSelectedProductEdit(e)
     }
     $('#selectedProduct').css('border', 'none')
   }
@@ -198,10 +205,14 @@ const AddProforma = () => {
   const handleUpdate = ()=> {
     let updated = editFormData
     let listCopy = [...productGridData]
-    let index = productGridData.findIndex(item => item.productId == updated.productId)
+    let index = productGridData.findIndex(item => item.id == updated.id)
     listCopy[index] = updated
     setProductGridData(listCopy)
     $('.modal').modal('hide')
+
+    editretailpriceTypeRef.current.checked = false
+    editwholesalepriceTypeRef.current.checked = false
+    editspecialpriceTypeRef.current.checked = false
   }
 
 
@@ -209,12 +220,16 @@ const AddProforma = () => {
     
     let item =
     {
-      id: productGridData.length + 1,
+      id: Math.ceil(Math.random() * 1000000),
       productId: selectedProduct.id,
       productName: selectedProduct.label,
       quantity: formData.quantity,
       unitPrice: formData?.price,
-      amount: formData?.price * formData?.quantity
+      amount: formData?.price * formData?.quantity,
+      retailPrice: selectedProduct.retailPrice,
+      specialPrice: selectedProduct.specialPrice,
+      wholeSalePrice: selectedProduct.wholeSalePrice
+
 
     }
     //console.log(item)
@@ -288,24 +303,37 @@ const AddProforma = () => {
   useEffect(() => {
     if(selectedCustomer && selectedCustomer?.label.includes('Retail')){
       retailpriceTypeRef.current.checked = true
+      editretailpriceTypeRef.current.checked = true
+
       wholesalepriceTypeRef.current.disabled = true
+      editwholesalepriceTypeRef.current.disabled = true
+
       retailpriceTypeRef.current.disabled = false
+      editretailpriceTypeRef.current.disabled = false
     }
     else if(selectedCustomer && selectedCustomer?.label.includes('Whole')){
       wholesalepriceTypeRef.current.checked = true
+      editwholesalepriceTypeRef.current.checked = true
+
       retailpriceTypeRef.current.disabled = true
+      editretailpriceTypeRef.current.disabled = true
+
       wholesalepriceTypeRef.current.disabled = false
+      editwholesalepriceTypeRef.current.disabled = false
      }
 
     else if((selectedCustomer && !selectedCustomer?.label.includes('Whole')) && (!selectedCustomer?.label.includes('Retail'))){
-      console.log('Not a wholesale nor Retail')
+    
         wholesalepriceTypeRef.current.disabled = false
+        editwholesalepriceTypeRef.current.disabled = false
+
         retailpriceTypeRef.current.disabled = false
+        editretailpriceTypeRef.current.disabled = false
   
         //setDisableUnselectedPrice({ wholesale: false, retail: false, special: false })
     }
 
-    console.log(selectedCustomer)
+
     $('#selectedCustomer').css('border', '1px solid rgba(145, 158, 171, 0.32)')
   }, [selectedCustomer])
 
@@ -405,6 +433,7 @@ const AddProforma = () => {
      }).finally(() => {
       setIsSaving(false)
       retailpriceTypeRef.current.checked =  true
+      editretailpriceTypeRef.current.checked =  true
       setSelectedCustomer(customerOptions[0])
     })
 
@@ -444,6 +473,19 @@ const AddProforma = () => {
     location.reload()
   }
 
+  useEffect(() => {
+    //priceType == 'Retail' ? editretailpriceTypeRef?.current.checked = true : priceType == "Wholesale" ? editwholesalepriceTypeRef?.current.checked = true: editspecialpriceTypeRef?.current.checked = true
+    if(priceType == 'Retail' &&  editretailpriceTypeRef != undefined){
+      editretailpriceTypeRef.current.checked = true
+    }
+    else if(priceType == 'Wholesale' &&  editwholesalepriceTypeRef != undefined){
+      editwholesalepriceTypeRef.current.checked = true
+    }
+    else if(priceType == 'Special' &&  editspecialpriceTypeRef != undefined){
+      editspecialpriceTypeRef.current.checked = true
+    }
+
+  }, [priceType])
 
   useEffect(() => {
     setFormData({ ...formData, amount: Number(formData.price) * Number(formData.quantity) || '' })
@@ -544,6 +586,7 @@ const AddProforma = () => {
                           <div class="input-group-text">
                             <input className="form-check-input" id="retailPriceType" type="radio" name="customerType" value={selectedProduct?.retailPrice} ref={retailpriceTypeRef}
                               onClick={(e) => {
+                                setPriceType('Retail')
                                 if (selectedProduct == '') {
                                   alertify.set("notifier", "position", "bottom-right");
                                   alertify.warning("Please select a product first.");
@@ -572,6 +615,7 @@ const AddProforma = () => {
                           <div class="input-group-text">
                             <input className="form-check-input" id="wholeSaleType" type="radio" name="customerType" value={selectedProduct?.wholeSalePrice} ref={wholesalepriceTypeRef}
                               onClick={(e) => {
+                                setPriceType('Wholesale')
                                 if (selectedProduct == '') {
                                   alertify.set("notifier", "position", "bottom-right");
                                   alertify.warning("Please select a product first.");
@@ -602,6 +646,7 @@ const AddProforma = () => {
                           <div class="input-group-text">
                             <input className="form-check-input" id="specialPriceType" type="radio" name="customerType" value={selectedProduct?.specialPrice} ref={specialpriceTypeRef}
                               onClick={(e) => {
+                                setPriceType('Special')
                                 if (selectedProduct == '') {
                                   alertify.set("notifier", "position", "bottom-right");
                                   alertify.warning("Please select a product first.");
@@ -659,6 +704,7 @@ const AddProforma = () => {
                       <label>Amount</label>
                       <div className="input-groupicon">
                         <input
+                          min={0}
                           type="number"
                           className="form-control"
                           disabled
@@ -721,7 +767,10 @@ const AddProforma = () => {
 
                             <td>
                             <Link to="#" className="me-2">
-                                <img src={EditIcon} alt="svg" data-bs-toggle="modal" data-bs-target="#editproduct" onClick={() => setEditFormData(item)}/>
+                                <img src={EditIcon} alt="svg" data-bs-toggle="modal" data-bs-target="#editproduct" onClick={() => {
+                                  // console.log(item, 'ITEM')
+                                  setEditFormData(item)}
+                                  }/>
                               </Link>
                               <Link to="#" className="delete-set" onClick={() => deleteRow(item)}>
                                 <img src={DeleteIcon} alt="svg" />
@@ -915,7 +964,7 @@ const AddProforma = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="col-lg-6 col-sm-12 col-12">
+                    <div className="col-lg-12 col-sm-12 col-12">
                       <div className="form-group">
                         <label>Quantity</label>
                         <input type="text" value={editFormData?.quantity}
@@ -933,7 +982,7 @@ const AddProforma = () => {
                       </div>
                     </div>
                  
-                    <div className="col-lg-6 col-sm-12 col-12">
+                    {/* <div className="col-lg-6 col-sm-12 col-12">
                       <div className="form-group">
                         <label>Unit Price</label>
                         <input type="text" value={editFormData?.unitPrice} 
@@ -945,7 +994,67 @@ const AddProforma = () => {
                         }}
                         />
                       </div>
+                    </div> */}
+
+                  <div className="col-lg-12 col-sm-12 col-12" id="editpriceType">
+                    <div className="form-group">
+                      <label>Unit Price </label>
+                      <div className="row" >
+
+                      <div class="col-lg-6">
+
+                        <div class="input-group">
+                          <div class="input-group-text">
+                            <input className="form-check-input" id="editretailPriceType" name="priceTypeEdit" type="radio" value={editFormData?.retailPrice} ref={editretailpriceTypeRef}
+                              onClick={(e) => {
+                                console.log(e.target.value)
+                                let unitP = parseInt(e.target.value) || 0
+                                let qty = parseInt(editFormData.quantity) || 0
+                                setEditFormData({ ...editFormData, unitPrice: e.target.value, amount: unitP * qty || unitP * 1 })
+                              }} />
+                          </div>
+                          <input type="text" className="form-control" aria-label="Text input with radio button" value={'Retail Price'} />
+                        </div>
+
+                      </div>
+
+                      <div class="col-lg-6">
+                        <div class="input-group">
+                          <div class="input-group-text">
+                            <input className="form-check-input" id="editwholeSaleType" name="priceTypeEdit" type="radio"  value={editFormData?.wholeSalePrice} ref={editwholesalepriceTypeRef}
+                              onClick={(e) => {
+                                console.log(e.target.value)
+                                let unitP = parseInt(e.target.value) || 0
+                                let qty = parseInt(editFormData.quantity) || 0
+                                setEditFormData({ ...editFormData, unitPrice: e.target.value, amount: unitP * qty || unitP * 1 })
+                              }} />
+                          </div>
+                          <input type="text" className="form-control" aria-label="Text input with radio button" value={'Wholesale Price'} />
+                        </div>
+                      </div>
                     </div>
+
+                    <div className="row" style={{ marginTop: 20 }}>
+                      <div class="col-lg-6">
+
+                        <div class="input-group">
+                          <div class="input-group-text">
+                            <input className="form-check-input" id="editspecialPriceType" name="priceTypeEdit" type="radio"  value={editFormData?.specialPrice} ref={editspecialpriceTypeRef}
+                              onClick={(e) => {
+                                console.log(e.target.value)
+                                let unitP = parseInt(e.target.value) || 0
+                                let qty = parseInt(editFormData.quantity) || 0
+                                setEditFormData({ ...editFormData, unitPrice: e.target.value, amount: unitP * qty || unitP * 1 })
+                              }} />
+                          </div>
+                          <input type="text" className="form-control" aria-label="Text input with radio button" value={'Special Price'} />
+                        </div>
+
+                      </div>
+                    </div>
+
+                  </div>
+                  </div>
                     <div className="col-lg-6 col-sm-12 col-12">
                       <div className="form-group">
                         <label>Amount</label>
@@ -955,6 +1064,8 @@ const AddProforma = () => {
                    
                    
                   </div>
+
+
                 </div>
                 <div className="modal-footer" style={{justifyContent:'flex-end'}}>
                   <button type="button" className="btn btn-submit" onClick={handleUpdate}>

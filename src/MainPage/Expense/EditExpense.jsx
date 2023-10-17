@@ -652,7 +652,8 @@ const EditExpense = () => {
                       <div className="form-group">
                         <label>Amount</label>
                         <div className="input-groupicon">
-                          <input type="text"
+                          <input type="number"
+                            min={0}
                             id="amount"
                             value={editFormData?.amount}
                             onChange={(e) => {

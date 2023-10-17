@@ -54,6 +54,7 @@ const Addsales = () => {
 
   const [activeTab, setActiveTab] = useState('Cash')
   const [disabledUnselectedPrice, setDisableUnselectedPrice] = useState({ retail: false, wholesale: false, special: false })
+  const [disabledUnselectedPriceEdit, setDisableUnselectedPriceEdit] = useState({ retail: false, wholesale: false, special: false })
   const [customerList, setCustomerList] = useState([])
   const [productsList, setProductsList] = useState([])
   const [selectedCustomer, setSelectedCustomer] = useState(null)
@@ -188,11 +189,11 @@ const Addsales = () => {
     //console.log("Salestype", salesType)
     if (salesType == 'Retail') {
       retailpriceTypeRef.current.checked = true
-      //editretailpriceTypeRef.current.checked = true
+      editretailpriceTypeRef.current.checked = true
     }
     else {
       wholesalepriceTypeRef.current.checked = true
-      //editwholesalepriceTypeRef.current.checked = true
+      editwholesalepriceTypeRef.current.checked = true
     }
   }
 
@@ -594,11 +595,11 @@ const Addsales = () => {
 
       if (salesType == 'Retail') {
         retailpriceTypeRef.current.checked = true
-        //editretailpriceTypeRef.current.checked = true
+        editretailpriceTypeRef.current.checked = true
       }
       else {
         wholesalepriceTypeRef.current.checked = true
-        //editwholesalepriceTypeRef.current.checked = true
+        editwholesalepriceTypeRef.current.checked = true
       }
 
       // specialpriceTypeRef.current.checked = false
@@ -662,29 +663,30 @@ const Addsales = () => {
     if (selectedCustomer && selectedCustomer?.label.includes('Retail')) {
    
       retailpriceTypeRef.current.checked = true
-      //editretailpriceTypeRef.current.checked = true
+      editretailpriceTypeRef.current.checked = true
 
       wholesalepriceTypeRef.current.disabled = true
-      // editwholesalepriceTypeRef.current.disabled = true 
+      editwholesalepriceTypeRef.current.disabled = true 
 
       retailpriceTypeRef.current.disabled = false
-      // editretailpriceTypeRef.current.disabled = false
+      editretailpriceTypeRef.current.disabled = false
       
       if (selectedProduct != null || selectedProduct != '' || selectedProduct != {}) {
         setSalesType('Retail')
       }
 
       setDisableUnselectedPrice({ wholesale: true, retail: false, special: true })
+      setDisableUnselectedPriceEdit({ wholesale: true, retail: false, special: true })
     }
     else if (selectedCustomer && selectedCustomer?.label.includes('Whole')) {
       wholesalepriceTypeRef.current.checked = true
-      //editwholesalepriceTypeRef.current.checked = true
+      editwholesalepriceTypeRef.current.checked = true
 
       retailpriceTypeRef.current.disabled = true
-      //editretailpriceTypeRef.current.disabled = true
+      editretailpriceTypeRef.current.disabled = true
 
       wholesalepriceTypeRef.current.disabled = false
-      //editwholesalepriceTypeRef.current.disabled = false
+      editwholesalepriceTypeRef.current.disabled = false
       if (selectedProduct != null || selectedProduct != '' || selectedProduct != {}) {
         setSalesType('Wholesale')
       }
@@ -692,6 +694,7 @@ const Addsales = () => {
 
 
       setDisableUnselectedPrice({ wholesale: false, retail: true, special: true })
+      setDisableUnselectedPriceEdit({ wholesale: true, retail: false, special: true })
     }
     else if (selectedCustomer == null || selectedCustomer == undefined) {
       setPrice(0)
@@ -699,14 +702,15 @@ const Addsales = () => {
     }
 
     else if (selectedCustomer && (!selectedCustomer?.label.includes('Whole')) && (!selectedCustomer?.label.includes('Retail'))) {
-      console.log('Not a wholesale nor Retail')
+
       wholesalepriceTypeRef.current.disabled = false
-      //editwholesalepriceTypeRef.current.disabled = false
+      editwholesalepriceTypeRef.current.disabled = false
 
       retailpriceTypeRef.current.disabled = false
-      //editretailpriceTypeRef.current.disabled = false
+      editretailpriceTypeRef.current.disabled = false
 
       setDisableUnselectedPrice({ wholesale: false, retail: false, special: false })
+      setDisableUnselectedPriceEdit({ wholesale: true, retail: false, special: true })
     }
 
 
@@ -717,6 +721,7 @@ const Addsales = () => {
   useEffect(() => {
     salesType == 'Retail' ? setPrice(selectedProduct.retailPrice) : salesType == "Wholesale" ? setPrice(selectedProduct.wholeSalePrice) : setPrice(selectedProduct.specialPrice)
     salesType == 'Retail' ? setEditPrice(selectedProduct.retailPrice) : salesType == "Wholesale" ? setEditPrice(selectedProduct.wholeSalePrice) : setEditPrice(selectedProduct.specialPrice)
+
   }, [salesType])
 
 
@@ -751,7 +756,7 @@ const Addsales = () => {
       setProductsList(mappedData2)
       //retailRef.current.checked = true
       retailpriceTypeRef.current.checked = true
-      //editretailpriceTypeRef.current.checked = true
+      editretailpriceTypeRef.current.checked = true
 
     }
   }, [productsIsLoading, customersIsLoading])
@@ -1035,6 +1040,7 @@ const Addsales = () => {
                           id="quantity"
                           className="form-control"
                           type="number"
+                          min={1}
                           value={formData?.quantity}
                           onChange={(e) => {
                             if (e.target.value == '') {
@@ -1393,7 +1399,7 @@ const Addsales = () => {
                                     <td>
                                       <Link to="#" className="delete-set me-2" data-bs-toggle="modal" data-bs-target="#editproduct" onClick={() => {
                                         setEditFormData(item)
-                                  
+                                       
                                         }}>
                                         <img src={EditIcon} alt="svg" />
                                       </Link>
@@ -1555,11 +1561,11 @@ const Addsales = () => {
 
                         <div className="input-group">
                           <div className="input-group-text">
-                            <input className="form-check-input" type="radio" ref={editretailpriceTypeRef} name="priceType" value={selectedProductEdit?.retailPrice}
+                            <input className="form-check-input" type="radio" ref={editretailpriceTypeRef} name="priceTypeEdit" value={selectedProductEdit?.retailPrice} 
                               onClick={(e) => {
                                 //setPrice(e.target.value)
                                 setEditPrice(e.target.value)
-                                //setDisableUnselectedPrice({ retail: false, wholesale: true, special: true })
+                                setDisableUnselectedPriceEdit({ wholesale: true, retail: false, special: true })
                                 let unitP = parseInt(e.target.value) || 0
                                 let qty = parseInt(editFormData.quantity) || 0
                                 setEditFormData({ ...editFormData, unitPrice: e.target.value, amount: unitP * qty || unitP * 1 })
@@ -1573,11 +1579,11 @@ const Addsales = () => {
                       <div className="col-lg-4">
                         <div className="input-group">
                           <div className="input-group-text">
-                            <input className="form-check-input" type="radio" ref={editwholesalepriceTypeRef} name="priceType" value={selectedProductEdit?.wholeSalePrice}
+                            <input className="form-check-input" type="radio" ref={editwholesalepriceTypeRef} name="priceTypeEdit" value={selectedProductEdit?.wholeSalePrice}
                               onClick={(e) => {
                                 //setPrice(e.target.value)
                                 setEditPrice(e.target.value)
-                                //setDisableUnselectedPrice({ wholesale: false, retail: true, special: true })
+                                setDisableUnselectedPriceEdit({ wholesale: true, retail: false, special: true })
                                 let unitP = parseInt(e.target.value) || 0
                                 let qty = parseInt(editFormData.quantity) || 0
                                 setEditFormData({ ...editFormData, unitPrice: e.target.value, amount: unitP * qty || unitP * 1 })
@@ -1592,10 +1598,10 @@ const Addsales = () => {
 
                         <div className="input-group">
                           <div className="input-group-text">
-                            <input className="form-check-input" type="radio" ref={editspecialpriceTypeRef} name="priceType" value={selectedProductEdit?.specialPrice} onClick={(e) => {
+                            <input className="form-check-input" type="radio" ref={editspecialpriceTypeRef} name="priceTypeEdit" value={selectedProductEdit?.specialPrice} onClick={(e) => {
                               //setPrice(e.target.value)
                               setEditPrice(e.target.value)
-                              //setDisableUnselectedPrice({ special: false, wholesale: true, retail: true })
+                              setDisableUnselectedPriceEdit({ wholesale: true, retail: false, special: true })
                               let unitP = parseInt(e.target.value) || 0
                               let qty = parseInt(editFormData.quantity) || 0
                               setEditFormData({ ...editFormData, unitPrice: e.target.value, amount: unitP * qty || unitP * 1 })
@@ -1630,7 +1636,7 @@ const Addsales = () => {
                 <div className="col-lg-6">
                   <div className="form-group">
                     <label>Quantity</label>
-                    <input type="number" className="form-control" value={editFormData?.quantity}
+                    <input type="number" min={0} className="form-control" value={editFormData?.quantity}
                       onChange={(e) => {
                         if (e.target.value == '') {
                           setEditFormData({ ...editFormData, quantity: '' })
@@ -1650,7 +1656,7 @@ const Addsales = () => {
               <div className="col-lg-6">
                 <div className="form-group">
                   <label>Amount</label>
-                  <input type="number" className="form-control" value={editFormData?.quantity * editPrice} />
+                  <input type="number" min={0} className="form-control" value={editFormData?.quantity * editPrice} />
                 </div>
               </div>
 
@@ -1736,6 +1742,7 @@ const Addsales = () => {
                     <div className="input-groupicon">
                       <input
                         type="number"
+                        min={0}
                         placeholder=""
                         className="form-control"
                         value={paymentInfo.cashAmount}
@@ -1861,6 +1868,7 @@ const Addsales = () => {
                     <div className="input-groupicon">
                       <input
                         type="number"
+                        min={0}
                         placeholder=""
                         className="form-control"
                         value={paymentInfo.chequeAmount}
@@ -1920,6 +1928,7 @@ const Addsales = () => {
                     <div className="input-groupicon">
                       <input
                         type="number"
+                        min={0}
                         placeholder=""
                         value={paymentInfo.momoAmount}
                         onChange={(e) => {
