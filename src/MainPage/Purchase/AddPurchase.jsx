@@ -769,9 +769,9 @@ const AddPurchase = () => {
                   <div className="row" style={{ textAlign: 'right' }}>
                     <div className="col-lg-12 col-sm-6 col-12">
                       <div className="form-group">
-                        <Link to="#" className="btn btn-submit me-2" onClick={handleAddItem} style={{ width: '100%' }}>
+                        <button className="btn btn-submit me-2" type="submit" onClick={handleAddItem} style={{ width: '100%' }}>
                           <FeatherIcon icon="shopping-cart" /> {" Add to Basket"}
-                        </Link>
+                        </button>
                         {/* <Link to="#" className="btn btn-cancel">
                               Clear
                             </Link> */}

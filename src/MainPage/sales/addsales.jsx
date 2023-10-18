@@ -1566,8 +1566,8 @@ const Addsales = () => {
                                 //setPrice(e.target.value)
                                 setEditPrice(e.target.value)
                                 setDisableUnselectedPriceEdit({ wholesale: true, retail: false, special: true })
-                                let unitP = parseInt(e.target.value) || 0
-                                let qty = parseInt(editFormData.quantity) || 0
+                                let unitP = Number(e.target.value) || 0
+                                let qty = Number(editFormData.quantity) || 0
                                 setEditFormData({ ...editFormData, unitPrice: e.target.value, amount: unitP * qty || unitP * 1 })
                               }} />
                           </div>
@@ -1584,8 +1584,8 @@ const Addsales = () => {
                                 //setPrice(e.target.value)
                                 setEditPrice(e.target.value)
                                 setDisableUnselectedPriceEdit({ wholesale: true, retail: false, special: true })
-                                let unitP = parseInt(e.target.value) || 0
-                                let qty = parseInt(editFormData.quantity) || 0
+                                let unitP = Number(e.target.value) || 0
+                                let qty = Number(editFormData.quantity) || 0
                                 setEditFormData({ ...editFormData, unitPrice: e.target.value, amount: unitP * qty || unitP * 1 })
                               }
                               } />
@@ -1602,8 +1602,8 @@ const Addsales = () => {
                               //setPrice(e.target.value)
                               setEditPrice(e.target.value)
                               setDisableUnselectedPriceEdit({ wholesale: true, retail: false, special: true })
-                              let unitP = parseInt(e.target.value) || 0
-                              let qty = parseInt(editFormData.quantity) || 0
+                              let unitP = Number(e.target.value) || 0
+                                let qty = Number(editFormData.quantity) || 0
                               setEditFormData({ ...editFormData, unitPrice: e.target.value, amount: unitP * qty || unitP * 1 })
                             }} />
                           </div>
@@ -1636,14 +1636,14 @@ const Addsales = () => {
                 <div className="col-lg-6">
                   <div className="form-group">
                     <label>Quantity</label>
-                    <input type="number" min={0} className="form-control" value={editFormData?.quantity}
+                    <input type="number" min={1} className="form-control" value={editFormData?.quantity}
                       onChange={(e) => {
                         if (e.target.value == '') {
                           setEditFormData({ ...editFormData, quantity: '' })
                         }
                         else {
-                          let qty = Number(e.target.value) || 0
-                          let unitP = Number(editFormData.unitPrice) || 0
+                          let qty = Number(e.target.value) 
+                          let unitP = Number(editFormData.unitPrice) 
                           //console.log(qty, unitP)
 
                           setEditFormData({ ...editFormData, quantity: e.target.value, amount: unitP * qty || unitP * 1 })
