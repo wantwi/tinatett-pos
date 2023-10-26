@@ -228,7 +228,7 @@ const EditExpense = () => {
   const handleUpdate = () => {
 
     let payload = {
-      amount: listData.reduce((total, item) => item.amount + total, 0),
+      amount: listData.reduce((total, item) => Number(item.amount) + total, 0),
       expenseDate: expenseDate,
       expenseList: listData.map((item) => {
         return {

@@ -212,7 +212,7 @@ const AddExpense = () => {
 
   const handleSubmit = () => {
     let payload = {
-      amount: listData.reduce((total, item) => item.amount + total, 0),
+      amount: listData.reduce((total, item) => Number(item.amount) + total, 0),
       expenseDate: expenseDate,
       expenseList: listData.map((item) => {
         return {
@@ -483,7 +483,7 @@ const AddExpense = () => {
                         <li className="total">
                           <h4>Grand Total</h4>
                           <h5>GHS {moneyInTxt(
-                            listData.reduce((total, item) => total + item.amount, 0)
+                            listData.reduce((total, item) => total + Number(item.amount), 0)
                           )}</h5>
                         </li>
                       </ul>
