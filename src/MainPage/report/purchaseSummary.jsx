@@ -23,7 +23,7 @@ import Swal from "sweetalert2";
 import { BASE_URL } from "../../api/CustomAxios";
 import useCustomApi from "../../hooks/useCustomApi";
 
-const PurchaseOrder = () => {
+const PurchaseSummary = () => {
   const [inputfilter, setInputfilter] = useState(false);
   const [data, setData] = useState([]);
   const axios = useCustomApi();
@@ -188,7 +188,7 @@ const PurchaseOrder = () => {
 
     setreportIsLoading(true)
     $('#pdfViewer').modal('show')
-      axios.get(`report/getPurchaseReport?startDate=${formData.startDate}&endDate=${formData.endDate}`)
+      axios.get(`report/getPurchaseSummaryReport?startDate=${formData.startDate}&endDate=${formData.endDate}`)
       .then((res) => {
 
         let base64 = res.data.base64String
@@ -293,8 +293,8 @@ const PurchaseOrder = () => {
         <div className="content">
           <div className="page-header">
             <div className="page-title">
-              <h4>Purchase Order Report</h4>
-              <h6>Generate your Purchase Report</h6>
+              <h4>Purchase Summary Report</h4>
+              <h6>Generate your Purchase Summary</h6>
             </div>
             <div className="page-btn">
               <Link
@@ -303,7 +303,7 @@ const PurchaseOrder = () => {
                 className="btn btn-success"
               >
                 
-                Generate Purchase Report
+                Generate Purchase Summary
               </Link>
             </div>
           </div>
@@ -451,7 +451,7 @@ const PurchaseOrder = () => {
                   </div>
               </div>
               <div className="modal-footer">
-                  <Link to="#" className="btn btn-submit me-2" style={{width:'100%'}} onClick={handleGenerateReport}>
+                  <Link to="#" className="btn btn-submit me-2"  style={{width:'100%'}} onClick={handleGenerateReport}>
                     Search
                   </Link>
                   {/* <Link to="#" className="btn btn-cancel" data-bs-dismiss="modal">
@@ -475,7 +475,7 @@ const PurchaseOrder = () => {
           <div className="modal-dialog modal-xl modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">Purchase Order Report</h5>
+                <h5 className="modal-title">Purchase Summary Report</h5>
                 <button
                   type="button"
                   className="close"
@@ -497,4 +497,4 @@ const PurchaseOrder = () => {
     </>
   );
 };
-export default PurchaseOrder;
+export default PurchaseSummary;

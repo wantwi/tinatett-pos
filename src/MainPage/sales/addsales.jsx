@@ -1043,9 +1043,9 @@ const Addsales = () => {
                           min={1}
                           value={formData?.quantity}
                           onChange={(e) => {
-                            if (e.target.value == '') {
-                              setFormData({ ...formData, quantity: '' })
-                            }
+                            // if (e.target.value == '') {
+                            //   setFormData({ ...formData, quantity: '' })
+                            // }
                             if (Number(e.target.value) > (selectedProduct?.remainingStock)) {
                               alertify.set("notifier", "position", "bottom-right");
                               alertify.message('Quantity can not be greater than quantity in stock')
@@ -1638,16 +1638,16 @@ const Addsales = () => {
                     <label>Quantity</label>
                     <input type="number" min={1} className="form-control" value={editFormData?.quantity}
                       onChange={(e) => {
-                        if (e.target.value == '') {
-                          setEditFormData({ ...editFormData, quantity: '' })
-                        }
-                        else {
+                        // if (e.target.value == '') {
+                        //   setEditFormData({ ...editFormData, quantity: '' })
+                        // }
+                        // else {
                           let qty = Number(e.target.value) 
                           let unitP = Number(editFormData.unitPrice) 
                           //console.log(qty, unitP)
 
                           setEditFormData({ ...editFormData, quantity: e.target.value, amount: unitP * qty || unitP * 1 })
-                        }
+                       // }
                       }
                       } />
                   </div>

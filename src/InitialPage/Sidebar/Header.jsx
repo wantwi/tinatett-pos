@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
+import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap'
 import {
   Logo,
   SmallLogo,
@@ -25,6 +26,7 @@ export const socket = io.connect(SOCKET_BASE_URL)
 import { NotificationsContext } from "./DefaultLayout";
 import { notification } from "antd";
 import { timeAgo } from "../../utility";
+// import { useIdleTimer } from "react-idle-timer"
 
 
 
@@ -67,6 +69,23 @@ const Header = (props) => {
   useEffect(() => {
     setInterval(() => setDateState(new Date()), 1000);
   }, []);
+
+
+  const [openModal, setOpenModal] = useState(false)
+
+  const handleIdle = () => {
+      setOpenModal(true);
+  }
+  //const {idleTimer} = useIdleTimer({ onIdle: handleIdle, idleTime: 5 })
+  const stay = () => {
+      setOpenModal(false)
+     // idleTimer.reset()
+  }
+  const handleLogout = () => {
+      //logout()
+      console.log('...loggin out')
+      setOpenModal(false)
+  }
 
   return (
     <>
@@ -307,6 +326,22 @@ const Header = (props) => {
         </div>
         {/* /Mobile Menu */}
       </div>
+
+      <Modal isOpen={openModal} onHide={stay}>
+      <ModalHeader>You Have Been Idle!</ModalHeader>
+      <ModalBody>
+        Your session has been timed Out. Do you want to stay? You have <span style={{fontSize:30, fontWeight:600}}>{60}</span> seconds left...
+      </ModalBody>
+      <ModalFooter>
+        <Button variant='danger' onClick={handleLogout}>
+          {' '}
+          Logout
+        </Button>{' '}
+        <Button variant='primary' onClick={stay}>
+          Continue Session
+        </Button>
+      </ModalFooter>
+    </Modal>
     </>
   );
 };

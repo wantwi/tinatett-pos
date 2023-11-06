@@ -1,4 +1,4 @@
-import React, { Component, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 
 import SignIn from './SignIn'
@@ -15,7 +15,10 @@ import Error500 from '../MainPage/ErrorPage/Error500';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ErrorBoundary from '../ErrorBoundary';
 
+
 export default function App(props) {
+
+
 
     const client = new QueryClient({
         defaultOptions: {
@@ -39,6 +42,7 @@ export default function App(props) {
 
         return (
             <Switch>
+               
                 <ErrorBoundary>
                     <QueryClientProvider client={client}>
                         <Route path="/signIn" component={SignIn} />

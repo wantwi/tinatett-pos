@@ -4,9 +4,10 @@ import Purchaseorder from './purchaseorder'
 import Inventry from './inventry'
 import Sales from './sales'
 import Invoices from './invoices'
-import Purchase from './purchase'
+import Purchase from './purchaseSummary'
 import Supplier from './supplier'
 import Customer from './customer'
+import PurchaseSummary from './purchaseSummary';
 
 
 
@@ -19,7 +20,7 @@ const AppIndex = ({ match}) =>(
         <Route path={`${match.url}/inventoryreport`} component={Inventry} />                                                                                             
         <Route path={`${match.url}/salesreport`} component={Sales} />                                                                                             
         <Route path={`${match.url}/invoicereport`} component={Invoices} />                                                                                             
-        <Route path={`${match.url}/purchasereport`} component={Purchase} />                                                                                             
+        <Route path={`${match.url}/purchase-summary-report`} component={PurchaseSummary} />                                                                                             
         <Route path={`${match.url}/supplierreport`} component={Supplier} />                                                                                             
         <Route path={`${match.url}/customerreport`} component={Customer} />                                                                                             
         

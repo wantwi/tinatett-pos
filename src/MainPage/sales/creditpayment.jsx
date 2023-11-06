@@ -65,7 +65,7 @@ const CreditPayment = () => {
       return {
         id: sale?.id,
         Date: sale?.transDate,
-        Name: sale?.customer_name || 'N/A',
+        Name: sale?.CustomerName || 'N/A',
         Status: sale?.status,
         Reference: sale?.salesRef,
         Payment: sale?.paymentType,
@@ -90,7 +90,7 @@ const CreditPayment = () => {
     isLoading,
     refetch,
 
-  } = useGet("suspend", "/sales/suspend", onSuccess);
+  } = useGet("suspend", "/sales/credit", onSuccess);
   const [data, setData] = useState([])
 
 
@@ -319,7 +319,7 @@ const CreditPayment = () => {
         return {
           id: sale?.id,
           Date: sale?.transDate,
-          Name: sale?.customer_name || 'N/A',
+          Name: sale?.CustomerName || 'N/A',
           Status: sale?.status,
           Reference: sale?.salesRef,
           Payment: sale?.paymentType,
@@ -346,7 +346,7 @@ const CreditPayment = () => {
         return {
           id: sale?.id,
           Date: sale?.transDate,
-          Name: sale?.customer_name || 'N/A',
+          Name: sale?.CustomerName || 'N/A',
           Status: sale?.status,
           Reference: sale?.salesRef,
           Payment: sale?.paymentType,
@@ -378,7 +378,7 @@ const CreditPayment = () => {
         return {
           id: sale?.id,
           Date: sale?.transDate,
-          Name: sale?.customer_name || 'N/A',
+          Name: sale?.CustomerName || 'N/A',
           Status: sale?.status,
           Reference: sale?.salesRef,
           Payment: sale?.paymentType,
@@ -429,7 +429,7 @@ const CreditPayment = () => {
     {
       title: "Customer name",
       dataIndex: "Name",
-      sorter: (a, b) => a.Name.length - b.Name.length,
+      
     },
 
     {
@@ -903,9 +903,9 @@ const CreditPayment = () => {
                     {/* {!isCredit && (<button className="btn btn-warning me-2" onClick={() => processPayment("Paid", false)} style={{ width: '20%' }}>
                       Sell Only
                     </button>)} */}
-                    <button className="btn btn-danger me-2" style={{ width: '20%' }} data-bs-toggle="modal" data-bs-target="#confirmPaymentCreditPrint" >
+                    {/* <button className="btn btn-danger me-2" style={{ width: '20%' }} data-bs-toggle="modal" data-bs-target="#confirmPaymentCreditPrint" >
                       Credit and Print
-                    </button>
+                    </button> */}
                     {/* <button className="btn btn-cancel" style={{ width: '20%' }} onClick={() => processPayment("Credit", false)}>
                       Credit Only
                     </button> */}

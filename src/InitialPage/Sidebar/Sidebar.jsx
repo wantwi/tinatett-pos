@@ -831,6 +831,16 @@ const Sidebar = (props) => {
                 </Link>
                 {isSideMenu == "Report" ? (
                   <ul>
+                     {/* <li>
+                      <Link
+                        to="/tinatett-pos/report/inventoryreport"
+                        className={
+                          pathname.includes("inventoryreport") ? "active" : ""
+                        }
+                      >
+                        Product Report
+                      </Link>
+                    </li> */}
                     <li>
                       <Link
                         to="/tinatett-pos/report/purchaseorderreport"
@@ -845,15 +855,16 @@ const Sidebar = (props) => {
                     </li>
                     <li>
                       <Link
-                        to="/tinatett-pos/report/inventoryreport"
+                        to="/tinatett-pos/report/purchase-summary-report"
                         className={
-                          pathname.includes("inventoryreport") ? "active" : ""
+                          pathname.includes("summary") ? "active" : ""
                         }
                       >
-                        Inventory Report
+                        Purchase Summary Report
                       </Link>
                     </li>
-                    <li>
+                   
+                    {/* <li>
                       <Link
                         to="/tinatett-pos/report/salesreport"
                         className={
@@ -862,8 +873,9 @@ const Sidebar = (props) => {
                       >
                         Sales Report
                       </Link>
-                    </li>
-                    <li>
+                    </li> */}
+                   
+                    {/* <li>
                       <Link
                         to="/tinatett-pos/report/invoicereport"
                         className={
@@ -872,18 +884,9 @@ const Sidebar = (props) => {
                       >
                         Invoice Report
                       </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="/tinatett-pos/report/purchasereport"
-                        className={
-                          pathname.includes("purchasereport") ? "active" : ""
-                        }
-                      >
-                        Purchase Report
-                      </Link>
-                    </li>
-                    <li>
+                    </li> */}
+                   
+                    {/* <li>
                       <Link
                         to="/tinatett-pos/report/supplierreport"
                         className={
@@ -902,7 +905,7 @@ const Sidebar = (props) => {
                       >
                         Customer Report
                       </Link>
-                    </li>
+                    </li> */}
                   </ul>
                 ) : (
                   ""
