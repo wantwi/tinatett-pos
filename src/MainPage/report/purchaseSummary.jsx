@@ -42,10 +42,10 @@ const PurchaseSummary = () => {
         supplierName: purchase?.supplierName,
         supplierId: purchase?.supplierId,
         status: purchase?.status,
-        reference: purchase.purchaseRef,
-        numberOfProduct: purchase.numberOfProduct,
+        reference: purchase?.purchaseRef,
+        numberOfProduct: purchase?.numberOfProduct,
         branch: loggedInUser?.branchName || '',
-        date: new Date(purchase.purchaseDate).toISOString().substring(0,10),
+        date: new Date(purchase?.purchaseDate).toISOString().substring(0,10),
         createdBy: "Admin",
 
         
@@ -214,29 +214,6 @@ const PurchaseSummary = () => {
   }
 
 
-  const options = [
-    { id: 1, text: "Choose Product", text: "Choose Product" },
-    { id: 2, text: "Macbook pro", text: "Macbook pro" },
-    { id: 3, text: "Orange", text: "Orange" },
-  ];
-  const options2 = [
-    { id: 1, text: "Choose Category", text: "Choose Category" },
-    { id: 2, text: "Computers", text: "Computers" },
-    { id: 3, text: "Fruits", text: "Fruits" },
-  ];
-  const options3 = [
-    { id: 1, text: "Choose Sub Category", text: "Choose Sub Category" },
-    { id: 2, text: "Computers", text: "Computers" },
-  ];
-  const options4 = [
-    { id: 1, text: "Brand", text: "Brand" },
-    { id: 2, text: "N/D", text: "N/D" },
-  ];
-  const options5 = [
-    { id: 1, text: "Price", text: "Price" },
-    { id: 2, text: "150.00", text: "150.00" },
-  ];
-
   const togglefilter = (value) => {
     setInputfilter(false);
   };
@@ -247,34 +224,34 @@ const PurchaseSummary = () => {
     {
       title: "Purchase Date",
       dataIndex: "date",
-      sorter: (a, b) => a.date.length - b.date.length,
+      // sorter: (a, b) => a.date.length - b.date.length,
     },
     {
       title: "Supplier Name",
       dataIndex: "supplierName",
-      sorter: (a, b) => a.supplierName.length - b.supplierName.length,
+      // sorter: (a, b) => a.supplierName.length - b.supplierName.length,
     },
     {
       title: "Reference",
       dataIndex: "reference",
-      sorter: (a, b) => a.reference.length - b.reference.length,
+      // sorter: (a, b) => a.reference.length - b.reference.length,
     },
     
     {
       title: "# of Products",
       dataIndex: "numberOfProduct",
-      sorter: (a, b) => a.numberOfProduct.length - b.numberOfProduct.length,
+      // sorter: (a, b) => a.numberOfProduct.length - b.numberOfProduct.length,
     },
     {
       title: "Branch",
       dataIndex: "branch",
-      sorter: (a, b) => a.branch.length - b.branch.length,
+      // sorter: (a, b) => a.branch.length - b.branch.length,
     },
     {
       title: "Status",
       dataIndex: "status",
-      render: (text, record) => (record.status == 1 ? <span className="badges bg-lightgreen">Active</span> : <span className="badges bg-lightred">Inctive</span> ),
-      sorter: (a, b) => a.status.length - b.status.length,
+      render: (text, record) => (record?.status == 1 ? <span className="badges bg-lightgreen">Active</span> : <span className="badges bg-lightred">Inactive</span> ),
+      // sorter: (a, b) => a.status.length - b.status.length,
     },
     
  
@@ -427,7 +404,7 @@ const PurchaseSummary = () => {
                         <Select
                           isLoading={isLoading}
                           options={selectedProductInfo?.batchNumber?.map((item) => {
-                            return { value: item.batchNumber, label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')' : item?.batchNumber + '-(' + item?.availablequantity + ')', expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
+                            return { value: item.batchNumber, label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')' : item?.batchNumber + '-(' + item?.availablequantity + ')' }
                           })}
                           placeholder=""
                           value={formData.batchNumber}

@@ -130,6 +130,7 @@ const ImportProduct = () => {
       let col3 = keys.filter((item) => item.Column === 'C')
       let col4 = keys.filter((item) => item.Column === 'D')
       let col5 = keys.filter((item) => item.Column === 'E')
+      let col6 = keys.filter((item) => item.Column === 'F')
 
       // console.log(col1, col2, col3, col4, col5)
 
@@ -139,6 +140,7 @@ const ImportProduct = () => {
       let WholesalePriceArr = []
       let SpecialPriceArr = []
       let AlertArr = []
+      let IsTinatettArr = []
 
 
       col1.forEach((name) => ItemsNameArr.push(name.Value))
@@ -146,7 +148,7 @@ const ImportProduct = () => {
       col3.forEach((wholesale) => WholesalePriceArr.push(wholesale.Value))
       col4.forEach((special) => SpecialPriceArr.push(special.Value))
       col5.forEach((alert) => AlertArr.push(alert.Value))
-    
+      col6.forEach((isTinatett) => IsTinatettArr.push(isTinatett.Value))
 
       let finalData = []
       finalData.push(
@@ -155,6 +157,7 @@ const ImportProduct = () => {
         WholesalePriceArr,
         SpecialPriceArr,
         AlertArr,
+        IsTinatettArr
       )
 
     // console.log(finalData, "DATA")
@@ -175,7 +178,7 @@ const ImportProduct = () => {
       }
 
       
-      let chunkSize = 5
+      let chunkSize = 6
       let chunks = []
       for (let i = 0; i < res.length; i += chunkSize) {
         const chunk = res.slice(i, i + chunkSize)
@@ -199,7 +202,8 @@ const ImportProduct = () => {
         retailPrice: value.RETAIL_PRICE,
         wholeSalePrice: value.WHOLESALE_PRICE,
         specialPrice: value.SPECIAL_PRICE,
-        alert: value.ALERT
+        alert: value.ALERT,
+        ownershipType: value.IS_TINATETT_PRODUCT == 'Yes' ? 'Tinatett' : 'Competitor'
       }))
 
       console.log(renderData, "Results")
@@ -262,6 +266,10 @@ const ImportProduct = () => {
     {
       title: "Alert",
       dataIndex: "alert",
+    },
+    {
+      title: "Tinatett/Competitor",
+      dataIndex: "ownershipType",
     },
    
     // {

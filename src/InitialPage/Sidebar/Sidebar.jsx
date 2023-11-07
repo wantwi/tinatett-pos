@@ -831,7 +831,7 @@ const Sidebar = (props) => {
                 </Link>
                 {isSideMenu == "Report" ? (
                   <ul>
-                     {/* <li>
+                     <li>
                       <Link
                         to="/tinatett-pos/report/inventoryreport"
                         className={
@@ -840,7 +840,7 @@ const Sidebar = (props) => {
                       >
                         Product Report
                       </Link>
-                    </li> */}
+                    </li>
                     <li>
                       <Link
                         to="/tinatett-pos/report/purchaseorderreport"
@@ -857,14 +857,14 @@ const Sidebar = (props) => {
                       <Link
                         to="/tinatett-pos/report/purchase-summary-report"
                         className={
-                          pathname.includes("summary") ? "active" : ""
+                          pathname.includes("purchase-summary") ? "active" : ""
                         }
                       >
                         Purchase Summary Report
                       </Link>
                     </li>
                    
-                    {/* <li>
+                    <li>
                       <Link
                         to="/tinatett-pos/report/salesreport"
                         className={
@@ -873,7 +873,17 @@ const Sidebar = (props) => {
                       >
                         Sales Report
                       </Link>
-                    </li> */}
+                    </li>
+                    <li>
+                      <Link
+                        to="/tinatett-pos/report/sales-summary-report"
+                        className={
+                          pathname.includes("sales-summary") ? "active" : ""
+                        }
+                      >
+                        Sales Summary Report
+                      </Link>
+                    </li>
                    
                     {/* <li>
                       <Link

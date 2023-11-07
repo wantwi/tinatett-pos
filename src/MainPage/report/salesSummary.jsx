@@ -1,37 +1,36 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import Swal from "sweetalert2";
 import Table from "../../EntryFile/datatable";
 import Tabletop from "../../EntryFile/tabletop";
-import {
-  Download,
-  AvocatImage,
-  EyeIcon,
-  EditIcon,
-  DeleteIcon,
-  search_whites,
-} from "../../EntryFile/imagePath";
+import Select2 from "react-select2-wrapper";
 import Select from "react-select";
 import "react-select2-wrapper/css/select2.css";
+import { Link } from "react-router-dom";
+import {
+  ClosesIcon,
+  Excel,
+  Filter,
+  Pdf,
+  PlusIcon,
+  Printer,
+  Search,
+  search_whites,
+  EditIcon,
+  DeleteIcon,
+} from "../../EntryFile/imagePath";
 import { useGet } from "../../hooks/useGet";
-import { moneyInTxt } from "../../utility";
 import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
-import { debounce } from "lodash";
+import Swal from "sweetalert2";
+import { BASE_URL } from "../../api/CustomAxios";
 import useCustomApi from "../../hooks/useCustomApi";
+import { moneyInTxt } from "../../utility";
 
-
-const Sales = () => {
+const SalesSummary = () => {
   const [inputfilter, setInputfilter] = useState(false);
   const [data, setData] = useState([]);
+  const axios = useCustomApi();
 
-  
-  const [productsDropdown, setProductsDropdown] = useState([]);
-  const [customersDropdown, setCustomersDropdown] = useState([]);
 
-  const { data: products, isLoading: productsIsLoading } = useGet("products", "/product");
-  const { data: customers, isLoading: customersIsLoading } = useGet("customers", "/customer");
 
-  
   const {
     data: sales,
     isError,
@@ -39,29 +38,87 @@ const Sales = () => {
     isSuccess,
   } = useGet("suspend", "/sales");
 
+  const [productsDropdown, setProductsDropdown] = useState([]);
+  const [suppliersDropdown, setSuppliersDropdown] = useState([]);
+
+  const { data: products, isLoading: productsIsLoading } = useGet("products", "/product");
+  const { data: suppliers, isLoading: suppliersIsLoading } = useGet("suppliers", "/supplier");
+
+  const [loggedInUser, setLoggedInUser] = useState({})
+
   const [selectedProduct, setSelectedProduct] = useState('')
   const [selectedProductInfo, setSelectedProductInfo] = useState()
-  const [customer, setCustomer] = useState('')
+  const [supplier, setSupplier] = useState('')
   //const [isLoading, setIsLoading] = useState(false)
   const [isBatchLoading, setIsBatchLoading] = useState(false)
-  const [formData, setFormData] = useState({productId:'', quantity: '', amount: '', batchNumber: '', manuDate: '', expDate: '' })
+  const [formData, setFormData] = useState({ quantity: '', amount: '', batchNumber: '', manuDate: '', expDate: '' })
   const [reportFile, setReportFile] = useState(null)
   const [reportIsLoading, setreportIsLoading] = useState(false)
-  const [receiptFile, setReceiptFile] = useState(null)
-  const [isSaving, setIsSaving] = useState(false)
-
-  const [userType, setUserType] = useState('')
-
-
 
   useEffect(() => {
-    let userRole = localStorage.getItem('auth')
-    let obj =JSON.parse(userRole)
-    console.log("Role:", obj.role)
-    setUserType(obj.role)
+    if (!productsIsLoading && !suppliersIsLoading) {
+      let mappedProducts = products?.data.map((item) => {
+        return {
+          id: item?.id,
+          label: item?.name,
+          value: item?.id,
+          retailPrice: item?.retailPrice,
+          wholeSalePrice: item?.wholeSalePrice,
+          specialPrice: item?.wholeSalePrice,
+          ownershipType: item?.ownershipType
+        }
+
+      })
+      setProductsDropdown(mappedProducts)
+
+      let mappedSuppliers = suppliers?.data.map((item) => {
+        return {
+          id: item?.id,
+          label: item?.name,
+          value: item?.id,
+        }
+
+      })
+      setSuppliersDropdown(mappedSuppliers)
+    }
+
+  }, [suppliers, products])
+
+  useEffect(() => {
+    // console.log("Selected Prod", selectedProduct)
+
+    if(selectedProduct)
+    axios.get(`${BASE_URL}/purchase/product/${selectedProduct?.value}`).then((res) => {
+      setIsLoading(true)
+      if (res.data.success) {
+        setIsLoading(false)
+        //console.log(res.data.newProduct)
+        setSelectedProductInfo(res.data.newProduct)
+        let x = res.data.newProduct.batchNumber?.map((item) => {
+          return { value: item.batchNumber, label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')' : item?.batchNumber + '-(' + item?.availablequantity + ')' }
+        })
+        setIsBatchLoading(false)
+        setFormData({ ...formData, batchNumber: x[0]})
+        //retailpriceTypeRef.current.checked = true
+      }
+    })
+
+    return () => {
+
+    }
+
+
+  }, [selectedProduct])
+
+  useEffect(() => {
+    let userDetails = localStorage.getItem('auth')
+    let user = JSON.parse(userDetails)
+    setLoggedInUser(user)
   }, [])
 
-
+  const handleProductSelect = (e) => {
+    setSelectedProduct(e)
+  }
 
   useEffect(() => {
     if (!isLoading) {
@@ -90,47 +147,18 @@ const Sales = () => {
     }
   }, [isLoading])
 
-  const axios = useCustomApi()
-  const handleSearch = debounce((value) => {
-    axios.get(`/product?ownershipType=&name=${value}`)
-    .then((res) => {
-     let mapped = res?.data.data.map((product) => {
-      return {
-        id: product?.id,
-        image: AvocatImage,
-        name: product?.name,
-        status: product?.status,
-        alert: product?.alert,
-        retailPrice: product?.retailPrice,
-        wholeSalePrice: product?.wholeSalePrice,
-        specialPrice: product?.specialPrice,
-        remainingStock: product?.stock_count || 0,
-        ownershipType: product?.ownershipType,
-        createdBy: product?.createdBy
-      }
-    })
-    setData(mapped)
-  })
-    
-
-}, 300)
-
-
-  const togglefilter = (value) => {
-    setInputfilter(false);
-  };
 
   const handleGenerateReport = () => {
     let filters = {
       formData,
       selectedProduct,
-      customer,
+      supplier,
 
     }
 
     setreportIsLoading(true)
     $('#pdfViewer').modal('show')
-      axios.get(`report/getSalesReport?startDate=${formData.startDate}&endDate=${formData.endDate}&productId=${formData?.productId}`)
+      axios.get(`report/getSalesSummaryReport?startDate=${formData.startDate}&endDate=${formData.endDate}`)
       .then((res) => {
 
         let base64 = res.data.base64String
@@ -154,6 +182,13 @@ const Sales = () => {
       return new Blob([arr], { type: type });
     }
   }
+
+
+  const togglefilter = (value) => {
+    setInputfilter(false);
+  };
+
+
 
   const columns = [
     {
@@ -222,8 +257,10 @@ const Sales = () => {
 
 
   if(isLoading){
-    return (<LoadingSpinner message="Fetching Sales.."/>)
+    return (<LoadingSpinner/>)
   }
+
+
 
   return (
     <>
@@ -231,53 +268,34 @@ const Sales = () => {
         <div className="content">
           <div className="page-header">
             <div className="page-title">
-              <h4>Sales List</h4>
-              <h6>Generate your sales Reports</h6>
+              <h4>Sales Summary Report</h4>
+              <h6>Generate your Sales Summary</h6>
             </div>
             <div className="page-btn">
-            <Link
+              <Link
                 to="#" 
                 data-bs-toggle="modal" data-bs-target="#filters"
                 className="btn btn-success"
               >
                 
-                Generate Sales Report
+                Generate Sales Summary
               </Link>
             </div>
           </div>
           {/* /product list */}
           <div className="card">
             <div className="card-body">
-              <Tabletop inputfilter={inputfilter} togglefilter={togglefilter} title={'Products List'} data={data} handleSearch={handleSearch}/>
+              <Tabletop inputfilter={inputfilter} togglefilter={togglefilter} data={data} title={'Sales List'}/>
               {/* /Filter */}
               <div
-                className={`card mb-0 ${inputfilter ? "toggleCls" : ""}`}
+                className={`card mb-0 ${ inputfilter ? "toggleCls" : ""}`}
                 id="filter_inputs"
-                style={{ display: inputfilter ? "block" : "none" }}
+                style={{ display: inputfilter ? "block" :"none"}}
               >
                 <div className="card-body pb-0">
                   <div className="row">
                     <div className="col-lg-12 col-sm-12">
-                      <div className="row">
-                    
-                        <div className="col-lg col-sm-6 col-12 ">
-                          <div className="form-group">
-                            <input
-                              type="number"
-                              className="form-control"
-                              placeholder="Enter max price range"
-                              
-                            />
-                          </div>
-                        </div>
-                        <div className="col-lg-1 col-sm-6 col-12">
-                          <div className="form-group">
-                            <a className="btn btn-filters ms-auto">
-                              <img src={search_whites} alt="img" />
-                            </a>
-                          </div>
-                        </div>
-                      </div>
+                      
                     </div>
                   </div>
                 </div>
@@ -286,16 +304,16 @@ const Sales = () => {
               <div className="table-responsive">
                 <Table columns={columns} dataSource={data} />
               </div>
-              
             </div>
           </div>
           {/* /product list */}
         </div>
       </div>
 
-       {/* Filters Modal */}
 
-       <div
+        {/* Filters Modal */}
+
+        <div
         className="modal fade"
         id="filters"
         tabIndex={-1}
@@ -305,7 +323,7 @@ const Sales = () => {
           <div className="modal-dialog modal-md modal-dialog-centered" role="document">
             <div className="modal-content">
               <div className="modal-header">
-                    <h5 className="modal-title">Sales Search </h5>
+                    <h5 className="modal-title">Sales Search (Summary)</h5>
                     <button
                     type="button"
                     className="close"
@@ -346,15 +364,15 @@ const Sales = () => {
                   </div>
                   <div className="row">
                       <div className="form-group">
-                        <label>Customer</label>
+                        <label>Supplier</label>
                         <Select
-                             id="customer"
+                             id="supplier"
                               className="select"
-                              options={customersDropdown}
-                              value={customer}
-                              isLoading={customersIsLoading}
+                              options={suppliersDropdown}
+                              value={supplier}
+                              isLoading={suppliersIsLoading}
                               onChange={(e) => {
-                                setCustomer(e)
+                                setSupplier(e)
                               }}
                             />
                     </div>
@@ -372,7 +390,40 @@ const Sales = () => {
                         />
                     </div>
                   </div>
-               
+                  <div className="row">
+                  <div className="form-group">
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <label>Batch No.</label>
+                        {isBatchLoading && <div className="spinner-border text-primary me-1" role="status" style={{ height: 20, width: 20 }}>
+                          <span className="sr-only">Loading...</span>
+                        </div>}
+                      </div>
+                      <div className="input-groupicon">
+                        <Select
+                          isLoading={isLoading}
+                          options={selectedProductInfo?.batchNumber?.map((item) => {
+                            return { value: item.batchNumber, label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')' : item?.batchNumber + '-(' + item?.availablequantity + ')', expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
+                          })}
+                          placeholder=""
+                          value={formData.batchNumber}
+                          onChange={(e) => setFormData({ ...formData, batchNumber: (e)})}
+                        />
+                    </div>
+                    </div>
+                  </div>
+                  <div className="row">
+                      <div className="form-group">
+                        <label>User</label>
+                        <div className="input-groupicon">
+                          <input
+                            type="text" className={`form-control `}
+                            id="amount"
+                            placeholder=""
+                            //value={(Number(productFormData?.amount).toFixed(2))}
+                          />
+                      </div>
+                    </div>
+                  </div>
               </div>
               <div className="modal-footer">
                   <Link to="#" className="btn btn-submit me-2"  style={{width:'100%'}} onClick={handleGenerateReport}>
@@ -399,7 +450,7 @@ const Sales = () => {
           <div className="modal-dialog modal-xl modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">Sales Report</h5>
+                <h5 className="modal-title">Sales Summary Report</h5>
                 <button
                   type="button"
                   className="close"
@@ -421,4 +472,4 @@ const Sales = () => {
     </>
   );
 };
-export default Sales;
+export default SalesSummary;

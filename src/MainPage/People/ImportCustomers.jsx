@@ -131,6 +131,7 @@ const ImportCustomers = () => {
       let col4 = keys.filter((item) => item.Column === 'D')
       let col5 = keys.filter((item) => item.Column === 'E')
       let col6 = keys.filter((item) => item.Column === 'F')
+      let col7 = keys.filter((item) => item.Column === 'G')
 
       // console.log(col1, col2, col3, col4, col5)
 
@@ -141,6 +142,7 @@ const ImportCustomers = () => {
       let OtherContactArr = []
       let LocationArr = []
       let GPSAddressArr = []
+      let CustomerTypeArr = []
 
 
       col1.forEach((name) => NamesArr.push(name.Value))
@@ -149,6 +151,7 @@ const ImportCustomers = () => {
       col4.forEach((special) => OtherContactArr.push(special.Value))
       col5.forEach((alert) => LocationArr.push(alert.Value))
       col6.forEach((alert) => GPSAddressArr.push(alert.Value))
+      col7.forEach((alert) => CustomerTypeArr.push(alert.Value))
     
 
       let finalData = []
@@ -158,7 +161,8 @@ const ImportCustomers = () => {
         ContactArr,
         OtherContactArr,
         LocationArr,
-        GPSAddressArr
+        GPSAddressArr,
+        CustomerTypeArr
       )
 
     // console.log(finalData, "DATA")
@@ -179,7 +183,7 @@ const ImportCustomers = () => {
       }
 
       
-      let chunkSize = 6
+      let chunkSize = 7
       let chunks = []
       for (let i = 0; i < res.length; i += chunkSize) {
         const chunk = res.slice(i, i + chunkSize)
@@ -204,9 +208,8 @@ const ImportCustomers = () => {
         contact: value.Contact,
         otherContact: value.OtherContact,
         location: value.Location,
-        customerType: 0,
+        customerType: value.CustomerType == 'Individual' ? 0 : 1,
         gpsAddress: value.GhanaPostAddress
-        
         
       }))
 
@@ -252,6 +255,20 @@ const ImportCustomers = () => {
       title: "Email",
       dataIndex: "email",
       sorter: (a, b) => a.email.length - b.email.length,
+    },
+    {
+      title: "Customer Type",
+      dataIndex: "customerType",
+      render: (text, record) => (
+        <>
+          {text == "0" && (
+            <span className="badges btn-success">{"Individual"}</span>
+          )}
+          {text == "1" && (
+            <span className="badges bg-lightgreen">{"Company"}</span>
+          )}
+         
+        </>)
     },
 
   ];

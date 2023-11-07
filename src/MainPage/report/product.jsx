@@ -4,7 +4,14 @@ import Swal from "sweetalert2";
 import Table from "../../EntryFile/datatable";
 import Tabletop from "../../EntryFile/tabletop";
 import {
-  Download,
+  PlusIcon,
+  MacbookIcon,
+  IphoneIcon,
+  SamsungIcon,
+  EarpodIcon,
+  OrangeImage,
+  PineappleImage,
+  StawberryImage,
   AvocatImage,
   EyeIcon,
   EditIcon,
@@ -19,76 +26,54 @@ import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 import { debounce } from "lodash";
 import useCustomApi from "../../hooks/useCustomApi";
 
-
-const Sales = () => {
+const ProductReport = () => {
   const [inputfilter, setInputfilter] = useState(false);
   const [data, setData] = useState([]);
 
   
   const [productsDropdown, setProductsDropdown] = useState([]);
-  const [customersDropdown, setCustomersDropdown] = useState([]);
+  const [suppliersDropdown, setSuppliersDropdown] = useState([]);
 
   const { data: products, isLoading: productsIsLoading } = useGet("products", "/product");
-  const { data: customers, isLoading: customersIsLoading } = useGet("customers", "/customer");
-
-  
-  const {
-    data: sales,
-    isError,
-    isLoading,
-    isSuccess,
-  } = useGet("suspend", "/sales");
+  const { data: suppliers, isLoading: suppliersIsLoading } = useGet("suppliers", "/supplier");
 
   const [selectedProduct, setSelectedProduct] = useState('')
   const [selectedProductInfo, setSelectedProductInfo] = useState()
-  const [customer, setCustomer] = useState('')
-  //const [isLoading, setIsLoading] = useState(false)
+  const [supplier, setSupplier] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
   const [isBatchLoading, setIsBatchLoading] = useState(false)
   const [formData, setFormData] = useState({productId:'', quantity: '', amount: '', batchNumber: '', manuDate: '', expDate: '' })
   const [reportFile, setReportFile] = useState(null)
   const [reportIsLoading, setreportIsLoading] = useState(false)
-  const [receiptFile, setReceiptFile] = useState(null)
-  const [isSaving, setIsSaving] = useState(false)
 
-  const [userType, setUserType] = useState('')
 
 
 
   useEffect(() => {
-    let userRole = localStorage.getItem('auth')
-    let obj =JSON.parse(userRole)
-    console.log("Role:", obj.role)
-    setUserType(obj.role)
-  }, [])
-
-
-
-  useEffect(() => {
-    if (!isLoading) {
-
-      let mappedData = sales?.data.map((sale) => {
-        // console.log("Payment Infor:", (JSON.parse(sale?.paymentInfo)).type)
-        return {
-          id: sale?.id,
-          Date: sale?.transDate,
-          Name: sale?.customerName,
-          Status: sale?.status,
-          Reference: sale?.salesRef,
-          // Payment: JSON.parse(sale?.paymentInfo).type,
-          Total: moneyInTxt(sale?.totalAmount) || '',
-          Paid: moneyInTxt(sale?.amountPaid),
-          Balance: moneyInTxt(sale?.balance),
-          Biller: sale?.salesPerson,
-        }
-      })
-      let sortedData = mappedData.sort((a, b) => new Date(b.Date) - new Date(a.Date))
-      setData(sortedData)
-      console.log('loaded..')
+    if(!productsIsLoading){
+      
+      let mappedData =  products?.data.map((product) => {
+          return {
+            id: product?.id,
+            image: AvocatImage,
+            name: product?.name,
+            status: product?.status,
+            alert: product?.alert,
+            retailPrice: product?.retailPrice,
+            wholeSalePrice: product?.wholeSalePrice,
+            specialPrice: product?.specialPrice,
+            remainingStock: product?.stock_count || 0,
+            ownershipType: product?.ownershipType,
+            createdBy: product?.createdBy
+          }
+        })
+      setData([...mappedData])
+      //console.log('loaded..')
     }
-    else {
-      console.log('loading...')
+    else{
+     // console.log('loading...')
     }
-  }, [isLoading])
+  }, [productsIsLoading])
 
   const axios = useCustomApi()
   const handleSearch = debounce((value) => {
@@ -124,13 +109,13 @@ const Sales = () => {
     let filters = {
       formData,
       selectedProduct,
-      customer,
+      supplier,
 
     }
 
     setreportIsLoading(true)
     $('#pdfViewer').modal('show')
-      axios.get(`report/getSalesReport?startDate=${formData.startDate}&endDate=${formData.endDate}&productId=${formData?.productId}`)
+      axios.get(`report/getProductReport?productId=${formData?.productId}`)
       .then((res) => {
 
         let base64 = res.data.base64String
@@ -157,72 +142,67 @@ const Sales = () => {
 
   const columns = [
     {
-      title: "Date",
-      dataIndex: "Date",
-      sorter: (a, b) => a.Date.length - b.Date.length,
+      title: "Product Name",
+      dataIndex: "name",
+      render: (text, record) => (
+        <div className="productimgname">
+          {/* <Link className="product-img">
+            <img alt="" src={record.image} />
+          </Link> */}
+          <Link style={{ fontSize: "15px", marginLeft: "10px" }}>
+            {record.name}
+          </Link>
+        </div>
+      ),
+      sorter: (a, b) => a.name.length - b.name.length,
     },
     {
-      title: "Customer name",
-      dataIndex: "Name",
-      sorter: (a, b) => a.Name.length - b.Name.length,
-    },
-
-    {
-      title: "Reference",
-      dataIndex: "Reference",
-      sorter: (a, b) => a.Reference.length - b.Reference.length,
+      title: "Retail Price",
+      dataIndex: "retailPrice",
+      sorter: (a, b) => a.retailPrice - b.retailPrice,
+      render: (text, record) => <p>{moneyInTxt(record?.retailPrice)}</p> 
     },
     {
-      title: "Status",
-      dataIndex: "Status",
+      title: "Wholesale Price",
+      dataIndex: "wholeSalePrice",
+      sorter: (a, b) => a.wholeSalePrice - b.wholeSalePrice,
+      render: (text, record) => <p>{moneyInTxt(record?.wholeSalePrice)}</p> 
+    },
+    {
+      title: "Special Price",
+      dataIndex: "specialPrice",
+      sorter: (a, b) => a.specialPrice - b.specialPrice,
+      render: (text, record) => <p>{moneyInTxt(record?.specialPrice)}</p> 
+    },
+    {
+      title: "Quantity",
+      dataIndex: "remainingStock",
+      sorter: (a, b) => a.remainingStock - b.remainingStock,
+      render: (text, record) => <p>{(record?.remainingStock)}</p> 
+    },
+   
+    {
+      title: "Action",
       render: (text, record) => (
         <>
-          {text === "Paid" && (
-            <span className="badges btn-success">{"Paid"}</span>
-          )}
-          {text === "Suspended" && (
-            <span className="badges bg-lightgreen">{"Suspended"}</span>
-          )}
-          {text === "Credit" && (
-            <span className="badges bg-lightred">{"Credit"}</span>
-          )}
+          <>
+            {/* <Link className="me-3" to="/tinatett-pos/product/product-details">
+              <img src={EyeIcon} alt="img" />
+            </Link> */}
+            <Link className="me-3" to={{ pathname:`/tinatett-pos/product/editproduct`, state:record}} title="Edit Product">
+              <img src={EditIcon} alt="img" />
+            </Link>
+            {/* <Link className="confirm-text" to="#" onClick={confirmText} title="Delete Product">
+              <img src={DeleteIcon} alt="img" />
+            </Link> */}
+          </>
         </>
       ),
-      sorter: (a, b) => a.Status.length - b.Status.length,
-    },
-    // {
-    //   title: "Payment",
-    //   dataIndex: "Payment",
-    //   render: (text, record) => (
-    //     <>
-
-    //         <span className="badges bg-lightgreen">{(text)}</span>
-
-    //     </>
-    //   ),
-    //   sorter: (a, b) => a.Payment.length - b.Payment.length,
-    // },
-    {
-      title: "Total Amount (GHS)",
-      dataIndex: "Total",
-      sorter: (a, b) => a.Total.length - b.Total.length,
-    },
-    {
-      title: "Paid Amount (GHS)",
-      dataIndex: "Paid",
-
-    },
-    {
-      title: "Balance (GHS)",
-      dataIndex: "Balance",
-
     },
   ];
 
-
-
-  if(isLoading){
-    return (<LoadingSpinner message="Fetching Sales.."/>)
+  if(productsIsLoading){
+    return (<LoadingSpinner message="Fetching Products.."/>)
   }
 
   return (
@@ -231,8 +211,8 @@ const Sales = () => {
         <div className="content">
           <div className="page-header">
             <div className="page-title">
-              <h4>Sales List</h4>
-              <h6>Generate your sales Reports</h6>
+              <h4>Product List</h4>
+              <h6>Manage your products</h6>
             </div>
             <div className="page-btn">
             <Link
@@ -241,7 +221,7 @@ const Sales = () => {
                 className="btn btn-success"
               >
                 
-                Generate Sales Report
+                Generate Product Report
               </Link>
             </div>
           </div>
@@ -305,7 +285,7 @@ const Sales = () => {
           <div className="modal-dialog modal-md modal-dialog-centered" role="document">
             <div className="modal-content">
               <div className="modal-header">
-                    <h5 className="modal-title">Sales Search </h5>
+                    <h5 className="modal-title">Product Search </h5>
                     <button
                     type="button"
                     className="close"
@@ -346,15 +326,15 @@ const Sales = () => {
                   </div>
                   <div className="row">
                       <div className="form-group">
-                        <label>Customer</label>
+                        <label>Supplier</label>
                         <Select
-                             id="customer"
+                             id="supplier"
                               className="select"
-                              options={customersDropdown}
-                              value={customer}
-                              isLoading={customersIsLoading}
+                              options={suppliersDropdown}
+                              value={supplier}
+                              isLoading={suppliersIsLoading}
                               onChange={(e) => {
-                                setCustomer(e)
+                                setSupplier(e)
                               }}
                             />
                     </div>
@@ -399,7 +379,7 @@ const Sales = () => {
           <div className="modal-dialog modal-xl modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">Sales Report</h5>
+                <h5 className="modal-title">Product Report</h5>
                 <button
                   type="button"
                   className="close"
@@ -421,4 +401,4 @@ const Sales = () => {
     </>
   );
 };
-export default Sales;
+export default ProductReport;
