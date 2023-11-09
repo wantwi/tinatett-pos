@@ -578,16 +578,7 @@ const Sidebar = (props) => {
                           Suspended
                         </Link>
                       </li>
-                      <li>
-                        <Link
-                          className={
-                            pathname.includes("credit-payment") ? "active" : ""
-                          }
-                          to="/tinatett-pos/sales/cashier/credit-payment"
-                        >
-                          Credit Payment
-                        </Link>
-                      </li>
+                    
                       <li>
                         <Link
                           className={
@@ -632,7 +623,7 @@ const Sidebar = (props) => {
               {/* Cashier Window */}
 
 
-              {userType == 'admin' || userType == 'supervisor' || userType == 'cashier' ? (<li className={pathname.includes("/tinatett-pos/cashier/suspended") ? "active" : ""}>
+              {/* {userType == 'admin' || userType == 'supervisor' || userType == 'cashier' ? (<li className={pathname.includes("/tinatett-pos/cashier/suspended") ? "active" : ""}>
                 <Link
                   to="/tinatett-pos/cashier/suspended"
                   onClick={() => toggleSidebar(isSideMenu == "cashier" ? "" : "")}
@@ -640,7 +631,56 @@ const Sidebar = (props) => {
                   <img src={debitcard} alt="img" />
                   <span>Cashier </span>
                 </Link>
-              </li>) : null}
+              </li>) : null} */}
+
+
+               {/* Cashier */}
+               {userType == 'admin' || userType == 'supervisor' || userType == 'cashier' ? (<li className="submenu">
+                  <a
+                    href="#"
+                    className={
+                      pathname.includes("/tinatett-pos/cashier/")
+                        ? "subdrop active"
+                        : "" || isSideMenu == "cashier"
+                        ? "subdrop active"
+                        : ""
+                    }
+                    onClick={() =>
+                      toggleSidebar(isSideMenu == "cashier" ? "" : "cashier")
+                    }
+                  >
+                    {" "}
+                    <img src={debitcard} alt="img" /> <span>Cashier</span>{" "}
+                    <span className="menu-arrow"></span>
+                  </a>
+                  {isSideMenu == "cashier" ? (
+                    <ul>
+                       <li>
+                        <Link
+                          className={
+                            pathname.includes("/cashier/sales-payment") ? "active" : ""
+                          }
+                          to="/tinatett-pos/cashier/sales-payment"
+                        >
+                          Sales Payment
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          className={
+                            pathname.includes("/cashier/credit-payment") ? "active" : ""
+                          }
+                          to="/tinatett-pos/cashier/credit-payment"
+                        >
+                          Credit Payment
+                        </Link>
+                      </li>
+      
+                    </ul>
+                  ) : (
+                    ""
+                  )}
+                </li>) :null}
 
               {/* Transfer */}
               {userType == 'admin' || userType == 'supervisor' ? (<li className="submenu">
@@ -924,7 +964,7 @@ const Sidebar = (props) => {
 
 
                 {/* Users */}
-              {userType == 'admin' || userType == 'supervisor' ? (<li className="submenu">
+              {userType == 'admin' ? (<li className="submenu">
                 <Link
                   to="#"
                   className={

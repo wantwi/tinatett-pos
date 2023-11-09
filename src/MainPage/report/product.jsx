@@ -181,24 +181,7 @@ const ProductReport = () => {
       render: (text, record) => <p>{(record?.remainingStock)}</p> 
     },
    
-    {
-      title: "Action",
-      render: (text, record) => (
-        <>
-          <>
-            {/* <Link className="me-3" to="/tinatett-pos/product/product-details">
-              <img src={EyeIcon} alt="img" />
-            </Link> */}
-            <Link className="me-3" to={{ pathname:`/tinatett-pos/product/editproduct`, state:record}} title="Edit Product">
-              <img src={EditIcon} alt="img" />
-            </Link>
-            {/* <Link className="confirm-text" to="#" onClick={confirmText} title="Delete Product">
-              <img src={DeleteIcon} alt="img" />
-            </Link> */}
-          </>
-        </>
-      ),
-    },
+   
   ];
 
   if(productsIsLoading){

@@ -19,7 +19,6 @@ import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
 import { Button } from "antd";
 import FeatherIcon from 'feather-icons-react'
 import { socket } from "../../InitialPage/Sidebar/Header";
-import useAuth from "../../hooks/useAuth";
 import { NotificationsContext } from "../../InitialPage/Sidebar/DefaultLayout";
 
 const Cashier = () => {

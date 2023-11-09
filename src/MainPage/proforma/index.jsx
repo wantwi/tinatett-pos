@@ -2,16 +2,8 @@ import React from 'react'
 import { Redirect, Route, Switch } from 'react-router-dom';
 import ProformaList from './proformaList'
 import AddProforma from './addproforma'
-import Editsales from './editsales'
-import SalesReturnList from '../Return/SalesReturnList'
-import AddSalesReturn from '../Return/AddSalesReturn'
 import ProformaDetail from './proformaDetails';
 import EditProforma from './editproforma';
-
-
-
-
-
 
 
 const ProformaIndex = ({ match}) =>(
