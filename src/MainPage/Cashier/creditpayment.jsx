@@ -185,20 +185,20 @@ const CreditPayment = () => {
       }
 
 
-      if ((type == 'Paid') && payload.amount < modalData?.Total) {
-        alertify.set("notifier", "position", "bottom-right");
-        alertify.warning("Please provide full payment amount before saving.");
+      // if ((type == 'Paid') && payload.amount < modalData?.Total) {
+      //   alertify.set("notifier", "position", "bottom-right");
+      //   alertify.warning("Please provide full payment amount before saving.");
 
-        let newNotification = {
-          id: Math.ceil(Math.random() * 1000000),
-          message: `${storage.name} Please provide full payment amount before saving.`,
-          time: new Date().toISOString(), type: 'warning'
-        }
-        setNotifications([newNotification, ...notifications])
-      }
+      //   let newNotification = {
+      //     id: Math.ceil(Math.random() * 1000000),
+      //     message: `${storage.name} Please provide full payment amount before saving.`,
+      //     time: new Date().toISOString(), type: 'warning'
+      //   }
+      //   setNotifications([newNotification, ...notifications])
+      // }
 
 
-      else {
+     // else {
         setIsSaving(true)
         // console.log(payload)
         axios.put('/sales/credit/payment', payload)
@@ -253,7 +253,7 @@ const CreditPayment = () => {
           })
       }
 
-    }
+   // }
 
     else {
       alertify.set("notifier", "position", "bottom-right");
