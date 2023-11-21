@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import Table from "../../EntryFile/datatable";
@@ -25,6 +25,7 @@ import { moneyInTxt } from "../../utility";
 import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 import { debounce } from "lodash";
 import useCustomApi from "../../hooks/useCustomApi";
+import { BASE_URL } from "../../api/CustomAxios";
 
 const ProductReport = () => {
   const [inputfilter, setInputfilter] = useState(false);
@@ -37,16 +38,20 @@ const ProductReport = () => {
   const { data: products, isLoading: productsIsLoading } = useGet("products", "/product");
   const { data: suppliers, isLoading: suppliersIsLoading } = useGet("suppliers", "/supplier");
 
-  const [selectedProduct, setSelectedProduct] = useState('')
+  const [selectedProduct, setSelectedProduct] = useState({})
   const [selectedProductInfo, setSelectedProductInfo] = useState()
   const [supplier, setSupplier] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isBatchLoading, setIsBatchLoading] = useState(false)
-  const [formData, setFormData] = useState({productId:'', quantity: '', amount: '', batchNumber: '', manuDate: '', expDate: '' })
+  const [formData, setFormData] = useState({productId:'', quantity: '', amount: '', batchNumber: '', manufactureFromDate: '', manufactureEndDate:'', expireFromDate: '', expireEndDate:'' })
   const [reportFile, setReportFile] = useState(null)
   const [reportIsLoading, setreportIsLoading] = useState(false)
 
+  const [priceType, setPriceType] = useState('All')
 
+  const retailpriceTypeRef = useRef()
+  const specialpriceTypeRef = useRef()
+  const wholesalepriceTypeRef = useRef()
 
 
   useEffect(() => {
@@ -64,10 +69,16 @@ const ProductReport = () => {
             specialPrice: product?.specialPrice,
             remainingStock: product?.stock_count || 0,
             ownershipType: product?.ownershipType,
-            createdBy: product?.createdBy
+            createdBy: product?.createdBy,
+            value: product?.id,
+            label: product?.name,
+            retailPrice: product?.retailPrice,
+            manuDate: product?.manufacturingDate,
+            expDate: product?.expiryDate
           }
         })
       setData([...mappedData])
+      setProductsDropdown(mappedData)
       //console.log('loaded..')
     }
     else{
@@ -110,12 +121,24 @@ const ProductReport = () => {
       formData,
       selectedProduct,
       supplier,
+      priceType
+      // branch, 
+      // productId : "",
+      // startDate : "", 
+      // endDate : "", 
+      // batchNumber :"", 
+      // manufacturingDate : "",
+      // expireDate : "", 
+      // userId : "",
+      // clientId : ""
 
     }
 
+    console.log(filters)
+
     setreportIsLoading(true)
     $('#pdfViewer').modal('show')
-      axios.get(`report/getProductReport?productId=${formData?.productId}`)
+      axios.get(`report/getProductReport?productId=${selectedProduct?.id}&unitPrice=${priceType}&batchNumber=${formData?.batchNumber?.value}`)
       .then((res) => {
 
         let base64 = res.data.base64String
@@ -183,6 +206,38 @@ const ProductReport = () => {
    
    
   ];
+
+  const handleProductSelect = (e) => {
+    setSelectedProduct(e)
+    setRetailPrice('(' + e.retailPrice + 'GHS)')
+    setWholesalePrice('(' + e.wholeSalePrice + 'GHS)')
+    setSpecialPrice('(' + e.specialPrice + 'GHS)')
+    salesType == 'Retail' ? setPrice(e.retailPrice) : salesType == "Wholesale" ? setPrice(e.wholeSalePrice) : setPrice(e.specialPrice)
+    salesType == 'Retail' ? setEditPrice(e.retailPrice) : salesType == "Wholesale" ? setEditPrice(e.wholeSalePrice) : setEditPrice(e.specialPrice)
+    setIsBatchLoading(true)
+  }
+
+
+  useEffect(() => {
+    // console.log("Selected Prod", selectedProduct)
+
+    axios.get(`${BASE_URL}/purchase/product/${selectedProduct?.value}`).then((res) => {
+      setIsLoading(true)
+      if (res.data.success) {
+        setIsLoading(false)
+        //console.log(res.data.newProduct)
+        setSelectedProductInfo(res.data.newProduct)
+        let x = res.data.newProduct.batchNumber?.map((item) => {
+          return { value: item.batchNumber, label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')' : item?.batchNumber + '-(' + item?.availablequantity + ')', expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
+        })
+        setIsBatchLoading(false)
+        setFormData({ ...formData, batchNumber: x[0], manuDate: (x[0]?.manufacturingDate).substring(0, 10), expDate: (x[0]?.expireDate).substring(0, 10) })
+  
+      }
+    })
+    $('#selectedProduct').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+
+  }, [selectedProduct])
 
   if(productsIsLoading){
     return (<LoadingSpinner message="Fetching Products.."/>)
@@ -265,7 +320,7 @@ const ProductReport = () => {
         aria-labelledby="filters"
         aria-hidden="true">
 
-          <div className="modal-dialog modal-md modal-dialog-centered" role="document">
+          <div className="modal-dialog modal-lg modal-dialog-centered" role="document">
             <div className="modal-content">
               <div className="modal-header">
                     <h5 className="modal-title">Product Search </h5>
@@ -279,35 +334,179 @@ const ProductReport = () => {
                 </button>
               </div>
               <div className="modal-body">
-                  <div className="row">
+                 <div className="row">
+                    <div className="col-6">
                       <div className="form-group">
-                        <label>From</label>
+                          <label>Product</label>
+                          <Select
+                            id="productName"
+                            className="select"
+                            options={productsDropdown}
+                            value={selectedProduct}
+                            isLoading={productsIsLoading}
+                            onChange={(e) => handleProductSelect(e)}
+                          />
+                      </div>
+                    </div>
+
+                    <div className="col-6">
+                      <div className="form-group">
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <label>Batch No.</label>
+                          {isBatchLoading && <div className="spinner-border text-primary me-1" role="status" style={{ height: 20, width: 20 }}>
+                            <span className="sr-only">Loading...</span>
+                          </div>}
+                        </div>
+                        <div className="input-groupicon">
+                          <Select
+                            isLoading={isLoading}
+                            options={selectedProductInfo?.batchNumber?.map((item) => {
+                              return { value: item.batchNumber, label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')' : item?.batchNumber + '-(' + item?.availablequantity + ')', expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
+                            })}
+                            placeholder=""
+                            value={formData.batchNumber}
+                            onChange={(e) => setFormData({ ...formData, batchNumber: (e), manuDate: e.manufacturingDate, expDate: e.expireDate })}
+                          //onChange={(e) => console.log(e)}
+                          />
+
+                        </div>
+                      </div>
+                    </div>
+                      
+                  </div>
+
+
+                 
+
+                  <div className="row">
+                    <div className="form-group">
+                      <label>Unit Price</label>
+                      <div className="row">
+                        <div className="col-lg-3">
+
+                          <div className="input-group">
+                            <div className="input-group-text">
+                              <input className="form-check-input" type="radio" ref={specialpriceTypeRef} name="priceType" value={'All'} 
+                              onClick={(e) => {
+                                setPriceType(e.target.value)
+                               }} />
+                            </div>
+                            <input type="text" className="form-control" aria-label="Text input with radio button" placeholder={`All `}  />
+                          </div>
+
+                        </div>
+
+                        <div className="col-lg-3">
+
+                          <div className="input-group">
+                            <div className="input-group-text">
+                              <input className="form-check-input" type="radio" ref={retailpriceTypeRef} name="priceType" value={'Retail'}
+                                onClick={(e) => {
+                                  setPriceType(e.target.value)
+                                  }} />
+                            </div>
+                            <input type="text" className="form-control" aria-label="Text input with radio button" placeholder={`Retail`}  />
+                          </div>
+
+                        </div>
+
+                        <div className="col-lg-3">
+                          <div className="input-group">
+                            <div className="input-group-text">
+                              <input className="form-check-input" type="radio" ref={wholesalepriceTypeRef} name="priceType" vvalue={'Wholesale'}
+                                onClick={(e) => {
+                                  setPriceType(e.target.value)
+                                }
+                                } />
+                            </div>
+                            <input type="text" className="form-control" aria-label="Text input with radio button" placeholder={`Wholesale `} />
+                          </div>
+                        </div>
+
+                        <div className="col-lg-3">
+
+                          <div className="input-group">
+                            <div className="input-group-text">
+                              <input className="form-check-input" type="radio" ref={specialpriceTypeRef} name="priceType" value={'Special'} onClick={(e) => {
+                                setPriceType(e.target.value)
+                               }} />
+                            </div>
+                            <input type="text" className="form-control" aria-label="Text input with radio button" placeholder={`Special `}  />
+                          </div>
+
+                        </div>
+
+                        
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="row">
+                    <div className="col-6">
+                        <div className="form-group">
+                          <label>Manufacture From</label>
+                          <div className="input-groupicon">
+                            <input
+                              type="date" className={`form-control `}
+                              id="amount"
+                              placeholder=""
+                              value={formData.manufactureFromDate}
+                              onChange={(e) => setFormData({...formData, manufactureFromDate: e.target.value})}
+                            />
+                        </div>
+                      </div>
+                    </div>
+                     
+                     <div className="col-6">
+                      <div className="form-group">
+                        <label>Manufacture To</label>
                         <div className="input-groupicon">
                           <input
                             type="date" className={`form-control `}
                             id="amount"
                             placeholder=""
-                            value={formData.startDate}
-                            onChange={(e) => setFormData({...formData, startDate: e.target.value})}
+                            value={formData.manufactureEndDate}
+                            onChange={(e) => setFormData({...formData, manufactureEndDate: e.target.value})}
                           />
                       </div>
-                    </div>
+                      </div>
+                     </div>
+                      
                   </div>
-                  <div className="row">
+
+                   <div className="row">
+                    <div className="col-6">
+                        <div className="form-group">
+                          <label>Expire From</label>
+                          <div className="input-groupicon">
+                            <input
+                              type="date" className={`form-control `}
+                              id="amount"
+                              placeholder=""
+                              value={formData.expireFromDate}
+                              onChange={(e) => setFormData({...formData, expireFromDate: e.target.value})}
+                            />
+                        </div>
+                      </div>
+                    </div>
+                     
+                     <div className="col-6">
                       <div className="form-group">
-                        <label>To</label>
+                        <label>Expire To</label>
                         <div className="input-groupicon">
                           <input
                             type="date" className={`form-control `}
                             id="amount"
                             placeholder=""
-                            value={formData.endDate}
-                            onChange={(e) => setFormData({...formData, endDate: e.target.value})}
+                            value={formData.expireEndDate}
+                            onChange={(e) => setFormData({...formData, expireEndDate: e.target.value})}
                           />
                       </div>
-                    </div>
+                      </div>
+                     </div>
+                      
                   </div>
-                  <div className="row">
+                  {/* <div className="row">
                       <div className="form-group">
                         <label>Supplier</label>
                         <Select
@@ -321,20 +520,8 @@ const ProductReport = () => {
                               }}
                             />
                     </div>
-                  </div>
-                  <div className="row">
-                      <div className="form-group">
-                        <label>Product</label>
-                        <Select
-                          id="productName"
-                          className="select"
-                          options={productsDropdown}
-                          value={selectedProduct}
-                          isLoading={productsIsLoading}
-                          onChange={(e) => handleProductSelect(e)}
-                        />
-                    </div>
-                  </div>
+                  </div> */}
+                 
                
               </div>
               <div className="modal-footer">

@@ -18,6 +18,7 @@ import { moneyInTxt } from "../../utility";
 import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 import { debounce } from "lodash";
 import useCustomApi from "../../hooks/useCustomApi";
+import { BASE_URL } from "../../api/CustomAxios";
 
 
 const Sales = () => {
@@ -35,20 +36,19 @@ const Sales = () => {
   const {
     data: sales,
     isError,
-    isLoading,
+    isLoading: isSuspendLoading,
     isSuccess,
   } = useGet("suspend", "/sales");
 
-  const [selectedProduct, setSelectedProduct] = useState('')
-  const [selectedProductInfo, setSelectedProductInfo] = useState()
-  const [customer, setCustomer] = useState('')
-  //const [isLoading, setIsLoading] = useState(false)
+  const [selectedProduct, setSelectedProduct] = useState({})
+  const [selectedProductInfo, setSelectedProductInfo] = useState(null)
+  const [customer, setCustomer] = useState({})
+  const [isLoading, setIsLoading] = useState(false)
   const [isBatchLoading, setIsBatchLoading] = useState(false)
-  const [formData, setFormData] = useState({productId:'', quantity: '', amount: '', batchNumber: '', manuDate: '', expDate: '' })
+  const [supplier, setSupplier] = useState('')
+  const [formData, setFormData] = useState({productId:'', quantity: '', amount: '', batchNumber: {}, manuDate: '', expDate: '' })
   const [reportFile, setReportFile] = useState(null)
   const [reportIsLoading, setreportIsLoading] = useState(false)
-  const [receiptFile, setReceiptFile] = useState(null)
-  const [isSaving, setIsSaving] = useState(false)
 
   const [userType, setUserType] = useState('')
 
@@ -62,9 +62,55 @@ const Sales = () => {
   }, [])
 
 
+  useEffect(() => {
+    if(!productsIsLoading){
+      
+      let mappedData =  products?.data.map((product) => {
+          return {
+            id: product?.id,
+            name: product?.name,
+            status: product?.status,
+            alert: product?.alert,
+            retailPrice: product?.retailPrice,
+            wholeSalePrice: product?.wholeSalePrice,
+            specialPrice: product?.specialPrice,
+            remainingStock: product?.stock_count || 0,
+            ownershipType: product?.ownershipType,
+            createdBy: product?.createdBy,
+            value: product?.id,
+            label: product?.name,
+            retailPrice: product?.retailPrice,
+            manuDate: product?.manufacturingDate,
+            expDate: product?.expiryDate
+          }
+        })
+
+      setProductsDropdown(mappedData)
+      //console.log('loaded..')
+    }
+    else{
+     // console.log('loading...')
+    }
+  }, [productsIsLoading])
+
+
 
   useEffect(() => {
-    if (!isLoading) {
+    if (!customersIsLoading) {
+      let mappedData = customers?.data.map((customer) => {
+        return {
+          value: customer?.id,
+          label: customer?.name,
+          customerType: customer?.customerType,
+        }
+      })
+      setCustomersDropdown(mappedData)
+
+    }
+  }, [customersIsLoading])
+
+  useEffect(() => {
+    if (!isSuspendLoading) {
 
       let mappedData = sales?.data.map((sale) => {
         // console.log("Payment Infor:", (JSON.parse(sale?.paymentInfo)).type)
@@ -88,37 +134,45 @@ const Sales = () => {
     else {
       console.log('loading...')
     }
-  }, [isLoading])
+  }, [isSuspendLoading])
 
   const axios = useCustomApi()
-  const handleSearch = debounce((value) => {
-    axios.get(`/product?ownershipType=&name=${value}`)
-    .then((res) => {
-     let mapped = res?.data.data.map((product) => {
-      return {
-        id: product?.id,
-        image: AvocatImage,
-        name: product?.name,
-        status: product?.status,
-        alert: product?.alert,
-        retailPrice: product?.retailPrice,
-        wholeSalePrice: product?.wholeSalePrice,
-        specialPrice: product?.specialPrice,
-        remainingStock: product?.stock_count || 0,
-        ownershipType: product?.ownershipType,
-        createdBy: product?.createdBy
-      }
-    })
-    setData(mapped)
+
+
+
+
+const handleProductSelect = (e) => {
+  setSelectedProduct(e)
+  setRetailPrice('(' + e.retailPrice + 'GHS)')
+  setWholesalePrice('(' + e.wholeSalePrice + 'GHS)')
+  setSpecialPrice('(' + e.specialPrice + 'GHS)')
+  salesType == 'Retail' ? setPrice(e.retailPrice) : salesType == "Wholesale" ? setPrice(e.wholeSalePrice) : setPrice(e.specialPrice)
+  salesType == 'Retail' ? setEditPrice(e.retailPrice) : salesType == "Wholesale" ? setEditPrice(e.wholeSalePrice) : setEditPrice(e.specialPrice)
+  setIsBatchLoading(true)
+}
+
+
+useEffect(() => {
+  // console.log("Selected Prod", selectedProduct)
+
+  axios.get(`${BASE_URL}/purchase/product/${selectedProduct?.value}`).then((res) => {
+    setIsLoading(true)
+    if (res.data.success) {
+      // setIsLoading(false)
+      //console.log(res.data.newProduct)
+      setSelectedProductInfo(res.data.newProduct)
+      let x = res.data.newProduct.batchNumber?.map((item) => {
+        return { value: item.batchNumber, label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')' : item?.batchNumber + '-(' + item?.availablequantity + ')', expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
+      })
+      setIsBatchLoading(false)
+      setFormData({ ...formData, batchNumber: x[0], manuDate: (x[0]?.manufacturingDate).substring(0, 10), expDate: (x[0]?.expireDate).substring(0, 10) })
+
+    }
   })
-    
+  $('#selectedProduct').css('border', '1px solid rgba(145, 158, 171, 0.32)')
 
-}, 300)
+}, [selectedProduct])
 
-
-  const togglefilter = (value) => {
-    setInputfilter(false);
-  };
 
   const handleGenerateReport = () => {
     let filters = {
@@ -128,9 +182,11 @@ const Sales = () => {
 
     }
 
+    console.log(filters)
+
     setreportIsLoading(true)
     $('#pdfViewer').modal('show')
-      axios.get(`report/getSalesReport?startDate=${formData.startDate}&endDate=${formData.endDate}&productId=${formData?.productId}`)
+      axios.get(`report/getSalesReport?startDate=${formData.startDate}&endDate=${formData.endDate}&productId=${selectedProduct?.id}&batchNumber=${formData?.batchNumber?.value}&customer=${customer?.value}`)
       .then((res) => {
 
         let base64 = res.data.base64String
@@ -221,7 +277,7 @@ const Sales = () => {
 
 
 
-  if(isLoading){
+  if(isSuspendLoading){
     return (<LoadingSpinner message="Fetching Sales.."/>)
   }
 
@@ -248,8 +304,7 @@ const Sales = () => {
           {/* /product list */}
           <div className="card">
             <div className="card-body">
-              <Tabletop inputfilter={inputfilter} togglefilter={togglefilter} title={'Products List'} data={data} handleSearch={handleSearch}/>
-              {/* /Filter */}
+             
               <div
                 className={`card mb-0 ${inputfilter ? "toggleCls" : ""}`}
                 id="filter_inputs"
@@ -371,6 +426,29 @@ const Sales = () => {
                           onChange={(e) => handleProductSelect(e)}
                         />
                     </div>
+                  </div>
+                  <div className="row">
+                      <div className="form-group">
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <label>Batch No.</label>
+                          {isBatchLoading && <div className="spinner-border text-primary me-1" role="status" style={{ height: 20, width: 20 }}>
+                            <span className="sr-only">Loading...</span>
+                          </div>}
+                        </div>
+                        <div className="input-groupicon">
+                          <Select
+                            isLoading={isLoading}
+                            options={selectedProductInfo?.batchNumber?.map((item) => {
+                              return { value: item.batchNumber, label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')' : item?.batchNumber + '-(' + item?.availablequantity + ')', expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
+                            })}
+                            placeholder=""
+                            value={formData.batchNumber}
+                            onChange={(e) => setFormData({ ...formData, batchNumber: (e), manuDate: e.manufacturingDate, expDate: e.expireDate })}
+                          //onChange={(e) => console.log(e)}
+                          />
+
+                        </div>
+                      </div>
                   </div>
                
               </div>

@@ -210,10 +210,6 @@ const Addsales = () => {
       }
       setNotifications([newNotification, ...notifications])
     }
-    // else if ((paymentInfo.amountPaid == '' || paymentInfo.amountPaid < 1 || paymentInfo.amountPaid == null) && (transactionType == 'CP' || transactionType == 'CO') ) {
-    //   alertify.set("notifier", "position", "bottom-right");
-    //   alertify.message("Please provide payment amount before saving.");
-    // }
 
     else if ((transactionType == 'SP' || transactionType == 'SO') && paymentInfo.amountPaid < (productGridData.reduce((total, item) => total + item.amount, 0))) {
       alertify.set("notifier", "position", "bottom-right");
@@ -226,6 +222,19 @@ const Addsales = () => {
       }
       setNotifications([newNotification, ...notifications])
     }
+
+    else if ((transactionType == 'CP' || transactionType == 'CO') && paymentInfo.amountPaid >= (productGridData.reduce((total, item) => total + item.amount, 0))) {
+      alertify.set("notifier", "position", "bottom-right");
+      alertify.warning("Please enter an amount less than  total or switch to a SELL option, not CREDIT.");
+
+      let newNotification = {
+        id: Math.ceil(Math.random() * 1000000),
+        message: `${storage.name} Please enter an amount less than  total or switch to a SELL option, not CREDIT.`,
+        time: new Date().toISOString(), type: 'warning'
+      }
+      setNotifications([newNotification, ...notifications])
+    }
+
     else {
       $('#payment').modal('hide')
       //handle the suspend first and then use the reference to process payment

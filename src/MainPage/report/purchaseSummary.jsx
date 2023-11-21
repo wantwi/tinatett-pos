@@ -186,6 +186,8 @@ const PurchaseSummary = () => {
 
     }
 
+    console.log(filters)
+
     setreportIsLoading(true)
     $('#pdfViewer').modal('show')
       axios.get(`report/getPurchaseSummaryReport?startDate=${formData.startDate}&endDate=${formData.endDate}`)

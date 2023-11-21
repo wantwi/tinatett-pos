@@ -295,8 +295,7 @@ const AddProforma = () => {
   }, [formData.price])
 
   useEffect(() => {
-    setSelectedCustomer(customerOptions[0])
-    console.log(selectedCustomer)
+    setSelectedCustomer(customerOptions.find((item) => item.label == 'Default Retail Customer'))
   }, [customerOptions])
 
 

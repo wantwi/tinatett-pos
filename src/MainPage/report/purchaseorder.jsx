@@ -186,6 +186,8 @@ const PurchaseOrder = () => {
 
     }
 
+    console.log(filters)
+
     setreportIsLoading(true)
     $('#pdfViewer').modal('show')
       axios.get(`report/getPurchaseReport?startDate=${formData.startDate}&endDate=${formData.endDate}`)
@@ -348,7 +350,7 @@ const PurchaseOrder = () => {
           <div className="modal-dialog modal-md modal-dialog-centered" role="document">
             <div className="modal-content">
               <div className="modal-header">
-                    <h5 className="modal-title">Purchases Search (Summary)</h5>
+                    <h5 className="modal-title">Purchases Report </h5>
                     <button
                     type="button"
                     className="close"
