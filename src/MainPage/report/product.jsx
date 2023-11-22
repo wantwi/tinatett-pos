@@ -43,7 +43,7 @@ const ProductReport = () => {
   const [supplier, setSupplier] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isBatchLoading, setIsBatchLoading] = useState(false)
-  const [formData, setFormData] = useState({productId:'', quantity: '', amount: '', batchNumber: '', manufactureFromDate: '', manufactureEndDate:'', expireFromDate: '', expireEndDate:'' })
+  const [formData, setFormData] = useState({productId:'', quantity: '', amount: '', batchNumber: {}, manufactureFromDate: '', manufactureEndDate:'', expireFromDate: '', expireEndDate:'' })
   const [reportFile, setReportFile] = useState(null)
   const [reportIsLoading, setreportIsLoading] = useState(false)
 
@@ -122,15 +122,6 @@ const ProductReport = () => {
       selectedProduct,
       supplier,
       priceType
-      // branch, 
-      // productId : "",
-      // startDate : "", 
-      // endDate : "", 
-      // batchNumber :"", 
-      // manufacturingDate : "",
-      // expireDate : "", 
-      // userId : "",
-      // clientId : ""
 
     }
 
@@ -138,7 +129,10 @@ const ProductReport = () => {
 
     setreportIsLoading(true)
     $('#pdfViewer').modal('show')
-      axios.get(`report/getProductReport?productId=${selectedProduct?.id}&unitPrice=${priceType}&batchNumber=${formData?.batchNumber?.value}`)
+      axios.get(`report/getProductReport?productId=${selectedProduct?.id}&unitPrice=${priceType}
+      &batchNumber=${formData?.batchNumber?.value}&manufacturingStartDate=${formData.manufactureFromDate}
+      &manufacturingEndDate=${formData?.manufactureEndDate}&expireStartDate=${formData?.expireFromDate}
+      &expireEndDate=${formData?.expireEndDate}`)
       .then((res) => {
 
         let base64 = res.data.base64String
