@@ -46,7 +46,7 @@ const Sales = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [isBatchLoading, setIsBatchLoading] = useState(false)
   const [supplier, setSupplier] = useState('')
-  const [formData, setFormData] = useState({productId:'', quantity: '', amount: '', batchNumber: {}, manuDate: '', expDate: '' })
+  const [formData, setFormData] = useState({productId:'', quantity: '', amount: '', batchNumber: {}, manuDate: '', expDate: '', startDate:'', endDate:'' })
   const [reportFile, setReportFile] = useState(null)
   const [reportIsLoading, setreportIsLoading] = useState(false)
 
@@ -186,7 +186,7 @@ useEffect(() => {
 
     setreportIsLoading(true)
     $('#pdfViewer').modal('show')
-      axios.get(`report/getSalesReport?startDate=${formData.startDate}&endDate=${formData.endDate}&productId=${selectedProduct?.id}&batchNumber=${formData?.batchNumber?.value}&customer=${customer?.value}`)
+      axios.get(`report/getSalesReport?startDate=${formData.startDate}&endDate=${formData.endDate}&productId=${selectedProduct?.id || ''}&batchNumber=${formData?.batchNumber?.value || ''}&customer=${customer?.value || ''}`)
       .then((res) => {
 
         let base64 = res.data.base64String

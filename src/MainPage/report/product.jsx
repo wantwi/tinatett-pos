@@ -129,10 +129,7 @@ const ProductReport = () => {
 
     setreportIsLoading(true)
     $('#pdfViewer').modal('show')
-      axios.get(`report/getProductReport?productId=${selectedProduct?.id}&unitPrice=${priceType}
-      &batchNumber=${formData?.batchNumber?.value}&manufacturingStartDate=${formData.manufactureFromDate}
-      &manufacturingEndDate=${formData?.manufactureEndDate}&expireStartDate=${formData?.expireFromDate}
-      &expireEndDate=${formData?.expireEndDate}`)
+      axios.get(`report/getProductReport?productId=${selectedProduct?.id || ''}&batchNumber=${formData?.batchNumber?.value || ''}&manufacturingStartDate=${formData.manufactureFromDate}&manufacturingEndDate=${formData?.manufactureEndDate}&expireStartDate=${formData?.expireFromDate}&expireEndDate=${formData?.expireEndDate}&unitPrice=${priceType}`)
       .then((res) => {
 
         let base64 = res.data.base64String
@@ -140,9 +137,6 @@ const ProductReport = () => {
         const blobFile = `data:application/pdf;base64,${base64}`
         const url = URL.createObjectURL(blob);
         setReportFile(blobFile)
-    
-
-       
       })
       .finally(() =>  setreportIsLoading(false))
 

@@ -72,12 +72,12 @@ const PurchaseOrder = () => {
 
   const [loggedInUser, setLoggedInUser] = useState({})
 
-  const [selectedProduct, setSelectedProduct] = useState('')
+  const [selectedProduct, setSelectedProduct] = useState({})
   const [selectedProductInfo, setSelectedProductInfo] = useState()
   const [supplier, setSupplier] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isBatchLoading, setIsBatchLoading] = useState(false)
-  const [formData, setFormData] = useState({ quantity: '', amount: '', batchNumber: {}, manuDate: '', expDate: '' , clientId:'', userId:''})
+  const [formData, setFormData] = useState({ quantity: '', amount: '', batchNumber: {}, manuDate: '', expDate: '' , clientId:'', userId:'', startDate:'', endDate:''})
   const [reportFile, setReportFile] = useState(null)
   const [reportIsLoading, setreportIsLoading] = useState(false)
 
@@ -190,8 +190,8 @@ const PurchaseOrder = () => {
 
     setreportIsLoading(true)
     $('#pdfViewer').modal('show')
-      axios.get(`report/getPurchaseReport?startDate=${formData.startDate}&endDate=${formData.endDate}
-      &productId=${selectedProduct?.id}&batchNumber=${formData?.batchNumber?.value}&userId=${formData?.userId}&clientId=${formData?.clientId}`)
+      if(formData.startDate != ''){
+        axios.get(`report/getPurchaseReport?startDate=${formData.startDate}&endDate=${formData.endDate}&productId=${selectedProduct?.id || ''}&batchNumber=${formData?.batchNumber?.value || ''}&userId=${formData?.userId}&clientId=${formData?.clientId}`)
       .then((res) => {
 
         let base64 = res.data.base64String
@@ -199,11 +199,20 @@ const PurchaseOrder = () => {
         const blobFile = `data:application/pdf;base64,${base64}`
         const url = URL.createObjectURL(blob);
         setReportFile(blobFile)
-    
-
-       
       })
       .finally(() =>  setreportIsLoading(false))
+      }
+      else{
+        axios.get(`report/getPurchaseReport`).then((res) => {
+
+        let base64 = res.data.base64String
+        const blob = base64ToBlob(base64, 'application/pdf');
+        const blobFile = `data:application/pdf;base64,${base64}`
+        const url = URL.createObjectURL(blob);
+        setReportFile(blobFile)
+      })
+      .finally(() =>  setreportIsLoading(false))
+      }
 
     function base64ToBlob(base64, type = "application/octet-stream") {
       const binStr = atob(base64);
