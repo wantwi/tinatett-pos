@@ -136,6 +136,7 @@ const ImportSuppliers = () => {
       let col9 = keys.filter((item) => item.Column === 'I')
       let col10 = keys.filter((item) => item.Column === 'J')
       let col11 = keys.filter((item) => item.Column === 'K')
+      let col12 = keys.filter((item) => item.Column === 'L')
 
       // console.log(col1, col2, col3, col4, col5)
 
@@ -151,6 +152,7 @@ const ImportSuppliers = () => {
       let CashDetailsArr = []
       let BankDetailsArr = []
       let MomoDetailsArr = []
+      let CustomerTypeArr = []
  
 
 
@@ -165,6 +167,7 @@ const ImportSuppliers = () => {
       col9.forEach((item) => CashDetailsArr.push(item.Value))
       col10.forEach((item) => BankDetailsArr.push(item.Value))
       col11.forEach((item) => MomoDetailsArr.push(item.Value))
+      col12.forEach((item) => CustomerTypeArr.push(item.Value))
     
 
       let finalData = []
@@ -174,7 +177,7 @@ const ImportSuppliers = () => {
         ContactArr,
         OtherContactArr,
         LocationArr,
-        GPSAddressArr, ProductsArr, CreditPeriodArr, CashDetailsArr, BankDetailsArr, MomoDetailsArr
+        GPSAddressArr, ProductsArr, CreditPeriodArr, CashDetailsArr, BankDetailsArr, MomoDetailsArr, CustomerTypeArr
       )
 
     // console.log(finalData, "DATA")
@@ -195,7 +198,7 @@ const ImportSuppliers = () => {
       }
 
       
-      let chunkSize = 11
+      let chunkSize = 12
       let chunks = []
       for (let i = 0; i < res.length; i += chunkSize) {
         const chunk = res.slice(i, i + chunkSize)
@@ -220,7 +223,7 @@ const ImportSuppliers = () => {
         contact: value.Contact,
         otherContact: value.OtherContact,
         location: value.Location,
-        customerType: 0,
+        customerType: value.SupplierType == 'Individual' ? 0 : 1,
         gpsAddress: value.GhanaPostAddress,
         creditPeriod: value.CreditPeriod,
         product: value.ProductSupplied,
@@ -291,11 +294,18 @@ const ImportSuppliers = () => {
       sorter: (a, b) => a.contact.length - b.contact.length,
     },
     {
-      title: "Status",
-      dataIndex: "status",
-      sorter: (a, b) => a.status.length - b.status.length,
-      render: (text, record) => (record.status == 1 ? <span className="badges bg-lightgreen">Active</span> : <span className="badges bg-lightred">Inctive</span> )
-
+      title: "Type",
+      dataIndex: "customerType",
+      render: (text, record) => (
+        <>
+          {text == "0" && (
+            <span className="badges btn-success">{"Individual"}</span>
+          )}
+          {text == "1" && (
+            <span className="badges bg-lightgreen">{"Company"}</span>
+          )}
+         
+        </>)
     },
   ];
 

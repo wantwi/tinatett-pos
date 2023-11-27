@@ -94,9 +94,8 @@ const AddPurchase = () => {
 
 
   const deleteRow = (record) => {
-    // console.log(record)
-    // console.log(productGridData)
-    let newGridData = productGridData.filter((item) => item.productId !== record.productId)
+
+    let newGridData = productGridData.filter((item) => item.id !== record.id)
     //console.log(newGridData)
     setProductGridData(newGridData)
   };
@@ -138,6 +137,37 @@ const AddPurchase = () => {
         }
       })
       .finally(() => setLoading(false))
+
+      checkIfBatchNoIsInBasket(batchNumber, productId)
+  }
+
+  const checkIfBatchNoIsInBasket = (batchNumber, productId) => {
+
+    productGridData.forEach((item) => {
+      if(item.batchNumber == batchNumber){
+        console.log(item, productId)
+        if(item.productId != productId){
+            $('#batchNumber').css('border', '1px solid red')
+            setTimeout(() => {
+              $('#batchNumber').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+            }, 3000)
+        
+            alertify.set("notifier", "position", "bottom-right");
+            alertify.warning("Batch Number is already added to the Basket");
+
+            let newNotification = {
+              id: Math.ceil(Math.random()*1000000),
+              message: `${storage.name} ${'Batch Number is already added to the Basket'}`,
+              time: new Date().toISOString(), type: 'warning'
+            }
+            setNotifications([newNotification, ...notifications])
+            setProductFormData({ ...productFormData, batchNumber: '' })
+        }else{
+          //allow
+        }
+        
+      }
+    })
   }
 
 
@@ -334,7 +364,8 @@ const AddPurchase = () => {
     else {
       setManDate('')
       setExpDate('')
-      setProductGridData([...productGridData, productFormData])
+      let obj = {...productFormData, id: Math.ceil(Math.random() * 1000000)}
+      setProductGridData([...productGridData, obj])
       setProductFormData({ unitPrice: '', quantity: '', amount: '', manufacturingDate: '', expireDate: '', batchNumber: '' })
       setSelectedProduct('')
     }
@@ -392,7 +423,7 @@ const AddPurchase = () => {
       mutate(postBody)
       setManDate('')
       setExpDate('')
-      //setPurDate('')
+      setPurDate(new Date().toISOString().substring(0,10))
       setSelectedProduct('')
       setSupplier('')
       setProductGridData([])
@@ -706,12 +737,12 @@ const AddPurchase = () => {
                     <div className="col-lg-6 col-sm-6 col-12">
                       <div className="form-group">
                         <label>Unit Price</label>
-                        <input type="text" id="unitPrice" className={`form-control `}
+                        <input type="number" min={0} id="unitPrice" className={`form-control `}
                           //step={0.01}
                           value={productFormData?.unitPrice}
                           onChange={(e) => {
-                            let unitP = parseInt(e.target.value) || 0
-                            let qty = parseInt(productFormData.quantity) || 0
+                            let unitP = Number(e.target.value) || 0
+                            let qty = Number(productFormData.quantity) || 0
                             setProductFormData({ ...productFormData, unitPrice: e.target.value, amount: productFormData ? unitP * qty : unitP * 1 })
                           }
                           } />
@@ -726,7 +757,7 @@ const AddPurchase = () => {
                             type="text" className={`form-control `}
                             id="amount"
                             placeholder=""
-                            value={productFormData?.amount}
+                            value={(Number(productFormData?.amount).toFixed(2))}
                             disabled
                           />
 
@@ -738,9 +769,9 @@ const AddPurchase = () => {
                   <div className="row" style={{ textAlign: 'right' }}>
                     <div className="col-lg-12 col-sm-6 col-12">
                       <div className="form-group">
-                        <Link to="#" className="btn btn-submit me-2" onClick={handleAddItem} style={{ width: '100%' }}>
+                        <button className="btn btn-submit me-2" type="submit" onClick={handleAddItem} style={{ width: '100%' }}>
                           <FeatherIcon icon="shopping-cart" /> {" Add to Basket"}
-                        </Link>
+                        </button>
                         {/* <Link to="#" className="btn btn-cancel">
                               Clear
                             </Link> */}
@@ -793,7 +824,7 @@ const AddPurchase = () => {
 
 
                   <div className="col-lg-12" style={{ textAlign: 'right' }}>
-                    <button className="btn btn-submit me-2" type="submit" onClick={onSubmitPurchase}><FeatherIcon icon="save" />Save</button>
+                    <button className="btn btn-submit me-2" type="submit" data-bs-toggle="modal" data-bs-target="#confirm"><FeatherIcon icon="save" />Save</button>
                     <Link to="/tinatett-pos/purchase/purchaselist" className="btn btn-cancel">
                       Cancel
                     </Link>
@@ -849,14 +880,14 @@ const AddPurchase = () => {
                     <div className="col-lg-6 col-sm-12 col-12">
                       <div className="form-group">
                         <label>Quantity</label>
-                        <input type="text" value={editFormData?.quantity}
+                        <input type="number" min={0} className="form-control" value={editFormData?.quantity}
                           onChange={(e) => {
                             if (e.target.value == '') {
                               setEditFormData({ ...editFormData, quantity: '' })
                             }
-                            else if (isValidNumber(e.target.value)) {
-                              let qty = parseInt(e.target.value) || 0
-                              let unitP = parseInt(editFormData.unitPrice) || 0
+                            else  {
+                              let qty = Number(e.target.value) || 0
+                              let unitP = Number(editFormData.unitPrice) || 0
                               setEditFormData({ ...editFormData, quantity: e.target.value, amount: unitP * qty || unitP * 1 })
                             }
                           }
@@ -872,11 +903,11 @@ const AddPurchase = () => {
                     <div className="col-lg-6 col-sm-12 col-12">
                       <div className="form-group">
                         <label>Unit Price</label>
-                        <input type="text" value={editFormData?.unitPrice}
-                          disabled
+                        <input type="number" min={0} value={editFormData?.unitPrice}
+                          
                           onChange={(e) => {
-                            let unitP = parseInt(e.target.value) || 0
-                            let qty = parseInt(editFormData.quantity) || 0
+                            let unitP = Number(e.target.value) || 0
+                            let qty = Number(editFormData.quantity) || 0
                             setEditFormData({ ...editFormData, unitPrice: e.target.value, amount: unitP * qty || unitP * 1 })
                           }}
                         />
@@ -885,7 +916,7 @@ const AddPurchase = () => {
                     <div className="col-lg-6 col-sm-12 col-12">
                       <div className="form-group">
                         <label>Amount</label>
-                        <input type="text" value={editFormData?.amount} />
+                        <input type="text" value={Number(editFormData?.amount)} />
                       </div>
                     </div>
 
@@ -1097,6 +1128,44 @@ const AddPurchase = () => {
           </div>
         </div>
       </div>
+
+      {/* Confirm Modal */}
+
+       <div
+        className="modal fade"
+        id="confirm"
+        tabIndex={-1}
+        aria-labelledby="confirm"
+        aria-hidden="true">
+
+          <div className="modal-dialog modal-md modal-dialog-centered" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                    <h5 className="modal-title">Confirm</h5>
+                    <button
+                    type="button"
+                    className="close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                    >
+                    <span aria-hidden="true">×</span>
+                </button>
+              </div>
+              <div className="modal-body">
+                Are you sure you want to complete this purchase?
+              </div>
+              <div className="modal-footer">
+                  <Link to="#" className="btn btn-submit me-2" data-bs-dismiss="modal" onClick={onSubmitPurchase}>
+                    Yes
+                  </Link>
+                  <Link to="#" className="btn btn-cancel" data-bs-dismiss="modal">
+                    No
+                </Link>
+              </div>
+            </div>
+          </div>
+
+        </div>
 
     </>
   );

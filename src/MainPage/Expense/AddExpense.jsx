@@ -56,8 +56,26 @@ const AddExpense = () => {
     { id: 24, label: "FDA", value: "FDA" },
     { id: 25, label: "MOH", value: "MOH" },
     { id: 26, label: "Assembly Levy", value: "Assembly Levy" },
-    { id: 27, label: "Other", value: "Other" },
+    { id: 27, label: "Allowance", value:"Allowance" },
+    { id: 28, label: "Special Bonus", value: "Special Bonus"},
+    { id: 29, label: "Transportation", value: "Transportation" }, 
+    { id: 30, label: "Refuse Collection", value:  "Refuse Collection"},
+    { id: 31, label: "Salary", value:  "Salary"},
+    { id: 32, label: "Other", value: "Other" },
   ];
+
+  let sortedOptions = options.sort(function (a, b) {
+    if (a.label < b.label) {
+      return -1;
+    }
+    if (a.label > b.label) {
+      return 1;
+    }
+    return 0;
+  });
+  
+
+
 
   const directorRef = useRef()
   const shopRef = useRef()
@@ -194,7 +212,7 @@ const AddExpense = () => {
 
   const handleSubmit = () => {
     let payload = {
-      amount: listData.reduce((total, item) => item.amount + total, 0),
+      amount: listData.reduce((total, item) => Number(item.amount) + total, 0),
       expenseDate: expenseDate,
       expenseList: listData.map((item) => {
         return {
@@ -352,7 +370,7 @@ const AddExpense = () => {
                         <Select style={{ width: '100%' }}
                           id="expenseFor"
                           className="select"
-                          options={options}
+                          options={sortedOptions}
                           value={formData.expenseFor}
                           onChange={(e) => setFormData({ ...formData, expenseFor: e })}
 
@@ -378,17 +396,13 @@ const AddExpense = () => {
                       <div className="form-group">
                         <label>Amount</label>
                         <div className="input-groupicon">
-                          <input type="text"
+                          <input type="number"
+                          min={0}
+                            className="form-control"
                             id="amount"
                             value={formData?.amount}
                             onChange={(e) => {
-                              if (e.target.value == '') {
-                                setFormData({ ...formData, amount: '' })
-                              }
-                              else if (isValidNumber(e.target.value)) {
-                                let amt = parseInt(e.target.value)
-                                setFormData({ ...formData, amount: amt })
-                              }
+                              setFormData({ ...formData, amount: e.target.value })
                             }}
                           />
 
@@ -469,7 +483,7 @@ const AddExpense = () => {
                         <li className="total">
                           <h4>Grand Total</h4>
                           <h5>GHS {moneyInTxt(
-                            listData.reduce((total, item) => total + item.amount, 0)
+                            listData.reduce((total, item) => total + Number(item.amount), 0)
                           )}</h5>
                         </li>
                       </ul>
@@ -478,7 +492,7 @@ const AddExpense = () => {
                 </div>
 
                 <div className="col-lg-12" style={{ textAlign: 'right' }}>
-                  <button type="submit" className="btn btn-submit me-2" onClick={handleSubmit}><FeatherIcon icon="save" />
+                  <button type="submit" className="btn btn-submit me-2" data-bs-toggle="modal" data-bs-target="#confirm"><FeatherIcon icon="save" />
                     {" Save Expenses"}
                   </button>
 
@@ -577,7 +591,7 @@ const AddExpense = () => {
                       <Select style={{ width: '100%' }}
                         id="expenseFor"
                         className="select"
-                        options={options}
+                        options={sortedOptions}
                         value={editFormData.expenseFor}
                         onChange={(e) => setEditFormData({ ...editFormData, expenseFor: e })}
 
@@ -604,16 +618,11 @@ const AddExpense = () => {
                       <label>Amount</label>
                       <div className="input-groupicon">
                         <input type="text"
+                          className="form-control"
                           id="amount"
                           value={editFormData?.amount}
                           onChange={(e) => {
-                            if (e.target.value == '') {
-                              setEditFormData({ ...editFormData, amount: '' })
-                            }
-                            else if (isValidNumber(e.target.value)) {
-                              let amt = parseInt(e.target.value)
-                              setEditFormData({ ...editFormData, amount: amt })
-                            }
+                            setEditFormData({ ...editFormData, amount: e.target.value })
                           }}
                         />
 
@@ -642,6 +651,46 @@ const AddExpense = () => {
           </div>
         </div>
       </div>
+
+     {/*  Confirm Modal */}
+
+    <div
+        className="modal fade"
+        id="confirm"
+        tabIndex={-1}
+        aria-labelledby="confirm"
+        aria-hidden="true">
+
+          <div className="modal-dialog modal-md modal-dialog-centered" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                    <h5 className="modal-title">Confirm</h5>
+                    <button
+                    type="button"
+                    className="close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                    >
+                    <span aria-hidden="true">×</span>
+                </button>
+              </div>
+              <div className="modal-body">
+                Are you sure you want to save this Expense Transaction?
+              </div>
+              <div className="modal-footer">
+                  <Link to="#" className="btn btn-submit me-2" data-bs-dismiss="modal" onClick={handleSubmit}>
+                    Yes
+                  </Link>
+                  <Link to="#" className="btn btn-cancel" data-bs-dismiss="modal">
+                    No
+                </Link>
+              </div>
+            </div>
+          </div>
+
+    </div>
+
+      
     </>
   );
 };

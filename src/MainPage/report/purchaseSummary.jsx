@@ -23,7 +23,7 @@ import Swal from "sweetalert2";
 import { BASE_URL } from "../../api/CustomAxios";
 import useCustomApi from "../../hooks/useCustomApi";
 
-const PurchaseOrder = () => {
+const PurchaseSummary = () => {
   const [inputfilter, setInputfilter] = useState(false);
   const [data, setData] = useState([]);
   const axios = useCustomApi();
@@ -42,10 +42,10 @@ const PurchaseOrder = () => {
         supplierName: purchase?.supplierName,
         supplierId: purchase?.supplierId,
         status: purchase?.status,
-        reference: purchase.purchaseRef,
-        numberOfProduct: purchase.numberOfProduct,
+        reference: purchase?.purchaseRef,
+        numberOfProduct: purchase?.numberOfProduct,
         branch: loggedInUser?.branchName || '',
-        date: new Date(purchase.purchaseDate).toISOString().substring(0,10),
+        date: new Date(purchase?.purchaseDate).toISOString().substring(0,10),
         createdBy: "Admin",
 
         
@@ -72,12 +72,12 @@ const PurchaseOrder = () => {
 
   const [loggedInUser, setLoggedInUser] = useState({})
 
-  const [selectedProduct, setSelectedProduct] = useState({})
+  const [selectedProduct, setSelectedProduct] = useState('')
   const [selectedProductInfo, setSelectedProductInfo] = useState()
   const [supplier, setSupplier] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isBatchLoading, setIsBatchLoading] = useState(false)
-  const [formData, setFormData] = useState({ quantity: '', amount: '', batchNumber: {}, manuDate: '', expDate: '' , clientId:'', userId:'', startDate:'', endDate:''})
+  const [formData, setFormData] = useState({ quantity: '', amount: '', batchNumber: {}, manuDate: '', expDate: '', userId:'', startDate:'', endDate:'' })
   const [reportFile, setReportFile] = useState(null)
   const [reportIsLoading, setreportIsLoading] = useState(false)
 
@@ -190,8 +190,7 @@ const PurchaseOrder = () => {
 
     setreportIsLoading(true)
     $('#pdfViewer').modal('show')
-      if(formData.startDate != ''){
-        axios.get(`report/getPurchaseReport?startDate=${formData.startDate}&endDate=${formData.endDate}&productId=${selectedProduct?.id || ''}&batchNumber=${formData?.batchNumber?.value || ''}&userId=${formData?.userId}&clientId=${formData?.clientId}`)
+      axios.get(`report/getPurchaseSummaryReport?startDate=${formData.startDate}&endDate=${formData.endDate}&productId=${selectedProduct?.id || ''}&batchNumber=${formData?.batchNumber?.value || ''}&userId=${formData?.userId}`)
       .then((res) => {
 
         let base64 = res.data.base64String
@@ -199,20 +198,11 @@ const PurchaseOrder = () => {
         const blobFile = `data:application/pdf;base64,${base64}`
         const url = URL.createObjectURL(blob);
         setReportFile(blobFile)
-      })
-      .finally(() =>  setreportIsLoading(false))
-      }
-      else{
-        axios.get(`report/getPurchaseReport`).then((res) => {
+    
 
-        let base64 = res.data.base64String
-        const blob = base64ToBlob(base64, 'application/pdf');
-        const blobFile = `data:application/pdf;base64,${base64}`
-        const url = URL.createObjectURL(blob);
-        setReportFile(blobFile)
+       
       })
       .finally(() =>  setreportIsLoading(false))
-      }
 
     function base64ToBlob(base64, type = "application/octet-stream") {
       const binStr = atob(base64);
@@ -226,29 +216,6 @@ const PurchaseOrder = () => {
   }
 
 
-  const options = [
-    { id: 1, text: "Choose Product", text: "Choose Product" },
-    { id: 2, text: "Macbook pro", text: "Macbook pro" },
-    { id: 3, text: "Orange", text: "Orange" },
-  ];
-  const options2 = [
-    { id: 1, text: "Choose Category", text: "Choose Category" },
-    { id: 2, text: "Computers", text: "Computers" },
-    { id: 3, text: "Fruits", text: "Fruits" },
-  ];
-  const options3 = [
-    { id: 1, text: "Choose Sub Category", text: "Choose Sub Category" },
-    { id: 2, text: "Computers", text: "Computers" },
-  ];
-  const options4 = [
-    { id: 1, text: "Brand", text: "Brand" },
-    { id: 2, text: "N/D", text: "N/D" },
-  ];
-  const options5 = [
-    { id: 1, text: "Price", text: "Price" },
-    { id: 2, text: "150.00", text: "150.00" },
-  ];
-
   const togglefilter = (value) => {
     setInputfilter(false);
   };
@@ -259,34 +226,34 @@ const PurchaseOrder = () => {
     {
       title: "Purchase Date",
       dataIndex: "date",
-      sorter: (a, b) => a.date.length - b.date.length,
+      // sorter: (a, b) => a.date.length - b.date.length,
     },
     {
       title: "Supplier Name",
       dataIndex: "supplierName",
-      sorter: (a, b) => a.supplierName.length - b.supplierName.length,
+      // sorter: (a, b) => a.supplierName.length - b.supplierName.length,
     },
     {
       title: "Reference",
       dataIndex: "reference",
-      sorter: (a, b) => a.reference.length - b.reference.length,
+      // sorter: (a, b) => a.reference.length - b.reference.length,
     },
     
     {
       title: "# of Products",
       dataIndex: "numberOfProduct",
-      sorter: (a, b) => a.numberOfProduct.length - b.numberOfProduct.length,
+      // sorter: (a, b) => a.numberOfProduct.length - b.numberOfProduct.length,
     },
     {
       title: "Branch",
       dataIndex: "branch",
-      sorter: (a, b) => a.branch.length - b.branch.length,
+      // sorter: (a, b) => a.branch.length - b.branch.length,
     },
     {
       title: "Status",
       dataIndex: "status",
-      render: (text, record) => (record.status == 1 ? <span className="badges bg-lightgreen">Active</span> : <span className="badges bg-lightred">Inctive</span> ),
-      sorter: (a, b) => a.status.length - b.status.length,
+      render: (text, record) => (record?.status == 1 ? <span className="badges bg-lightgreen">Active</span> : <span className="badges bg-lightred">Inactive</span> ),
+      // sorter: (a, b) => a.status.length - b.status.length,
     },
     
  
@@ -305,8 +272,8 @@ const PurchaseOrder = () => {
         <div className="content">
           <div className="page-header">
             <div className="page-title">
-              <h4>Purchase Order Report</h4>
-              <h6>Generate your Purchase Report</h6>
+              <h4>Purchase Summary Report</h4>
+              <h6>Generate your Purchase Summary</h6>
             </div>
             <div className="page-btn">
               <Link
@@ -315,7 +282,7 @@ const PurchaseOrder = () => {
                 className="btn btn-success"
               >
                 
-                Generate Purchase Report
+                Generate Purchase Summary
               </Link>
             </div>
           </div>
@@ -360,7 +327,7 @@ const PurchaseOrder = () => {
           <div className="modal-dialog modal-md modal-dialog-centered" role="document">
             <div className="modal-content">
               <div className="modal-header">
-                    <h5 className="modal-title">Purchases Report </h5>
+                    <h5 className="modal-title">Purchases Search (Summary)</h5>
                     <button
                     type="button"
                     className="close"
@@ -439,7 +406,7 @@ const PurchaseOrder = () => {
                         <Select
                           isLoading={isLoading}
                           options={selectedProductInfo?.batchNumber?.map((item) => {
-                            return { value: item.batchNumber, label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')' : item?.batchNumber + '-(' + item?.availablequantity + ')', expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
+                            return { value: item.batchNumber, label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')' : item?.batchNumber + '-(' + item?.availablequantity + ')' }
                           })}
                           placeholder=""
                           value={formData.batchNumber}
@@ -463,7 +430,7 @@ const PurchaseOrder = () => {
                   </div>
               </div>
               <div className="modal-footer">
-                  <Link to="#" className="btn btn-submit me-2" style={{width:'100%'}} onClick={handleGenerateReport}>
+                  <Link to="#" className="btn btn-submit me-2"  style={{width:'100%'}} onClick={handleGenerateReport}>
                     Search
                   </Link>
                   {/* <Link to="#" className="btn btn-cancel" data-bs-dismiss="modal">
@@ -487,7 +454,7 @@ const PurchaseOrder = () => {
           <div className="modal-dialog modal-xl modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">Purchase Order Report</h5>
+                <h5 className="modal-title">Purchase Summary Report</h5>
                 <button
                   type="button"
                   className="close"
@@ -509,4 +476,4 @@ const PurchaseOrder = () => {
     </>
   );
 };
-export default PurchaseOrder;
+export default PurchaseSummary;

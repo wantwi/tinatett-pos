@@ -23,11 +23,18 @@ const options = [
 
 const EditSupplier = () => {
   const { state } = useLocation()
-  console.log(state)
+
   const [formData, setFormData] = useState(state)
 
   const [customerType, setCustomerType] = useState(formData?.customerType)
+  const [userType, setUserType] = useState(null)
 
+  useEffect(() => {
+    let userRole = localStorage.getItem('auth')
+    let obj =JSON.parse(userRole)
+    //console.log("Role:", obj.role)
+    setUserType(obj.role)
+  }, [])
 
 
   const validationSchema = Yup.object().shape({
@@ -150,7 +157,7 @@ const EditSupplier = () => {
                       <input className={`form-control ${errors.name ? "is-invalid" : ""
                         }`}
                         type="text"
-                        {...register("name")} disabled />
+                        {...register("name")} disabled={userType == 'admin' || userType == 'supervisor' ? false : true} />
                     </div>
                   </div>
 

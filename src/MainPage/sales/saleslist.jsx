@@ -37,11 +37,19 @@ const SalesList = () => {
   const [inputfilter, setInputfilter] = useState(false);
   const [receiptFile, setReceiptFile] = useState(null)
   const [isSaving, setIsSaving] = useState(false)
+  const [userType, setUserType] = useState('')
 
   const togglefilter = (value) => {
     setInputfilter(value);
   };
 
+
+  useEffect(() => {
+    let userRole = localStorage.getItem('auth')
+    let obj =JSON.parse(userRole)
+    console.log("Role:", obj.role)
+    setUserType(obj.role)
+  }, [])
 
   const axios = useCustomApi()
 
@@ -262,7 +270,7 @@ const SalesList = () => {
           </a>
 
 
-          {/* <Link
+          {userType == 'admin' &&  <Link
                   to="#"
                   className="confirm-text"
                   onClick={() => confirmText(record?.id)}
@@ -270,7 +278,7 @@ const SalesList = () => {
                 >
                   <img src={DeleteIcon} alt="img" />
                  
-                </Link> */}
+                </Link>}
 
 
         </>

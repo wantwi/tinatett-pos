@@ -1,6 +1,6 @@
 {
   "name": "tinatett",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "homepage": "",
   "private": true,
   "scripts": {
@@ -76,6 +76,7 @@
     "react-fontawesome": "^1.7.1",
     "react-helmet": "^6.1.0",
     "react-hook-form": "^7.34.0",
+    "react-idle-timer": "^5.7.2",
     "react-image-lightbox": "^5.1.4",
     "react-input-mask": "^2.0.4",
     "react-owl-carousel": "^2.3.3",

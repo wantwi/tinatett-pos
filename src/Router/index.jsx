@@ -22,7 +22,9 @@ import Users from '../MainPage/users'
 import Settings from '../MainPage/settings'
 import BlankPage from "../MainPage/BlankPage";
 import ProformaIndex from "../MainPage/proforma";
-import Cashier from "../MainPage/sales/cashier";
+import CashierIndex  from "../MainPage/Cashier";
+
+
 
 export default [
     {
@@ -119,7 +121,7 @@ export default [
     },
     {
         path:'Cashier',
-        component: Cashier
+        component: CashierIndex
     },
     {
         path:'Proforma',

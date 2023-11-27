@@ -22,47 +22,21 @@ import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 import Swal from "sweetalert2";
 import { BASE_URL } from "../../api/CustomAxios";
 import useCustomApi from "../../hooks/useCustomApi";
+import { moneyInTxt } from "../../utility";
 
-const PurchaseOrder = () => {
+const SalesSummary = () => {
   const [inputfilter, setInputfilter] = useState(false);
   const [data, setData] = useState([]);
   const axios = useCustomApi();
 
-  const onSuccess = (data) =>{
-    setData([])
-
-    let mappedData =  data?.data.map((purchase) => {
-      return {
-        id: purchase?.id,
-        supplier:{
-          id: purchase?.supplierId,
-          text: purchase?.supplierName,
-          value: purchase?.supplierId,
-        },
-        supplierName: purchase?.supplierName,
-        supplierId: purchase?.supplierId,
-        status: purchase?.status,
-        reference: purchase.purchaseRef,
-        numberOfProduct: purchase.numberOfProduct,
-        branch: loggedInUser?.branchName || '',
-        date: new Date(purchase.purchaseDate).toISOString().substring(0,10),
-        createdBy: "Admin",
-
-        
-      }
-    })
-  setData(mappedData)
-
-  }
 
 
   const {
-    data: purchases,
+    data: sales,
     isError,
-    isLoading: purchaseIsLoading,
+    isLoading,
     isSuccess,
-    refetch
-  } = useGet("purchases", "/purchase",onSuccess);
+  } = useGet("suspend", "/sales");
 
   const [productsDropdown, setProductsDropdown] = useState([]);
   const [suppliersDropdown, setSuppliersDropdown] = useState([]);
@@ -72,12 +46,12 @@ const PurchaseOrder = () => {
 
   const [loggedInUser, setLoggedInUser] = useState({})
 
-  const [selectedProduct, setSelectedProduct] = useState({})
+  const [selectedProduct, setSelectedProduct] = useState('')
   const [selectedProductInfo, setSelectedProductInfo] = useState()
   const [supplier, setSupplier] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
+  //const [isLoading, setIsLoading] = useState(false)
   const [isBatchLoading, setIsBatchLoading] = useState(false)
-  const [formData, setFormData] = useState({ quantity: '', amount: '', batchNumber: {}, manuDate: '', expDate: '' , clientId:'', userId:'', startDate:'', endDate:''})
+  const [formData, setFormData] = useState({ quantity: '', amount: '', batchNumber: '', manuDate: '', expDate: '', startDate:'', endDate:'' })
   const [reportFile, setReportFile] = useState(null)
   const [reportIsLoading, setreportIsLoading] = useState(false)
 
@@ -143,37 +117,33 @@ const PurchaseOrder = () => {
   }, [])
 
   const handleProductSelect = (e) => {
-    console.log("Product:", e)
     setSelectedProduct(e)
   }
 
   useEffect(() => {
-    if(!isLoading){
-      let mappedData =  purchases?.data.map((purchase) => {
-          return {
-            id: purchase?.id,
-            supplier:{
-              id: purchase?.supplierId,
-              text: purchase?.supplierName,
-              value: purchase?.supplierId,
-            },
-            supplierName: purchase?.supplierName,
-            supplierId: purchase?.supplierId,
-            status: purchase?.status,
-            reference: purchase.purchaseRef,
-            numberOfProduct: purchase.numberOfProduct,
-            branch: loggedInUser?.branchName || '',
-            date: new Date(purchase.purchaseDate).toISOString().substring(0,10),
-            createdBy: "Admin",
+    if (!isLoading) {
 
-            
-          }
-        })
-      setData(mappedData)
-
+      let mappedData = sales?.data.map((sale) => {
+        // console.log("Payment Infor:", (JSON.parse(sale?.paymentInfo)).type)
+        return {
+          id: sale?.id,
+          Date: sale?.transDate,
+          Name: sale?.customerName,
+          Status: sale?.status,
+          Reference: sale?.salesRef,
+          // Payment: JSON.parse(sale?.paymentInfo).type,
+          Total: moneyInTxt(sale?.totalAmount) || '',
+          Paid: moneyInTxt(sale?.amountPaid),
+          Balance: moneyInTxt(sale?.balance),
+          Biller: sale?.salesPerson,
+        }
+      })
+      let sortedData = mappedData.sort((a, b) => new Date(b.Date) - new Date(a.Date))
+      setData(sortedData)
+      console.log('loaded..')
     }
-    else{
-      // console.log('loading...')
+    else {
+      console.log('loading...')
     }
   }, [isLoading])
 
@@ -186,12 +156,9 @@ const PurchaseOrder = () => {
 
     }
 
-    console.log(filters)
-
     setreportIsLoading(true)
     $('#pdfViewer').modal('show')
-      if(formData.startDate != ''){
-        axios.get(`report/getPurchaseReport?startDate=${formData.startDate}&endDate=${formData.endDate}&productId=${selectedProduct?.id || ''}&batchNumber=${formData?.batchNumber?.value || ''}&userId=${formData?.userId}&clientId=${formData?.clientId}`)
+      axios.get(`report/getSalesSummaryReport?startDate=${formData.startDate}&endDate=${formData.endDate}`)
       .then((res) => {
 
         let base64 = res.data.base64String
@@ -199,20 +166,11 @@ const PurchaseOrder = () => {
         const blobFile = `data:application/pdf;base64,${base64}`
         const url = URL.createObjectURL(blob);
         setReportFile(blobFile)
-      })
-      .finally(() =>  setreportIsLoading(false))
-      }
-      else{
-        axios.get(`report/getPurchaseReport`).then((res) => {
+    
 
-        let base64 = res.data.base64String
-        const blob = base64ToBlob(base64, 'application/pdf');
-        const blobFile = `data:application/pdf;base64,${base64}`
-        const url = URL.createObjectURL(blob);
-        setReportFile(blobFile)
+       
       })
       .finally(() =>  setreportIsLoading(false))
-      }
 
     function base64ToBlob(base64, type = "application/octet-stream") {
       const binStr = atob(base64);
@@ -226,29 +184,6 @@ const PurchaseOrder = () => {
   }
 
 
-  const options = [
-    { id: 1, text: "Choose Product", text: "Choose Product" },
-    { id: 2, text: "Macbook pro", text: "Macbook pro" },
-    { id: 3, text: "Orange", text: "Orange" },
-  ];
-  const options2 = [
-    { id: 1, text: "Choose Category", text: "Choose Category" },
-    { id: 2, text: "Computers", text: "Computers" },
-    { id: 3, text: "Fruits", text: "Fruits" },
-  ];
-  const options3 = [
-    { id: 1, text: "Choose Sub Category", text: "Choose Sub Category" },
-    { id: 2, text: "Computers", text: "Computers" },
-  ];
-  const options4 = [
-    { id: 1, text: "Brand", text: "Brand" },
-    { id: 2, text: "N/D", text: "N/D" },
-  ];
-  const options5 = [
-    { id: 1, text: "Price", text: "Price" },
-    { id: 2, text: "150.00", text: "150.00" },
-  ];
-
   const togglefilter = (value) => {
     setInputfilter(false);
   };
@@ -257,43 +192,71 @@ const PurchaseOrder = () => {
 
   const columns = [
     {
-      title: "Purchase Date",
-      dataIndex: "date",
-      sorter: (a, b) => a.date.length - b.date.length,
+      title: "Date",
+      dataIndex: "Date",
+      sorter: (a, b) => a.Date.length - b.Date.length,
     },
     {
-      title: "Supplier Name",
-      dataIndex: "supplierName",
-      sorter: (a, b) => a.supplierName.length - b.supplierName.length,
+      title: "Customer name",
+      dataIndex: "Name",
+      sorter: (a, b) => a.Name.length - b.Name.length,
     },
+
     {
       title: "Reference",
-      dataIndex: "reference",
-      sorter: (a, b) => a.reference.length - b.reference.length,
-    },
-    
-    {
-      title: "# of Products",
-      dataIndex: "numberOfProduct",
-      sorter: (a, b) => a.numberOfProduct.length - b.numberOfProduct.length,
-    },
-    {
-      title: "Branch",
-      dataIndex: "branch",
-      sorter: (a, b) => a.branch.length - b.branch.length,
+      dataIndex: "Reference",
+      sorter: (a, b) => a.Reference.length - b.Reference.length,
     },
     {
       title: "Status",
-      dataIndex: "status",
-      render: (text, record) => (record.status == 1 ? <span className="badges bg-lightgreen">Active</span> : <span className="badges bg-lightred">Inctive</span> ),
-      sorter: (a, b) => a.status.length - b.status.length,
+      dataIndex: "Status",
+      render: (text, record) => (
+        <>
+          {text === "Paid" && (
+            <span className="badges btn-success">{"Paid"}</span>
+          )}
+          {text === "Suspended" && (
+            <span className="badges bg-lightgreen">{"Suspended"}</span>
+          )}
+          {text === "Credit" && (
+            <span className="badges bg-lightred">{"Credit"}</span>
+          )}
+        </>
+      ),
+      sorter: (a, b) => a.Status.length - b.Status.length,
     },
-    
- 
+    // {
+    //   title: "Payment",
+    //   dataIndex: "Payment",
+    //   render: (text, record) => (
+    //     <>
+
+    //         <span className="badges bg-lightgreen">{(text)}</span>
+
+    //     </>
+    //   ),
+    //   sorter: (a, b) => a.Payment.length - b.Payment.length,
+    // },
+    {
+      title: "Total Amount (GHS)",
+      dataIndex: "Total",
+      sorter: (a, b) => a.Total.length - b.Total.length,
+    },
+    {
+      title: "Paid Amount (GHS)",
+      dataIndex: "Paid",
+
+    },
+    {
+      title: "Balance (GHS)",
+      dataIndex: "Balance",
+
+    },
   ];
 
 
-  if(purchaseIsLoading){
+
+  if(isLoading){
     return (<LoadingSpinner/>)
   }
 
@@ -305,8 +268,8 @@ const PurchaseOrder = () => {
         <div className="content">
           <div className="page-header">
             <div className="page-title">
-              <h4>Purchase Order Report</h4>
-              <h6>Generate your Purchase Report</h6>
+              <h4>Sales Summary Report</h4>
+              <h6>Generate your Sales Summary</h6>
             </div>
             <div className="page-btn">
               <Link
@@ -315,14 +278,14 @@ const PurchaseOrder = () => {
                 className="btn btn-success"
               >
                 
-                Generate Purchase Report
+                Generate Sales Summary
               </Link>
             </div>
           </div>
           {/* /product list */}
           <div className="card">
             <div className="card-body">
-              <Tabletop inputfilter={inputfilter} togglefilter={togglefilter} data={data} title={'Purchase List'}/>
+              <Tabletop inputfilter={inputfilter} togglefilter={togglefilter} data={data} title={'Sales List'}/>
               {/* /Filter */}
               <div
                 className={`card mb-0 ${ inputfilter ? "toggleCls" : ""}`}
@@ -360,7 +323,7 @@ const PurchaseOrder = () => {
           <div className="modal-dialog modal-md modal-dialog-centered" role="document">
             <div className="modal-content">
               <div className="modal-header">
-                    <h5 className="modal-title">Purchases Report </h5>
+                    <h5 className="modal-title">Sales Search (Summary)</h5>
                     <button
                     type="button"
                     className="close"
@@ -463,7 +426,7 @@ const PurchaseOrder = () => {
                   </div>
               </div>
               <div className="modal-footer">
-                  <Link to="#" className="btn btn-submit me-2" style={{width:'100%'}} onClick={handleGenerateReport}>
+                  <Link to="#" className="btn btn-submit me-2"  style={{width:'100%'}} onClick={handleGenerateReport}>
                     Search
                   </Link>
                   {/* <Link to="#" className="btn btn-cancel" data-bs-dismiss="modal">
@@ -487,7 +450,7 @@ const PurchaseOrder = () => {
           <div className="modal-dialog modal-xl modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">Purchase Order Report</h5>
+                <h5 className="modal-title">Sales Summary Report</h5>
                 <button
                   type="button"
                   className="close"
@@ -509,4 +472,4 @@ const PurchaseOrder = () => {
     </>
   );
 };
-export default PurchaseOrder;
+export default SalesSummary;

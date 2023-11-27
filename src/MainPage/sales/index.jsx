@@ -2,19 +2,12 @@ import React from 'react'
 import { Redirect, Route, Switch } from 'react-router-dom';
 import Saleslist from './saleslist'
 import Addsales from './addsales'
-import Editsales from './editsales'
 import Saledetails from './saledetails'
 import SalesReturnList from '../Return/SalesReturnList'
 import AddSalesReturn from '../Return/AddSalesReturn'
 import Suspended from './suspended';
-import Cashier from './cashier';
 import ProformaSales from './proformasales';
 import EditSales from './EditSale';
-
-
-
-
-
 
 
 const SalesIndex = ({ match}) =>(
@@ -22,7 +15,7 @@ const SalesIndex = ({ match}) =>(
         <Redirect exact from={`${match.url}/`} to={`${match.url}/generalsettings`} />
         <Route path={`${match.url}/saleslist`} component={Saleslist} />     
         <Route path={`${match.url}/suspended`} component={Suspended} />      
-        <Route path={`${match.url}/cashier/suspended`} component={Cashier} />                                                                                                                                                                                  
+                                                                                                                                                                                          
         <Route path={`${match.url}/add-sales`} component={Addsales} />    
         <Route path={`${match.url}/proforma-sales`} component={ProformaSales} />                                                                                                                                                                                        
         <Route path={`${match.url}/edit-sales`} component={EditSales} />                                                                                                                                                                                        
@@ -35,16 +28,7 @@ const SalesIndex = ({ match}) =>(
     </Switch>
 )
 
-
-export const CashierIndex = ({ match}) =>(
-    <Switch>
-        <Redirect exact from={`${match.url}/`} to={`${match.url}/generalsettings`} />    
-        <Route path={`${match.url}/cashier/suspended`} component={Cashier} />                                                                                                                                                                                  
-                                                                                                                                                                                                                                                                                                                                                                      
-                                                                                           
-                                                                                                  
-        
-    </Switch>
-)
-
 export default SalesIndex
+
+
+

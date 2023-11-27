@@ -1,32 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Table from "../../EntryFile/datatable";
 import { Link } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import Tabletop from "../../EntryFile/tabletop";
 import Swal from "sweetalert2";
 import "react-datepicker/dist/react-datepicker.css";
-import {
-  // ClosesIcon,
-  // Excel,
-  // Filter,
-  // Pdf,
-  // Eye1,
-  Calendar,
-  Printer,
-  search_whites,
-  //Search,
-  PlusIcon,
-  //EditIcon,
-  Dollar1,
-  // plusCircle,
-  Download,
-  pause1,
-  delete1,
-  //DeleteIcon,
-  datepicker,
-  DeleteIcon,
-  EditIcon,
-} from "../../EntryFile/imagePath";
+import { useMutation } from '@tanstack/react-query'
 import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
 import { useGet } from "../../hooks/useGet";
@@ -39,15 +18,12 @@ import "../../../node_modules/alertifyjs/build/css/alertify.css";
 import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
 import { Button } from "antd";
 import FeatherIcon from 'feather-icons-react'
+import { socket } from "../../InitialPage/Sidebar/Header";
+import useAuth from "../../hooks/useAuth";
+import { NotificationsContext } from "../../InitialPage/Sidebar/DefaultLayout";
 
-
-const Suspended = () => {
-  const [startDate, setStartDate] = useState(new Date());
-  const [startDate1, setStartDate1] = useState(new Date());
-  const [inputfilter, setInputfilter] = useState(false);
-  const [activeTab, setActiveTab] = useState('Cash')
-  const [modalData, setModalData] = useState(null)
-  const [paymentInfo, setPaymentInfo] = useState({
+const CreditPayment = () => {
+  const init = {
     type: '',
     cashWaybill: '',
     cashReceiptNo: '',
@@ -64,24 +40,32 @@ const Suspended = () => {
     transactionID: '',
     amountPaid: ''
 
-  })
+  }
+
+  const [inputfilter, setInputfilter] = useState(true);
+  const [activeTab, setActiveTab] = useState('Cash')
+  const [modalData, setModalData] = useState(null)
+  const [isCredit, setIsCredit] = useState(false)
+  const [paymentInfo, setPaymentInfo] = useState(init)
+  const [filter, setFilter] = useState('All')
+  const [productGridData, setProductGridData] = useState([])
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [receiptFile, setReceiptFile] = useState(null)
+  const [isSaving, setIsSaving] = useState(false)
+
+  const { notifications, setNotifications } = useContext(NotificationsContext)
+  let storage = JSON.parse(localStorage.getItem("auth"))
 
 
-  useEffect(() => {
-    setPaymentInfo({ ...paymentInfo, amountPaid: Number(paymentInfo.cashAmount) + Number(paymentInfo.chequeAmount) + Number(paymentInfo.momoAmount) })
-  }, [paymentInfo.cashAmount, paymentInfo.chequeAmount, paymentInfo.momoAmount])
+  const onSuccess = (data) => {
 
-
-  const onSuccess = (data) =>{
-    
     setData([])
 
     let mappedData = data?.data.map((sale) => {
       return {
-        ...sale,
         id: sale?.id,
         Date: sale?.transDate,
-        Name: sale?.customer_name || 'N/A',
+        Name: sale?.CustomerName || 'N/A',
         Status: sale?.status,
         Reference: sale?.salesRef,
         Payment: sale?.paymentType,
@@ -92,21 +76,24 @@ const Suspended = () => {
         salestype: sale?.salesType
       }
     })
-    let sortedData = mappedData.sort((a,b) => new Date(b.Date) - new Date(a.Date))
-    setData(sortedData)
+    setData(mappedData)
 
   }
+
+  useEffect(() => {
+    setPaymentInfo({ ...paymentInfo, amountPaid: Number(paymentInfo.cashAmount) + Number(paymentInfo.chequeAmount) + Number(paymentInfo.momoAmount) })
+  }, [paymentInfo.cashAmount, paymentInfo.chequeAmount, paymentInfo.momoAmount])
 
   const {
     data: sales,
     isError,
     isLoading,
     refetch,
-  } = useGet("suspend", "/sales/suspend", onSuccess);
+
+  } = useGet("suspend", "/sales/credit", onSuccess);
   const [data, setData] = useState([])
 
-  const axios = useCustomApi()
-  
+
   const togglefilter = (value) => {
     setInputfilter(value);
   };
@@ -123,31 +110,36 @@ const Suspended = () => {
       confirmButtonClass: "btn btn-primary",
       cancelButtonClass: "btn btn-danger ml-1",
       buttonsStyling: !1,
-    }) .then( async(t) => {
-     
-      if(t.isConfirmed){
-          let data = await axios.delete(`/sales/suspend/${id}`)
-          if(data.status < 205){
-            Swal.fire({
-              type: "success",
-              title: "Deleted!",
-              text: "Your suspended sale item has been deleted.",
-              confirmButtonClass: "btn btn-success",
-            });
-          refetch()
-      
-          }
-          else{
-            Swal.fire({
-              type: "danger",
-              title: "Error!",
-              text: data.response.data.message,
-              confirmButtonClass: "btn btn-danger",
-            });
-          }
-        }
+    }).then(async (t) => {
 
-        t.dismiss === Swal.DismissReason.cancel &&
+      if (t.isConfirmed) {
+        setIsDeleting(true)
+
+
+        let data = await axios.delete(`/sales/suspend/${id}`)
+        if (data.status < 205) {
+          setIsDeleting(false)
+          Swal.fire({
+            type: "success",
+            title: "Deleted!",
+            text: "Your suspended item has been deleted.",
+            confirmButtonClass: "btn btn-success",
+          });
+          refetch()
+
+        }
+        else {
+          Swal.fire({
+            type: "danger",
+            title: "Error!",
+            text: data.response.data.message,
+            confirmButtonClass: "btn btn-danger",
+          });
+        }
+      }
+
+
+      t.dismiss === Swal.DismissReason.cancel &&
         Swal.fire({
           title: "Cancelled",
           text: "You cancelled the delete action",
@@ -155,18 +147,21 @@ const Suspended = () => {
           confirmButtonClass: "btn btn-success",
         });
     })
-    .catch( (error) => {
+      .catch((error) => {
         Swal.fire({
           type: "danger",
           title: "Error!",
           text: error,
           confirmButtonClass: "btn btn-danger",
         });
-    });
+      });
   };
 
+  const axios = useCustomApi()
+
   const processPayment = (type, print) => {
-    if (Number(paymentInfo.cashAmount) + Number(paymentInfo.cashAmount) + Number(paymentInfo.cashAmount) > 0) {
+
+    if ((Number(paymentInfo.cashAmount) + Number(paymentInfo.cashAmount) + Number(paymentInfo.cashAmount) > 0) || type == 'Credit') {
       let pType = ''
       if (paymentInfo.cashAmount > 0) {
         pType = pType.concat('Cash,')
@@ -179,10 +174,9 @@ const Suspended = () => {
         pType = pType.concat('Cheque,')
       }
       let payload = {
-        status: type,
+        transDate: new Date().toISOString(),
         salesRef: modalData.Reference,
-        amount: modalData?.Total,
-        paymentType: pType,
+        amount: (Number(paymentInfo.cashAmount) + Number(paymentInfo.momoAmount) + Number(paymentInfo.chequeAmount)),
         paymentInfo: [
           { "type": "Cash", waybill: paymentInfo.cashWaybill, amountPaid: paymentInfo.cashAmount },
           { "type": "Momo", name: paymentInfo.momoName, receiptNo: paymentInfo.momoReceiptNo, amountPaid: paymentInfo.momoAmount },
@@ -190,51 +184,87 @@ const Suspended = () => {
         ]
       }
 
-      // console.log(payload)
-      axios.post('/sales', payload)
-        .then((res) => {
-          console.log(res.data.success)
-          if (res.data.success) {
-            if (print) {
-              getInvoiceReceipt(modalData.Reference)
-            }
-            alertify.set("notifier", "position", "bottom-right");
-            alertify.success("Sale completed.");
 
-          }
-        })
-        .catch((error) => {
-          alertify.set("notifier", "position", "bottom-right");
-          alertify.error("Error...Could not complete transaction");
-        })
-        .finally(() => {
-          setPaymentInfo({
-            type: '',
-            cashWaybill: '',
-            cashReceiptNo: '',
-            cashAmount: '',
-            chequeNo: '',
-            chequeReceiptNo: '',
-            chequeAmount: '',
-            chequeWaybill: '',
-            dueDate: '',
-            bank: '',
-            momoName: '',
-            momoReceiptNo: '',
-            momoAmount: '',
-            transactionID: '',
-            amountPaid: ''
+      // if ((type == 'Paid') && payload.amount < modalData?.Total) {
+      //   alertify.set("notifier", "position", "bottom-right");
+      //   alertify.warning("Please provide full payment amount before saving.");
+
+      //   let newNotification = {
+      //     id: Math.ceil(Math.random() * 1000000),
+      //     message: `${storage.name} Please provide full payment amount before saving.`,
+      //     time: new Date().toISOString(), type: 'warning'
+      //   }
+      //   setNotifications([newNotification, ...notifications])
+      // }
+
+
+     // else {
+        setIsSaving(true)
+        // console.log(payload)
+        axios.put('/sales/credit/payment', payload)
+          .then((res) => {
+
+            console.log(res.data.success)
+            if (res.data.success) {
+              if (print) {
+                getInvoiceReceipt(modalData.Reference)
+              }
+              alertify.set("notifier", "position", "bottom-right");
+              alertify.success("Sale completed.");
+              refetch()
+              $('.modal').modal('hide')
+              $('body').removeClass('modal-open');
+              $('.modal-backdrop').remove();
+            }
           })
-          setTimeout(() => {
-            $('.modal').modal('hide')
-            
-          }, 1500)
-          //
-        })
-    }
+          .catch((error) => {
+            console.log(error)
+            alertify.set("notifier", "position", "bottom-right");
+            alertify.error(error.response.data.error);
+
+            let newNotification = {
+              id: Math.ceil(Math.random() * 1000000),
+              message: `${storage.name} ${error.response.data.error}`,
+              time: new Date().toISOString(), type: 'error'
+            }
+            setNotifications([newNotification, ...notifications])
+          })
+          .finally(() => {
+            setIsSaving(false)
+            setIsCredit(false)
+            setPaymentInfo({
+              type: '',
+              cashWaybill: '',
+              cashReceiptNo: '',
+              cashAmount: '',
+              chequeNo: '',
+              chequeReceiptNo: '',
+              chequeAmount: '',
+              chequeWaybill: '',
+              dueDate: '',
+              bank: '',
+              momoName: '',
+              momoReceiptNo: '',
+              momoAmount: '',
+              transactionID: '',
+              amountPaid: ''
+            })
+
+          })
+      }
+
+   // }
+
     else {
       alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please enter an amount first");
+
+      let newNotification = {
+        id: Math.ceil(Math.random() * 1000000),
+        message: `${storage.name} Please enter an amount first`,
+        time: new Date().toISOString(), type: 'warning'
+      }
+      setNotifications([newNotification, ...notifications])
     }
 
 
@@ -243,12 +273,16 @@ const Suspended = () => {
   const getInvoiceReceipt = (salesref) => {
     axios.get('/sales/getSaleReceipt/' + salesref)
       .then((res) => {
-        console.log(res.data)
-        var base64 = res.data.base64
+        let base64 = res.data.base64
         const blob = base64ToBlob(base64, 'application/pdf');
+        const blobFile = `data:application/pdf;base64,${base64}`
         const url = URL.createObjectURL(blob);
-        const pdfWindow = window.open("");
-        pdfWindow.document.write("<iframe width='100%' height='100%' src='" + url + "'></iframe>");
+        setReceiptFile(blobFile)
+        //window.open(url, "_blank", "width=600, height=600", 'modal=yes');
+        // var newWindow = window.open(url, "_blank", "width=800, height=800");  
+        //pdfWindow.document.write("<iframe width='100%' height='100%' src='" + url + "'></iframe>");
+
+        $('#pdfViewer').modal('show')
       })
 
     function base64ToBlob(base64, type = "application/octet-stream") {
@@ -266,8 +300,9 @@ const Suspended = () => {
 
 
   const options = [
-    { id: 1, text: "Completed", text: "Completed" },
-    { id: 2, text: "Paid", text: "Paid" },
+    { id: 'Retail', text: "Retail", text: "Retail" },
+    { id: 'Wholesale', text: "Wholesale", text: "Wholesale" },
+    { id: 'All', text: "All", text: "All" },
   ];
   const options1 = [
     { id: 1, text: "Cash", text: "Cash" },
@@ -276,15 +311,15 @@ const Suspended = () => {
   ];
 
 
-
+  //
   useEffect(() => {
-    if (!isLoading) {
+    // refetch()
+    if (sales) {
       let mappedData = sales?.data.map((sale) => {
         return {
-          ...sale,
           id: sale?.id,
           Date: sale?.transDate,
-          Name: sale?.customer_name || 'N/A',
+          Name: sale?.CustomerName || 'N/A',
           Status: sale?.status,
           Reference: sale?.salesRef,
           Payment: sale?.paymentType,
@@ -295,11 +330,95 @@ const Suspended = () => {
           salestype: sale?.salesType
         }
       })
-      let sortedData = mappedData.sort((a,b) => new Date(b.Date) - new Date(a.Date))
-      setData(sortedData)  
+      setData(mappedData)
+      console.log('loaded..')
     }
-   
-  }, [isLoading])
+    else {
+      console.log('loading...')
+    }
+  }, [sales])
+
+
+  socket.on("receive_message", (data) => {
+    try {
+
+      let mappedData = data?.response.map((sale) => {
+        return {
+          id: sale?.id,
+          Date: sale?.transDate,
+          Name: sale?.CustomerName || 'N/A',
+          Status: sale?.status,
+          Reference: sale?.salesRef,
+          Payment: sale?.paymentType,
+          Total: moneyInTxt(sale?.totalAmount),
+          Paid: sale?.changeAmt,
+          Due: sale?.balance,
+          Biller: sale?.salesPerson,
+          salestype: sale?.salesType
+        }
+      })
+
+      setData([])
+      setData(mappedData)
+
+      console.log({ receive_message: data });
+      return
+    } catch (error) {
+
+    }
+
+
+  })
+
+
+
+  useEffect(() => {
+    if (!isLoading) {
+      let mappedData = sales?.data.map((sale) => {
+        return {
+          id: sale?.id,
+          Date: sale?.transDate,
+          Name: sale?.CustomerName || 'N/A',
+          Status: sale?.status,
+          Reference: sale?.salesRef,
+          Payment: sale?.paymentType,
+          Total: moneyInTxt(sale?.totalAmount),
+          Paid: sale?.changeAmt,
+          Due: sale?.balance,
+          Biller: sale?.salesPerson,
+          salestype: sale?.salesType
+        }
+      })
+      if (filter == 'All') {
+        setData(mappedData)
+      }
+      else {
+        setData(mappedData?.filter((item) => item?.salestype == filter))
+      }
+
+    }
+  }, [filter])
+
+
+  const getSalesProductById = (id) => {
+    axios.get(`/sales/suspend/items/${id}`)
+      .then((res) => {
+        let x = (res.data?.data)
+        console.log("Items", x)
+        let mapped = x.map((item) => {
+          return {
+            salesRef: item?.salesRef,
+            name: item?.product?.name,
+            productId: item?.id,
+            quantity: item?.quantity,
+            unitPrice: item?.unitPrice,
+            amount: item?.amount
+          }
+        })
+        setProductGridData(mapped)
+      })//.finally(() => setLoading(false))
+  }
+
 
   const columns = [
     {
@@ -310,7 +429,7 @@ const Suspended = () => {
     {
       title: "Customer name",
       dataIndex: "Name",
-      sorter: (a, b) => a.Name.length - b.Name.length,
+      
     },
 
     {
@@ -343,34 +462,22 @@ const Suspended = () => {
       title: "Action",
       render: (text, record) => (
         <>
-
-          {/* <li>
-                <Link to="/tinatett-pos/sales/sales-details" className="dropdown-item">
-                  <img src={Eye1} className="me-2" alt="img" />
-                  Sale Detail
-                </Link>
-              </li>
-              */}
-
-          {/* <Link
-                  to="#"
-                  data-bs-toggle="modal"
-                  data-bs-target="#showpayment"
-                  onClick={() => setModalData(record)}
-                  title={'Pay'}
-                >
-                
-                  <span className="badges bg-lightgreen me-2"><FeatherIcon icon="credit-card"/> Pay</span>
-                 
-                </Link> */}
-
-          <Link  to={{pathname:"/tinatett-pos/sales/edit-sales" , state:record}}  title={'Edit'}>
-            <span className="badges btn-cancel me-2"><FeatherIcon icon="edit" />  Edit</span>
+          <Link
+            to="#"  data-bs-toggle="modal"
+            data-bs-target="#showpayment"
+            onClick={() => { setModalData(record), setIsCredit(false) }}
+            title={'Pay'}>
+             <span className="badges bg-lightgreen me-2"><FeatherIcon icon="credit-card" /> Pay</span>
           </Link>
+          <Link
+              to="#"
+              // className="dropdown-item confirm-text"
+              onClick={() => confirmText(record.id)}
+              title={'Delete Transaction'}
+            >
 
-
-          <Link to="#" onClick={() => confirmText(record?.id)} title={'Remove'}>
-            <span className="badges bg-lightred"><FeatherIcon icon="trash" /> Remove</span>
+              <span className="badges bg-lightred"><FeatherIcon icon="trash" /> Remove</span>
+              {/* Remove  */}
           </Link>
 
 
@@ -381,7 +488,16 @@ const Suspended = () => {
 
 
   if (isLoading) {
-    return (<LoadingSpinner message="Fetching Suspended sales.." />)
+    return (<LoadingSpinner message="Fetching Credited sales.." />)
+  }
+
+
+  if (isDeleting) {
+    return (<LoadingSpinner message="Deleting.." />)
+  }
+
+  if (isSaving) {
+    return <LoadingSpinner message="Processing...please wait" />
   }
 
   return (
@@ -390,14 +506,14 @@ const Suspended = () => {
         <div className="content">
           <div className="page-header">
             <div className="page-title">
-              <h4>Suspended List</h4>
-              <h6>Cashiers Window </h6>
+              <h4>Credit Payment</h4>
+              <h6>Payment for credit purchases </h6>
             </div>
             <div className="page-btn">
-              <Link to="/tinatett-pos/sales/add-sales" className="btn btn-added">
+              {/* <Link to="/tinatett-pos/sales/add-sales" className="btn btn-added">
                 <img src={PlusIcon} alt="img" className="me-1" />
                 Go to Sales
-              </Link>
+              </Link> */}
             </div>
           </div>
           {/* /product list */}
@@ -412,34 +528,27 @@ const Suspended = () => {
               >
                 <div className="card-body pb-0">
                   <div className="row">
-                    <div className="col-lg-3 col-sm-6 col-12">
-                      <div className="form-group">
-                        <input type="text" placeholder="Enter Name" />
-                      </div>
-                    </div>
-                    <div className="col-lg-3 col-sm-6 col-12">
-                      <div className="form-group">
-                        <input type="text" placeholder="Enter Reference No" />
-                      </div>
-                    </div>
+
                     <div className="col-lg-3 col-sm-6 col-12">
                       <div className="form-group">
                         <Select2
                           className="select"
                           data={options}
                           options={{
-                            placeholder: "Choose Suppliers",
+                            placeholder: "Filter by Sales Type",
                           }}
+                          value={filter}
+                          onChange={(e) => setFilter(e.target.value)}
                         />
                       </div>
                     </div>
-                    <div className="col-lg-3 col-sm-6 col-12">
+                    {/* <div className="col-lg-3 col-sm-6 col-12">
                       <div className="form-group">
                         <Link className="btn btn-filters ms-auto">
                           <img src={search_whites} alt="img" />
                         </Link>
                       </div>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </div>
@@ -453,6 +562,7 @@ const Suspended = () => {
         </div>
       </div>
       <>
+        {/* show payment Modal */}
         <div
           className="modal fade"
           id="showpayment"
@@ -469,6 +579,7 @@ const Suspended = () => {
                   className="close"
                   data-bs-dismiss="modal"
                   aria-label="Close"
+                  onClick={() => { setIsCredit(false), setPaymentInfo(init) }}
                 >
                   <span aria-hidden="true">×</span>
                 </button>
@@ -515,14 +626,16 @@ const Suspended = () => {
                                 <label>Amount </label>
                                 <div className="input-groupicon">
                                   <input
-                                    type="text"
+                                    type="number"
+                                    min={0}
+                                    className="form-control"
                                     placeholder=""
                                     value={paymentInfo.cashAmount}
                                     onChange={(e) => {
                                       if (e.target.value == '') {
                                         setPaymentInfo({ ...paymentInfo, cashAmount: '' })
                                       }
-                                      else if (isValidNumber(e.target.value)) {
+                                      else {
                                         setPaymentInfo({ ...paymentInfo, cashAmount: Number(e.target.value) })
                                       }
 
@@ -637,14 +750,17 @@ const Suspended = () => {
                                 <label>Amount</label>
                                 <div className="input-groupicon">
                                   <input
-                                    type="text"
+                                    type="number"
+                                    min={0}
                                     placeholder=""
+                                    className="form-control"
                                     value={paymentInfo.chequeAmount}
+
                                     onChange={(e) => {
                                       if (e.target.value == '') {
                                         setPaymentInfo({ ...paymentInfo, chequeAmount: '' })
                                       }
-                                      else if (isValidNumber(e.target.value)) {
+                                      else {
                                         setPaymentInfo({ ...paymentInfo, chequeAmount: Number(e.target.value) })
                                       }
 
@@ -695,18 +811,21 @@ const Suspended = () => {
                                 <label>Amount</label>
                                 <div className="input-groupicon">
                                   <input
-                                    type="text"
+                                    type="number"
+                                    min={0}
+                                    className="form-control"
                                     placeholder=""
                                     value={paymentInfo.momoAmount}
                                     onChange={(e) => {
                                       if (e.target.value == '') {
                                         setPaymentInfo({ ...paymentInfo, momoAmount: '' })
                                       }
-                                      else if (isValidNumber(e.target.value)) {
+                                      else {
                                         setPaymentInfo({ ...paymentInfo, momoAmount: Number(e.target.value) })
                                       }
 
                                     }}
+
                                   />
 
                                 </div>
@@ -754,7 +873,7 @@ const Suspended = () => {
                                 <h4>Grand Total</h4>
                                 <h5>GHS {moneyInTxt(modalData?.Total)}</h5>
                               </li>
-                              <li>
+                              <li style={{ border: Number(modalData?.Total) - Number(paymentInfo.amountPaid) > 0 ? '2px solid red' : Number(modalData?.Total) - Number(paymentInfo.amountPaid) < 0 ? '2px solid green' : null }}>
                                 <h4>{Number(modalData?.Total) - Number(paymentInfo.amountPaid) < 0 ? 'Change' : 'Balance'}</h4>
                                 <h5>GHS {moneyInTxt(Math.abs(Number(modalData?.Total) - Number(paymentInfo.amountPaid)))}</h5>
                               </li>
@@ -777,19 +896,19 @@ const Suspended = () => {
                 </div>
 
                 <div className="row mt-2">
-                  <div className="col-lg-12" style={{ display: 'flex', justifyContent: 'space-between' }} >
-                    <button className="btn btn-info me-2" style={{ width: '20%' }}  data-bs-toggle="modal" data-bs-target="#confirmPaymentSellPrint">
+                  <div className="col-lg-12" style={{ display: 'flex', justifyContent: 'flex-start' }} >
+                    {!isCredit && (<button className="btn btn-info me-2" data-bs-toggle="modal" data-bs-target="#confirmPaymentSellPrint" style={{ width: '20%' }}>
                       Sell and Print
-                    </button>
-                    <button className="btn btn-warning me-2"  style={{ width: '20%' }}  data-bs-toggle="modal" data-bs-target="#confirmPaymentSellOnly">
+                    </button>)}
+                    {/* {!isCredit && (<button className="btn btn-warning me-2" onClick={() => processPayment("Paid", false)} style={{ width: '20%' }}>
                       Sell Only
-                    </button>
-                    <button className="btn btn-danger me-2" style={{ width: '20%' }}  data-bs-toggle="modal" data-bs-target="#confirmPaymentCreditPrint">
+                    </button>)} */}
+                    {/* <button className="btn btn-danger me-2" style={{ width: '20%' }} data-bs-toggle="modal" data-bs-target="#confirmPaymentCreditPrint" >
                       Credit and Print
-                    </button>
-                    <button className="btn btn-cancel" style={{ width: '20%' }}  data-bs-toggle="modal" data-bs-target="#confirmPaymentCreditOnly">
+                    </button> */}
+                    {/* <button className="btn btn-cancel" style={{ width: '20%' }} onClick={() => processPayment("Credit", false)}>
                       Credit Only
-                    </button>
+                    </button> */}
 
                   </div>
                 </div>
@@ -798,170 +917,151 @@ const Suspended = () => {
           </div>
         </div>
 
-         {/* Payment Confirm Modal */}
-
-    <div
-        className="modal fade"
-        id="confirmPaymentSellPrint"
-        tabIndex={-1}
-        aria-labelledby="confirmPaymentSellPrint"
-        aria-hidden="true">
-
-          <div className="modal-dialog modal-md modal-dialog-centered" role="document">
-            <div className="modal-content">
-              <div className="modal-header">
-                    <h5 className="modal-title">Confirm</h5>
-                    <button
-                    type="button"
-                    className="close"
-                    data-bs-dismiss="modal"
-                    aria-label="Close"
-                    >
-                    <span aria-hidden="true">×</span>
-                </button>
-              </div>
-              <div className="modal-body">
-                Are you sure you want to save this payment Transaction?
-              </div>
-              <div className="modal-footer">
-                  <Link to="#" className="btn btn-submit me-2" data-bs-dismiss="modal"  onClick={() => processPayment("Paid", true)}>
-                    Yes
-                  </Link>
-                  <Link to="#" className="btn btn-cancel" data-bs-dismiss="modal">
-                    No
-                </Link>
-              </div>
-            </div>
-          </div>
-
-    </div>
-
-
-    <div
-        className="modal fade"
-        id="confirmPaymentSellOnly"
-        tabIndex={-1}
-        aria-labelledby="confirmPaymentSellOnly"
-        aria-hidden="true">
-
-          <div className="modal-dialog modal-md modal-dialog-centered" role="document">
-            <div className="modal-content">
-              <div className="modal-header">
-                    <h5 className="modal-title">Confirm</h5>
-                    <button
-                    type="button"
-                    className="close"
-                    data-bs-dismiss="modal"
-                    aria-label="Close"
-                    >
-                    <span aria-hidden="true">×</span>
-                </button>
-              </div>
-              <div className="modal-body">
-                Are you sure you want to save this payment Transaction?
-              </div>
-              <div className="modal-footer">
-                  <Link to="#" className="btn btn-submit me-2" data-bs-dismiss="modal" onClick={() => processPayment("Paid", false)}>
-                    Yes
-                  </Link>
-                  <Link to="#" className="btn btn-cancel" data-bs-dismiss="modal">
-                    No
-                </Link>
-              </div>
-            </div>
-          </div>
-
-    </div>
-
-
-    <div
-        className="modal fade"
-        id="confirmPaymentCreditOnly"
-        tabIndex={-1}
-        aria-labelledby="confirmPaymentCreditOnly"
-        aria-hidden="true">
-
-          <div className="modal-dialog modal-md modal-dialog-centered" role="document">
-            <div className="modal-content">
-              <div className="modal-header">
-                    <h5 className="modal-title">Confirm</h5>
-                    <button
-                    type="button"
-                    className="close"
-                    data-bs-dismiss="modal"
-                    aria-label="Close"
-                    >
-                    <span aria-hidden="true">×</span>
-                </button>
-              </div>
-              <div className="modal-body">
-                Are you sure you want to save this payment Transaction?
-              </div>
-              <div className="modal-footer">
-                  <Link to="#" className="btn btn-submit me-2" data-bs-dismiss="modal"  onClick={() => processPayment("Credit", false)}>
-                    Yes
-                  </Link>
-                  <Link to="#" className="btn btn-cancel" data-bs-dismiss="modal">
-                    No
-                </Link>
-              </div>
-            </div>
-          </div>
-
-    </div>
-
-
-    <div
-        className="modal fade"
-        id="confirmPaymentCreditPrint"
-        tabIndex={-1}
-        aria-labelledby="confirmPaymentCreditPrint"
-        aria-hidden="true">
-
-          <div className="modal-dialog modal-md modal-dialog-centered" role="document">
-            <div className="modal-content">
-              <div className="modal-header">
-                    <h5 className="modal-title">Confirm</h5>
-                    <button
-                    type="button"
-                    className="close"
-                    data-bs-dismiss="modal"
-                    aria-label="Close"
-                    >
-                    <span aria-hidden="true">×</span>
-                </button>
-              </div>
-              <div className="modal-body">
-                Are you sure you want to save this payment Transaction?
-              </div>
-              <div className="modal-footer">
-                  <Link to="#" className="btn btn-submit me-2" data-bs-dismiss="modal"  onClick={() => processPayment("Credit", true)}>
-                    Yes
-                  </Link>
-                  <Link to="#" className="btn btn-cancel" data-bs-dismiss="modal">
-                    No
-                </Link>
-              </div>
-            </div>
-          </div>
-
-    </div>
-        {/* show payment Modal */}
-        {/* show payment Modal */}
+        {/* cash payment Modal */}
         <div
           className="modal fade"
-          id="createpayment"
+          id="cashpayment"
           tabIndex={-1}
-          aria-labelledby="createpayment"
+          aria-labelledby="cashpayment"
           aria-hidden="true"
         >
           <div className="modal-dialog modal-lg modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">Create Payment</h5>
+                <h5 className="modal-title">Sales Type: {modalData?.salestype}</h5>
                 <button
                   type="button"
-                  className="btn-close"
+                  className="close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                  onClick={() => { setIsCredit(false), setPaymentInfo(init) }}
+                >
+                  <span aria-hidden="true">×</span>
+                </button>
+              </div>
+              <div className="modal-body">
+                <div style={{ display: 'grid', gridTemplateColumns: '4fr 1fr' }}>
+                  <div className="card" style={{ border: '1px solid #252525' }}>
+                    <div className="card-body">
+                      <div className="payment-div" >
+                        <ul className="nav nav-tabs">
+                          <li className="nav-item" onClick={() => setActiveTab('Cash')}>
+                            <a className={activeTab == 'Cash' ? `nav-link active` : `nav-link`} href="javascript:void(0);">Cash</a>
+                          </li>
+
+                        </ul>
+
+                        <div id="cash-tab" style={{ marginTop: 20 }}>
+                          <div className="row">
+
+
+                            <div className="col-12">
+                              <div className="form-group">
+                                <label>Amount </label>
+                                <div className="input-groupicon">
+                                  <input
+                                    type="number"
+                                    min={0}
+                                    className="form-control"
+                                    placeholder=""
+                                    value={paymentInfo.cashAmount}
+                                    onChange={(e) => {
+                                      if (e.target.value == '') {
+                                        setPaymentInfo({ ...paymentInfo, cashAmount: '' })
+                                      }
+                                      else if (isValidNumber(e.target.value)) {
+                                        setPaymentInfo({ ...paymentInfo, cashAmount: Number(e.target.value) })
+                                      }
+
+                                    }}
+                                  />
+
+                                </div>
+                              </div>
+                            </div>
+
+
+                          </div>
+                        </div>
+
+                      </div>
+
+                      <div className="row">
+                        <div className="col-lg-6 ">
+                          <div className="total-order w-100 max-widthauto m-auto mb-4">
+                            <ul>
+                              <li>
+                                <h4>Amount Given</h4>
+                                <h5>GHS {moneyInTxt(paymentInfo?.amountPaid)} </h5>
+                              </li>
+                              <li>
+                                <h4>Discount </h4>
+                                <h5>GHS 0.00</h5>
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
+                        <div className="col-lg-6 ">
+                          <div className="total-order w-100 max-widthauto m-auto mb-4">
+                            <ul>
+                              <li className="total">
+                                <h4>Grand Total</h4>
+                                <h5>GHS {moneyInTxt(modalData?.Total)}</h5>
+                              </li>
+                              <li style={{ border: Number(modalData?.Total) - Number(paymentInfo.amountPaid) > 0 ? '2px solid red' : Number(modalData?.Total) - Number(paymentInfo.amountPaid) < 0 ? '2px solid green' : null }}>
+                                <h4>{Number(modalData?.Total) - Number(paymentInfo.amountPaid) < 0 ? 'Change' : 'Balance'}</h4>
+                                <h5>GHS {moneyInTxt(Math.abs(Number(modalData?.Total) - Number(paymentInfo.amountPaid)))}</h5>
+                              </li>
+
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+
+                  <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', fontWeight: 900 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', width: '90%', gap: 10 }}>
+                      <Button data-bs-dismiss="modal" color="#3085d6">{' Hold '} </Button>
+                      <Button data-bs-dismiss="modal" color="#252525">Remove</Button>
+                    </div>
+                    <span style={{ fontSize: 20, marginTop: 180, marginBottom: 180 }}>GHS {modalData?.Total}</span>
+                  </div>
+                </div>
+
+                <div className="row mt-2">
+                  <div className="col-lg-12" style={{ display: 'flex', justifyContent: 'flex-start' }} >
+                    {!isCredit && (<button className="btn btn-info me-2" data-bs-toggle="modal" data-bs-target="#confirmPaymentSellPrint" style={{ width: '20%' }}>
+                      Sell and Print
+                    </button>)}
+                    {/* {!isCredit && (<button className="btn btn-warning me-2" onClick={() => processPayment("Paid", false)} style={{ width: '20%' }}>
+                      Sell Only
+                    </button>)} */}
+
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Payment Confirm Modal */}
+
+        <div
+          className="modal fade"
+          id="confirmPaymentSellPrint"
+          tabIndex={-1}
+          aria-labelledby="confirmPaymentSellPrint"
+          aria-hidden="true">
+
+          <div className="modal-dialog modal-md modal-dialog-centered" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Confirm</h5>
+                <button
+                  type="button"
+                  className="close"
                   data-bs-dismiss="modal"
                   aria-label="Close"
                 >
@@ -969,87 +1069,112 @@ const Suspended = () => {
                 </button>
               </div>
               <div className="modal-body">
-                <div className="row">
-                  <div className="col-lg-6 col-sm-12 col-12">
-                    <div className="form-group">
-                      <label>Customer</label>
-                      <div className="input-groupicon">
-                        <DatePicker
-                          selected={startDate}
-                          onChange={(date) => setStartDate(date)}
-                        />
-                        <div className="addonset">
-                          <img src={Calendar} alt="img" />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="col-lg-6 col-sm-12 col-12">
-                    <div className="form-group">
-                      <label>Reference</label>
-                      <input type="text" defaultValue="INV/SL0101" />
-                    </div>
-                  </div>
-                  <div className="col-lg-6 col-sm-12 col-12">
-                    <div className="form-group">
-                      <label>Received Amount</label>
-                      <input type="text" defaultValue={0.0} />
-                    </div>
-                  </div>
-                  <div className="col-lg-6 col-sm-12 col-12">
-                    <div className="form-group">
-                      <label>Paying Amount</label>
-                      <input type="text" defaultValue={0.0} />
-                    </div>
-                  </div>
-                  <div className="col-lg-6 col-sm-12 col-12">
-                    <div className="form-group">
-                      <label>Payment type</label>
-                      <Select2
-                        className="select"
-                        data={options1}
-                        options={{
-                          placeholder: "Choose Suppliers",
-                        }}
-                      />
-                    </div>
-                  </div>
-                  <div className="col-lg-12">
-                    <div className="form-group mb-0">
-                      <label>Note</label>
-                      <textarea className="form-control" defaultValue={""} />
-                    </div>
-                  </div>
-                </div>
+                Are you sure you want to save this payment Transaction?
               </div>
               <div className="modal-footer">
-                <button type="button" className="btn btn-submit">
-                  Submit
-                </button>
+                <Link to="#" className="btn btn-submit me-2" data-bs-dismiss="modal" onClick={() => processPayment("Paid", true)}>
+                  Yes
+                </Link>
+                <Link to="#" className="btn btn-cancel" data-bs-dismiss="modal">
+                  No
+                </Link>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+
+        <div
+          className="modal fade"
+          id="confirmPaymentCreditPrint"
+          tabIndex={-1}
+          aria-labelledby="confirmPaymentCreditPrint"
+          aria-hidden="true">
+
+          <div className="modal-dialog modal-md modal-dialog-centered" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Confirm</h5>
                 <button
                   type="button"
-                  className="btn btn-cancel"
+                  className="close"
                   data-bs-dismiss="modal"
+                  aria-label="Close"
                 >
-                  Close
+                  <span aria-hidden="true">×</span>
                 </button>
+              </div>
+              <div className="modal-body">
+                Are you sure you want to save this payment Transaction?
+              </div>
+              <div className="modal-footer">
+                <Link to="#" className="btn btn-submit me-2" data-bs-dismiss="modal" onClick={() => processPayment("Credit", true)}>
+                  Yes
+                </Link>
+                <Link to="#" className="btn btn-cancel" data-bs-dismiss="modal">
+                  No
+                </Link>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+
+        {/* Credit Modal */}
+        <div
+          className="modal fade"
+          id="creditpayment"
+          tabIndex={-1}
+          aria-labelledby=""
+          aria-hidden="true"
+        >
+          <div className="modal-dialog modal-md modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Sales Type: {modalData?.salestype}</h5>
+                <button
+                  type="button"
+                  className="close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                  onClick={() => { setPaymentInfo(init) }}
+                >
+                  <span aria-hidden="true">×</span>
+                </button>
+              </div>
+              <div className="modal-body">
+                <h3 style={{ textAlign: 'center' }}>Do you want to do a full credit? </h3>
+              </div>
+              <div className="modal-footer">
+                <div className="col-lg-12" style={{ display: 'flex', justifyContent: 'flex-end' }} >
+                  <button className="btn btn-success me-2" onClick={() => processPayment("Credit", true)} style={{ width: '20%' }}>
+                    Yes
+                  </button>
+                  <button className="btn btn-danger me-2" data-bs-dismiss="modal">
+                    No
+                  </button>
+
+                </div>
               </div>
             </div>
           </div>
         </div>
-        {/* show payment Modal */}
-        {/* edit payment Modal */}
+
+
+        {/* View Products Modal */}
         <div
           className="modal fade"
-          id="editpayment"
+          id="showproducts"
           tabIndex={-1}
-          aria-labelledby="editpayment"
+          aria-labelledby=""
           aria-hidden="true"
         >
           <div className="modal-dialog modal-lg modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">Edit Payment</h5>
+                <h5 className="modal-title">Sales Ref - {productGridData[0]?.salesRef || 'N/A'}</h5>
                 <button
                   type="button"
                   className="close"
@@ -1061,70 +1186,74 @@ const Suspended = () => {
               </div>
               <div className="modal-body">
                 <div className="row">
-                  <div className="col-lg-6 col-sm-12 col-12">
-                    <div className="form-group">
-                      <label>Customer</label>
-                      <div className="input-groupicon">
-                        <DatePicker
-                          selected={startDate1}
-                          onChange={(date) => setStartDate1(date)}
-                        />
-                        <div className="addonset">
-                          <img src={datepicker} alt="img" />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="col-lg-6 col-sm-12 col-12">
-                    <div className="form-group">
-                      <label>Reference</label>
-                      <input type="text" defaultValue="INV/SL0101" />
-                    </div>
-                  </div>
-                  <div className="col-lg-6 col-sm-12 col-12">
-                    <div className="form-group">
-                      <label>Received Amount</label>
-                      <input type="text" defaultValue={0.0} />
-                    </div>
-                  </div>
-                  <div className="col-lg-6 col-sm-12 col-12">
-                    <div className="form-group">
-                      <label>Paying Amount</label>
-                      <input type="text" defaultValue={0.0} />
-                    </div>
-                  </div>
-                  <div className="col-lg-6 col-sm-12 col-12">
-                    <div className="form-group">
-                      <label>Payment type</label>
-                      <Select2
-                        className="select"
-                        data={options1}
-                        options={{
-                          placeholder: "Choose Suppliers",
-                        }}
-                      />
-                    </div>
-                  </div>
-                  <div className="col-lg-12">
-                    <div className="form-group mb-0">
-                      <label>Note</label>
-                      <textarea className="form-control" defaultValue={""} />
-                    </div>
+                  <div className="table-responsive mb-3">
+                    <table className="table">
+                      <thead>
+                        <tr>
+                          <th>#</th>
+                          <th>Product Name</th>
+                          <th>Quantity</th>
+                          <th>Unit Price</th>
+                          <th>Amount</th>
+
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {productGridData.length > 0 ? productGridData?.map((item, index) => {
+                          return (
+                            <tr key={index}>
+                              <td>{index + 1}</td>
+                              <td>
+                                <Link to="#">{item?.name}</Link>
+                              </td>
+                              <td>{item?.quantity}</td>
+                              <td>{item?.unitPrice}</td>
+                              <td>{item?.amount}</td>
+
+
+                            </tr>
+                          )
+                        }) : 'No Data'}
+
+                      </tbody>
+                    </table>
                   </div>
                 </div>
+
               </div>
-              <div className="modal-footer">
-                <button type="button" className="btn btn-submit">
-                  Submit
-                </button>
+            </div>
+          </div>
+
+
+        </div>
+
+
+        {/* PDF Modal */}
+        <div
+          className="modal fade"
+          id="pdfViewer"
+          tabIndex={-1}
+          aria-labelledby="pdfViewer"
+          aria-hidden="true"
+        >
+          <div className="modal-dialog modal-xl modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Sales Receipt</h5>
                 <button
                   type="button"
-                  className="btn btn-cancel"
+                  className="close"
                   data-bs-dismiss="modal"
+                  aria-label="Close"
+                  onClick={() => $('.modal').modal('hide')}
                 >
-                  Close
+                  <span aria-hidden="true">×</span>
                 </button>
               </div>
+              <div className="modal-body">
+                <iframe width='100%' height='800px' src={receiptFile}></iframe>
+              </div>
+
             </div>
           </div>
         </div>
@@ -1133,4 +1262,4 @@ const Suspended = () => {
   );
 };
 
-export default Suspended;
+export default CreditPayment;
