@@ -190,8 +190,8 @@ const PurchaseOrder = () => {
 
     setreportIsLoading(true)
     $('#pdfViewer').modal('show')
-      if(formData.startDate != ''){
-        axios.get(`report/getPurchaseReport?startDate=${formData.startDate}&endDate=${formData.endDate}&productId=${selectedProduct?.id || ''}&batchNumber=${formData?.batchNumber?.value || ''}&userId=${formData?.userId}&clientId=${formData?.clientId}`)
+    
+        axios.get(`report/getPurchaseReport?startDate=${formData.startDate}&endDate=${formData.endDate}&productId=${selectedProduct?.id || ''}&batchNumber=${formData?.batchNumber?.value || ''}&userId=${formData?.userId}&clientId=${supplier?.id}`)
       .then((res) => {
 
         let base64 = res.data.base64String
@@ -201,18 +201,8 @@ const PurchaseOrder = () => {
         setReportFile(blobFile)
       })
       .finally(() =>  setreportIsLoading(false))
-      }
-      else{
-        axios.get(`report/getPurchaseReport`).then((res) => {
-
-        let base64 = res.data.base64String
-        const blob = base64ToBlob(base64, 'application/pdf');
-        const blobFile = `data:application/pdf;base64,${base64}`
-        const url = URL.createObjectURL(blob);
-        setReportFile(blobFile)
-      })
-      .finally(() =>  setreportIsLoading(false))
-      }
+      
+     
 
     function base64ToBlob(base64, type = "application/octet-stream") {
       const binStr = atob(base64);

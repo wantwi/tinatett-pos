@@ -186,7 +186,7 @@ useEffect(() => {
 
     setreportIsLoading(true)
     $('#pdfViewer').modal('show')
-      axios.get(`report/getSalesReport?startDate=${formData.startDate}&endDate=${formData.endDate}&productId=${selectedProduct?.id || ''}&batchNumber=${formData?.batchNumber?.value || ''}&customer=${customer?.value || ''}`)
+      axios.get(`report/getSalesReport?startDate=${formData.startDate}&endDate=${formData.endDate}&productId=${selectedProduct?.id || ''}&batchNumber=${formData?.batchNumber?.value || ''}&clientId=${customer?.value || ''}`)
       .then((res) => {
 
         let base64 = res.data.base64String
