@@ -1067,7 +1067,7 @@ const Addsales = () => {
                               setNotifications([newNotification, ...notifications])
                             }
                             else {
-                              setFormData({ ...formData, quantity: Number(e.target.value) })
+                              setFormData({ ...formData, quantity: (e.target.value) })
                             }
                           }}
                         />
