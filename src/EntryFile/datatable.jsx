@@ -22,7 +22,7 @@ const Datatable = ({ props, columns, dataSource }) => {
       columns={columns}
       dataSource={dataSource}
       pagination={{
-        total: dataSource.length,
+        total: dataSource?.length || 1,
         showTotal: (total, range) =>
           ` ${range[0]} to ${range[1]} of ${total} items`,
         showSizeChanger: true,

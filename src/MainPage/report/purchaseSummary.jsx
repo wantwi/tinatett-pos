@@ -5,18 +5,6 @@ import Select2 from "react-select2-wrapper";
 import Select from "react-select";
 import "react-select2-wrapper/css/select2.css";
 import { Link } from "react-router-dom";
-import {
-  ClosesIcon,
-  Excel,
-  Filter,
-  Pdf,
-  PlusIcon,
-  Printer,
-  Search,
-  search_whites,
-  EditIcon,
-  DeleteIcon,
-} from "../../EntryFile/imagePath";
 import { useGet } from "../../hooks/useGet";
 import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 import Swal from "sweetalert2";
@@ -72,12 +60,12 @@ const PurchaseSummary = () => {
 
   const [loggedInUser, setLoggedInUser] = useState({})
 
-  const [selectedProduct, setSelectedProduct] = useState('')
+  const [selectedProduct, setSelectedProduct] = useState({})
   const [selectedProductInfo, setSelectedProductInfo] = useState()
   const [supplier, setSupplier] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isBatchLoading, setIsBatchLoading] = useState(false)
-  const [formData, setFormData] = useState({ quantity: '', amount: '', batchNumber: {}, manuDate: '', expDate: '', userId:'', startDate:'', endDate:'' })
+  const [formData, setFormData] = useState({ quantity: '', amount: '', batchNumber: {}, userId:'', startDate:'', endDate:'' })
   const [reportFile, setReportFile] = useState(null)
   const [reportIsLoading, setreportIsLoading] = useState(false)
 
@@ -120,11 +108,11 @@ const PurchaseSummary = () => {
         setIsLoading(false)
         //console.log(res.data.newProduct)
         setSelectedProductInfo(res.data.newProduct)
-        let x = res.data.newProduct.batchNumber?.map((item) => {
-          return { value: item.batchNumber, label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')' : item?.batchNumber + '-(' + item?.availablequantity + ')' }
-        })
-        setIsBatchLoading(false)
-        setFormData({ ...formData, batchNumber: x[0]})
+        // let x = res.data.newProduct.batchNumber?.map((item) => {
+        //   return { value: item.batchNumber, label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')' : item?.batchNumber + '-(' + item?.availablequantity + ')' }
+        // })
+        // setIsBatchLoading(false)
+        // setFormData({ ...formData, batchNumber: x[0]})
         //retailpriceTypeRef.current.checked = true
       }
     })
@@ -143,7 +131,6 @@ const PurchaseSummary = () => {
   }, [])
 
   const handleProductSelect = (e) => {
-    console.log("Product:", e)
     setSelectedProduct(e)
   }
 
@@ -176,6 +163,13 @@ const PurchaseSummary = () => {
       // console.log('loading...')
     }
   }, [isLoading])
+
+
+  const handleReset = () => {
+    setFormData({ quantity: '', amount: '', batchNumber: {}, userId:'', startDate:'', endDate:'' })
+    setSelectedProduct(null)
+    setSupplier(null)
+  }
 
 
   const handleGenerateReport = () => {
@@ -406,7 +400,7 @@ const PurchaseSummary = () => {
                         <Select
                           isLoading={isLoading}
                           options={selectedProductInfo?.batchNumber?.map((item) => {
-                            return { value: item.batchNumber, label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')' : item?.batchNumber + '-(' + item?.availablequantity + ')' }
+                            return { value: item?.batchNumber, label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')' : item?.batchNumber + '-(' + item?.availablequantity + ')' }
                           })}
                           placeholder=""
                           value={formData.batchNumber}
@@ -423,19 +417,20 @@ const PurchaseSummary = () => {
                             type="text" className={`form-control `}
                             id="amount"
                             placeholder=""
-                            //value={(Number(productFormData?.amount).toFixed(2))}
+                            value={formData.userId}
+                            onChange={(e) => setFormData({...formData, userId: e.target.value})}
                           />
                       </div>
                     </div>
                   </div>
               </div>
               <div className="modal-footer">
-                  <Link to="#" className="btn btn-submit me-2"  style={{width:'100%'}} onClick={handleGenerateReport}>
+                  <Link to="#" className="btn btn-cancel me-2"  style={{width:'47%'}} onClick={handleReset}>
+                    Reset
+                  </Link>
+                  <Link to="#" className="btn btn-submit "  style={{width:'47%'}} onClick={handleGenerateReport}>
                     Search
                   </Link>
-                  {/* <Link to="#" className="btn btn-cancel" data-bs-dismiss="modal">
-                    Cancel
-                </Link> */}
               </div>
             </div>
           </div>

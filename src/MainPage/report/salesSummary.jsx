@@ -46,12 +46,12 @@ const SalesSummary = () => {
 
   const [loggedInUser, setLoggedInUser] = useState({})
 
-  const [selectedProduct, setSelectedProduct] = useState('')
-  const [selectedProductInfo, setSelectedProductInfo] = useState()
+  const [selectedProduct, setSelectedProduct] = useState({})
+  const [selectedProductInfo, setSelectedProductInfo] = useState({})
   const [supplier, setSupplier] = useState('')
   //const [isLoading, setIsLoading] = useState(false)
   const [isBatchLoading, setIsBatchLoading] = useState(false)
-  const [formData, setFormData] = useState({ quantity: '', amount: '', batchNumber: '', manuDate: '', expDate: '', startDate:'', endDate:'' })
+  const [formData, setFormData] = useState({ quantity: '', amount: '', batchNumber: {},  startDate:'', endDate:'' })
   const [reportFile, setReportFile] = useState(null)
   const [reportIsLoading, setreportIsLoading] = useState(false)
 
@@ -86,28 +86,23 @@ const SalesSummary = () => {
 
   useEffect(() => {
     // console.log("Selected Prod", selectedProduct)
-
-    if(selectedProduct)
+  
     axios.get(`${BASE_URL}/purchase/product/${selectedProduct?.value}`).then((res) => {
-      setIsLoading(true)
+   
       if (res.data.success) {
-        setIsLoading(false)
-        //console.log(res.data.newProduct)
+        // setIsLoading(false)
+        console.log(res.data.newProduct)
         setSelectedProductInfo(res.data.newProduct)
-        let x = res.data.newProduct.batchNumber?.map((item) => {
-          return { value: item.batchNumber, label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')' : item?.batchNumber + '-(' + item?.availablequantity + ')' }
-        })
-        setIsBatchLoading(false)
-        setFormData({ ...formData, batchNumber: x[0]})
-        //retailpriceTypeRef.current.checked = true
+        // let x = res.data.newProduct.batchNumber?.map((item) => {
+        //   return { value: item.batchNumber, label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')' : item?.batchNumber + '-(' + item?.availablequantity + ')', expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
+        // })
+        // setIsBatchLoading(false)
+        // setFormData({ ...formData, batchNumber: x[0], manuDate: (x[0]?.manufacturingDate).substring(0, 10), expDate: (x[0]?.expireDate).substring(0, 10) })
+  
       }
     })
-
-    return () => {
-
-    }
-
-
+    $('#selectedProduct').css('border', '1px solid rgba(145, 158, 171, 0.32)')
+  
   }, [selectedProduct])
 
   useEffect(() => {
@@ -117,6 +112,7 @@ const SalesSummary = () => {
   }, [])
 
   const handleProductSelect = (e) => {
+    console.log(e)
     setSelectedProduct(e)
   }
 
@@ -147,6 +143,11 @@ const SalesSummary = () => {
     }
   }, [isLoading])
 
+  const handleReset = () => {
+    setFormData({ quantity: '', amount: '', batchNumber: '',  startDate:'', endDate:'' })
+    setSupplier(null)
+    setSelectedProduct(null)
+  }
 
   const handleGenerateReport = () => {
     let filters = {
@@ -158,7 +159,7 @@ const SalesSummary = () => {
 
     setreportIsLoading(true)
     $('#pdfViewer').modal('show')
-      axios.get(`report/getSalesSummaryReport?startDate=${formData.startDate}&endDate=${formData.endDate}`)
+      axios.get(`report/getSalesSummaryReport?startDate=${formData.startDate}&endDate=${formData.endDate}&productId=${selectedProduct?.id || ''}&batchNumber=${formData?.batchNumber?.value || ''}&clientId=${supplier?.value || ''}`)
       .then((res) => {
 
         let base64 = res.data.base64String
@@ -391,47 +392,37 @@ const SalesSummary = () => {
                     </div>
                   </div>
                   <div className="row">
-                  <div className="form-group">
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <label>Batch No.</label>
-                        {isBatchLoading && <div className="spinner-border text-primary me-1" role="status" style={{ height: 20, width: 20 }}>
-                          <span className="sr-only">Loading...</span>
-                        </div>}
-                      </div>
-                      <div className="input-groupicon">
-                        <Select
-                          isLoading={isLoading}
-                          options={selectedProductInfo?.batchNumber?.map((item) => {
-                            return { value: item.batchNumber, label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')' : item?.batchNumber + '-(' + item?.availablequantity + ')', expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
-                          })}
-                          placeholder=""
-                          value={formData.batchNumber}
-                          onChange={(e) => setFormData({ ...formData, batchNumber: (e)})}
-                        />
-                    </div>
-                    </div>
-                  </div>
-                  <div className="row">
                       <div className="form-group">
-                        <label>User</label>
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <label>Batch No.</label>
+                          {isBatchLoading && <div className="spinner-border text-primary me-1" role="status" style={{ height: 20, width: 20 }}>
+                            <span className="sr-only">Loading...</span>
+                          </div>}
+                        </div>
                         <div className="input-groupicon">
-                          <input
-                            type="text" className={`form-control `}
-                            id="amount"
+                          <Select
+                           
+                            options={selectedProductInfo?.batchNumber?.map((item) => {
+                              return { value: item.batchNumber, label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')' : item?.batchNumber + '-(' + item?.availablequantity + ')', expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
+                            })}
                             placeholder=""
-                            //value={(Number(productFormData?.amount).toFixed(2))}
+                            value={formData.batchNumber}
+                            onChange={(e) => setFormData({ ...formData, batchNumber: (e)})}
+                          //onChange={(e) => console.log(e)}
                           />
+
+                        </div>
                       </div>
-                    </div>
                   </div>
+                  
               </div>
               <div className="modal-footer">
-                  <Link to="#" className="btn btn-submit me-2"  style={{width:'100%'}} onClick={handleGenerateReport}>
+                  <Link to="#" className="btn btn-cancel me-2"  style={{width:'47%'}} onClick={handleReset}>
+                    Reset
+                  </Link>
+                  <Link to="#" className="btn btn-submit "  style={{width:'47%'}} onClick={handleGenerateReport}>
                     Search
                   </Link>
-                  {/* <Link to="#" className="btn btn-cancel" data-bs-dismiss="modal">
-                    Cancel
-                </Link> */}
               </div>
             </div>
           </div>

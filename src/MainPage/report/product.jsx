@@ -4,18 +4,6 @@ import Swal from "sweetalert2";
 import Table from "../../EntryFile/datatable";
 import Tabletop from "../../EntryFile/tabletop";
 import {
-  PlusIcon,
-  MacbookIcon,
-  IphoneIcon,
-  SamsungIcon,
-  EarpodIcon,
-  OrangeImage,
-  PineappleImage,
-  StawberryImage,
-  AvocatImage,
-  EyeIcon,
-  EditIcon,
-  DeleteIcon,
   search_whites,
 } from "../../EntryFile/imagePath";
 import Select from "react-select";
@@ -60,7 +48,6 @@ const ProductReport = () => {
       let mappedData =  products?.data.map((product) => {
           return {
             id: product?.id,
-            image: AvocatImage,
             name: product?.name,
             status: product?.status,
             alert: product?.alert,
@@ -93,7 +80,6 @@ const ProductReport = () => {
      let mapped = res?.data.data.map((product) => {
       return {
         id: product?.id,
-        image: AvocatImage,
         name: product?.name,
         status: product?.status,
         alert: product?.alert,
@@ -115,6 +101,11 @@ const ProductReport = () => {
   const togglefilter = (value) => {
     setInputfilter(false);
   };
+
+  const handleReset = () => {
+    setFormData({productId:'', quantity: '', amount: '', batchNumber: {}, manufactureFromDate: '', manufactureEndDate:'', expireFromDate: '', expireEndDate:'' })
+    setSelectedProduct(null)
+  }
 
   const handleGenerateReport = () => {
     let filters = {
@@ -161,7 +152,7 @@ const ProductReport = () => {
             <img alt="" src={record.image} />
           </Link> */}
           <Link style={{ fontSize: "15px", marginLeft: "10px" }}>
-            {record.name}
+            {record?.name}
           </Link>
         </div>
       ),
@@ -219,7 +210,7 @@ const ProductReport = () => {
           return { value: item.batchNumber, label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')' : item?.batchNumber + '-(' + item?.availablequantity + ')', expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
         })
         setIsBatchLoading(false)
-        setFormData({ ...formData, batchNumber: x[0], manuDate: (x[0]?.manufacturingDate).substring(0, 10), expDate: (x[0]?.expireDate).substring(0, 10) })
+        // setFormData({ ...formData, batchNumber: x[0], manuDate: (x[0]?.manufacturingDate).substring(0, 10), expDate: (x[0]?.expireDate).substring(0, 10) })
   
       }
     })
@@ -513,12 +504,13 @@ const ProductReport = () => {
                
               </div>
               <div className="modal-footer">
-                  <Link to="#" className="btn btn-submit me-2"  style={{width:'100%'}} onClick={handleGenerateReport}>
+                  <Link to="#" className="btn btn-cancel me-2"  style={{width:'47%'}} onClick={handleReset}>
+                    Reset
+                  </Link>
+                  <Link to="#" className="btn btn-submit "  style={{width:'50%'}} onClick={handleGenerateReport}>
                     Search
                   </Link>
-                  {/* <Link to="#" className="btn btn-cancel" data-bs-dismiss="modal">
-                    Cancel
-                </Link> */}
+                  
               </div>
             </div>
           </div>

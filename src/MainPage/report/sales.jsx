@@ -4,11 +4,7 @@ import Swal from "sweetalert2";
 import Table from "../../EntryFile/datatable";
 import Tabletop from "../../EntryFile/tabletop";
 import {
-  Download,
-  AvocatImage,
-  EyeIcon,
-  EditIcon,
-  DeleteIcon,
+
   search_whites,
 } from "../../EntryFile/imagePath";
 import Select from "react-select";
@@ -46,7 +42,7 @@ const Sales = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [isBatchLoading, setIsBatchLoading] = useState(false)
   const [supplier, setSupplier] = useState('')
-  const [formData, setFormData] = useState({productId:'', quantity: '', amount: '', batchNumber: {}, manuDate: '', expDate: '', startDate:'', endDate:'' })
+  const [formData, setFormData] = useState({productId:'', quantity: '', amount: '', batchNumber: {},  startDate:'', endDate:'' })
   const [reportFile, setReportFile] = useState(null)
   const [reportIsLoading, setreportIsLoading] = useState(false)
 
@@ -161,11 +157,11 @@ useEffect(() => {
       // setIsLoading(false)
       //console.log(res.data.newProduct)
       setSelectedProductInfo(res.data.newProduct)
-      let x = res.data.newProduct.batchNumber?.map((item) => {
-        return { value: item.batchNumber, label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')' : item?.batchNumber + '-(' + item?.availablequantity + ')', expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
-      })
-      setIsBatchLoading(false)
-      setFormData({ ...formData, batchNumber: x[0], manuDate: (x[0]?.manufacturingDate).substring(0, 10), expDate: (x[0]?.expireDate).substring(0, 10) })
+      // let x = res.data.newProduct.batchNumber?.map((item) => {
+      //   return { value: item.batchNumber, label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')' : item?.batchNumber + '-(' + item?.availablequantity + ')', expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
+      // })
+      // setIsBatchLoading(false)
+      // setFormData({ ...formData, batchNumber: x[0], manuDate: (x[0]?.manufacturingDate).substring(0, 10), expDate: (x[0]?.expireDate).substring(0, 10) })
 
     }
   })
@@ -173,6 +169,11 @@ useEffect(() => {
 
 }, [selectedProduct])
 
+const handleReset = () => {
+  setFormData({productId:'', quantity: '', amount: '', batchNumber: {},  startDate:'', endDate:'' })
+  setCustomer(null)
+  setSelectedProduct(null)
+}
 
   const handleGenerateReport = () => {
     let filters = {
@@ -186,7 +187,7 @@ useEffect(() => {
 
     setreportIsLoading(true)
     $('#pdfViewer').modal('show')
-      axios.get(`report/getSalesReport?startDate=${formData.startDate}&endDate=${formData.endDate}&productId=${selectedProduct?.id || ''}&batchNumber=${formData?.batchNumber?.value || ''}&customer=${customer?.value || ''}`)
+      axios.get(`report/getSalesReport?startDate=${formData.startDate}&endDate=${formData.endDate}&productId=${selectedProduct?.id || ''}&batchNumber=${formData?.batchNumber?.value || ''}&clientId=${customer?.value || ''}`)
       .then((res) => {
 
         let base64 = res.data.base64String
@@ -437,7 +438,7 @@ useEffect(() => {
                         </div>
                         <div className="input-groupicon">
                           <Select
-                            isLoading={isLoading}
+                           
                             options={selectedProductInfo?.batchNumber?.map((item) => {
                               return { value: item.batchNumber, label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')' : item?.batchNumber + '-(' + item?.availablequantity + ')', expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
                             })}
@@ -453,12 +454,12 @@ useEffect(() => {
                
               </div>
               <div className="modal-footer">
-                  <Link to="#" className="btn btn-submit me-2"  style={{width:'100%'}} onClick={handleGenerateReport}>
+                <Link to="#" className="btn btn-cancel me-2"  style={{width:'47%'}} onClick={handleReset}>
+                    Reset
+                  </Link>
+                  <Link to="#" className="btn btn-submit "  style={{width:'47%'}} onClick={handleGenerateReport}>
                     Search
                   </Link>
-                  {/* <Link to="#" className="btn btn-cancel" data-bs-dismiss="modal">
-                    Cancel
-                </Link> */}
               </div>
             </div>
           </div>
