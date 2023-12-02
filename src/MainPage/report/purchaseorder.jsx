@@ -22,19 +22,22 @@ import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 import Swal from "sweetalert2";
 import { BASE_URL } from "../../api/CustomAxios";
 import useCustomApi from "../../hooks/useCustomApi";
+import PurchaseReport from "./tables/PurchaseReport";
 
 const PurchaseOrder = () => {
+
+
   const [inputfilter, setInputfilter] = useState(false);
   const [data, setData] = useState([]);
   const axios = useCustomApi();
 
-  const onSuccess = (data) =>{
+  const onSuccess = (data) => {
     setData([])
 
-    let mappedData =  data?.data.map((purchase) => {
+    let mappedData = data?.data.map((purchase) => {
       return {
         id: purchase?.id,
-        supplier:{
+        supplier: {
           id: purchase?.supplierId,
           text: purchase?.supplierName,
           value: purchase?.supplierId,
@@ -45,13 +48,13 @@ const PurchaseOrder = () => {
         reference: purchase?.purchaseRef,
         numberOfProduct: purchase?.numberOfProduct,
         branch: loggedInUser?.branchName || '',
-        date: new Date(purchase?.purchaseDate).toISOString().substring(0,10),
+        date: new Date(purchase?.purchaseDate).toISOString().substring(0, 10),
         createdBy: "Admin",
 
-        
+
       }
     })
-  setData(mappedData)
+    setData(mappedData)
 
   }
 
@@ -62,7 +65,7 @@ const PurchaseOrder = () => {
     isLoading: purchaseIsLoading,
     isSuccess,
     refetch
-  } = useGet("purchases", "/purchase",onSuccess);
+  } = useGet("purchases", "/purchase", onSuccess);
 
   const [productsDropdown, setProductsDropdown] = useState([]);
   const [suppliersDropdown, setSuppliersDropdown] = useState([]);
@@ -77,9 +80,10 @@ const PurchaseOrder = () => {
   const [supplier, setSupplier] = useState({})
   const [isLoading, setIsLoading] = useState(false)
   const [isBatchLoading, setIsBatchLoading] = useState(false)
-  const [formData, setFormData] = useState({ quantity: '', amount: '', batchNumber: {},  clientId:'', userId:'', startDate:'', endDate:''})
+  const [formData, setFormData] = useState({ quantity: '', amount: '', batchNumber: '', clientId: '', userId: '', startDate: '', endDate: '' })
   const [reportFile, setReportFile] = useState(null)
   const [reportIsLoading, setreportIsLoading] = useState(false)
+  const [report, setReport] = useState([])
 
   useEffect(() => {
     if (!productsIsLoading && !suppliersIsLoading) {
@@ -113,21 +117,21 @@ const PurchaseOrder = () => {
   useEffect(() => {
     // console.log("Selected Prod", selectedProduct)
 
-    if(selectedProduct)
-    axios.get(`${BASE_URL}/purchase/product/${selectedProduct?.value}`).then((res) => {
-      setIsLoading(true)
-      if (res.data.success) {
-        setIsLoading(false)
-        //console.log(res.data.newProduct)
-        setSelectedProductInfo(res.data.newProduct)
-        // let x = res.data.newProduct.batchNumber?.map((item) => {
-        //   return { value: item.batchNumber, label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')' : item?.batchNumber + '-(' + item?.availablequantity + ')' }
-        // })
-        // setIsBatchLoading(false)
-        // setFormData({ ...formData, batchNumber: x[0]})
-        //retailpriceTypeRef.current.checked = true
-      }
-    })
+    if (selectedProduct)
+      axios.get(`${BASE_URL}/purchase/product/${selectedProduct?.value}`).then((res) => {
+        setIsLoading(true)
+        if (res.data.success) {
+          setIsLoading(false)
+          //console.log(res.data.newProduct)
+          setSelectedProductInfo(res.data.newProduct)
+          // let x = res.data.newProduct.batchNumber?.map((item) => {
+          //   return { value: item.batchNumber, label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')' : item?.batchNumber + '-(' + item?.availablequantity + ')' }
+          // })
+          // setIsBatchLoading(false)
+          // setFormData({ ...formData, batchNumber: x[0]})
+          //retailpriceTypeRef.current.checked = true
+        }
+      })
 
     return () => {
 
@@ -148,66 +152,90 @@ const PurchaseOrder = () => {
   }
 
   useEffect(() => {
-    if(!isLoading){
-      let mappedData =  purchases?.data.map((purchase) => {
-          return {
-            id: purchase?.id,
-            supplier:{
-              id: purchase?.supplierId,
-              text: purchase?.supplierName,
-              value: purchase?.supplierId,
-            },
-            supplierName: purchase?.supplierName,
-            supplierId: purchase?.supplierId,
-            status: purchase?.status,
-            reference: purchase.purchaseRef,
-            numberOfProduct: purchase.numberOfProduct,
-            branch: loggedInUser?.branchName || '',
-            date: new Date(purchase.purchaseDate).toISOString().substring(0,10),
-            createdBy: "Admin",
+    if (!isLoading) {
+      let mappedData = purchases?.data.map((purchase) => {
+        return {
+          id: purchase?.id,
+          supplier: {
+            id: purchase?.supplierId,
+            text: purchase?.supplierName,
+            value: purchase?.supplierId,
+          },
+          supplierName: purchase?.supplierName,
+          supplierId: purchase?.supplierId,
+          status: purchase?.status,
+          reference: purchase.purchaseRef,
+          numberOfProduct: purchase.numberOfProduct,
+          branch: loggedInUser?.branchName || '',
+          date: new Date(purchase.purchaseDate).toISOString().substring(0, 10),
+          createdBy: "Admin",
 
-            
-          }
-        })
+
+        }
+      })
       setData(mappedData)
 
     }
-    else{
+    else {
       // console.log('loading...')
     }
   }, [isLoading])
 
   const handleReset = () => {
-    setFormData({ quantity: '', amount: '', batchNumber: {},  clientId:'', userId:'', startDate:'', endDate:''})
+    setFormData({ quantity: '', amount: '', batchNumber: '', clientId: '', userId: '', startDate: '', endDate: '' })
     setSelectedProduct(null)
     setSupplier(null)
   }
 
   const handleGenerateReport = () => {
+    // let filters = {
+    //   formData,
+    //   selectedProduct: selectedProduct?.id,
+    //   supplier,
+    //   startDate:formData?.startDate,
+    //   endDate:formData?.endDate,
+    //   batchNumber:formData?.batchNumber,
+    //   clientId:formData?.clientId,
+    //   userId:formData?.userId
+
+    // }
+
+    const baseUrl = "report/getPurchaseReport";
     let filters = {
-      formData,
-      selectedProduct,
-      supplier,
+      productId: selectedProduct?.id || "",
+      startDate: formData?.startDate || "",
+      endDate: formData?.endDate || "",
+      batchNumber: formData?.batchNumber?.label || "",
+      clientId: supplier?.id || "",
+      userId: formData?.userId || "",
+    };
 
-    }
+    const encodeFilterValue = (value) => encodeURIComponent(value);
 
-    console.log(filters)
+    const urlParams = Object.entries(filters)
+      .filter(([key, value]) => value !== undefined && value !== null && value !== "")
+      .map(([key, value]) => `${key}=${encodeFilterValue(value)}`)
+      .join("&");
+
+    const dynamicUrl = `${baseUrl}?${urlParams}`;
+
 
     setreportIsLoading(true)
-    $('#pdfViewer').modal('show')
-    
-        axios.get(`report/getPurchaseReport?startDate=${formData.startDate}&endDate=${formData.endDate}&productId=${selectedProduct?.id || ''}&batchNumber=${formData?.batchNumber?.value || ''}&userId=${formData?.userId}&clientId=${supplier?.id}`)
-      .then((res) => {
+    // 
 
-        let base64 = res.data.base64String
-        const blob = base64ToBlob(base64, 'application/pdf');
-        const blobFile = `data:application/pdf;base64,${base64}`
-        const url = URL.createObjectURL(blob);
-        setReportFile(blobFile)
-      })
-      .finally(() =>  setreportIsLoading(false))
-      
-     
+    // axios.get(`report/getPurchaseReport?startDate=${formData.startDate}&endDate=${formData.endDate}&productId=${selectedProduct?.id || ''}&batchNumber=${formData?.batchNumber?.value || ''}&userId=${formData?.userId}&clientId=${supplier?.id}`)
+    axios.get(dynamicUrl).then((res) => {
+      setReport(res.data?.data)
+      $('#filters').modal('hide')
+      // let base64 = res.data.base64String
+      // const blob = base64ToBlob(base64, 'application/pdf');
+      // const blobFile = `data:application/pdf;base64,${base64}`
+      // const url = URL.createObjectURL(blob);
+      // setReportFile(blobFile)
+    })
+      .finally(() => setreportIsLoading(false))
+
+
 
     function base64ToBlob(base64, type = "application/octet-stream") {
       const binStr = atob(base64);
@@ -266,7 +294,7 @@ const PurchaseOrder = () => {
       dataIndex: "reference",
       sorter: (a, b) => a.reference.length - b.reference.length,
     },
-    
+
     {
       title: "# of Products",
       dataIndex: "numberOfProduct",
@@ -280,19 +308,17 @@ const PurchaseOrder = () => {
     {
       title: "Status",
       dataIndex: "status",
-      render: (text, record) => (record.status == 1 ? <span className="badges bg-lightgreen">Active</span> : <span className="badges bg-lightred">Inctive</span> ),
+      render: (text, record) => (record.status == 1 ? <span className="badges bg-lightgreen">Active</span> : <span className="badges bg-lightred">Inctive</span>),
       sorter: (a, b) => a.status.length - b.status.length,
     },
-    
- 
+
+
   ];
 
 
-  if(purchaseIsLoading){
-    return (<LoadingSpinner/>)
+  if (purchaseIsLoading) {
+    return (<LoadingSpinner />)
   }
-
-
 
   return (
     <>
@@ -305,11 +331,11 @@ const PurchaseOrder = () => {
             </div>
             <div className="page-btn">
               <Link
-                to="#" 
+                to="#"
                 data-bs-toggle="modal" data-bs-target="#filters"
                 className="btn btn-success"
               >
-                
+
                 Generate Purchase Report
               </Link>
             </div>
@@ -317,24 +343,24 @@ const PurchaseOrder = () => {
           {/* /product list */}
           <div className="card">
             <div className="card-body">
-              <Tabletop inputfilter={inputfilter} togglefilter={togglefilter} data={data} title={'Purchase List'}/>
+              <Tabletop inputfilter={inputfilter} togglefilter={togglefilter} data={data} title={'Purchase List'} />
               {/* /Filter */}
               <div
-                className={`card mb-0 ${ inputfilter ? "toggleCls" : ""}`}
+                className={`card mb-0 ${inputfilter ? "toggleCls" : ""}`}
                 id="filter_inputs"
-                style={{ display: inputfilter ? "block" :"none"}}
+                style={{ display: inputfilter ? "block" : "none" }}
               >
                 <div className="card-body pb-0">
                   <div className="row">
                     <div className="col-lg-12 col-sm-12">
-                      
+
                     </div>
                   </div>
                 </div>
               </div>
               {/* /Filter */}
               <div className="table-responsive">
-                <Table columns={columns} dataSource={data} />
+                <PurchaseReport data={report} />
               </div>
             </div>
           </div>
@@ -343,165 +369,165 @@ const PurchaseOrder = () => {
       </div>
 
 
-        {/* Filters Modal */}
+      {/* Filters Modal */}
 
-        <div
+      <div
         className="modal fade"
         id="filters"
         tabIndex={-1}
         aria-labelledby="filters"
         aria-hidden="true">
 
-          <div className="modal-dialog modal-md modal-dialog-centered" role="document">
-            <div className="modal-content">
-              <div className="modal-header">
-                    <h5 className="modal-title">Purchases Report </h5>
-                    <button
-                    type="button"
-                    className="close"
-                    data-bs-dismiss="modal"
-                    aria-label="Close"
-                    >
-                    <span aria-hidden="true">×</span>
-                </button>
+        <div className="modal-dialog modal-md modal-dialog-centered" role="document">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title">Purchases Report </h5>
+              <button
+                type="button"
+                className="close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">×</span>
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="row">
+                <div className="form-group">
+                  <label>From</label>
+                  <div className="input-groupicon">
+                    <input
+                      type="date" className={`form-control `}
+                      id="amount"
+                      placeholder=""
+                      value={formData.startDate}
+                      onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                    />
+                  </div>
+                </div>
               </div>
-              <div className="modal-body">
-                  <div className="row">
-                      <div className="form-group">
-                        <label>From</label>
-                        <div className="input-groupicon">
-                          <input
-                            type="date" className={`form-control `}
-                            id="amount"
-                            placeholder=""
-                            value={formData.startDate}
-                            onChange={(e) => setFormData({...formData, startDate: e.target.value})}
-                          />
-                      </div>
-                    </div>
+              <div className="row">
+                <div className="form-group">
+                  <label>To</label>
+                  <div className="input-groupicon">
+                    <input
+                      type="date" className={`form-control `}
+                      id="amount"
+                      placeholder=""
+                      value={formData.endDate}
+                      onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                    />
                   </div>
-                  <div className="row">
-                      <div className="form-group">
-                        <label>To</label>
-                        <div className="input-groupicon">
-                          <input
-                            type="date" className={`form-control `}
-                            id="amount"
-                            placeholder=""
-                            value={formData.endDate}
-                            onChange={(e) => setFormData({...formData, endDate: e.target.value})}
-                          />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="row">
-                      <div className="form-group">
-                        <label>Supplier</label>
-                        <Select
-                             id="supplier"
-                              className="select"
-                              options={suppliersDropdown}
-                              value={supplier}
-                              isLoading={suppliersIsLoading}
-                              onChange={(e) => {
-                                setSupplier(e)
-                              }}
-                            />
-                    </div>
-                  </div>
-                  <div className="row">
-                      <div className="form-group">
-                        <label>Product</label>
-                        <Select
-                          id="productName"
-                          className="select"
-                          options={productsDropdown}
-                          value={selectedProduct}
-                          isLoading={productsIsLoading}
-                          onChange={(e) => handleProductSelect(e)}
-                        />
-                    </div>
-                  </div>
-                  <div className="row">
-                  <div className="form-group">
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <label>Batch No.</label>
-                        {isBatchLoading && <div className="spinner-border text-primary me-1" role="status" style={{ height: 20, width: 20 }}>
-                          <span className="sr-only">Loading...</span>
-                        </div>}
-                      </div>
-                      <div className="input-groupicon">
-                        <Select
-                          isLoading={isLoading}
-                          options={selectedProductInfo?.batchNumber?.map((item) => {
-                            return { value: item?.batchNumber, label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')' : item?.batchNumber + '-(' + item?.availablequantity + ')', expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
-                          })}
-                          placeholder=""
-                          value={formData.batchNumber}
-                          onChange={(e) => setFormData({ ...formData, batchNumber: (e)})}
-                        />
-                    </div>
-                    </div>
-                  </div>
-                  <div className="row">
-                      <div className="form-group">
-                        <label>User</label>
-                        <div className="input-groupicon">
-                          <input
-                            type="text" className={`form-control `}
-                            id="amount"
-                            placeholder=""
-                            value={formData.userId}
-                            onChange={(e) => setFormData({...formData, userId: e.target.value})}
-                          />
-                      </div>
-                    </div>
-                  </div>
+                </div>
               </div>
-              <div className="modal-footer">
-                  <Link to="#" className="btn btn-cancel me-2"  style={{width:'47%'}} onClick={handleReset}>
-                    Reset
-                  </Link>
-                  <Link to="#" className="btn btn-submit "  style={{width:'47%'}} onClick={handleGenerateReport}>
-                    Search
-                  </Link>
+              <div className="row">
+                <div className="form-group">
+                  <label>Supplier</label>
+                  <Select
+                    id="supplier"
+                    className="select"
+                    options={suppliersDropdown}
+                    value={supplier}
+                    isLoading={suppliersIsLoading}
+                    onChange={(e) => {
+                      setSupplier(e)
+                    }}
+                  />
+                </div>
+              </div>
+              <div className="row">
+                <div className="form-group">
+                  <label>Product</label>
+                  <Select
+                    id="productName"
+                    className="select"
+                    options={productsDropdown}
+                    value={selectedProduct}
+                    isLoading={productsIsLoading}
+                    onChange={(e) => handleProductSelect(e)}
+                  />
+                </div>
+              </div>
+              <div className="row">
+                <div className="form-group">
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <label>Batch No.</label>
+                    {isBatchLoading && <div className="spinner-border text-primary me-1" role="status" style={{ height: 20, width: 20 }}>
+                      <span className="sr-only">Loading...</span>
+                    </div>}
+                  </div>
+                  <div className="input-groupicon">
+                    <Select
+                      isLoading={isLoading}
+                      options={selectedProductInfo?.batchNumber?.map((item) => {
+                        return { value: item?.batchNumber, label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')' : item?.batchNumber + '-(' + item?.availablequantity + ')', expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
+                      })}
+                      placeholder=""
+                      value={formData.batchNumber}
+                      onChange={(e) => setFormData({ ...formData, batchNumber: (e) })}
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="row">
+                <div className="form-group">
+                  <label>User</label>
+                  <div className="input-groupicon">
+                    <input
+                      type="text" className={`form-control `}
+                      id="amount"
+                      placeholder=""
+                      value={formData.userId}
+                      onChange={(e) => setFormData({ ...formData, userId: e.target.value })}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-
-        </div>
-
-
-          {/* PDF Modal */ }
-        <div
-          className="modal fade"
-          id="pdfViewer"
-          tabIndex={-1}
-          aria-labelledby="pdfViewer"
-          aria-hidden="true"
-        >
-          <div className="modal-dialog modal-xl modal-dialog-centered">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">Purchase Order Report</h5>
-                <button
-                  type="button"
-                  className="close"
-                  data-bs-dismiss="modal"
-                  aria-label="Close"
-                >
-                  <span aria-hidden="true">×</span>
-                </button>
-              </div>
-              <div className="modal-body" style={{display:'flex', justifyContent:'center', alignItems:'center'}}>
-                {!reportIsLoading ? (<iframe width='100%' height='800px' src={reportFile}></iframe>) : (<div className="spinner-border text-primary me-1" role="status" style={{ height: 50, width: 50,  }}>
-                          <span className="sr-only">Loading...</span>
-                        </div>)}
-              </div>
-
+            <div className="modal-footer">
+              <Link to="#" className="btn btn-cancel me-2" style={{ width: '47%' }} onClick={handleReset}>
+                Reset
+              </Link>
+              <Link to="#" className="btn btn-submit " style={{ width: '47%' }} onClick={handleGenerateReport}>
+                Search
+              </Link>
             </div>
           </div>
         </div>
+
+      </div>
+
+
+      {/* PDF Modal */}
+      <div
+        className="modal fade"
+        id="pdfViewer"
+        tabIndex={-1}
+        aria-labelledby="pdfViewer"
+        aria-hidden="true"
+      >
+        <div className="modal-dialog modal-xl modal-dialog-centered">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title">Purchase Order Report</h5>
+              <button
+                type="button"
+                className="close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">×</span>
+              </button>
+            </div>
+            <div className="modal-body" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              {!reportIsLoading ? (<iframe width='100%' height='800px' src={reportFile}></iframe>) : (<div className="spinner-border text-primary me-1" role="status" style={{ height: 50, width: 50, }}>
+                <span className="sr-only">Loading...</span>
+              </div>)}
+            </div>
+
+          </div>
+        </div>
+      </div>
     </>
   );
 };

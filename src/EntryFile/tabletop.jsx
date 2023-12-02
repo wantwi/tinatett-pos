@@ -14,9 +14,9 @@ import { jsPDF } from 'jspdf'
 const Tabletop = ({ inputfilter, togglefilter, data, title, handleSearch }) => {
 
 
-  const createPDF =  (id) => {
+  const createPDF = (id) => {
     const pdf = new jsPDF("landscape", "pt", "a4");
-    const data =  document.getElementById(id);
+    const data = document.getElementById(id);
     pdf.html(data).then(() => {
       pdf.save(`${title}.pdf`);
     });
@@ -55,7 +55,7 @@ const Tabletop = ({ inputfilter, togglefilter, data, title, handleSearch }) => {
         createdBy: 'Created By'
       }
 
-     
+
 
       // format the data
       data.map((item) => {
@@ -90,7 +90,7 @@ const Tabletop = ({ inputfilter, togglefilter, data, title, handleSearch }) => {
         createdBy: "Created By"
       }
 
-     
+
 
       // format the data
       data.map((supplier) => {
@@ -130,21 +130,21 @@ const Tabletop = ({ inputfilter, togglefilter, data, title, handleSearch }) => {
         createdBy: "Created By"
       }
 
-     
+
 
       // format the data
       data.map((customer) => {
         itemsFormatted.push({
-            customerName: customer?.customerName,
-            //status: customer?.status,
-            customerType: customer?.customerType == 0 ? 'Individual' : 'Company',
-            contact: customer?.contact,
-            othercontact:customer?.othercontact || 'N/A',
-            email: customer?.email,
-            location: customer?.location.replace(/,/g, ''), // remove commas to avoid errors,
-            gpsAddress: customer?.gpsAddress,
-            branch: customer?.branch || 'N/A', 
-            createdBy: customer?.createdBy,
+          customerName: customer?.customerName,
+          //status: customer?.status,
+          customerType: customer?.customerType == 0 ? 'Individual' : 'Company',
+          contact: customer?.contact,
+          othercontact: customer?.othercontact || 'N/A',
+          email: customer?.email,
+          location: customer?.location.replace(/,/g, ''), // remove commas to avoid errors,
+          gpsAddress: customer?.gpsAddress,
+          branch: customer?.branch || 'N/A',
+          createdBy: customer?.createdBy,
         });
       });
 
@@ -161,7 +161,7 @@ const Tabletop = ({ inputfilter, togglefilter, data, title, handleSearch }) => {
         createdBy: "Created By"
       }
 
-     
+
 
       // format the data
       data.map((product) => {
@@ -184,22 +184,22 @@ const Tabletop = ({ inputfilter, togglefilter, data, title, handleSearch }) => {
       headers = {
         customerName: "Customer Name",
         // status: proforma?.status,
-        date:"Date",
+        date: "Date",
         proformaRef: "Reference",
         numberOfProduct: "Number of Products",
         createdBy: "Created By"
       }
 
-     
+
       // format the data
       data.map((proforma) => {
         itemsFormatted.push({
-            customerName: proforma.customerName || 'N/A',
-            //status: proforma?.status,
-            date:proforma.date || 'N/A',
-            proformaRef: proforma?.proformaRef,
-            numberOfProduct: proforma?.numberOfProduct,
-            createdBy: proforma?.createdBy || 'N/A'
+          customerName: proforma.customerName || 'N/A',
+          //status: proforma?.status,
+          date: proforma.date || 'N/A',
+          proformaRef: proforma?.proformaRef,
+          numberOfProduct: proforma?.numberOfProduct,
+          createdBy: proforma?.createdBy || 'N/A'
         });
       });
 
@@ -211,12 +211,12 @@ const Tabletop = ({ inputfilter, togglefilter, data, title, handleSearch }) => {
 
 
 
-    if(title !== ''){
+    if (title !== '') {
       // Convert Object to JSON
       let jsonObject = JSON.stringify(itemsFormatted);
       //console.log(jsonObject)
       let csv = convertToCSV(jsonObject);
-      let exportedFilenmae = title  + '.csv' || 'export.csv';
+      let exportedFilenmae = title + '.csv' || 'export.csv';
 
       let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       if (navigator.msSaveBlob) { // IE 10+
@@ -236,7 +236,7 @@ const Tabletop = ({ inputfilter, togglefilter, data, title, handleSearch }) => {
       }
 
     }
-    else{
+    else {
       alert('Unable to export')
     }
 
@@ -280,7 +280,7 @@ const Tabletop = ({ inputfilter, togglefilter, data, title, handleSearch }) => {
               <img src={Pdf} alt="img" />
             </a>
           </li> */}
-          <li onClick={() => exportToCSV()}>
+          <li hidden onClick={() => exportToCSV()}>
             <a data-tip="Excel">
               <img src={Excel} alt="img" />
             </a>

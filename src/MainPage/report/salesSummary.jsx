@@ -23,7 +23,7 @@ import Swal from "sweetalert2";
 import { BASE_URL } from "../../api/CustomAxios";
 import useCustomApi from "../../hooks/useCustomApi";
 import { moneyInTxt } from "../../utility";
-
+import PurchaseSummaryTable from "./tables/PurchaseSummary"
 const SalesSummary = () => {
   const [inputfilter, setInputfilter] = useState(false);
   const [data, setData] = useState([]);
@@ -51,9 +51,10 @@ const SalesSummary = () => {
   const [supplier, setSupplier] = useState('')
   //const [isLoading, setIsLoading] = useState(false)
   const [isBatchLoading, setIsBatchLoading] = useState(false)
-  const [formData, setFormData] = useState({ quantity: '', amount: '', batchNumber: {},  startDate:'', endDate:'' })
+  const [formData, setFormData] = useState({ quantity: '', amount: '', batchNumber: {}, startDate: '', endDate: '' })
   const [reportFile, setReportFile] = useState(null)
   const [reportIsLoading, setreportIsLoading] = useState(false)
+  const [report, setReport] = useState([])
 
   useEffect(() => {
     if (!productsIsLoading && !suppliersIsLoading) {
@@ -86,9 +87,9 @@ const SalesSummary = () => {
 
   useEffect(() => {
     // console.log("Selected Prod", selectedProduct)
-  
+
     axios.get(`${BASE_URL}/purchase/product/${selectedProduct?.value}`).then((res) => {
-   
+
       if (res.data.success) {
         // setIsLoading(false)
         console.log(res.data.newProduct)
@@ -98,11 +99,11 @@ const SalesSummary = () => {
         // })
         // setIsBatchLoading(false)
         // setFormData({ ...formData, batchNumber: x[0], manuDate: (x[0]?.manufacturingDate).substring(0, 10), expDate: (x[0]?.expireDate).substring(0, 10) })
-  
+
       }
     })
     $('#selectedProduct').css('border', '1px solid rgba(145, 158, 171, 0.32)')
-  
+
   }, [selectedProduct])
 
   useEffect(() => {
@@ -144,34 +145,50 @@ const SalesSummary = () => {
   }, [isLoading])
 
   const handleReset = () => {
-    setFormData({ quantity: '', amount: '', batchNumber: '',  startDate:'', endDate:'' })
+    setFormData({ quantity: '', amount: '', batchNumber: '', startDate: '', endDate: '' })
     setSupplier(null)
     setSelectedProduct(null)
   }
 
   const handleGenerateReport = () => {
+    const baseUrl = "report/getSalesSummaryReport";
     let filters = {
-      formData,
-      selectedProduct,
-      supplier,
+      productId: selectedProduct?.id || "",
+      startDate: formData?.startDate || "",
+      endDate: formData?.endDate || "",
+      batchNumber: formData?.batchNumber?.label || "",
+      clientId: supplier?.id || "",
+      userId: formData?.userId || "",
+    };
 
-    }
+    const encodeFilterValue = (value) => encodeURIComponent(value);
+
+    const urlParams = Object.entries(filters)
+      .filter(([key, value]) => value !== undefined && value !== null && value !== "")
+      .map(([key, value]) => `${key}=${encodeFilterValue(value)}`)
+      .join("&");
+
+    const dynamicUrl = `${baseUrl}?${urlParams}`;
 
     setreportIsLoading(true)
-    $('#pdfViewer').modal('show')
-      axios.get(`report/getSalesSummaryReport?startDate=${formData.startDate}&endDate=${formData.endDate}&productId=${selectedProduct?.id || ''}&batchNumber=${formData?.batchNumber?.value || ''}&clientId=${supplier?.value || ''}`)
-      .then((res) => {
+    // $('#pdfViewer').modal('show')
+    // axios.get(`report/getSalesSummaryReport?startDate=${formData.startDate}&endDate=${formData.endDate}&productId=${selectedProduct?.id || ''}&batchNumber=${formData?.batchNumber?.value || ''}&clientId=${supplier?.value || ''}`)
+    axios.get(dynamicUrl).then((res) => {
 
-        let base64 = res.data.base64String
-        const blob = base64ToBlob(base64, 'application/pdf');
-        const blobFile = `data:application/pdf;base64,${base64}`
-        const url = URL.createObjectURL(blob);
-        setReportFile(blobFile)
-    
+      setReport(res.data?.data)
 
-       
-      })
-      .finally(() =>  setreportIsLoading(false))
+      $('#filters').modal('hide')
+
+      // let base64 = res.data.base64String
+      // const blob = base64ToBlob(base64, 'application/pdf');
+      // const blobFile = `data:application/pdf;base64,${base64}`
+      // const url = URL.createObjectURL(blob);
+      // setReportFile(blobFile)
+
+
+
+    })
+      .finally(() => setreportIsLoading(false))
 
     function base64ToBlob(base64, type = "application/octet-stream") {
       const binStr = atob(base64);
@@ -257,8 +274,8 @@ const SalesSummary = () => {
 
 
 
-  if(isLoading){
-    return (<LoadingSpinner/>)
+  if (isLoading) {
+    return (<LoadingSpinner />)
   }
 
 
@@ -274,11 +291,11 @@ const SalesSummary = () => {
             </div>
             <div className="page-btn">
               <Link
-                to="#" 
+                to="#"
                 data-bs-toggle="modal" data-bs-target="#filters"
                 className="btn btn-success"
               >
-                
+
                 Generate Sales Summary
               </Link>
             </div>
@@ -286,24 +303,24 @@ const SalesSummary = () => {
           {/* /product list */}
           <div className="card">
             <div className="card-body">
-              <Tabletop inputfilter={inputfilter} togglefilter={togglefilter} data={data} title={'Sales List'}/>
+              <Tabletop inputfilter={inputfilter} togglefilter={togglefilter} data={data} title={'Sales List'} />
               {/* /Filter */}
               <div
-                className={`card mb-0 ${ inputfilter ? "toggleCls" : ""}`}
+                className={`card mb-0 ${inputfilter ? "toggleCls" : ""}`}
                 id="filter_inputs"
-                style={{ display: inputfilter ? "block" :"none"}}
+                style={{ display: inputfilter ? "block" : "none" }}
               >
                 <div className="card-body pb-0">
                   <div className="row">
                     <div className="col-lg-12 col-sm-12">
-                      
+
                     </div>
                   </div>
                 </div>
               </div>
               {/* /Filter */}
               <div className="table-responsive">
-                <Table columns={columns} dataSource={data} />
+                <PurchaseSummaryTable title="SALES SUMMMARY REPORT" fileName="salesSummaryReport" data={report} />
               </div>
             </div>
           </div>
@@ -312,154 +329,154 @@ const SalesSummary = () => {
       </div>
 
 
-        {/* Filters Modal */}
+      {/* Filters Modal */}
 
-        <div
+      <div
         className="modal fade"
         id="filters"
         tabIndex={-1}
         aria-labelledby="filters"
         aria-hidden="true">
 
-          <div className="modal-dialog modal-md modal-dialog-centered" role="document">
-            <div className="modal-content">
-              <div className="modal-header">
-                    <h5 className="modal-title">Sales Search (Summary)</h5>
-                    <button
-                    type="button"
-                    className="close"
-                    data-bs-dismiss="modal"
-                    aria-label="Close"
-                    >
-                    <span aria-hidden="true">×</span>
-                </button>
-              </div>
-              <div className="modal-body">
-                  <div className="row">
-                      <div className="form-group">
-                        <label>From</label>
-                        <div className="input-groupicon">
-                          <input
-                            type="date" className={`form-control `}
-                            id="amount"
-                            placeholder=""
-                            value={formData.startDate}
-                            onChange={(e) => setFormData({...formData, startDate: e.target.value})}
-                          />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="row">
-                      <div className="form-group">
-                        <label>To</label>
-                        <div className="input-groupicon">
-                          <input
-                            type="date" className={`form-control `}
-                            id="amount"
-                            placeholder=""
-                            value={formData.endDate}
-                            onChange={(e) => setFormData({...formData, endDate: e.target.value})}
-                          />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="row">
-                      <div className="form-group">
-                        <label>Supplier</label>
-                        <Select
-                             id="supplier"
-                              className="select"
-                              options={suppliersDropdown}
-                              value={supplier}
-                              isLoading={suppliersIsLoading}
-                              onChange={(e) => {
-                                setSupplier(e)
-                              }}
-                            />
-                    </div>
-                  </div>
-                  <div className="row">
-                      <div className="form-group">
-                        <label>Product</label>
-                        <Select
-                          id="productName"
-                          className="select"
-                          options={productsDropdown}
-                          value={selectedProduct}
-                          isLoading={productsIsLoading}
-                          onChange={(e) => handleProductSelect(e)}
-                        />
-                    </div>
-                  </div>
-                  <div className="row">
-                      <div className="form-group">
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <label>Batch No.</label>
-                          {isBatchLoading && <div className="spinner-border text-primary me-1" role="status" style={{ height: 20, width: 20 }}>
-                            <span className="sr-only">Loading...</span>
-                          </div>}
-                        </div>
-                        <div className="input-groupicon">
-                          <Select
-                           
-                            options={selectedProductInfo?.batchNumber?.map((item) => {
-                              return { value: item.batchNumber, label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')' : item?.batchNumber + '-(' + item?.availablequantity + ')', expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
-                            })}
-                            placeholder=""
-                            value={formData.batchNumber}
-                            onChange={(e) => setFormData({ ...formData, batchNumber: (e)})}
-                          //onChange={(e) => console.log(e)}
-                          />
-
-                        </div>
-                      </div>
-                  </div>
-                  
-              </div>
-              <div className="modal-footer">
-                  <Link to="#" className="btn btn-cancel me-2"  style={{width:'47%'}} onClick={handleReset}>
-                    Reset
-                  </Link>
-                  <Link to="#" className="btn btn-submit "  style={{width:'47%'}} onClick={handleGenerateReport}>
-                    Search
-                  </Link>
-              </div>
+        <div className="modal-dialog modal-md modal-dialog-centered" role="document">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title">Sales Search (Summary)</h5>
+              <button
+                type="button"
+                className="close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">×</span>
+              </button>
             </div>
-          </div>
-
-        </div>
-
-
-          {/* PDF Modal */ }
-        <div
-          className="modal fade"
-          id="pdfViewer"
-          tabIndex={-1}
-          aria-labelledby="pdfViewer"
-          aria-hidden="true"
-        >
-          <div className="modal-dialog modal-xl modal-dialog-centered">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">Sales Summary Report</h5>
-                <button
-                  type="button"
-                  className="close"
-                  data-bs-dismiss="modal"
-                  aria-label="Close"
-                >
-                  <span aria-hidden="true">×</span>
-                </button>
+            <div className="modal-body">
+              <div className="row">
+                <div className="form-group">
+                  <label>From</label>
+                  <div className="input-groupicon">
+                    <input
+                      type="date" className={`form-control `}
+                      id="amount"
+                      placeholder=""
+                      value={formData.startDate}
+                      onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                    />
+                  </div>
+                </div>
               </div>
-              <div className="modal-body" style={{display:'flex', justifyContent:'center', alignItems:'center'}}>
-                {!reportIsLoading ? (<iframe width='100%' height='800px' src={reportFile}></iframe>) : (<div className="spinner-border text-primary me-1" role="status" style={{ height: 50, width: 50,  }}>
-                          <span className="sr-only">Loading...</span>
-                        </div>)}
+              <div className="row">
+                <div className="form-group">
+                  <label>To</label>
+                  <div className="input-groupicon">
+                    <input
+                      type="date" className={`form-control `}
+                      id="amount"
+                      placeholder=""
+                      value={formData.endDate}
+                      onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="row">
+                <div className="form-group">
+                  <label>Supplier</label>
+                  <Select
+                    id="supplier"
+                    className="select"
+                    options={suppliersDropdown}
+                    value={supplier}
+                    isLoading={suppliersIsLoading}
+                    onChange={(e) => {
+                      setSupplier(e)
+                    }}
+                  />
+                </div>
+              </div>
+              <div className="row">
+                <div className="form-group">
+                  <label>Product</label>
+                  <Select
+                    id="productName"
+                    className="select"
+                    options={productsDropdown}
+                    value={selectedProduct}
+                    isLoading={productsIsLoading}
+                    onChange={(e) => handleProductSelect(e)}
+                  />
+                </div>
+              </div>
+              <div className="row">
+                <div className="form-group">
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <label>Batch No.</label>
+                    {isBatchLoading && <div className="spinner-border text-primary me-1" role="status" style={{ height: 20, width: 20 }}>
+                      <span className="sr-only">Loading...</span>
+                    </div>}
+                  </div>
+                  <div className="input-groupicon">
+                    <Select
+
+                      options={selectedProductInfo?.batchNumber?.map((item) => {
+                        return { value: item.batchNumber, label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')' : item?.batchNumber + '-(' + item?.availablequantity + ')', expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
+                      })}
+                      placeholder=""
+                      value={formData.batchNumber}
+                      onChange={(e) => setFormData({ ...formData, batchNumber: (e) })}
+                    //onChange={(e) => console.log(e)}
+                    />
+
+                  </div>
+                </div>
               </div>
 
             </div>
+            <div className="modal-footer">
+              <Link to="#" className="btn btn-cancel me-2" style={{ width: '47%' }} onClick={handleReset}>
+                Reset
+              </Link>
+              <Link to="#" className="btn btn-submit " style={{ width: '47%' }} onClick={handleGenerateReport}>
+                Search
+              </Link>
+            </div>
           </div>
         </div>
+
+      </div>
+
+
+      {/* PDF Modal */}
+      <div
+        className="modal fade"
+        id="pdfViewer"
+        tabIndex={-1}
+        aria-labelledby="pdfViewer"
+        aria-hidden="true"
+      >
+        <div className="modal-dialog modal-xl modal-dialog-centered">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title">Sales Summary Report</h5>
+              <button
+                type="button"
+                className="close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">×</span>
+              </button>
+            </div>
+            <div className="modal-body" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              {!reportIsLoading ? (<iframe width='100%' height='800px' src={reportFile}></iframe>) : (<div className="spinner-border text-primary me-1" role="status" style={{ height: 50, width: 50, }}>
+                <span className="sr-only">Loading...</span>
+              </div>)}
+            </div>
+
+          </div>
+        </div>
+      </div>
     </>
   );
 };
