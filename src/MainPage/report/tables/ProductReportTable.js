@@ -159,15 +159,15 @@ function ProductReportTable({ data = [] }) {
                         <ColumnDirective field='expireDate' headerText='Expire Date' width={"6%"}></ColumnDirective>
 
                     </ColumnsDirective>
-                    {/* <AggregatesDirective>
+                    <AggregatesDirective>
                         <AggregateDirective>
                             <AggregateColumnsDirective>
                                 <AggregateColumnDirective field='QTY' type='Sum' format='N2' footerTemplate={footerSum} />
-                                <AggregateColumnDirective field='Quantity' type='Sum' format='N2' footerTemplate={footerSum} />
-                                <AggregateColumnDirective field='Amount' type='Sum' format='N2' footerTemplate={footerSum} />
+                                <AggregateColumnDirective field='quantity' type='Sum' format='N2' footerTemplate={footerSum} />
+
                             </AggregateColumnsDirective>
                         </AggregateDirective>
-                    </AggregatesDirective> */}
+                    </AggregatesDirective>
                     <Inject services={[Toolbar, ExcelExport, PdfExport, Page, Aggregate]} />
                 </GridComponent>
             </div>

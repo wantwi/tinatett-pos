@@ -3,6 +3,7 @@ import { GridComponent, ColumnsDirective, ColumnDirective, Inject, Toolbar, Exce
 import { image } from './image';
 import { getCurrentDateInWords } from './helper';
 import useAuth from '../../../hooks/useAuth';
+
 function PurchaseReport({ data = [], title = "PURCHASE REPORT", fileName = "purchaseReport", isSupplier = true }) {
     const { auth } = useAuth()
     console.log({ auth });
@@ -10,6 +11,7 @@ function PurchaseReport({ data = [], title = "PURCHASE REPORT", fileName = "purc
     const date = ((new Date()).getDate().toString()) + '/';
     const year = ((new Date()).getFullYear().toString());
     const toolbarOptions = ['ExcelExport', 'PdfExport'];
+    let flag = true;
     let gridInstance;
     function toolbarClick(args) {
         switch (args.item.id) {
@@ -143,11 +145,25 @@ function PurchaseReport({ data = [], title = "PURCHASE REPORT", fileName = "purc
 
     };
 
+    const pdfQueryCellInfo = () => {
+        if (flag) {
+            // to avoid execution for all the pdf cells
+
+            console.log({ gridInstance });
+
+            // gridInstance.pdfExportModule.pdfDocument.pageSettings.margins.all = 10;//pdfPageSettings
+
+            // console.log({ gridInstance });
+
+            flag = false;
+        }
+    }
+
 
     return (<div className='control-pane'>
         <div className='control-section'>
             <div>
-                <GridComponent id="Grid" beforePdfExport={beforePdfExport} dataSource={data} ref={grid => gridInstance = grid} pdfHeaderQueryCellInfo={pdfHeaderQueryCellInfo} toolbar={toolbarOptions} allowExcelExport={true} allowPdfExport={true} toolbarClick={toolbarClick.bind(this)} height={500} allowPaging={true} pageSettings={{ pageCount: 2, pageSize: 1000 }}>
+                <GridComponent id="Grid" pdfQueryCellInfo={pdfQueryCellInfo} beforePdfExport={beforePdfExport} dataSource={data} ref={grid => gridInstance = grid} pdfHeaderQueryCellInfo={pdfHeaderQueryCellInfo} toolbar={toolbarOptions} allowExcelExport={true} allowPdfExport={true} toolbarClick={toolbarClick.bind(this)} height={500} allowPaging={true} pageSettings={{ pageCount: 2, pageSize: 1000 }}>
                     <ColumnsDirective>
                         <ColumnDirective field='date' headerText='Date' width={90}></ColumnDirective>
                         <ColumnDirective field='refrence' headerText='Ref.#' width={100} ></ColumnDirective>
@@ -163,6 +179,8 @@ function PurchaseReport({ data = [], title = "PURCHASE REPORT", fileName = "purc
                     <AggregatesDirective>
                         <AggregateDirective>
                             <AggregateColumnsDirective>
+                                <AggregateColumnDirective field='quantity' type='Sum' format='N2' footerTemplate={footerSum} />
+                                <AggregateColumnDirective field='unitPrice' type='Sum' format='N2' footerTemplate={footerSum} />
                                 <AggregateColumnDirective field='amount' type='Sum' format='N2' footerTemplate={footerSum} />
                             </AggregateColumnsDirective>
                         </AggregateDirective>
