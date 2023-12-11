@@ -46,6 +46,8 @@ const ProductReport = () => {
   const [isSpecialChecked, setisSpecialChecked] = useState(true)
   const [isQuantityChecked, setIsQuantityChecked] = useState(true)
 
+  const [disableBatchNo, setDisableBatchNo] = useState(false)
+
   const retailpriceTypeRef = useRef()
   const specialpriceTypeRef = useRef()
   const wholesalepriceTypeRef = useRef()
@@ -250,6 +252,10 @@ const ProductReport = () => {
   }, [isRetailChecked, isSpecialChecked, isWholsaleChecked])
 
 
+  const handleToggleBatchNumberStatus = (e) => {
+    //console.log(e.target.value)
+    setDisableBatchNo(!disableBatchNo)
+  }
 
   useEffect(() => {
     // console.log("Selected Prod", selectedProduct)
@@ -385,8 +391,9 @@ const ProductReport = () => {
 
                 <div className="col-6">
                   <div className="form-group">
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <label>Batch No.</label>
+                    <div style={{ display: 'flex' }}>
+                       <input type="checkbox" className="form-check-input" style={{marginRight:10}} 
+                       onChange={handleToggleBatchNumberStatus} checked={disableBatchNo}/><label>Batch No.</label>
                       {isBatchLoading && <div className="spinner-border text-primary me-1" role="status" style={{ height: 20, width: 20 }}>
                         <span className="sr-only">Loading...</span>
                       </div>}
@@ -400,7 +407,7 @@ const ProductReport = () => {
                         placeholder=""
                         value={formData.batchNumber}
                         onChange={(e) => setFormData({ ...formData, batchNumber: (e), manuDate: e.manufacturingDate, expDate: e.expireDate })}
-                      //onChange={(e) => console.log(e)}
+                        isDisabled={disableBatchNo}
                       />
 
                     </div>
