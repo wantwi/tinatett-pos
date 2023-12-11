@@ -89,7 +89,7 @@ function PurchaseSummary({ data = [], title = "", fileName = "" }) {
                     {
                         type: 'Text',
                         value: `${getCurrentDateInWords(Date.now())}`,
-                        position: { x: 630, y: 110 },
+                        position: { x: 600, y: 110 },
                         style: { textBrushColor: '#000000', fontSize: 11 }
                     },
                 ]
