@@ -40,9 +40,18 @@ const SalesSummary = () => {
 
   const [productsDropdown, setProductsDropdown] = useState([]);
   const [suppliersDropdown, setSuppliersDropdown] = useState([]);
+  const [usersDropdown, setUsersDropdown] = useState([]);
 
   const { data: products, isLoading: productsIsLoading } = useGet("products", "/product");
   const { data: suppliers, isLoading: suppliersIsLoading } = useGet("suppliers", "/supplier");
+  useGet("users", "/user/branchUsers", (data) => {
+    setUsersDropdown(data?.data.map(x => ({
+      id: x?.id,
+      label: `${x?.firstName} ${x?.lastName}`,
+      value: x?.id
+    })))
+
+  });
 
   const [loggedInUser, setLoggedInUser] = useState({})
 
@@ -55,6 +64,7 @@ const SalesSummary = () => {
   const [reportFile, setReportFile] = useState(null)
   const [reportIsLoading, setreportIsLoading] = useState(false)
   const [report, setReport] = useState([])
+  const [selectedUser, setSelectedUser] = useState({})
 
   useEffect(() => {
     if (!productsIsLoading && !suppliersIsLoading) {
@@ -89,7 +99,7 @@ const SalesSummary = () => {
     // console.log("Selected Prod", selectedProduct)
 
     axios.get(`${BASE_URL}/purchase/product/${selectedProduct?.value}`).then((res) => {
-
+      setFormData({ ...formData, batchNumber: null })
       if (res.data.success) {
         // setIsLoading(false)
         console.log(res.data.newProduct)
@@ -148,6 +158,7 @@ const SalesSummary = () => {
     setFormData({ quantity: '', amount: '', batchNumber: '', startDate: '', endDate: '' })
     setSupplier(null)
     setSelectedProduct(null)
+    setSelectedUser(null)
   }
 
   const handleGenerateReport = () => {
@@ -158,7 +169,7 @@ const SalesSummary = () => {
       endDate: formData?.endDate || "",
       batchNumber: formData?.batchNumber?.label || "",
       clientId: supplier?.id || "",
-      userId: formData?.userId || "",
+      userId: selectedUser?.value || "",
     };
 
     const encodeFilterValue = (value) => encodeURIComponent(value);
@@ -429,6 +440,18 @@ const SalesSummary = () => {
                     />
 
                   </div>
+                </div>
+              </div>
+              <div className="row">
+                <div className="form-group">
+                  <label>User</label>
+                  <Select
+                    id="users"
+                    className="select"
+                    options={usersDropdown}
+                    value={selectedUser}
+                    onChange={(e) => setSelectedUser(e)}
+                  />
                 </div>
               </div>
 

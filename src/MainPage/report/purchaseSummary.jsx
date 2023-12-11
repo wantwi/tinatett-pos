@@ -56,9 +56,18 @@ const PurchaseSummary = () => {
 
   const [productsDropdown, setProductsDropdown] = useState([]);
   const [suppliersDropdown, setSuppliersDropdown] = useState([]);
+  const [usersDropdown, setUsersDropdown] = useState([]);
 
   const { data: products, isLoading: productsIsLoading } = useGet("products", "/product");
   const { data: suppliers, isLoading: suppliersIsLoading } = useGet("suppliers", "/supplier");
+  useGet("users", "/user/branchUsers", (data) => {
+    setUsersDropdown(data?.data.map(x => ({
+      id: x?.id,
+      label: `${x?.firstName} ${x?.lastName}`,
+      value: x?.id
+    })))
+
+  });
 
   const [loggedInUser, setLoggedInUser] = useState({})
 
@@ -70,6 +79,7 @@ const PurchaseSummary = () => {
   const [formData, setFormData] = useState({ quantity: '', amount: '', batchNumber: {}, userId: '', startDate: '', endDate: '' })
   const [reportFile, setReportFile] = useState(null)
   const [reportIsLoading, setreportIsLoading] = useState(false)
+  const [selectedUser, setSelectedUser] = useState({})
 
   useEffect(() => {
     if (!productsIsLoading && !suppliersIsLoading) {
@@ -175,6 +185,8 @@ const PurchaseSummary = () => {
 
 
   const handleGenerateReport = () => {
+
+    setReport([])
     const baseUrl = "report/getPurchaseSummaryReport";
     let filters = {
       productId: selectedProduct?.id || "",
@@ -182,7 +194,7 @@ const PurchaseSummary = () => {
       endDate: formData?.endDate || "",
       batchNumber: formData?.batchNumber?.label || "",
       clientId: supplier?.id || "",
-      userId: formData?.userId || "",
+      userId: selectedUser?.value || "",
     };
 
     const encodeFilterValue = (value) => encodeURIComponent(value);
@@ -193,6 +205,8 @@ const PurchaseSummary = () => {
       .join("&");
 
     const dynamicUrl = `${baseUrl}?${urlParams}`;
+
+    console.log({ filters });
 
 
     setreportIsLoading(true)
@@ -418,7 +432,7 @@ const PurchaseSummary = () => {
                     <Select
                       isLoading={isLoading}
                       options={selectedProductInfo?.batchNumber?.map((item) => {
-                        return { value: item?.batchNumber, label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')' : item?.batchNumber + '-(' + item?.availablequantity + ')' }
+                        return { value: item?.batchNumber, label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')' : item?.batchNumber }
                       })}
                       placeholder=""
                       value={formData.batchNumber}
@@ -430,15 +444,13 @@ const PurchaseSummary = () => {
               <div className="row">
                 <div className="form-group">
                   <label>User</label>
-                  <div className="input-groupicon">
-                    <input
-                      type="text" className={`form-control `}
-                      id="amount"
-                      placeholder=""
-                      value={formData.userId}
-                      onChange={(e) => setFormData({ ...formData, userId: e.target.value })}
-                    />
-                  </div>
+                  <Select
+                    id="users"
+                    className="select"
+                    options={usersDropdown}
+                    value={selectedUser}
+                    onChange={(e) => setSelectedUser(e)}
+                  />
                 </div>
               </div>
             </div>

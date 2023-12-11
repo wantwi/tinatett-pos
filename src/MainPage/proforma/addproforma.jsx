@@ -39,7 +39,7 @@ const AddProforma = () => {
   const [productOptions, setProductOptions] = useState([])
 
 
-  const { data: customers, isError, isLoading: isCustomerLoading, refetch } = useGet("customers", "/customer");
+  const { data: customers, isError, isLoading: isCustomerLoading, refetch } = useGet("customers", "/customer/combo");
   const { data: products, isLoading: isProductLoading } = useGet("products", "/product");
   // const { isLoading, isError: isPostError, error, mutate } = usePost("/proforma");
 
@@ -61,7 +61,7 @@ const AddProforma = () => {
   const [isSaving, setIsSaving] = useState(false)
   const [proformaFile, setProformaFile] = useState(null)
   const [priceType, setPriceType] = useState('')
- 
+
   const { notifications, setNotifications } = useContext(NotificationsContext)
   let storage = JSON.parse(localStorage.getItem("auth"))
 
@@ -72,7 +72,7 @@ const AddProforma = () => {
     contact: Yup.string().required("Phone number is required"),
   });
 
-  const {register,handleSubmit,reset,formState: { errors, isSubmitSuccessful }} = useForm({
+  const { register, handleSubmit, reset, formState: { errors, isSubmitSuccessful } } = useForm({
     defaultValues: {
       name: "",
       email: "",
@@ -80,8 +80,8 @@ const AddProforma = () => {
       otherContact: "",
       location: "",
       customerType: 0,
-      gpsAddress:""
-      
+      gpsAddress: ""
+
     },
     resolver: yupResolver(validationSchema),
   });
@@ -91,37 +91,37 @@ const AddProforma = () => {
 
   //save adhoc customer
   const onSubmit = (data) => {
-    let payload = {...data, customerType}
+    let payload = { ...data, customerType }
 
-    axios.post(`/customer`,  payload)
-    .then((res) => {
-      console.log(res.data)
-      if(res.data.success){
-        let addedCustomer =  {
+    axios.post(`/customer`, payload)
+      .then((res) => {
+        console.log(res.data)
+        if (res.data.success) {
+          let addedCustomer = {
             id: res.data.data?.id,
             label: res.data.data?.name,
             value: res.data.data?.id,
             location: res.data.data?.location,
             contact: res.data.data?.contact,
             email: res.data.data?.email
-  
-          }
-        setCustomerOptions([addedCustomer,...customerOptions])
-      }
-      else{
-        alertify.set("notifier", "position", "bottom-right");
-        alertify.error("Error...Could not save customer.");
 
-        let newNotification = {
-          id: Math.ceil(Math.random()*1000000),
-          message: `${storage.name} Error..could not save customer`,
-          time: new Date().toISOString(),
-          type: 'error'
+          }
+          setCustomerOptions([addedCustomer, ...customerOptions])
         }
-        setNotifications([newNotification, ...notifications])
-      }
-      
-    })
+        else {
+          alertify.set("notifier", "position", "bottom-right");
+          alertify.error("Error...Could not save customer.");
+
+          let newNotification = {
+            id: Math.ceil(Math.random() * 1000000),
+            message: `${storage.name} Error..could not save customer`,
+            time: new Date().toISOString(),
+            type: 'error'
+          }
+          setNotifications([newNotification, ...notifications])
+        }
+
+      })
   };
 
   useEffect(() => {
@@ -133,7 +133,7 @@ const AddProforma = () => {
 
       $('.modal').modal('hide')
     }
-    return () => {};
+    return () => { };
   }, [isSubmitSuccessful, isError]);
 
 
@@ -151,7 +151,7 @@ const AddProforma = () => {
         }
       })
       setCustomerOptions(mappedData)
-  
+
 
       let mappedData2 = products?.data.map((product) => {
         return {
@@ -166,9 +166,9 @@ const AddProforma = () => {
       setProductOptions(mappedData2)
       retailpriceTypeRef.current.checked = true
       editretailpriceTypeRef.current.checked = true
-   
+
     }
-   
+
   }, [isCustomerLoading, isProductLoading, refetch])
 
 
@@ -186,7 +186,7 @@ const AddProforma = () => {
       // let item = customers?.data.find((customer) => customer.id == e.target.value)
       setSelectedCustomer(e)
       setSelectedCustomerPrint(e)
-      
+
     }
     $('#selectedCustomerRef').css('border', '1px solid rgba(145, 158, 171, 0.32)')
   }
@@ -202,7 +202,7 @@ const AddProforma = () => {
     setProductGridData(newGridData)
   };
 
-  const handleUpdate = ()=> {
+  const handleUpdate = () => {
     let updated = editFormData
     let listCopy = [...productGridData]
     let index = productGridData.findIndex(item => item.id == updated.id)
@@ -217,7 +217,7 @@ const AddProforma = () => {
 
 
   const handleAddItem = () => {
-    
+
     let item =
     {
       id: Math.ceil(Math.random() * 1000000),
@@ -254,7 +254,7 @@ const AddProforma = () => {
       // }, 3000)
     }
 
-    if(formData.price == '' || formData.price == null){
+    if (formData.price == '' || formData.price == null) {
       $('#priceType').css('border', '1px solid red')
     }
 
@@ -263,7 +263,7 @@ const AddProforma = () => {
       alertify.warning("Please make sure all fields are filled.");
 
       let newNotification = {
-        id: Math.ceil(Math.random()*1000000),
+        id: Math.ceil(Math.random() * 1000000),
         message: `${storage.name} Please make sure all fields are filled`,
         time: new Date().toISOString(),
         type: 'warning'
@@ -300,7 +300,7 @@ const AddProforma = () => {
 
 
   useEffect(() => {
-    if(selectedCustomer && selectedCustomer?.label.includes('Retail')){
+    if (selectedCustomer && selectedCustomer?.label.includes('Retail')) {
       retailpriceTypeRef.current.checked = true
       editretailpriceTypeRef.current.checked = true
 
@@ -310,7 +310,7 @@ const AddProforma = () => {
       retailpriceTypeRef.current.disabled = false
       editretailpriceTypeRef.current.disabled = false
     }
-    else if(selectedCustomer && selectedCustomer?.label.includes('Whole')){
+    else if (selectedCustomer && selectedCustomer?.label.includes('Whole')) {
       wholesalepriceTypeRef.current.checked = true
       editwholesalepriceTypeRef.current.checked = true
 
@@ -319,17 +319,17 @@ const AddProforma = () => {
 
       wholesalepriceTypeRef.current.disabled = false
       editwholesalepriceTypeRef.current.disabled = false
-     }
+    }
 
-    else if((selectedCustomer && !selectedCustomer?.label.includes('Whole')) && (!selectedCustomer?.label.includes('Retail'))){
-    
-        wholesalepriceTypeRef.current.disabled = false
-        editwholesalepriceTypeRef.current.disabled = false
+    else if ((selectedCustomer && !selectedCustomer?.label.includes('Whole')) && (!selectedCustomer?.label.includes('Retail'))) {
 
-        retailpriceTypeRef.current.disabled = false
-        editretailpriceTypeRef.current.disabled = false
-  
-        //setDisableUnselectedPrice({ wholesale: false, retail: false, special: false })
+      wholesalepriceTypeRef.current.disabled = false
+      editwholesalepriceTypeRef.current.disabled = false
+
+      retailpriceTypeRef.current.disabled = false
+      editretailpriceTypeRef.current.disabled = false
+
+      //setDisableUnselectedPrice({ wholesale: false, retail: false, special: false })
     }
 
 
@@ -338,14 +338,14 @@ const AddProforma = () => {
 
 
   useEffect(() => {
-    if($('#retailPriceType').prop('checked')){
-      setFormData({...formData, price: selectedProduct.retailPrice, amount: formData.quantity ? selectedProduct?.retailPrice * formData.quantity : selectedProduct?.retailPrice * 1 })
+    if ($('#retailPriceType').prop('checked')) {
+      setFormData({ ...formData, price: selectedProduct.retailPrice, amount: formData.quantity ? selectedProduct?.retailPrice * formData.quantity : selectedProduct?.retailPrice * 1 })
     }
-    else if($('#wholeSaleType').prop('checked')){
-      setFormData({...formData, price: selectedProduct.wholeSalePrice, amount: formData.quantity ? selectedProduct?.wholeSalePrice * formData.quantity : selectedProduct?.wholeSalePrice * 1 })
+    else if ($('#wholeSaleType').prop('checked')) {
+      setFormData({ ...formData, price: selectedProduct.wholeSalePrice, amount: formData.quantity ? selectedProduct?.wholeSalePrice * formData.quantity : selectedProduct?.wholeSalePrice * 1 })
     }
-    else{
-      setFormData({...formData, price: selectedProduct.specialPrice, amount: formData.quantity ? selectedProduct?.specialPrice * formData.quantity : selectedProduct?.specialPrice * 1 })
+    else {
+      setFormData({ ...formData, price: selectedProduct.specialPrice, amount: formData.quantity ? selectedProduct?.specialPrice * formData.quantity : selectedProduct?.specialPrice * 1 })
     }
 
   }, [selectedProduct, selectedCustomer])
@@ -359,7 +359,7 @@ const AddProforma = () => {
       alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please add at least one item to list before saving.");
       let newNotification = {
-        id: Math.ceil(Math.random()*1000000),
+        id: Math.ceil(Math.random() * 1000000),
         message: `${storage.name} Please add at least one item to list before saving`,
         time: new Date().toISOString(),
         type: 'warning'
@@ -380,61 +380,61 @@ const AddProforma = () => {
           }
         })
       }
-     // mutate(postBody)
-     axios.post('/proforma', payload)
-     .then((res) => {
-        if(res.status == 201 || res.data.success == true){
+      // mutate(postBody)
+      axios.post('/proforma', payload)
+        .then((res) => {
+          if (res.status == 201 || res.data.success == true) {
 
-          alertify.set("notifier", "position", "bottom-right");
-          alertify.success("Proforma saved successfully.");
+            alertify.set("notifier", "position", "bottom-right");
+            alertify.success("Proforma saved successfully.");
 
-          let storage = JSON.parse(localStorage.getItem("auth"))
-          let newNotification = {
-            message: `${storage.name} added a Proforma successfully.`,
-            time: new Date().toISOString(),
-            type: 'success'
+            let storage = JSON.parse(localStorage.getItem("auth"))
+            let newNotification = {
+              message: `${storage.name} added a Proforma successfully.`,
+              time: new Date().toISOString(),
+              type: 'success'
+            }
+            setNotifications([newNotification, ...notifications])
+
+            //setSelectedCustomer(customerOptions[0])
+            setSelectedProduct({})
+            setFormData({ amount: '', quantity: '', price: '' })
+            setProductGridData([])
+
+            //setTransDate('')
+
+            setTimeout(() => {
+              let base64 = res.data.base64
+              const blob = base64ToBlob(base64, 'application/pdf');
+              const blobFile = `data:application/pdf;base64,${base64}`
+              const url = URL.createObjectURL(blob);
+              setProformaFile(blobFile)
+              //window.open(url, "_blank", "width=600, height=600", 'modal=yes');
+              // var newWindow = window.open(url, "_blank", "width=800, height=800");  
+              //pdfWindow.document.write("<iframe width='100%' height='100%' src='" + url + "'></iframe>");
+
+              $('#pdfViewer').modal('show')
+
+            }, 1000)
+
           }
-          setNotifications([newNotification, ...notifications])
-
-          //setSelectedCustomer(customerOptions[0])
-          setSelectedProduct({})
-          setFormData({ amount: '', quantity: '', price: '' })
-          setProductGridData([])
-          
-          //setTransDate('')
-
-          setTimeout(() => {
-            let base64 = res.data.base64
-            const blob = base64ToBlob(base64, 'application/pdf');
-            const blobFile = `data:application/pdf;base64,${base64}`
-            const url = URL.createObjectURL(blob);
-            setProformaFile(blobFile)
-            //window.open(url, "_blank", "width=600, height=600", 'modal=yes');
-            // var newWindow = window.open(url, "_blank", "width=800, height=800");  
-            //pdfWindow.document.write("<iframe width='100%' height='100%' src='" + url + "'></iframe>");
-            
-            $('#pdfViewer').modal('show')
-      
-          }, 1000)
-          
-        }
-        else{
-          alertify.set("notifier", "position", "bottom-right");
-          alertify.error("Error...Could not save.");
-          let newNotification = {
-            id: Math.ceil(Math.random()*1000000),
-            message: `${storage.name} Error. Could not save Proforma`,
-            time: new Date().toISOString(),
-            type: 'error'
+          else {
+            alertify.set("notifier", "position", "bottom-right");
+            alertify.error("Error...Could not save.");
+            let newNotification = {
+              id: Math.ceil(Math.random() * 1000000),
+              message: `${storage.name} Error. Could not save Proforma`,
+              time: new Date().toISOString(),
+              type: 'error'
+            }
+            setNotifications([newNotification, ...notifications])
           }
-          setNotifications([newNotification, ...notifications])
-        }
-     }).finally(() => {
-      setIsSaving(false)
-      retailpriceTypeRef.current.checked =  true
-      editretailpriceTypeRef.current.checked =  true
-      setSelectedCustomer(customerOptions[0])
-    })
+        }).finally(() => {
+          setIsSaving(false)
+          retailpriceTypeRef.current.checked = true
+          editretailpriceTypeRef.current.checked = true
+          setSelectedCustomer(customerOptions[0])
+        })
 
 
       //base 64 function
@@ -452,9 +452,9 @@ const AddProforma = () => {
 
   };
 
-  const createPDF =  (id) => {
+  const createPDF = (id) => {
     const pdf = new jsPDF("portrait", "pt", "a4");
-    const data =  document.getElementById(id);
+    const data = document.getElementById(id);
     pdf.html(data).then(() => {
       pdf.save(`Proforma.pdf`);
     });
@@ -474,13 +474,13 @@ const AddProforma = () => {
 
   useEffect(() => {
     //priceType == 'Retail' ? editretailpriceTypeRef?.current.checked = true : priceType == "Wholesale" ? editwholesalepriceTypeRef?.current.checked = true: editspecialpriceTypeRef?.current.checked = true
-    if(priceType == 'Retail' &&  editretailpriceTypeRef != undefined){
+    if (priceType == 'Retail' && editretailpriceTypeRef != undefined) {
       editretailpriceTypeRef.current.checked = true
     }
-    else if(priceType == 'Wholesale' &&  editwholesalepriceTypeRef != undefined){
+    else if (priceType == 'Wholesale' && editwholesalepriceTypeRef != undefined) {
       editwholesalepriceTypeRef.current.checked = true
     }
-    else if(priceType == 'Special' &&  editspecialpriceTypeRef != undefined){
+    else if (priceType == 'Special' && editspecialpriceTypeRef != undefined) {
       editspecialpriceTypeRef.current.checked = true
     }
 
@@ -498,7 +498,7 @@ const AddProforma = () => {
   }
 
   if (isSaving) {
-    return <LoadingSpinner message="Saving.."/>
+    return <LoadingSpinner message="Saving.." />
   }
 
   // if(isLoading){
@@ -537,11 +537,11 @@ const AddProforma = () => {
                         </div>
 
                         <div className="col-lg-2 col-sm-2 col-2 ps-0">
-                            <div className="add-icon">
-                              <Link to="#" data-bs-toggle="modal" data-bs-target="#addsupplier">
-                                <img src={Plus} alt="img" />
-                              </Link>
-                            </div>
+                          <div className="add-icon">
+                            <Link to="#" data-bs-toggle="modal" data-bs-target="#addsupplier">
+                              <img src={Plus} alt="img" />
+                            </Link>
+                          </div>
                         </div>
 
                       </div>
@@ -550,8 +550,8 @@ const AddProforma = () => {
                   <div className="col-lg-12 col-sm-12 col-12">
                     <div className="form-group">
                       <label> Date</label>
-                      <input type="date" className="form-control" value={transDate} onChange={(e) => setTransDate(e.target.value)} />                   
-                
+                      <input type="date" className="form-control" value={transDate} onChange={(e) => setTransDate(e.target.value)} />
+
                     </div>
                   </div>
                 </div>
@@ -564,7 +564,7 @@ const AddProforma = () => {
                   <div className="form-group">
                     <label>Product Name (Designation)</label>
                     <Select
-                    id="selectedProduct"
+                      id="selectedProduct"
                       className="select"
                       options={productOptions}
                       onChange={handleProductSelect}
@@ -590,7 +590,7 @@ const AddProforma = () => {
                                   alertify.set("notifier", "position", "bottom-right");
                                   alertify.warning("Please select a product first.");
                                   let newNotification = {
-                                    id: Math.ceil(Math.random()*1000000),
+                                    id: Math.ceil(Math.random() * 1000000),
                                     message: `${storage.name} Please select a product first`,
                                     time: new Date().toISOString(),
                                     type: 'warning'
@@ -619,7 +619,7 @@ const AddProforma = () => {
                                   alertify.set("notifier", "position", "bottom-right");
                                   alertify.warning("Please select a product first.");
                                   let newNotification = {
-                                    id: Math.ceil(Math.random()*1000000),
+                                    id: Math.ceil(Math.random() * 1000000),
                                     message: `${storage.name} Please select a product first`,
                                     time: new Date().toISOString(),
                                     type: 'warning'
@@ -650,7 +650,7 @@ const AddProforma = () => {
                                   alertify.set("notifier", "position", "bottom-right");
                                   alertify.warning("Please select a product first.");
                                   let newNotification = {
-                                    id: Math.ceil(Math.random()*1000000),
+                                    id: Math.ceil(Math.random() * 1000000),
                                     message: `${storage.name} Please select a product first`,
                                     time: new Date().toISOString(),
                                     type: 'warning'
@@ -685,10 +685,10 @@ const AddProforma = () => {
                           value={formData.quantity}
                           // {...register("quantity")}
                           onChange={(e) => {
-                            if(e.target.value == ''){
-                              setFormData({...formData, quantity: ''})
+                            if (e.target.value == '') {
+                              setFormData({ ...formData, quantity: '' })
                             }
-                            else if(isValidNumber(e.target.value)) {
+                            else if (isValidNumber(e.target.value)) {
                               setFormData({ ...formData, quantity: Number(e.target.value) })
                             }
 
@@ -765,11 +765,12 @@ const AddProforma = () => {
                             <td>{item?.amount}</td>
 
                             <td>
-                            <Link to="#" className="me-2">
+                              <Link to="#" className="me-2">
                                 <img src={EditIcon} alt="svg" data-bs-toggle="modal" data-bs-target="#editproduct" onClick={() => {
                                   // console.log(item, 'ITEM')
-                                  setEditFormData(item)}
-                                  }/>
+                                  setEditFormData(item)
+                                }
+                                } />
                               </Link>
                               <Link to="#" className="delete-set" onClick={() => deleteRow(item)}>
                                 <img src={DeleteIcon} alt="svg" />
@@ -859,69 +860,69 @@ const AddProforma = () => {
               </button>
             </div>
             <div className="modal-body">
-         
+
               <div id="printArea">
-                    <div style={{display:'flex', flexDirection:'column', gap:10}}>
-                      <h5 style={{textAlign:'center', fontWeight:900}}>TINATETT HERBAL MANUFACTURING AND MARKKETING COMPANY LIMITED</h5>
-                      <span style={{textAlign:'center'}}>P.O. BOC CO 2699, TEMA-ACCRA, WHOLESALE AND RETAIL OF HERBAL MEDICINE </span>
-                      <span style={{textAlign:'center'}}>KOTOBABI SPINTEX - FACTORY WEARHOUSE, 02081660807, tinatettonline@gmail.com</span>
-                      <h5 style={{textAlign:'center', textDecoration:'underline', fontWeight:700}}>PROFORMA INVOICE</h5>
-                      <h6 style={{fontWeight:700}}>Customer Info: </h6>
-                      <span>Customer Name : {selectedCustomerPrint?.label}</span>
-                      <span>Email: {selectedCustomerPrint?.email}</span>
-                      <span>Contact: {selectedCustomerPrint?.contact}</span>
-                      <span>Address: {selectedCustomerPrint?.location}</span>
-                    </div>
-                    <div className="row mt-3">
-                        <div class="table-responsive mb-3">
-                          <table class="table">
-                            <thead>
-                              <tr>
-                                <th>#</th><th>Product Name</th><th>Quantity</th><th>Unit Price</th><th>Amount</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                            {printGridData?.map((item, index) => {
-                                return (
-                                  <tr key={item?.id}>
-                                    <td>{index + 1}</td>
-                                    <td>
-                                      <Link to="#">{item?.productName}</Link>
-                                    </td>
-                                    <td>{item?.quantity}</td>
-                                    <td>{item?.unitPrice}</td>
-                                    <td>{item?.amount}</td>
-                                  </tr>
-                                )
-                              })}
-                            </tbody>
-                          </table>
-                        </div>
-                    </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  <h5 style={{ textAlign: 'center', fontWeight: 900 }}>TINATETT HERBAL MANUFACTURING AND MARKKETING COMPANY LIMITED</h5>
+                  <span style={{ textAlign: 'center' }}>P.O. BOC CO 2699, TEMA-ACCRA, WHOLESALE AND RETAIL OF HERBAL MEDICINE </span>
+                  <span style={{ textAlign: 'center' }}>KOTOBABI SPINTEX - FACTORY WEARHOUSE, 02081660807, tinatettonline@gmail.com</span>
+                  <h5 style={{ textAlign: 'center', textDecoration: 'underline', fontWeight: 700 }}>PROFORMA INVOICE</h5>
+                  <h6 style={{ fontWeight: 700 }}>Customer Info: </h6>
+                  <span>Customer Name : {selectedCustomerPrint?.label}</span>
+                  <span>Email: {selectedCustomerPrint?.email}</span>
+                  <span>Contact: {selectedCustomerPrint?.contact}</span>
+                  <span>Address: {selectedCustomerPrint?.location}</span>
+                </div>
+                <div className="row mt-3">
+                  <div class="table-responsive mb-3">
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th>#</th><th>Product Name</th><th>Quantity</th><th>Unit Price</th><th>Amount</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {printGridData?.map((item, index) => {
+                          return (
+                            <tr key={item?.id}>
+                              <td>{index + 1}</td>
+                              <td>
+                                <Link to="#">{item?.productName}</Link>
+                              </td>
+                              <td>{item?.quantity}</td>
+                              <td>{item?.unitPrice}</td>
+                              <td>{item?.amount}</td>
+                            </tr>
+                          )
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
 
 
-                    <div className="row mt-3">
-                    <div className="col-lg-6"  style={{ textAlign: 'right' }}></div>
-                      <div className="col-lg-6 "  style={{ textAlign: 'right' }}>
-                        <div className="total-order w-100 max-widthauto m-auto mb-4">
-                          <ul>
+                <div className="row mt-3">
+                  <div className="col-lg-6" style={{ textAlign: 'right' }}></div>
+                  <div className="col-lg-6 " style={{ textAlign: 'right' }}>
+                    <div className="total-order w-100 max-widthauto m-auto mb-4">
+                      <ul>
 
-                            <li className="total" >
-                              <h4>Grand Total</h4>
-                              <h5>GHS {moneyInTxt(
-                                printGridData.reduce((total, item) => total + item.amount, 0)
-                              )}</h5>
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
+                        <li className="total" >
+                          <h4>Grand Total</h4>
+                          <h5>GHS {moneyInTxt(
+                            printGridData.reduce((total, item) => total + item.amount, 0)
+                          )}</h5>
+                        </li>
+                      </ul>
                     </div>
-                    
+                  </div>
+                </div>
+
               </div>
-             
+
               <div className="col-lg-12" style={{ textAlign: 'right' }}>
                 <Link to="#" className="btn btn-submit me-2" data-bs-dismiss="modal" onClick={() => printReport()}>
-                <FeatherIcon icon="printer" /> Print
+                  <FeatherIcon icon="printer" /> Print
                 </Link>
                 <Link to="#" className="btn btn-cancel" data-bs-dismiss="modal">
                   Cancel
@@ -932,56 +933,56 @@ const AddProforma = () => {
         </div>
       </div>
 
-{/* Edit Modal */}
-          <div
-            className="modal fade"
-            id="editproduct"
-            tabIndex={-1}
-            aria-labelledby="editproduct"
-            aria-hidden="true"
-          >
-            <div className="modal-dialog modal-md modal-dialog-centered">
-              <div className="modal-content">
-                <div className="modal-header">
-                  <h5 className="modal-title">Edit Product</h5>
-                  <button
-                    type="button"
-                    className="close"
-                    data-bs-dismiss="modal"
-                    aria-label="Close"
-                  >
-                    <span aria-hidden="true">×</span>
-                  </button>
+      {/* Edit Modal */}
+      <div
+        className="modal fade"
+        id="editproduct"
+        tabIndex={-1}
+        aria-labelledby="editproduct"
+        aria-hidden="true"
+      >
+        <div className="modal-dialog modal-md modal-dialog-centered">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title">Edit Product</h5>
+              <button
+                type="button"
+                className="close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">×</span>
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="row">
+                <div className="col-lg-12 col-sm-12 col-12">
+                  <div className="form-group">
+                    <label>Product Name</label>
+                    <div className="input-groupicon">
+                      <input type="text" value={editFormData?.productName} onChange={(e) => setEditFormData({ ...editFormData, productName: e.target.value })} disabled />
+                    </div>
+                  </div>
                 </div>
-                <div className="modal-body">
-                  <div className="row">
-                    <div className="col-lg-12 col-sm-12 col-12">
-                      <div className="form-group">
-                        <label>Product Name</label>
-                        <div className="input-groupicon">
-                        <input type="text" value={editFormData?.productName} onChange={(e) => setEditFormData({...editFormData, productName:e.target.value})} disabled/>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="col-lg-12 col-sm-12 col-12">
-                      <div className="form-group">
-                        <label>Quantity</label>
-                        <input type="text" value={editFormData?.quantity}
-                         onChange={(e) => {
-                          if(e.target.value == ''){
-                            setEditFormData({...editFormData, quantity: ''})
-                          }
-                          else if (isValidNumber(e.target.value)) {
-                            let qty = parseInt(e.target.value) || 0
-                            let unitP = parseInt(editFormData.unitPrice) || 0
-                            setEditFormData({ ...editFormData, quantity: e.target.value, amount: unitP * qty || unitP * 1 })
-                          }
+                <div className="col-lg-12 col-sm-12 col-12">
+                  <div className="form-group">
+                    <label>Quantity</label>
+                    <input type="text" value={editFormData?.quantity}
+                      onChange={(e) => {
+                        if (e.target.value == '') {
+                          setEditFormData({ ...editFormData, quantity: '' })
                         }
-                        }/>
-                      </div>
-                    </div>
-                 
-                    {/* <div className="col-lg-6 col-sm-12 col-12">
+                        else if (isValidNumber(e.target.value)) {
+                          let qty = parseInt(e.target.value) || 0
+                          let unitP = parseInt(editFormData.unitPrice) || 0
+                          setEditFormData({ ...editFormData, quantity: e.target.value, amount: unitP * qty || unitP * 1 })
+                        }
+                      }
+                      } />
+                  </div>
+                </div>
+
+                {/* <div className="col-lg-6 col-sm-12 col-12">
                       <div className="form-group">
                         <label>Unit Price</label>
                         <input type="text" value={editFormData?.unitPrice} 
@@ -995,10 +996,10 @@ const AddProforma = () => {
                       </div>
                     </div> */}
 
-                  <div className="col-lg-12 col-sm-12 col-12" id="editpriceType">
-                    <div className="form-group">
-                      <label>Unit Price </label>
-                      <div className="row" >
+                <div className="col-lg-12 col-sm-12 col-12" id="editpriceType">
+                  <div className="form-group">
+                    <label>Unit Price </label>
+                    <div className="row" >
 
                       <div class="col-lg-6">
 
@@ -1020,7 +1021,7 @@ const AddProforma = () => {
                       <div class="col-lg-6">
                         <div class="input-group">
                           <div class="input-group-text">
-                            <input className="form-check-input" id="editwholeSaleType" name="priceTypeEdit" type="radio"  value={editFormData?.wholeSalePrice} ref={editwholesalepriceTypeRef}
+                            <input className="form-check-input" id="editwholeSaleType" name="priceTypeEdit" type="radio" value={editFormData?.wholeSalePrice} ref={editwholesalepriceTypeRef}
                               onClick={(e) => {
                                 console.log(e.target.value)
                                 let unitP = parseInt(e.target.value) || 0
@@ -1038,7 +1039,7 @@ const AddProforma = () => {
 
                         <div class="input-group">
                           <div class="input-group-text">
-                            <input className="form-check-input" id="editspecialPriceType" name="priceTypeEdit" type="radio"  value={editFormData?.specialPrice} ref={editspecialpriceTypeRef}
+                            <input className="form-check-input" id="editspecialPriceType" name="priceTypeEdit" type="radio" value={editFormData?.specialPrice} ref={editspecialpriceTypeRef}
                               onClick={(e) => {
                                 console.log(e.target.value)
                                 let unitP = parseInt(e.target.value) || 0
@@ -1053,252 +1054,246 @@ const AddProforma = () => {
                     </div>
 
                   </div>
+                </div>
+                <div className="col-lg-6 col-sm-12 col-12">
+                  <div className="form-group">
+                    <label>Amount</label>
+                    <input type="text" value={editFormData?.amount} />
                   </div>
-                    <div className="col-lg-6 col-sm-12 col-12">
-                      <div className="form-group">
-                        <label>Amount</label>
-                        <input type="text" value={editFormData?.amount} />
-                      </div>
-                    </div>
-                   
-                   
-                  </div>
+                </div>
 
 
-                </div>
-                <div className="modal-footer" style={{justifyContent:'flex-end'}}>
-                  <button type="button" className="btn btn-submit" onClick={handleUpdate}>
-                    Update
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-cancel"
-                    data-bs-dismiss="modal"
-                  >
-                    Close
-                  </button>
-                </div>
               </div>
+
+
+            </div>
+            <div className="modal-footer" style={{ justifyContent: 'flex-end' }}>
+              <button type="button" className="btn btn-submit" onClick={handleUpdate}>
+                Update
+              </button>
+              <button
+                type="button"
+                className="btn btn-cancel"
+                data-bs-dismiss="modal"
+              >
+                Close
+              </button>
             </div>
           </div>
+        </div>
+      </div>
 
-{/* Add Customer Modal */}
-            <div
-            className="modal fade"
-            id="addsupplier"
-            tabIndex={-1}
-            aria-labelledby="addsupplier"
-            aria-hidden="true"
-          >
-            <div className="modal-dialog modal-md modal-dialog-centered">
-              <div className="modal-content">
-                <div className="modal-header">
-                  <h5 className="modal-title">Add Customer</h5>
-                  <button
-                    type="button"
-                    className="close"
-                    data-bs-dismiss="modal"
-                    aria-label="Close"
-                  >
-                    <span aria-hidden="true">×</span>
-                  </button>
-                </div>
-                <div className="modal-body">
-                <form onSubmit={handleSubmit(onSubmit)}>
-                    <div className="row">
-                      <div className="col-lg-12 col-sm-6 col-12">
-                        <div className="form-group">
-                          <label>Customer Name</label>
-                          <input 
-                          className={`form-control ${
-                            errors.name ? "is-invalid" : ""
+      {/* Add Customer Modal */}
+      <div
+        className="modal fade"
+        id="addsupplier"
+        tabIndex={-1}
+        aria-labelledby="addsupplier"
+        aria-hidden="true"
+      >
+        <div className="modal-dialog modal-md modal-dialog-centered">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title">Add Customer</h5>
+              <button
+                type="button"
+                className="close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">×</span>
+              </button>
+            </div>
+            <div className="modal-body">
+              <form onSubmit={handleSubmit(onSubmit)}>
+                <div className="row">
+                  <div className="col-lg-12 col-sm-6 col-12">
+                    <div className="form-group">
+                      <label>Customer Name</label>
+                      <input
+                        className={`form-control ${errors.name ? "is-invalid" : ""
                           }`}
-                          type="text"
-                          {...register("name")}
-                        />
-                        <div className="invalid-feedback">
-                          {errors.name?.message}
-                        </div>
-                        </div>
+                        type="text"
+                        {...register("name")}
+                      />
+                      <div className="invalid-feedback">
+                        {errors.name?.message}
                       </div>
+                    </div>
+                  </div>
 
-                      <div className="col-lg-12 col-sm-6 col-12">
-                        <div className="form-group">
-                          <label>Choose Type</label>
-                          <div className="row">
-                              <div class="col-lg-6">
-                                <div class="input-group">
-                                  <div class="input-group-text">
-                                    <input className="form-check-input" type="radio" name="customerType" value="0" onChange = {(e) => setCustomerType(e.target.value)}/>
-                                  </div>
-                                  <input type="text" className="form-control" aria-label="Text input with radio button" value={'Company'}/>
-                                </div>
+                  <div className="col-lg-12 col-sm-6 col-12">
+                    <div className="form-group">
+                      <label>Choose Type</label>
+                      <div className="row">
+                        <div class="col-lg-6">
+                          <div class="input-group">
+                            <div class="input-group-text">
+                              <input className="form-check-input" type="radio" name="customerType" value="0" onChange={(e) => setCustomerType(e.target.value)} />
                             </div>
-
-                              <div class="col-lg-6">
-
-                                <div class="input-group">
-                                  <div class="input-group-text">
-                                    <input className="form-check-input" type="radio" name="customerType" value="1" onChange = {(e) => setCustomerType(e.target.value)}/>
-                                  </div>
-                                  <input type="text" className="form-control" aria-label="Text input with radio button" value={'Individual'} />
-                                </div>
-                              
-                              </div>
+                            <input type="text" className="form-control" aria-label="Text input with radio button" value={'Company'} />
                           </div>
-                          
                         </div>
-                      </div>
 
-                      <div className="col-lg-12 col-sm-12 col-12">
-                        <div className="form-group">
-                          <label>Email</label>
-                          <input 
-                          placeholder="someone@gmail.com"
-                          className={`form-control ${
-                            errors.name ? "is-invalid" : ""
-                          }`}
-                          type="text"
-                          {...register("email")}
-                        />
-                      
-                        </div>
-                      </div>
+                        <div class="col-lg-6">
 
-                      
-                    </div>
-
-                    <div className="row">
-                      <div className="col-lg-6 col-sm-6 col-12">
-                        <div className="form-group">
-                          <label>Contact</label>
-                          <input  className={`form-control ${
-                                errors.name ? "is-invalid" : ""
-                              }`}
-                              type="text"
-                              {...register("contact")}
-                            />
-                            <div className="invalid-feedback">
-                              {errors.name?.message}
+                          <div class="input-group">
+                            <div class="input-group-text">
+                              <input className="form-check-input" type="radio" name="customerType" value="1" onChange={(e) => setCustomerType(e.target.value)} />
                             </div>
+                            <input type="text" className="form-control" aria-label="Text input with radio button" value={'Individual'} />
+                          </div>
+
                         </div>
                       </div>
 
-                      <div className="col-lg-6 col-12">
-                        <div className="form-group">
-                          <label>Other Contact</label>
-                          <input  className={`form-control ${
-                                errors.name ? "is-invalid" : ""
-                              }`}
-                              type="text"
-                              {...register("otherContact")}
-                            />
-                          
-                        </div>
-                      </div>
-                    
-                  
-                      <div className="col-lg-12 col-12">
-                        <div className="form-group">
-                          <label>Location/Address</label>
-                          <input className={`form-control ${
-                                errors.name ? "is-invalid" : ""
-                              }`}
-                              type="text"
-                              {...register("location")}/>
-                        </div>
-                      </div>
+                    </div>
+                  </div>
 
-                      <div className="col-lg-12 col-12">
-                        <div className="form-group">
-                          <label>Ghana Post Address</label>
-                          <input className={`form-control ${
-                                errors.name ? "is-invalid" : ""
-                              }`}
-                              type="text"
-                              placeholder="GZ-000-0000"
-                              {...register("gpsAddress")}/>
-                        </div>
-                      </div>
-                    
-                      <div className="col-lg-12" style={{textAlign:'right'}}>
-                        <button type="submit" className="btn btn-submit me-2"><FeatherIcon icon="save"/> Save</button>
-                        <button type="button" className="btn btn-cancel"  data-bs-dismiss="modal">Close</button>
+                  <div className="col-lg-12 col-sm-12 col-12">
+                    <div className="form-group">
+                      <label>Email</label>
+                      <input
+                        placeholder="someone@gmail.com"
+                        className={`form-control ${errors.name ? "is-invalid" : ""
+                          }`}
+                        type="text"
+                        {...register("email")}
+                      />
+
+                    </div>
+                  </div>
+
+
+                </div>
+
+                <div className="row">
+                  <div className="col-lg-6 col-sm-6 col-12">
+                    <div className="form-group">
+                      <label>Contact</label>
+                      <input className={`form-control ${errors.name ? "is-invalid" : ""
+                        }`}
+                        type="text"
+                        {...register("contact")}
+                      />
+                      <div className="invalid-feedback">
+                        {errors.name?.message}
                       </div>
                     </div>
-              </form>
+                  </div>
+
+                  <div className="col-lg-6 col-12">
+                    <div className="form-group">
+                      <label>Other Contact</label>
+                      <input className={`form-control ${errors.name ? "is-invalid" : ""
+                        }`}
+                        type="text"
+                        {...register("otherContact")}
+                      />
+
+                    </div>
+                  </div>
+
+
+                  <div className="col-lg-12 col-12">
+                    <div className="form-group">
+                      <label>Location/Address</label>
+                      <input className={`form-control ${errors.name ? "is-invalid" : ""
+                        }`}
+                        type="text"
+                        {...register("location")} />
+                    </div>
+                  </div>
+
+                  <div className="col-lg-12 col-12">
+                    <div className="form-group">
+                      <label>Ghana Post Address</label>
+                      <input className={`form-control ${errors.name ? "is-invalid" : ""
+                        }`}
+                        type="text"
+                        placeholder="GZ-000-0000"
+                        {...register("gpsAddress")} />
+                    </div>
+                  </div>
+
+                  <div className="col-lg-12" style={{ textAlign: 'right' }}>
+                    <button type="submit" className="btn btn-submit me-2"><FeatherIcon icon="save" /> Save</button>
+                    <button type="button" className="btn btn-cancel" data-bs-dismiss="modal">Close</button>
+                  </div>
                 </div>
-                
-              </div>
+              </form>
             </div>
+
           </div>
+        </div>
+      </div>
 
-            {/* Confirm Modal */}
+      {/* Confirm Modal */}
 
-       <div
+      <div
         className="modal fade"
         id="confirm"
         tabIndex={-1}
         aria-labelledby="confirm"
         aria-hidden="true">
 
-          <div className="modal-dialog modal-md modal-dialog-centered" role="document">
-            <div className="modal-content">
-              <div className="modal-header">
-                    <h5 className="modal-title">Confirm</h5>
-                    <button
-                    type="button"
-                    className="close"
-                    data-bs-dismiss="modal"
-                    aria-label="Close"
-                    >
-                    <span aria-hidden="true">×</span>
-                </button>
-              </div>
-              <div className="modal-body">
-                Are you sure you want to generate this Proforma?
-              </div>
-              <div className="modal-footer">
-                  <Link to="#" className="btn btn-submit me-2" data-bs-dismiss="modal"  onClick={onSubmitProforma}>
-                    Yes
-                  </Link>
-                  <Link to="#" className="btn btn-cancel" data-bs-dismiss="modal">
-                    No
-                </Link>
-              </div>
+        <div className="modal-dialog modal-md modal-dialog-centered" role="document">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title">Confirm</h5>
+              <button
+                type="button"
+                className="close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">×</span>
+              </button>
+            </div>
+            <div className="modal-body">
+              Are you sure you want to generate this Proforma?
+            </div>
+            <div className="modal-footer">
+              <Link to="#" className="btn btn-submit me-2" data-bs-dismiss="modal" onClick={onSubmitProforma}>
+                Yes
+              </Link>
+              <Link to="#" className="btn btn-cancel" data-bs-dismiss="modal">
+                No
+              </Link>
             </div>
           </div>
-
         </div>
 
-{/* PDF Modal */}
-<div
-            className="modal fade"
-            id="pdfViewer"
-            tabIndex={-1}
-            aria-labelledby="pdfViewer"
-            aria-hidden="true"
-          >
-            <div className="modal-dialog modal-lg modal-dialog-centered">
-              <div className="modal-content">
-                <div className="modal-header">
-                  <h5 className="modal-title">Proforma Receipt</h5>
-                  <button
-                    type="button"
-                    className="close"
-                    data-bs-dismiss="modal"
-                    aria-label="Close"
-                  >
-                    <span aria-hidden="true">×</span>
-                  </button>
-                </div>
-                <div className="modal-body">
-                  <iframe width='100%' height='800px' src={proformaFile}></iframe>            
-                </div>
-                
-              </div>
+      </div>
+
+      {/* PDF Modal */}
+      <div
+        className="modal fade"
+        id="pdfViewer"
+        tabIndex={-1}
+        aria-labelledby="pdfViewer"
+        aria-hidden="true"
+      >
+        <div className="modal-dialog modal-lg modal-dialog-centered">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title">Proforma Receipt</h5>
+              <button
+                type="button"
+                className="close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">×</span>
+              </button>
             </div>
+            <div className="modal-body">
+              <iframe width='100%' height='800px' src={proformaFile}></iframe>
+            </div>
+
           </div>
+        </div>
+      </div>
     </div>
 
 

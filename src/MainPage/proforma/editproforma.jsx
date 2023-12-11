@@ -33,10 +33,10 @@ const EditProforma = () => {
   const [customerOptions, setCustomerOptions] = useState([])
   const [productOptions, setProductOptions] = useState([])
 
-  const {state} = useLocation()
+  const { state } = useLocation()
   console.log("Proforma State", state)
 
-  const { data: customers, isError, isLoading: isCustomerLoading, isSuccess } = useGet("customers", "/customer");
+  const { data: customers, isError, isLoading: isCustomerLoading, isSuccess } = useGet("customers", "/customer/combo");
   const { data: products, isLoading: isProductLoading } = useGet("products", "/product");
   const [proformaId] = useState(state?.id)
   const { isLoading, isError: isPostError, error, mutate } = usePut(`/proforma/${proformaId}`);
@@ -84,14 +84,14 @@ const EditProforma = () => {
         }
       })
       setProductOptions(mappedData2)
-   
+
     }
-   
+
   }, [isCustomerLoading, isProductLoading])
 
 
   useEffect(() => {
-    let mappedData = proformaDetails?.data.map((item) =>{
+    let mappedData = proformaDetails?.data.map((item) => {
       return {
         productId: item?.productId,
         productName: item?.product.name,
@@ -99,7 +99,7 @@ const EditProforma = () => {
         manufacturingDate: item?.manufacturingDate,
         expireDate: item?.expireDate,
         quantity: item?.quantity,
-        unitPrice:item?.unitPrice,
+        unitPrice: item?.unitPrice,
         amount: item?.amount
       }
     })
@@ -131,7 +131,7 @@ const EditProforma = () => {
       // let item = customers?.data.find((customer) => customer.id == e.target.value)
       setSelectedCustomer(e)
       setSelectedCustomerPrint(e)
-      
+
     }
   }
 
@@ -143,7 +143,7 @@ const EditProforma = () => {
     setProductGridData(newGridData)
   };
 
-  const handleUpdate = ()=> {
+  const handleUpdate = () => {
     let updated = editFormData
     let listCopy = [...productGridData]
     let index = productGridData.findIndex(item => item.productId == updated.productId)
@@ -216,9 +216,9 @@ const EditProforma = () => {
 
   };
 
-  const createPDF =  (id) => {
+  const createPDF = (id) => {
     const pdf = new jsPDF("portrait", "pt", "a4");
-    const data =  document.getElementById(id);
+    const data = document.getElementById(id);
     pdf.html(data).then(() => {
       pdf.save(`Proforma.pdf`);
     });
@@ -276,12 +276,12 @@ const EditProforma = () => {
                       <label>Customer Name</label>
                       <div className="row">
                         <div className="col-lg-12 col-sm-12 col-12">
-                        <Select2
-                              className="select"
-                              data={customerOptions}
-                              value={selectedCustomer}      
-                              disabled      
-                            />
+                          <Select2
+                            className="select"
+                            data={customerOptions}
+                            value={selectedCustomer}
+                            disabled
+                          />
                         </div>
 
                       </div>
@@ -410,10 +410,10 @@ const EditProforma = () => {
                           value={formData.quantity}
                           // {...register("quantity")}
                           onChange={(e) => {
-                            if(e.target.value == ''){
-                              setFormData({...formData, quantity: ''})
+                            if (e.target.value == '') {
+                              setFormData({ ...formData, quantity: '' })
                             }
-                            else if(isValidNumber(e.target.value)) {
+                            else if (isValidNumber(e.target.value)) {
                               setFormData({ ...formData, quantity: Number(e.target.value) })
                             }
 
@@ -491,8 +491,8 @@ const EditProforma = () => {
                             <td>{item?.amount}</td>
 
                             <td>
-                            <Link to="#" className="me-2">
-                                <img src={EditIcon} alt="svg" data-bs-toggle="modal" data-bs-target="#editproduct" onClick={() => setEditFormData(item)}/>
+                              <Link to="#" className="me-2">
+                                <img src={EditIcon} alt="svg" data-bs-toggle="modal" data-bs-target="#editproduct" onClick={() => setEditFormData(item)} />
                               </Link>
                               <Link to="#" className="delete-set" onClick={() => deleteRow(item)}>
                                 <img src={DeleteIcon} alt="svg" />
@@ -582,69 +582,69 @@ const EditProforma = () => {
               </button>
             </div>
             <div className="modal-body">
-         
+
               <div id="printArea">
-                    <div style={{display:'flex', flexDirection:'column', gap:10}}>
-                      <h5 style={{textAlign:'center', fontWeight:900}}>TINATETT HERBAL MANUFACTURING AND MARKKETING COMPANY LIMITED</h5>
-                      <span style={{textAlign:'center'}}>P.O. BOC CO 2699, TEMA-ACCRA, WHOLESALE AND RETAIL OF HERBAL MEDICINE </span>
-                      <span style={{textAlign:'center'}}>KOTOBABI SPINTEX - FACTORY WEARHOUSE, 02081660807, tinatettonline@gmail.com</span>
-                      <h5 style={{textAlign:'center', textDecoration:'underline', fontWeight:700}}>PROFORMA INVOICE</h5>
-                      <h6 style={{fontWeight:700}}>Customer Info: </h6>
-                      <span>Customer Name : {selectedCustomerPrint?.label}</span>
-                      <span>Email: {selectedCustomerPrint?.email}</span>
-                      <span>Contact: {selectedCustomerPrint?.contact}</span>
-                      <span>Address: {selectedCustomerPrint?.location}</span>
-                    </div>
-                    <div className="row mt-3">
-                        <div class="table-responsive mb-3">
-                          <table class="table">
-                            <thead>
-                              <tr>
-                                <th>#</th><th>Product Name</th><th>Quantity</th><th>Unit Price</th><th>Amount</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                            {printGridData?.map((item, index) => {
-                                return (
-                                  <tr key={item?.id}>
-                                    <td>{index + 1}</td>
-                                    <td>
-                                      <Link to="#">{item?.productName}</Link>
-                                    </td>
-                                    <td>{item?.quantity}</td>
-                                    <td>{item?.unitPrice}</td>
-                                    <td>{item?.amount}</td>
-                                  </tr>
-                                )
-                              })}
-                            </tbody>
-                          </table>
-                        </div>
-                    </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  <h5 style={{ textAlign: 'center', fontWeight: 900 }}>TINATETT HERBAL MANUFACTURING AND MARKKETING COMPANY LIMITED</h5>
+                  <span style={{ textAlign: 'center' }}>P.O. BOC CO 2699, TEMA-ACCRA, WHOLESALE AND RETAIL OF HERBAL MEDICINE </span>
+                  <span style={{ textAlign: 'center' }}>KOTOBABI SPINTEX - FACTORY WEARHOUSE, 02081660807, tinatettonline@gmail.com</span>
+                  <h5 style={{ textAlign: 'center', textDecoration: 'underline', fontWeight: 700 }}>PROFORMA INVOICE</h5>
+                  <h6 style={{ fontWeight: 700 }}>Customer Info: </h6>
+                  <span>Customer Name : {selectedCustomerPrint?.label}</span>
+                  <span>Email: {selectedCustomerPrint?.email}</span>
+                  <span>Contact: {selectedCustomerPrint?.contact}</span>
+                  <span>Address: {selectedCustomerPrint?.location}</span>
+                </div>
+                <div className="row mt-3">
+                  <div class="table-responsive mb-3">
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th>#</th><th>Product Name</th><th>Quantity</th><th>Unit Price</th><th>Amount</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {printGridData?.map((item, index) => {
+                          return (
+                            <tr key={item?.id}>
+                              <td>{index + 1}</td>
+                              <td>
+                                <Link to="#">{item?.productName}</Link>
+                              </td>
+                              <td>{item?.quantity}</td>
+                              <td>{item?.unitPrice}</td>
+                              <td>{item?.amount}</td>
+                            </tr>
+                          )
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
 
 
-                    <div className="row mt-3">
-                    <div className="col-lg-6"  style={{ textAlign: 'right' }}></div>
-                      <div className="col-lg-6 "  style={{ textAlign: 'right' }}>
-                        <div className="total-order w-100 max-widthauto m-auto mb-4">
-                          <ul>
+                <div className="row mt-3">
+                  <div className="col-lg-6" style={{ textAlign: 'right' }}></div>
+                  <div className="col-lg-6 " style={{ textAlign: 'right' }}>
+                    <div className="total-order w-100 max-widthauto m-auto mb-4">
+                      <ul>
 
-                            <li className="total" >
-                              <h4>Grand Total</h4>
-                              <h5>GHS {moneyInTxt(
-                                // printGridData.reduce((total, item) => total + item.amount, 0)
-                              )}</h5>
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
+                        <li className="total" >
+                          <h4>Grand Total</h4>
+                          <h5>GHS {moneyInTxt(
+                            // printGridData.reduce((total, item) => total + item.amount, 0)
+                          )}</h5>
+                        </li>
+                      </ul>
                     </div>
-                    
+                  </div>
+                </div>
+
               </div>
-             
+
               <div className="col-lg-12" style={{ textAlign: 'right' }}>
                 <Link to="#" className="btn btn-submit me-2" data-bs-dismiss="modal" onClick={() => printReport()}>
-                <FeatherIcon icon="printer" /> Print
+                  <FeatherIcon icon="printer" /> Print
                 </Link>
                 <Link to="#" className="btn btn-cancel" data-bs-dismiss="modal">
                   Cancel
@@ -655,93 +655,93 @@ const EditProforma = () => {
         </div>
       </div>
 
-{/* Edit Modal */}
-          <div
-            className="modal fade"
-            id="editproduct"
-            tabIndex={-1}
-            aria-labelledby="editproduct"
-            aria-hidden="true"
-          >
-            <div className="modal-dialog modal-md modal-dialog-centered">
-              <div className="modal-content">
-                <div className="modal-header">
-                  <h5 className="modal-title">Edit Product</h5>
-                  <button
-                    type="button"
-                    className="close"
-                    data-bs-dismiss="modal"
-                    aria-label="Close"
-                  >
-                    <span aria-hidden="true">×</span>
-                  </button>
-                </div>
-                <div className="modal-body">
-                  <div className="row">
-                    <div className="col-lg-12 col-sm-12 col-12">
-                      <div className="form-group">
-                        <label>Product Name</label>
-                        <div className="input-groupicon">
-                        <input type="text" value={editFormData?.productName} onChange={(e) => setEditFormData({...editFormData, productName:e.target.value})} disabled/>
-                        </div>
-                      </div>
+      {/* Edit Modal */}
+      <div
+        className="modal fade"
+        id="editproduct"
+        tabIndex={-1}
+        aria-labelledby="editproduct"
+        aria-hidden="true"
+      >
+        <div className="modal-dialog modal-md modal-dialog-centered">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title">Edit Product</h5>
+              <button
+                type="button"
+                className="close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">×</span>
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="row">
+                <div className="col-lg-12 col-sm-12 col-12">
+                  <div className="form-group">
+                    <label>Product Name</label>
+                    <div className="input-groupicon">
+                      <input type="text" value={editFormData?.productName} onChange={(e) => setEditFormData({ ...editFormData, productName: e.target.value })} disabled />
                     </div>
-                    <div className="col-lg-6 col-sm-12 col-12">
-                      <div className="form-group">
-                        <label>Quantity</label>
-                        <input type="text" value={editFormData?.quantity}
-                         onChange={(e) => {
-                          if(e.target.value == ''){
-                            setEditFormData({...editFormData, quantity: ''})
-                          }
-                          else if (isValidNumber(e.target.value)) {
-                            let qty = parseInt(e.target.value) || 0
-                            let unitP = parseInt(editFormData.unitPrice) || 0
-                            setEditFormData({ ...editFormData, quantity: e.target.value, amount: unitP * qty || unitP * 1 })
-                          }
-                        }
-                        }/>
-                      </div>
-                    </div>
-                 
-                    <div className="col-lg-6 col-sm-12 col-12">
-                      <div className="form-group">
-                        <label>Unit Price</label>
-                        <input type="text" value={editFormData?.unitPrice} 
-                         disabled
-                         onChange={(e) => {
-                          let unitP = parseInt(e.target.value) || 0
-                          let qty = parseInt(editFormData.quantity) || 0
-                          setEditFormData({ ...editFormData, unitPrice: e.target.value, amount: unitP * qty || unitP * 1 })
-                        }}
-                        />
-                      </div>
-                    </div>
-                    <div className="col-lg-6 col-sm-12 col-12">
-                      <div className="form-group">
-                        <label>Amount</label>
-                        <input type="text" value={editFormData?.amount} />
-                      </div>
-                    </div>
-                   
-                   
                   </div>
                 </div>
-                <div className="modal-footer" style={{justifyContent:'flex-end'}}>
-                  <button type="button" className="btn btn-submit" onClick={handleUpdate}>
-                    Update
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-cancel"
-                    data-bs-dismiss="modal"
-                  >
-                    Close
-                  </button>
+                <div className="col-lg-6 col-sm-12 col-12">
+                  <div className="form-group">
+                    <label>Quantity</label>
+                    <input type="text" value={editFormData?.quantity}
+                      onChange={(e) => {
+                        if (e.target.value == '') {
+                          setEditFormData({ ...editFormData, quantity: '' })
+                        }
+                        else if (isValidNumber(e.target.value)) {
+                          let qty = parseInt(e.target.value) || 0
+                          let unitP = parseInt(editFormData.unitPrice) || 0
+                          setEditFormData({ ...editFormData, quantity: e.target.value, amount: unitP * qty || unitP * 1 })
+                        }
+                      }
+                      } />
+                  </div>
                 </div>
+
+                <div className="col-lg-6 col-sm-12 col-12">
+                  <div className="form-group">
+                    <label>Unit Price</label>
+                    <input type="text" value={editFormData?.unitPrice}
+                      disabled
+                      onChange={(e) => {
+                        let unitP = parseInt(e.target.value) || 0
+                        let qty = parseInt(editFormData.quantity) || 0
+                        setEditFormData({ ...editFormData, unitPrice: e.target.value, amount: unitP * qty || unitP * 1 })
+                      }}
+                    />
+                  </div>
+                </div>
+                <div className="col-lg-6 col-sm-12 col-12">
+                  <div className="form-group">
+                    <label>Amount</label>
+                    <input type="text" value={editFormData?.amount} />
+                  </div>
+                </div>
+
+
               </div>
             </div>
+            <div className="modal-footer" style={{ justifyContent: 'flex-end' }}>
+              <button type="button" className="btn btn-submit" onClick={handleUpdate}>
+                Update
+              </button>
+              <button
+                type="button"
+                className="btn btn-cancel"
+                data-bs-dismiss="modal"
+              >
+                Close
+              </button>
+            </div>
           </div>
+        </div>
+      </div>
     </div>
   );
 };

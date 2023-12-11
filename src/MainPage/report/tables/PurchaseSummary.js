@@ -128,7 +128,7 @@ function PurchaseSummary({ data = [], title = "", fileName = "" }) {
         };
     }
     const footerSum = (props) => {
-        return (<span>Sum: {props.Sum}</span>);
+        return (<span> {props.Sum}</span>);
     };
     const footerMax = (props) => {
         return (<span>Maximum: {props.Max}</span>);

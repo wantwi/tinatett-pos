@@ -15,6 +15,7 @@ import { debounce } from "lodash";
 import useCustomApi from "../../hooks/useCustomApi";
 import { BASE_URL } from "../../api/CustomAxios";
 import ProductReportTable from "./tables/ProductReportTable";
+import alertify from "alertifyjs";
 
 const ProductReport = () => {
   const [inputfilter, setInputfilter] = useState(false);
@@ -36,8 +37,14 @@ const ProductReport = () => {
   const [reportFile, setReportFile] = useState(null)
   const [reportIsLoading, setreportIsLoading] = useState(false)
   const [report, setReport] = useState([])
+  const [showReport, setShowReport] = useState(false)
 
   const [priceType, setPriceType] = useState('All')
+  const [isAllChecked, setIsAllChecked] = useState(true)
+  const [isRetailChecked, setIsRetailChecked] = useState(true)
+  const [isWholsaleChecked, setIsWholsaleChecked] = useState(true)
+  const [isSpecialChecked, setisSpecialChecked] = useState(true)
+  const [isQuantityChecked, setIsQuantityChecked] = useState(true)
 
   const retailpriceTypeRef = useRef()
   const specialpriceTypeRef = useRef()
@@ -120,11 +127,16 @@ const ProductReport = () => {
 
     }
 
-    console.log(filters)
+    if (!isAllChecked) {
+      if (!isRetailChecked && !isSpecialChecked && !isWholsaleChecked) {
+        alertify.warning("Please select at least one Price Type (Retail, Wholesale or Special");
+        return
+      }
+    }
 
     setreportIsLoading(true)
     // $('#pdfViewer').modal('show')
-    axios.get(`report/getProductReport?productId=${selectedProduct?.id || ''}&batchNumber=${formData?.batchNumber?.value || ''}&manufacturingStartDate=${formData.manufactureFromDate}&manufacturingEndDate=${formData?.manufactureEndDate}&expireStartDate=${formData?.expireFromDate}&expireEndDate=${formData?.expireEndDate}&unitPrice=${priceType}`)
+    axios.get(`report/getProductReport?showAll=${isAllChecked}&productId=${selectedProduct?.id || ''}&batchNumber=${formData?.batchNumber?.value || ''}&manufacturingStartDate=${formData.manufactureFromDate}&manufacturingEndDate=${formData?.manufactureEndDate}&expireStartDate=${formData?.expireFromDate}&expireEndDate=${formData?.expireEndDate}&unitPrice=${priceType}`)
       .then((res) => {
 
         console.log({ res })
@@ -136,6 +148,7 @@ const ProductReport = () => {
         // const blobFile = `data:application/pdf;base64,${base64}`
         // const url = URL.createObjectURL(blob);
         // setReportFile(blobFile)
+        setShowReport(true)
       })
       .finally(() => setreportIsLoading(false))
 
@@ -203,6 +216,39 @@ const ProductReport = () => {
     salesType == 'Retail' ? setEditPrice(e.retailPrice) : salesType == "Wholesale" ? setEditPrice(e.wholeSalePrice) : setEditPrice(e.specialPrice)
     setIsBatchLoading(true)
   }
+
+  useEffect(() => {
+
+    if (isAllChecked) {
+      setIsRetailChecked(true)
+      setIsWholsaleChecked(true)
+      setisSpecialChecked(true)
+    } else {
+      setIsRetailChecked(false)
+      setIsWholsaleChecked(false)
+      setisSpecialChecked(false)
+    }
+
+
+    return () => {
+
+    }
+  }, [isAllChecked])
+
+  useEffect(() => {
+
+    if (isRetailChecked && isSpecialChecked && isWholsaleChecked) {
+      setIsAllChecked(true)
+    } else {
+      setIsAllChecked(false)
+    }
+
+
+    return () => {
+
+    }
+  }, [isRetailChecked, isSpecialChecked, isWholsaleChecked])
+
 
 
   useEffect(() => {
@@ -289,7 +335,7 @@ const ProductReport = () => {
               </div>
               {/* /Filter */}
               <div className="table-responsive">
-                <ProductReportTable data={report} />
+                <ProductReportTable isAllChecked={isAllChecked} isRetailChecked={isRetailChecked} isWholsaleChecked={isWholsaleChecked} isSpecialChecked={isSpecialChecked} showReport={showReport} setShowReport={setShowReport} data={report} />
                 {/* <Table columns={columns} dataSource={data} /> */}
               </div>
 
@@ -349,7 +395,7 @@ const ProductReport = () => {
                       <Select
                         isLoading={isLoading}
                         options={selectedProductInfo?.batchNumber?.map((item) => {
-                          return { value: item.batchNumber, label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')' : item?.batchNumber + '-(' + item?.availablequantity + ')', expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
+                          return { value: item.batchNumber, label: item?.batchNumber, expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
                         })}
                         placeholder=""
                         value={formData.batchNumber}
@@ -362,21 +408,17 @@ const ProductReport = () => {
                 </div>
 
               </div>
-
-
-
-
               <div className="row">
                 <div className="form-group">
-                  <label>Unit Price</label>
+                  <label>Price Type</label>
                   <div className="row">
                     <div className="col-lg-3">
 
                       <div className="input-group">
                         <div className="input-group-text">
-                          <input className="form-check-input" type="radio" ref={specialpriceTypeRef} name="priceType" value={'All'}
+                          <input className="form-check-input" type="checkbox" checked={isAllChecked} ref={specialpriceTypeRef} name="priceType" value={'All'}
                             onClick={(e) => {
-                              setPriceType(e.target.value)
+                              setIsAllChecked(!isAllChecked)
                             }} />
                         </div>
                         <input type="text" className="form-control" aria-label="Text input with radio button" placeholder={`All `} />
@@ -386,11 +428,11 @@ const ProductReport = () => {
 
                     <div className="col-lg-3">
 
-                      <div className="input-group">
+                      <div className="input-group" style={{ cursor: isAllChecked ? 'not-allowed' : 'pointer' }}>
                         <div className="input-group-text">
-                          <input className="form-check-input" type="radio" ref={retailpriceTypeRef} name="priceType" value={'Retail'}
+                          <input className="form-check-input" disabled={isAllChecked} type="checkbox" checked={isRetailChecked} ref={retailpriceTypeRef} name="priceType" value={'Retail'}
                             onClick={(e) => {
-                              setPriceType(e.target.value)
+                              setIsRetailChecked(!isRetailChecked)
                             }} />
                         </div>
                         <input type="text" className="form-control" aria-label="Text input with radio button" placeholder={`Retail`} />
@@ -399,11 +441,11 @@ const ProductReport = () => {
                     </div>
 
                     <div className="col-lg-3">
-                      <div className="input-group">
+                      <div className="input-group" style={{ cursor: isAllChecked ? 'not-allowed' : 'pointer' }}>
                         <div className="input-group-text">
-                          <input className="form-check-input" type="radio" ref={wholesalepriceTypeRef} name="priceType" vvalue={'Wholesale'}
+                          <input className="form-check-input" disabled={isAllChecked} type="checkbox" checked={isWholsaleChecked} ref={wholesalepriceTypeRef} name="priceType" vvalue={'Wholesale'}
                             onClick={(e) => {
-                              setPriceType(e.target.value)
+                              setIsWholsaleChecked(!isWholsaleChecked)
                             }
                             } />
                         </div>
@@ -413,10 +455,10 @@ const ProductReport = () => {
 
                     <div className="col-lg-3">
 
-                      <div className="input-group">
+                      <div className="input-group" style={{ cursor: isAllChecked ? 'not-allowed' : 'pointer' }}>
                         <div className="input-group-text">
-                          <input className="form-check-input" type="radio" ref={specialpriceTypeRef} name="priceType" value={'Special'} onClick={(e) => {
-                            setPriceType(e.target.value)
+                          <input className="form-check-input" disabled={isAllChecked} checked={isSpecialChecked} type="checkbox" name="priceType" value={'Special'} onClick={(e) => {
+                            setisSpecialChecked(!isSpecialChecked)
                           }} />
                         </div>
                         <input type="text" className="form-control" aria-label="Text input with radio button" placeholder={`Special `} />

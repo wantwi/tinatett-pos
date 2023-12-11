@@ -25,9 +25,18 @@ const Sales = () => {
 
   const [productsDropdown, setProductsDropdown] = useState([]);
   const [customersDropdown, setCustomersDropdown] = useState([]);
+  const [usersDropdown, setUsersDropdown] = useState([]);
 
   const { data: products, isLoading: productsIsLoading } = useGet("products", "/product");
-  const { data: customers, isLoading: customersIsLoading } = useGet("customers", "/customer");
+  const { data: customers, isLoading: customersIsLoading } = useGet("customers", "/customer/combo");
+  useGet("users", "/user/branchUsers", (data) => {
+    setUsersDropdown(data?.data.map(x => ({
+      id: x?.id,
+      label: `${x?.firstName} ${x?.lastName}`,
+      value: x?.id
+    })))
+
+  });
 
 
   const {
@@ -47,6 +56,7 @@ const Sales = () => {
   const [reportFile, setReportFile] = useState(null)
   const [reportIsLoading, setreportIsLoading] = useState(false)
   const [report, setReport] = useState([])
+  const [selectedUser, setSelectedUser] = useState({})
 
   const [userType, setUserType] = useState('')
 
@@ -155,6 +165,7 @@ const Sales = () => {
 
     axios.get(`${BASE_URL}/purchase/product/${selectedProduct?.value}`).then((res) => {
       setIsLoading(true)
+      setFormData({ ...formData, batchNumber: null })
       if (res.data.success) {
         // setIsLoading(false)
         //console.log(res.data.newProduct)
@@ -175,18 +186,22 @@ const Sales = () => {
     setFormData({ productId: '', quantity: '', amount: '', batchNumber: {}, startDate: '', endDate: '' })
     setCustomer(null)
     setSelectedProduct(null)
+    setSelectedUser(null)
   }
 
   const handleGenerateReport = () => {
+
     const baseUrl = "report/getSalesReport";
     let filters = {
       productId: selectedProduct?.id || "",
       startDate: formData?.startDate || "",
       endDate: formData?.endDate || "",
       batchNumber: formData?.batchNumber?.label || "",
-      clientId: customer?.id || "",
-      userId: formData?.userId || "",
+      clientId: customer?.value || "",
+      userId: selectedUser?.value || "",
     };
+
+    console.log({ filters });
 
     const encodeFilterValue = (value) => encodeURIComponent(value);
 
@@ -448,7 +463,7 @@ const Sales = () => {
                     <Select
 
                       options={selectedProductInfo?.batchNumber?.map((item) => {
-                        return { value: item.batchNumber, label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')' : item?.batchNumber + '-(' + item?.availablequantity + ')', expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
+                        return { value: item.batchNumber, label: item?.availablequantity == 0 ? item?.batchNumber : item?.batchNumber, expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
                       })}
                       placeholder=""
                       value={formData.batchNumber}
@@ -457,6 +472,18 @@ const Sales = () => {
                     />
 
                   </div>
+                </div>
+              </div>
+              <div className="row">
+                <div className="form-group">
+                  <label>User</label>
+                  <Select
+                    id="users"
+                    className="select"
+                    options={usersDropdown}
+                    value={selectedUser}
+                    onChange={(e) => setSelectedUser(e)}
+                  />
                 </div>
               </div>
 
