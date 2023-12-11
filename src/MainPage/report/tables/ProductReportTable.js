@@ -43,11 +43,9 @@ function ProductReportTable({ isAllChecked, isRetailChecked, isWholsaleChecked, 
     }
     /* tslint:disable-next-line:no-any */
     function getPdfExportProperties() {
-        if (isAllChecked) {
+        if (isAllChecked === true) {
             return {
-                pageOrientation: isAllChecked ? 'Landscape' : "Portrait",
-                screenX: 0,
-
+                pageOrientation: 'Landscape',
                 pageSize: 'letter',
 
                 header: {
