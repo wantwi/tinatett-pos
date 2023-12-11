@@ -237,19 +237,19 @@ const ProductReport = () => {
     }
   }, [isAllChecked])
 
-  useEffect(() => {
+  // useEffect(() => {
 
-    if (isRetailChecked && isSpecialChecked && isWholsaleChecked) {
-      setIsAllChecked(true)
-    } else {
-      setIsAllChecked(false)
-    }
+  //   if (isRetailChecked && isSpecialChecked && isWholsaleChecked) {
+  //     setIsAllChecked(true)
+  //   } else {
+  //     setIsAllChecked(false)
+  //   }
 
 
-    return () => {
+  //   return () => {
 
-    }
-  }, [isRetailChecked, isSpecialChecked, isWholsaleChecked])
+  //   }
+  // }, [isRetailChecked, isSpecialChecked, isWholsaleChecked])
 
 
   const handleToggleBatchNumberStatus = (e) => {
@@ -341,7 +341,7 @@ const ProductReport = () => {
               </div>
               {/* /Filter */}
               <div className="table-responsive">
-                <ProductReportTable isAllChecked={isAllChecked} isRetailChecked={isRetailChecked} isWholsaleChecked={isWholsaleChecked} isSpecialChecked={isSpecialChecked} showReport={showReport} setShowReport={setShowReport} data={report} />
+                <ProductReportTable disableBatchNo={disableBatchNo} isQuantityChecked={isQuantityChecked} isAllChecked={isAllChecked} isRetailChecked={isRetailChecked} isWholsaleChecked={isWholsaleChecked} isSpecialChecked={isSpecialChecked} showReport={showReport} setShowReport={setShowReport} data={report} />
                 {/* <Table columns={columns} dataSource={data} /> */}
               </div>
 
@@ -391,17 +391,17 @@ const ProductReport = () => {
 
                 <div className="col-6">
                   <div className="form-group">
-                    <div style={{ display: 'flex', justifyContent:'space-between'}}>
-                      <div style={{display: 'flex',width:'50%'}}><input type="checkbox" className="form-check-input" style={{marginRight:10}} 
-                       onChange={handleToggleBatchNumberStatus} checked={!disableBatchNo}/><label>Batch No.</label>
-                       </div>
-                       
-                      <div style={{display: 'flex',width:'50%'}}>
-                        <input type="checkbox" className="form-check-input" style={{marginRight:10}} 
-                        onChange={() => setIsQuantityChecked(!isQuantityChecked)} checked={isQuantityChecked}/><label>Quantity</label> 
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <div style={{ display: 'flex', width: '50%' }}><input type="checkbox" className="form-check-input" style={{ marginRight: 10 }}
+                        onChange={handleToggleBatchNumberStatus} checked={!disableBatchNo} /><label>Batch No.</label>
                       </div>
-                           
-                      
+
+                      <div style={{ display: 'flex', width: '50%' }}>
+                        <input type="checkbox" className="form-check-input" style={{ marginRight: 10 }}
+                          onChange={() => setIsQuantityChecked(!isQuantityChecked)} checked={isQuantityChecked} /><label>Quantity</label>
+                      </div>
+
+
                     </div>
                     <div className="input-groupicon">
                       <Select

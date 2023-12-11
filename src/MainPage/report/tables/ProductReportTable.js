@@ -6,7 +6,7 @@ import { getCurrentDateInWords } from './helper';
 import { ToolbarComponent, ItemsDirective, ItemDirective } from '@syncfusion/ej2-react-navigations';
 import { addClass, removeClass } from '@syncfusion/ej2-base';
 //isAllChecked={isAllChecked} isRetailChecked={isRetailChecked} isWholsaleChecked={isWholsaleChecked} isSpecialChecked={isSpecialChecked}
-function ProductReportTable({ isAllChecked, isRetailChecked, isWholsaleChecked, isSpecialChecked, data = [], showReport, setShowReport }) {
+function ProductReportTable({ disableBatchNo, isQuantityChecked, isAllChecked, isRetailChecked, isWholsaleChecked, isSpecialChecked, data = [], showReport, setShowReport }) {
     const { auth } = useAuth()
     const month = ((new Date()).getMonth().toString()) + '/';
     const date = ((new Date()).getDate().toString()) + '/';
@@ -17,10 +17,13 @@ function ProductReportTable({ isAllChecked, isRetailChecked, isWholsaleChecked, 
     const [showSpecial, setShowSpecial] = React.useState(true)
     const toolbarOptions = ['ExcelExport', 'PdfExport'];
     let gridInstance;
+    let gridInstance2;
     function toolbarClick(args) {
+
         switch (args.item.id) {
             case 'Grid_pdfexport':
                 if (!isAllChecked) {
+
                     gridInstance.columns[2].visible = isRetailChecked;
                     gridInstance.columns[3].visible = isWholsaleChecked;
                     gridInstance.columns[4].visible = isSpecialChecked;
@@ -29,11 +32,33 @@ function ProductReportTable({ isAllChecked, isRetailChecked, isWholsaleChecked, 
                     gridInstance.columns[7].visible = false;
                     gridInstance.columns[8].visible = false;
                 }
-
+                gridInstance.columns[1].visible = isQuantityChecked
                 gridInstance.pdfExport(getPdfExportProperties());
                 break;
             case 'Grid_excelexport':
                 gridInstance.excelExport(getExcelExportProperties());
+                break;
+        }
+    }
+    function toolbarClick2(args) {
+        switch (args.item.id) {
+            case 'Grid_pdfexport':
+                if (!isAllChecked) {
+
+                    gridInstance2.columns[2].visible = isRetailChecked;
+                    gridInstance2.columns[3].visible = isWholsaleChecked;
+                    gridInstance2.columns[4].visible = isSpecialChecked;
+                    // gridInstance2.columns[5].visible = false;
+                    // gridInstance2.columns[6].visible = false;
+                    // gridInstance2.columns[7].visible = false;
+                    // gridInstance2.columns[8].visible = false;
+                }
+                gridInstance2.columns[1].visible = isQuantityChecked
+
+                gridInstance2.pdfExport(getPdfExportProperties2());
+                break;
+            case 'Grid_excelexport':
+                gridInstance2.excelExport(getExcelExportProperties());
                 break;
         }
     }
@@ -43,200 +68,203 @@ function ProductReportTable({ isAllChecked, isRetailChecked, isWholsaleChecked, 
     }
     /* tslint:disable-next-line:no-any */
     function getPdfExportProperties() {
-        if (isAllChecked === true) {
-            return {
-                pageOrientation: 'Landscape',
-                pageSize: 'letter',
 
-                header: {
+        return {
+            pageOrientation: 'Landscape',
+            pageSize: 'letter',
 
-                    fromTop: 20,
-                    // minHeight: 200,
-                    height: 175,
+            header: {
 
-                    contents: [
-                        {
-                            position: { x: 0, y: 0 },
-                            size: { height: 80, width: 120 },
-                            src: image,
-                            type: 'Image'
-                        },
-                        {
-                            type: 'Text',
-                            value: 'TINATETT MARKETING COMPANY LIMITED',
-                            position: { x: 308, y: 0 },
-                            style: { textBrushColor: '#575C88', fontSize: 18 },
-                        },
-                        {
-                            type: 'Text',
-                            value: 'P.O. BOX CO 2699, TEMA-ACCRA, WHOLESALE AND RETAIL OF HERBAL MEDICINE',
-                            position: { x: 218, y: 20 },
-                            style: { textBrushColor: '#575C88', fontSize: 14 },
-                        },
-                        {
-                            type: 'Text',
-                            value: 'KOTOBABI SPINTEX - FACTORY WAREHOUSE, 02081660807, tinatettonline@gmail.com',
-                            position: { x: 218, y: 40 },
-                            style: { textBrushColor: '#575C88', fontSize: 14 },
-                        },
+                fromTop: 20,
+                // minHeight: 200,
+                height: 175,
 
-                        {
-                            type: 'Text',
-                            value: 'PURCHASE REPORT',
-                            position: { x: 420, y: 120 },
-                            style: { textBrushColor: '#000000', fontSize: 15, textDecoration: "underline" },
-                        },
-                        {
-                            type: 'Text',
-                            value: 'Branch Info',
-                            position: { x: 0, y: 100 },
-                            style: { textBrushColor: '#000000', fontSize: 16 }
-                        },
-                        {
-                            type: 'Text',
-                            value: `${auth?.branchName}`,
-                            position: { x: 0, y: 120 },
-                            style: { textBrushColor: '#000000', fontSize: 11 }
-                        },
-                        {
-                            type: 'Text',
-                            value: `${getCurrentDateInWords(Date.now())}`,
-                            position: { x: 940, y: 120 },
-                            style: { textBrushColor: '#000000', fontSize: 11 }
-                        },
+                contents: [
+                    {
+                        position: { x: 0, y: 0 },
+                        size: { height: 80, width: 120 },
+                        src: image,
+                        type: 'Image'
+                    },
+                    {
+                        type: 'Text',
+                        value: 'TINATETT MARKETING COMPANY LIMITED',
+                        position: { x: 308, y: 0 },
+                        style: { textBrushColor: '#575C88', fontSize: 18 },
+                    },
+                    {
+                        type: 'Text',
+                        value: 'P.O. BOX CO 2699, TEMA-ACCRA, WHOLESALE AND RETAIL OF HERBAL MEDICINE',
+                        position: { x: 218, y: 20 },
+                        style: { textBrushColor: '#575C88', fontSize: 14 },
+                    },
+                    {
+                        type: 'Text',
+                        value: 'KOTOBABI SPINTEX - FACTORY WAREHOUSE, 02081660807, tinatettonline@gmail.com',
+                        position: { x: 218, y: 40 },
+                        style: { textBrushColor: '#575C88', fontSize: 14 },
+                    },
 
-                    ]
-                },
-                footer: {
-                    fromBottom: 20,
-                    height: 20,
-                    contents: [
-                        {
-                            type: 'Text',
-                            value: 'Prepared By:',
-                            position: { x: 0, y: 0 },
-                            style: { textBrushColor: '#575C88', fontSize: 14 }
-                        },
-                        {
-                            type: 'Text',
-                            value: `${auth?.name}`,
-                            position: { x: 80, y: 0 },
-                            style: { textBrushColor: '#0A1172', fontSize: 14 }
-                        },
-                        {
-                            /** format is optional */
-                            format: 'Page {$current} of {$total}',
-                            pageNumberType: 'Arabic',
-                            position: { x: 940, y: 0 },
-                            style: {
-                                fontSize: 11,
-                                hAlign: 'Center',
-                                textBrushColor: '#0A1172',
-                            },
-                            type: 'PageNumber',
-                        }
-                    ]
-                },
-                fileName: "ProductReport.pdf"
-            };
-        }
-        else {
-            return {
-                pageOrientation: 'Portrait',
-                screenX: 0,
+                    {
+                        type: 'Text',
+                        value: 'PURCHASE REPORT',
+                        position: { x: 420, y: 120 },
+                        style: { textBrushColor: '#000000', fontSize: 15, textDecoration: "underline" },
+                    },
+                    {
+                        type: 'Text',
+                        value: 'Branch Info',
+                        position: { x: 0, y: 100 },
+                        style: { textBrushColor: '#000000', fontSize: 16 }
+                    },
+                    {
+                        type: 'Text',
+                        value: `${auth?.branchName}`,
+                        position: { x: 0, y: 120 },
+                        style: { textBrushColor: '#000000', fontSize: 11 }
+                    },
+                    {
+                        type: 'Text',
+                        value: `${getCurrentDateInWords(Date.now())}`,
+                        position: { x: 940, y: 120 },
+                        style: { textBrushColor: '#000000', fontSize: 11 }
+                    },
 
-                pageSize: 'A4',
+                ]
+            },
+            footer: {
+                fromBottom: 20,
+                height: 20,
+                contents: [
+                    {
+                        type: 'Text',
+                        value: 'Prepared By:',
+                        position: { x: 0, y: 0 },
+                        style: { textBrushColor: '#575C88', fontSize: 14 }
+                    },
+                    {
+                        type: 'Text',
+                        value: `${auth?.name}`,
+                        position: { x: 80, y: 0 },
+                        style: { textBrushColor: '#0A1172', fontSize: 14 }
+                    },
+                    {
+                        /** format is optional */
+                        format: 'Page {$current} of {$total}',
+                        pageNumberType: 'Arabic',
+                        position: { x: 940, y: 0 },
+                        style: {
+                            fontSize: 11,
+                            hAlign: 'Center',
+                            textBrushColor: '#0A1172',
+                        },
+                        type: 'PageNumber',
+                    }
+                ]
+            },
+            fileName: "ProductReport.pdf"
+        };
 
-                header: {
 
-                    fromTop: 0,
-                    // minHeight: 200,
-                    height: 140,
+    }
+    function getPdfExportProperties2() {
 
-                    contents: [
-                        {
-                            position: { x: 0, y: 0 },
-                            size: { height: 60, width: 90 },
-                            src: image,
-                            type: 'Image'
+        return {
+            pageOrientation: 'Portrait',
+            screenX: 0,
+
+            pageSize: 'A4',
+
+            header: {
+
+                fromTop: 0,
+                // minHeight: 200,
+                height: 140,
+
+                contents: [
+                    {
+                        position: { x: 0, y: 0 },
+                        size: { height: 60, width: 90 },
+                        src: image,
+                        type: 'Image'
+                    },
+                    {
+                        type: 'Text',
+                        value: 'TINATETT MARKETING COMPANY LIMITED',
+                        position: { x: 150, y: 0 },
+                        style: { textBrushColor: '#575C88', fontSize: 17 },
+                    },
+                    {
+                        type: 'Text',
+                        value: 'P.O. BOX CO 2699, TEMA-ACCRA, WHOLESALE AND RETAIL OF HERBAL MEDICINE',
+                        position: { x: 95, y: 20 },
+                        style: { textBrushColor: '#575C88', fontSize: 13 },
+                    },
+                    {
+                        type: 'Text',
+                        value: 'KOTOBABI SPINTEX - FACTORY WAREHOUSE, 02081660807, tinatettonline@gmail.com',
+                        position: { x: 95, y: 40 },
+                        style: { textBrushColor: '#575C88', fontSize: 13 },
+                    },
+                    {
+                        type: 'Text',
+                        value: 'PURCHASE REPORT',
+                        position: { x: 250, y: 100 },
+                        style: { textBrushColor: '#000000', fontSize: 15, textDecoration: "underline" },
+                    },
+                    {
+                        type: 'Text',
+                        value: 'Branch Info',
+                        position: { x: 0, y: 90 },
+                        style: { textBrushColor: '#000000', fontSize: 16 }
+                    },
+                    {
+                        type: 'Text',
+                        value: `${auth?.branchName}`,
+                        position: { x: 0, y: 110 },
+                        style: { textBrushColor: '#000000', fontSize: 11 }
+                    },
+                    {
+                        type: 'Text',
+                        value: `${getCurrentDateInWords(Date.now())}`,
+                        position: { x: 610, y: 110 },
+                        style: { textBrushColor: '#000000', fontSize: 11 }
+                    },
+                ]
+            },
+            footer: {
+                fromBottom: 100,
+                height: 80,
+                contents: [
+                    {
+                        type: 'Text',
+                        value: 'Prepared By:',
+                        position: { x: 0, y: 60 },
+                        style: { textBrushColor: '#575C88', fontSize: 14 }
+                    },
+                    {
+                        type: 'Text',
+                        value: `${auth?.name}`,
+                        position: { x: 80, y: 60 },
+                        style: { textBrushColor: '#0A1172', fontSize: 14 }
+                    },
+                    {
+                        /** format is optional */
+                        format: 'Page {$current} of {$total}',
+                        pageNumberType: 'Arabic',
+                        position: { x: 630, y: 65 },
+                        style: {
+                            fontSize: 11,
+                            hAlign: 'Center',
+                            textBrushColor: '#0A1172',
                         },
-                        {
-                            type: 'Text',
-                            value: 'TINATETT MARKETING COMPANY LIMITED',
-                            position: { x: 150, y: 0 },
-                            style: { textBrushColor: '#575C88', fontSize: 17 },
-                        },
-                        {
-                            type: 'Text',
-                            value: 'P.O. BOX CO 2699, TEMA-ACCRA, WHOLESALE AND RETAIL OF HERBAL MEDICINE',
-                            position: { x: 95, y: 20 },
-                            style: { textBrushColor: '#575C88', fontSize: 13 },
-                        },
-                        {
-                            type: 'Text',
-                            value: 'KOTOBABI SPINTEX - FACTORY WAREHOUSE, 02081660807, tinatettonline@gmail.com',
-                            position: { x: 95, y: 40 },
-                            style: { textBrushColor: '#575C88', fontSize: 13 },
-                        },
-                        {
-                            type: 'Text',
-                            value: 'PURCHASE REPORT',
-                            position: { x: 250, y: 100 },
-                            style: { textBrushColor: '#000000', fontSize: 15, textDecoration: "underline" },
-                        },
-                        {
-                            type: 'Text',
-                            value: 'Branch Info',
-                            position: { x: 0, y: 90 },
-                            style: { textBrushColor: '#000000', fontSize: 16 }
-                        },
-                        {
-                            type: 'Text',
-                            value: `${auth?.branchName}`,
-                            position: { x: 0, y: 110 },
-                            style: { textBrushColor: '#000000', fontSize: 11 }
-                        },
-                        {
-                            type: 'Text',
-                            value: `${getCurrentDateInWords(Date.now())}`,
-                            position: { x: 610, y: 110 },
-                            style: { textBrushColor: '#000000', fontSize: 11 }
-                        },
-                    ]
-                },
-                footer: {
-                    fromBottom: 100,
-                    height: 80,
-                    contents: [
-                        {
-                            type: 'Text',
-                            value: 'Prepared By:',
-                            position: { x: 0, y: 60 },
-                            style: { textBrushColor: '#575C88', fontSize: 14 }
-                        },
-                        {
-                            type: 'Text',
-                            value: `${auth?.name}`,
-                            position: { x: 80, y: 60 },
-                            style: { textBrushColor: '#0A1172', fontSize: 14 }
-                        },
-                        {
-                            /** format is optional */
-                            format: 'Page {$current} of {$total}',
-                            pageNumberType: 'Arabic',
-                            position: { x: 630, y: 65 },
-                            style: {
-                                fontSize: 11,
-                                hAlign: 'Center',
-                                textBrushColor: '#0A1172',
-                            },
-                            type: 'PageNumber',
-                        }
-                    ]
-                },
-                fileName: `ProductReport.pdf`
-            };
-        }
+                        type: 'PageNumber',
+                    }
+                ]
+            },
+            fileName: `ProductReport.pdf`
+        };
+
     }
     const footerSum = (props) => {
         return (<span>{props.Sum}</span>);
@@ -306,44 +334,92 @@ function ProductReportTable({ isAllChecked, isRetailChecked, isWholsaleChecked, 
 
             <div>
 
-                <GridComponent
-                    id="Grid"
-                    beforePdfExport={beforePdfExport}
-                    dataSource={data}
-                    ref={grid => gridInstance = grid}
-                    pdfHeaderQueryCellInfo={pdfHeaderQueryCellInfo}
-                    toolbar={toolbarOptions}
-                    allowExcelExport={true}
-                    allowPdfExport={true}
-                    toolbarClick={toolbarClick.bind(this)}
-                    height={500}
-                    allowPaging={true}
-                    pageSettings={{ pageCount: 2, pageSize: 1000 }}
-                    dataBound={dataBound}
-                >
-                    <ColumnsDirective>
-                        <ColumnDirective field='Name' headerText='Product Name' width={isAllChecked ?? "13%"}></ColumnDirective>
-                        <ColumnDirective field='QTY' headerText='Total QTY' textAlign='Center' width={"5%"} format='N2'></ColumnDirective>
-                        <ColumnDirective field='retailPrice' headerText='Retail' textAlign='Right' format='N2' width={"7%"}></ColumnDirective>
-                        <ColumnDirective field='wholeSalePrice' headerText='Wholesale' textAlign='Right' format='N2' width={"7%"}></ColumnDirective>
-                        <ColumnDirective field='specialPrice' visible={showSpecial} headerText='Special' textAlign='Right' format='N2' width={"7%"}></ColumnDirective>
-                        <ColumnDirective field='batchNumber' headerText='Batch No.' format='N2' width={"7%"}></ColumnDirective>
-                        <ColumnDirective field='quantity' headerText='QTY' textAlign='Center' format='N2' width={"5%"}></ColumnDirective>
-                        <ColumnDirective field='manufacturingDate' headerText='MGF Date' width={"6%"}></ColumnDirective>
-                        <ColumnDirective field='expireDate' headerText='EXP. Date' width={"6%"}></ColumnDirective>
+                {
+                    isAllChecked && !disableBatchNo ?
+                        <>
+                            <GridComponent
+                                id="Grid"
+                                beforePdfExport={beforePdfExport}
+                                dataSource={data}
+                                ref={grid => gridInstance = grid}
+                                pdfHeaderQueryCellInfo={pdfHeaderQueryCellInfo}
+                                toolbar={toolbarOptions}
+                                allowExcelExport={true}
+                                allowPdfExport={true}
+                                toolbarClick={toolbarClick.bind(this)}
+                                height={500}
+                                allowPaging={true}
+                                pageSettings={{ pageCount: 2, pageSize: 1000 }}
+                                dataBound={dataBound}
+                            >
+                                <ColumnsDirective>
+                                    <ColumnDirective field='Name' headerText='Product Name' width={isQuantityChecked ? "15%" : "21%"} ></ColumnDirective>
+                                    <ColumnDirective field='QTY' template={({ QTY }) => isQuantityChecked ? QTY : ''} headerText='Total QTY' textAlign='Center' width={"6%"} format='N2'></ColumnDirective>
+                                    <ColumnDirective field='retailPrice' headerText='Retail' textAlign='Right' format='N2' width={"6%"}></ColumnDirective>
+                                    <ColumnDirective field='wholeSalePrice' headerText='Wholesale' textAlign='Right' format='N2' width={"7%"}></ColumnDirective>
+                                    <ColumnDirective field='specialPrice' visible={showSpecial} headerText='Special' textAlign='Right' format='N2' width={"7%"}></ColumnDirective>
+                                    <ColumnDirective field='batchNumber' headerText='Batch No.' format='N2' width={"7%"}></ColumnDirective>
+                                    <ColumnDirective field='quantity' headerText='QTY' textAlign='Center' format='N2' width={"5%"}></ColumnDirective>
+                                    <ColumnDirective field='manufacturingDate' headerText='MGF Date' width={"6%"}></ColumnDirective>
+                                    <ColumnDirective field='expireDate' headerText='EXP. Date' width={"6%"}></ColumnDirective>
 
-                    </ColumnsDirective>
-                    <AggregatesDirective>
-                        <AggregateDirective>
-                            <AggregateColumnsDirective>
-                                <AggregateColumnDirective field='QTY' type='Sum' format='N2' footerTemplate={footerSum} />
-                                <AggregateColumnDirective field='quantity' type='Sum' format='N2' footerTemplate={footerSum} />
+                                </ColumnsDirective>
+                                <AggregatesDirective>
+                                    <AggregateDirective>
+                                        <AggregateColumnsDirective>
+                                            <AggregateColumnDirective field='QTY' type='Sum' format='N2' footerTemplate={footerSum} />
+                                            <AggregateColumnDirective field='quantity' type='Sum' format='N2' footerTemplate={footerSum} />
 
-                            </AggregateColumnsDirective>
-                        </AggregateDirective>
-                    </AggregatesDirective>
-                    <Inject services={[Toolbar, ExcelExport, PdfExport, Page, Aggregate]} />
-                </GridComponent>
+                                        </AggregateColumnsDirective>
+                                    </AggregateDirective>
+                                </AggregatesDirective>
+                                <Inject services={[Toolbar, ExcelExport, PdfExport, Page, Aggregate]} />
+                            </GridComponent>
+                        </> :
+                        <>
+
+                            <GridComponent
+                                id="Grid2"
+                                beforePdfExport={beforePdfExport}
+                                dataSource={data?.filter(x => x?.Name.length > 0)}
+                                ref={grid => gridInstance2 = grid}
+                                pdfHeaderQueryCellInfo={pdfHeaderQueryCellInfo}
+                                toolbar={toolbarOptions}
+                                allowExcelExport={true}
+                                allowPdfExport={true}
+                                toolbarClick={toolbarClick2.bind(this)}
+                                height={500}
+                                allowPaging={true}
+                                pageSettings={{ pageCount: 2, pageSize: 10000 }}
+                                dataBound={dataBound}
+                            >
+                                <ColumnsDirective>
+                                    <ColumnDirective field='Name' headerText='Product Name'></ColumnDirective>
+                                    <ColumnDirective field='QTY' template={({ QTY }) => isQuantityChecked ? QTY : ''} headerText='Total QTY' textAlign='Center' format='N2' width={100}></ColumnDirective>
+                                    <ColumnDirective field='retailPrice' template={({ retailPrice }) => isRetailChecked ? retailPrice : ''} headerText='Retail' textAlign='Right' format='N2' width={110}></ColumnDirective>
+                                    <ColumnDirective field='wholeSalePrice' template={({ wholeSalePrice }) => isWholsaleChecked ? wholeSalePrice : ''} headerText='Wholesale' textAlign='Right' format='N2' width={110}></ColumnDirective>
+                                    <ColumnDirective field='specialPrice' template={({ specialPrice }) => isSpecialChecked ? specialPrice : ''} headerText='Special' textAlign='Right' format='N2' width={100}></ColumnDirective>
+                                    {/* <ColumnDirective field='batchNumber' headerText='Batch No.' format='N2' width={120}></ColumnDirective> */}
+                                    {/* <ColumnDirective field='quantity' headerText='QTY' textAlign='Center' format='N2' width={80}></ColumnDirective> */}
+                                    {/* <ColumnDirective field='manufacturingDate' visible={false} headerText='MGF Date'></ColumnDirective>
+                                    <ColumnDirective field='expireDate' visible={false} headerText='EXP. Date'></ColumnDirective> */}
+
+                                </ColumnsDirective>
+                                <AggregatesDirective>
+                                    <AggregateDirective>
+                                        <AggregateColumnsDirective>
+                                            <AggregateColumnDirective field='QTY' type='Sum' format='N2' footerTemplate={footerSum} />
+                                            <AggregateColumnDirective field='quantity' type='Sum' format='N2' footerTemplate={footerSum} />
+
+                                        </AggregateColumnsDirective>
+                                    </AggregateDirective>
+                                </AggregatesDirective>
+                                <Inject services={[Toolbar, ExcelExport, PdfExport, Page, Aggregate]} />
+                            </GridComponent>
+                        </>
+                }
+
+
             </div>
         </div>
     </div>);
