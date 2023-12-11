@@ -391,12 +391,17 @@ const ProductReport = () => {
 
                 <div className="col-6">
                   <div className="form-group">
-                    <div style={{ display: 'flex' }}>
-                       <input type="checkbox" className="form-check-input" style={{marginRight:10}} 
-                       onChange={handleToggleBatchNumberStatus} checked={disableBatchNo}/><label>Batch No.</label>
-                      {isBatchLoading && <div className="spinner-border text-primary me-1" role="status" style={{ height: 20, width: 20 }}>
-                        <span className="sr-only">Loading...</span>
-                      </div>}
+                    <div style={{ display: 'flex', justifyContent:'space-between'}}>
+                      <div style={{display: 'flex',width:'50%'}}><input type="checkbox" className="form-check-input" style={{marginRight:10}} 
+                       onChange={handleToggleBatchNumberStatus} checked={!disableBatchNo}/><label>Batch No.</label>
+                       </div>
+                       
+                      <div style={{display: 'flex',width:'50%'}}>
+                        <input type="checkbox" className="form-check-input" style={{marginRight:10}} 
+                        onChange={() => setIsQuantityChecked(!isQuantityChecked)} checked={isQuantityChecked}/><label>Quantity</label> 
+                      </div>
+                           
+                      
                     </div>
                     <div className="input-groupicon">
                       <Select
