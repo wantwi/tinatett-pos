@@ -459,7 +459,7 @@ const PurchaseSummary = () => {
                 Reset
               </Link>
               <Link to="#" className="btn btn-submit " style={{ width: '47%' }} onClick={handleGenerateReport}>
-                Search
+                {reportIsLoading ? 'Loading Please wait...' : 'Search'}
               </Link>
             </div>
           </div>

@@ -268,6 +268,9 @@ const PurchaseSummary = () => {
   if (purchaseIsLoading) {
     return (<LoadingSpinner />)
   }
+  if (reportIsLoading) {
+    return (<LoadingSpinner message="Fetching Report..." />)
+  }
 
 
 
