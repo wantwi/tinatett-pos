@@ -129,12 +129,12 @@ const ProductReport = () => {
 
     }
 
-    if (!isAllChecked) {
-      if (!isRetailChecked && !isSpecialChecked && !isWholsaleChecked) {
-        alertify.warning("Please select at least one Price Type (Retail, Wholesale or Special");
-        return
-      }
-    }
+    // if (!isAllChecked) {
+    //   if (!isRetailChecked && !isSpecialChecked && !isWholsaleChecked) {
+    //     alertify.warning("Please select at least one Price Type (Retail, Wholesale or Special");
+    //     return
+    //   }
+    // }
 
     setreportIsLoading(true)
     // $('#pdfViewer').modal('show')

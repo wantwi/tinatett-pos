@@ -107,7 +107,7 @@ function ProductReportTable({ disableBatchNo, isQuantityChecked, isAllChecked, i
 
                     {
                         type: 'Text',
-                        value: 'PURCHASE REPORT',
+                        value: 'PRODUCT REPORT',
                         position: { x: 420, y: 120 },
                         style: { textBrushColor: '#000000', fontSize: 15, textDecoration: "underline" },
                     },
@@ -167,6 +167,12 @@ function ProductReportTable({ disableBatchNo, isQuantityChecked, isAllChecked, i
 
 
     }
+    const calculate = (data) => {
+        return data.reduce(
+            (accumulator, currentValue) => accumulator + currentValue,
+            0,
+        )
+    }
     function getPdfExportProperties2() {
 
         return {
@@ -208,7 +214,7 @@ function ProductReportTable({ disableBatchNo, isQuantityChecked, isAllChecked, i
                     },
                     {
                         type: 'Text',
-                        value: 'PURCHASE REPORT',
+                        value: 'PRODUCT REPORT',
                         position: { x: 250, y: 100 },
                         style: { textBrushColor: '#000000', fontSize: 15, textDecoration: "underline" },
                     },
@@ -267,6 +273,7 @@ function ProductReportTable({ disableBatchNo, isQuantityChecked, isAllChecked, i
 
     }
     const footerSum = (props) => {
+        console.log({ props });
         return (<span>{props.Sum}</span>);
     };
     const footerMax = (props) => {
@@ -357,7 +364,7 @@ function ProductReportTable({ disableBatchNo, isQuantityChecked, isAllChecked, i
                                     <ColumnDirective field='QTY' template={({ QTY }) => isQuantityChecked ? QTY : ''} headerText='Total QTY' textAlign='Center' width={"6%"} format='N2'></ColumnDirective>
                                     <ColumnDirective field='retailPrice' headerText='Retail' textAlign='Right' format='N2' width={"6%"}></ColumnDirective>
                                     <ColumnDirective field='wholeSalePrice' headerText='Wholesale' textAlign='Right' format='N2' width={"7%"}></ColumnDirective>
-                                    <ColumnDirective field='specialPrice' visible={showSpecial} headerText='Special' textAlign='Right' format='N2' width={"7%"}></ColumnDirective>
+                                    <ColumnDirective field='specialPrice' visible={showSpecial} headerText='Special' textAlign='Right' format='N2' width={"6%"}></ColumnDirective>
                                     <ColumnDirective field='batchNumber' headerText='Batch No.' format='N2' width={"7%"}></ColumnDirective>
                                     <ColumnDirective field='quantity' headerText='QTY' textAlign='Center' format='N2' width={"5%"}></ColumnDirective>
                                     <ColumnDirective field='manufacturingDate' headerText='MGF Date' width={"6%"}></ColumnDirective>
