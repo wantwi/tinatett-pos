@@ -1,28 +1,17 @@
 import React, { useEffect, useState } from "react";
 import Table from "../../EntryFile/datatable";
 import { Link } from "react-router-dom";
-import DatePicker from "react-datepicker";
+import { debounce } from "lodash";
 import Tabletop from "../../EntryFile/tabletop";
 import Swal from "sweetalert2";
 import "react-datepicker/dist/react-datepicker.css";
 import {
-  ClosesIcon,
-  Excel,
-  Filter,
-  Pdf,
-  Eye1,
-  Calendar,
+
   Printer,
-  search_whites,
-  Search,
   PlusIcon,
   EditIcon,
-  Dollar1,
-  plusCircle,
-  Download,
-  delete1,
   DeleteIcon,
-  datepicker,
+
 } from "../../EntryFile/imagePath";
 import Select2 from "react-select2-wrapper";
 import Select from "react-select";
@@ -80,6 +69,7 @@ const ProformaList = () => {
   } = useGet("proformas", "/proforma", onSuccess);
 
 
+  
   
 
   const handleCustomerSelect = (e) => {
@@ -334,6 +324,26 @@ const ProformaList = () => {
     },
   ];
 
+
+  const handleSearch = debounce((value) => {
+    axios.get(`/proforma/search?proformaRef=${value}`)
+    .then((res) => {
+     let mapped = res?.data.data.map((proforma) => {
+      return {
+        id: proforma?.id,
+        customerName: proforma.customerName,
+        customer: proforma?.customerId,
+        status: proforma?.status,
+        date: new Date(proforma.createdAt).toISOString().substring(0, 10),
+        proformaRef: proforma?.proformaRef,
+        numberOfProduct: proforma?.numberOfProduct,
+        createdBy: proforma?.createdBy || 'N/A',
+      }
+    })
+    setData(mapped)
+  })
+}, 300)
+
   return (
     <>
       <div className="page-wrapper">
@@ -353,9 +363,9 @@ const ProformaList = () => {
           {/* /product list */}
           <div className="card">
             <div className="card-body">
-              <Tabletop inputfilter={inputfilter} togglefilter={togglefilter} data={data} title={'Proforma List'} />
+              <Tabletop inputfilter={inputfilter} togglefilter={togglefilter} data={data} title={'Proforma List'} handleSearch={handleSearch}/>
               {/* /Filter */}
-              <div
+              {/* <div
                 className={`card mb-0 ${inputfilter ? "toggleCls" : ""}`}
                 id="filter_inputs"
                 style={{ display: inputfilter ? "block" : "none" }}
@@ -392,7 +402,7 @@ const ProformaList = () => {
                     </div>
                   </div>
                 </div>
-              </div>
+              </div> */}
               {/* /Filter */}
               <div className="table-responsive">
                 <Table columns={columns} dataSource={data} />
