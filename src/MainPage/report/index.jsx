@@ -10,23 +10,27 @@ import Customer from './customer'
 import PurchaseSummary from './purchaseSummary';
 import ProductReport from './product';
 import SalesSummary from './salesSummary';
+import StockReport from './stockreport';
+import TransferReport from './transfer';
+import TransferSummaryReport from './transferSummary';
 
 
 
-
-
-const AppIndex = ({ match}) =>(
+const AppIndex = ({ match }) => (
     <Switch>
         <Redirect exact from={`${match.url}/`} to={`${match.url}/purchaseorderreport`} />
-        <Route path={`${match.url}/purchaseorderreport`} component={Purchaseorder} />                                                                                             
-        <Route path={`${match.url}/inventoryreport`} component={ProductReport} />                                                                                             
-        <Route path={`${match.url}/salesreport`} component={Sales} />                                                                                             
-        <Route path={`${match.url}/invoicereport`} component={Invoices} />                                                                                             
-        <Route path={`${match.url}/purchase-summary-report`} component={PurchaseSummary} />     
-        <Route path={`${match.url}/sales-summary-report`} component={SalesSummary} />                                                                                         
-        <Route path={`${match.url}/supplierreport`} component={Supplier} />                                                                                             
-        <Route path={`${match.url}/customerreport`} component={Customer} />                                                                                             
-        
+        <Route path={`${match.url}/purchaseorderreport`} component={Purchaseorder} />
+        <Route path={`${match.url}/inventoryreport`} component={ProductReport} />
+        <Route path={`${match.url}/salesreport`} component={Sales} />
+        <Route path={`${match.url}/invoicereport`} component={Invoices} />
+        <Route path={`${match.url}/purchase-summary-report`} component={PurchaseSummary} />
+        <Route path={`${match.url}/sales-summary-report`} component={SalesSummary} />
+        <Route path={`${match.url}/supplierreport`} component={Supplier} />
+        <Route path={`${match.url}/customerreport`} component={Customer} />
+        <Route path={`${match.url}/stock-report`} component={StockReport} />
+        <Route path={`${match.url}/transfer-report`} component={TransferReport} />
+        <Route path={`${match.url}/transfer-summary-report`} component={TransferSummaryReport} />
+
     </Switch>
 )
 

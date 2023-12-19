@@ -20,14 +20,10 @@ import alertify from "alertifyjs";
 const ProductReport = () => {
   const [inputfilter, setInputfilter] = useState(false);
   const [data, setData] = useState([]);
-
-
   const [productsDropdown, setProductsDropdown] = useState([]);
   const [suppliersDropdown, setSuppliersDropdown] = useState([]);
-
   const { data: products, isLoading: productsIsLoading } = useGet("products", "/product");
   const { data: suppliers, isLoading: suppliersIsLoading } = useGet("suppliers", "/supplier");
-
   const [selectedProduct, setSelectedProduct] = useState({})
   const [selectedProductInfo, setSelectedProductInfo] = useState()
   const [supplier, setSupplier] = useState('')
