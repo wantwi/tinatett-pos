@@ -6,19 +6,10 @@ import Tabletop from "../../EntryFile/tabletop";
 import Swal from "sweetalert2";
 import "react-datepicker/dist/react-datepicker.css";
 import {
-  ClosesIcon,
-  Excel,
-  Filter,
-  Pdf,
-  Eye1,
   Calendar,
   Printer,
-  search_whites,
-  Search,
   PlusIcon,
   EditIcon,
-  Dollar1,
-  plusCircle,
   Download,
   delete1,
   DeleteIcon,
@@ -30,6 +21,7 @@ import { useGet } from "../../hooks/useGet";
 import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 import { moneyInTxt } from "../../utility";
 import useCustomApi from "../../hooks/useCustomApi";
+import { debounce } from "lodash";
 
 const SalesList = () => {
   const [startDate, setStartDate] = useState(new Date());
@@ -286,6 +278,26 @@ const SalesList = () => {
     },
   ];
 
+  const handleSearch = debounce((value) => {
+    axios.get(`/sales?customername=${value}`)
+    .then((res) => {
+     let mapped = res?.data.data.map((sale) => {
+      return {
+        id: sale?.id,
+        Date: sale?.transDate,
+        Name: sale?.customerName,
+        Status: sale?.status,
+        Reference: sale?.salesRef,
+        // Payment: JSON.parse(sale?.paymentInfo).type,
+        Total: moneyInTxt(sale?.totalAmount) || '',
+        Paid: moneyInTxt(sale?.amountPaid),
+        Balance: moneyInTxt(sale?.balance),
+        Biller: sale?.salesPerson,
+      }
+    })
+    setData(mapped)
+  })
+}, 300)
 
   const getInvoiceReceipt = (salesref) => {
     axios.get('/sales/getSaleReceipt/' + salesref)
@@ -346,9 +358,9 @@ const SalesList = () => {
           {/* /product list */}
           <div className="card">
             <div className="card-body">
-              <Tabletop inputfilter={inputfilter} togglefilter={togglefilter} />
+              <Tabletop inputfilter={inputfilter} togglefilter={togglefilter} handleSearch={handleSearch}/>
               {/* /Filter */}
-              <div
+              {/* <div
                 className={`card mb-0 ${inputfilter ? "toggleCls" : ""}`}
                 id="filter_inputs"
                 style={{ display: inputfilter ? "block" : "none" }}
@@ -385,7 +397,7 @@ const SalesList = () => {
                     </div>
                   </div>
                 </div>
-              </div>
+              </div> */}
               {/* /Filter */}
               <div className="table-responsive">
                 <Table columns={columns} dataSource={data} />
