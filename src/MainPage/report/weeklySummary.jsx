@@ -26,7 +26,31 @@ import { moneyInTxt } from "../../utility";
 import PurchaseSummaryTable from "./tables/PurchaseSummary"
 import StockReport from "./tables/StockTable";
 import alertify from "alertifyjs";
-const SalesSummary = () => {
+import ProductMovementTable from "./tables/ProductMovementTable";
+import WeeklySaleSummaryTable from "./tables/WeeklySaleSummaryTable";
+
+function getWeek(dateString) {
+  const date = new Date(dateString);
+  const dayOfWeek = date.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+
+  // Calculate the start date by subtracting the day of the week from the current date
+  const startDate = new Date(date);
+  startDate.setDate(date.getDate() - dayOfWeek);
+
+  // Calculate the end date by adding the remaining days to the start date
+  const endDate = new Date(startDate);
+  endDate.setDate(startDate.getDate() + 6);
+
+  // Format the dates as 'YYYY-MM-DD'
+  const formattedStartDate = startDate.toISOString().split('T')[0];
+  const formattedEndDate = endDate.toISOString().split('T')[0];
+
+  return formattedEndDate
+}
+
+
+
+const ProductMovement = () => {
   const [inputfilter, setInputfilter] = useState(false);
   const [data, setData] = useState([]);
   const axios = useCustomApi();
@@ -164,6 +188,17 @@ const SalesSummary = () => {
     setSelectedUser(null)
   }
 
+  useEffect(() => {
+    if (formData?.startDate) {
+      setFormData(prev => ({ ...prev, endDate: getWeek(formData?.startDate) }))
+    }
+
+    return () => {
+
+    }
+  }, [formData?.startDate])
+
+
   const handleGenerateReport = () => {
     if (!formData?.startDate || !formData?.endDate) {
 
@@ -171,11 +206,17 @@ const SalesSummary = () => {
       return
 
     }
-    const baseUrl = "report/getOpeningAndCloseStockReport";
+    // if (!selectedProduct?.id || !formData?.batchNumber?.label) {
+
+    //   alertify.warning("Please product and batch number");
+    //   return
+
+    // }
+    const baseUrl = "report/getWeeklySalesReport";
     let filters = {
-      productId: selectedProduct?.id || "",
+      // productId: selectedProduct?.id || "",
       startDate: formData?.startDate || "",
-      endDate: formData?.endDate || ""
+      endDate: formData?.endDate || "",
       // batchNumber: formData?.batchNumber?.label || "",
       // clientId: supplier?.id || "",
       // userId: selectedUser?.value || "",
@@ -194,13 +235,7 @@ const SalesSummary = () => {
     // $('#pdfViewer').modal('show')
     // axios.get(`report/getSalesSummaryReport?startDate=${formData.startDate}&endDate=${formData.endDate}&productId=${selectedProduct?.id || ''}&batchNumber=${formData?.batchNumber?.value || ''}&clientId=${supplier?.value || ''}`)
     axios.get(dynamicUrl).then((res) => {
-
-      if (showOnlyActive) {
-        setReport(res.data?.data.filter(x => x?.stockStatus === "Active"))
-      } else {
-        setReport(res.data?.data)
-      }
-
+      setReport(res.data?.data)
 
 
       $('#filters').modal('hide')
@@ -297,14 +332,9 @@ const SalesSummary = () => {
 
     },
   ];
-
-
-
   if (isLoading) {
     return (<LoadingSpinner />)
   }
-
-
 
   return (
     <>
@@ -312,8 +342,8 @@ const SalesSummary = () => {
         <div className="content">
           <div className="page-header">
             <div className="page-title">
-              <h4>Open and Close Report</h4>
-              <h6>Generate your Open and Close Report</h6>
+              <h4>Weekly Sale Summary Report</h4>
+              <h6>Generate your Weekly Sale Summary Report</h6>
             </div>
             <div className="page-btn">
               <Link
@@ -322,7 +352,7 @@ const SalesSummary = () => {
                 className="btn btn-success"
               >
 
-                Generate Open and Close Report
+                Generate Weekly Sale Summary Report
               </Link>
             </div>
           </div>
@@ -346,7 +376,7 @@ const SalesSummary = () => {
               </div>
               {/* /Filter */}
               <div className="table-responsive">
-                <StockReport startDate={formData?.startDate} endDate={formData?.endDate} title="OPEN AND CLOSING REPORT" fileName="stockreport" data={report} />
+                <WeeklySaleSummaryTable startDate={formData?.startDate} endDate={formData?.endDate} title="WEEKLY SALE SUMMARY REPORT" fileName="weeklysalereport" data={report} />
               </div>
             </div>
           </div>
@@ -367,7 +397,7 @@ const SalesSummary = () => {
         <div className="modal-dialog modal-md modal-dialog-centered" role="document">
           <div className="modal-content">
             <div className="modal-header">
-              <h5 className="modal-title">Open and Close Stock Search</h5>
+              <h5 className="modal-title">Weekly Sale Summary Search</h5>
               <button
                 type="button"
                 className="close"
@@ -397,6 +427,7 @@ const SalesSummary = () => {
                   <label>To</label>
                   <div className="input-groupicon">
                     <input
+                      disabled
                       type="date" className={`form-control `}
                       id="amount"
                       placeholder=""
@@ -421,16 +452,18 @@ const SalesSummary = () => {
                   />
                 </div>
               </div>
-              <div className="row">
+              <div className="row" hidden>
                 <div className="form-group">
                   <label>Product</label>
                   <Select
                     id="productName"
                     className="select"
                     options={productsDropdown}
+                    placeholder="Select product"
                     value={selectedProduct}
                     isLoading={productsIsLoading}
                     onChange={(e) => handleProductSelect(e)}
+
                   />
                 </div>
               </div>
@@ -446,9 +479,9 @@ const SalesSummary = () => {
                     <Select
 
                       options={selectedProductInfo?.batchNumber?.map((item) => {
-                        return { value: item.batchNumber, label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')' : item?.batchNumber + '-(' + item?.availablequantity + ')', expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
+                        return { value: item.batchNumber, label: item?.batchNumber, expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
                       })}
-                      placeholder=""
+                      placeholder="Select batch number"
                       value={formData.batchNumber}
                       onChange={(e) => setFormData({ ...formData, batchNumber: (e) })}
                     //onChange={(e) => console.log(e)}
@@ -457,7 +490,7 @@ const SalesSummary = () => {
                   </div>
                 </div>
               </div>
-              <div>
+              <div hidden>
                 <div className="col">
 
                   <div className="input-group" style={{ marginLeft: -13 }}>
@@ -533,4 +566,4 @@ const SalesSummary = () => {
     </>
   );
 };
-export default SalesSummary;
+export default ProductMovement;

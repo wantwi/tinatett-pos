@@ -954,6 +954,27 @@ const Sidebar = (props) => {
                         Transfer Summary
                       </Link>
                     </li>
+                    <li>
+                      <Link
+                        to="/tinatett-pos/report/product-movement"
+                        className={
+                          pathname.includes("product-movement") ? "active" : ""
+                        }
+                      >
+                        Product Movement
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        to="/tinatett-pos/report/weekly-summary"
+                        className={
+                          pathname.includes("/weekly-summary") ? "active" : ""
+                        }
+                      >
+                        Weekly Sale Summary
+                      </Link>
+                    </li>
+
 
                     {/* <li>
                       <Link
