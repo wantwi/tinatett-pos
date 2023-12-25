@@ -283,7 +283,7 @@ const Addsales = () => {
                 pType.concat('Momo,')
             }
             if (paymentInfo.chequeAmount > 0) {
-              pType = pType.concat('Cheque,')
+              pType = pType.concat('Cheque')
             }
 
             const totalProductAmount = productGridData.reduce((total, item) => total + item.amount, 0)
@@ -1940,6 +1940,7 @@ const Addsales = () => {
                     <div className="input-groupicon">
                       <input
                         type="number"
+                        className="form-control"
                         min={0}
                         placeholder=""
                         value={paymentInfo.momoAmount}
