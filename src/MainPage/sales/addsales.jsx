@@ -285,6 +285,8 @@ const Addsales = () => {
             if (paymentInfo.chequeAmount > 0) {
               pType = pType.concat('Cheque,')
             }
+
+            const totalProductAmount = productGridData.reduce((total, item) => total + item.amount, 0)
             let payload = {
               status: type,
               salesRef: res.data.reference,
@@ -292,7 +294,8 @@ const Addsales = () => {
               // amount: productGridData.reduce((total, item) => total + item.amount, 0),
               paymentType: pType,
               paymentInfo: [
-                { "type": "Cash", waybill: paymentInfo.cashWaybill, amountPaid: paymentInfo.cashAmount },
+                // { "type": "Cash", waybill: paymentInfo.cashWaybill, amountPaid: paymentInfo.cashAmount },
+                { "type": "Cash", waybill: paymentInfo.cashWaybill, amountPaid: (totalProductAmount - (paymentInfo.momoAmount + paymentInfo.chequeAmount)) },
                 { "type": "Momo", name: paymentInfo.momoName, receiptNo: paymentInfo.momoReceiptNo, amountPaid: paymentInfo.momoAmount },
                 { "type": "Cheque", waybill: paymentInfo.chequeWaybill, chequeNo: paymentInfo.chequeNo, chequeReceiptNo: paymentInfo.chequeReceiptNo, amountPaid: paymentInfo.chequeAmount, waybill: paymentInfo.chequeWaybill }
               ]
