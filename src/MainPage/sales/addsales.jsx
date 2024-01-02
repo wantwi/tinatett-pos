@@ -308,7 +308,7 @@ const Addsales = () => {
               "paymentType": pType,
               "cashAmount":Number(paymentInfo.cashAmount),
               "momoAmount":Number(paymentInfo.momoAmount),
-              "ChequeAmount":Number(paymentInfo.chequeAmount),
+              "chequeAmount":Number(paymentInfo.chequeAmount),
               "paymentInfo": [
                   {
                       "type": "Cash",
