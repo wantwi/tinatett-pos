@@ -173,16 +173,46 @@ const CreditPayment = () => {
       if (paymentInfo.chequeAmount > 0) {
         pType = pType.concat('Cheque,')
       }
+      // let payload = {
+      //   transDate: new Date().toISOString(),
+      //   salesRef: modalData.Reference,
+      //   amount: (Number(paymentInfo.cashAmount) + Number(paymentInfo.momoAmount) + Number(paymentInfo.chequeAmount)),
+      //   paymentInfo: [
+      //     { "type": "Cash", waybill: paymentInfo.cashWaybill, amountPaid: paymentInfo.cashAmount },
+      //     { "type": "Momo", name: paymentInfo.momoName, receiptNo: paymentInfo.momoReceiptNo, amountPaid: paymentInfo.momoAmount },
+      //     { "type": "Cheque", waybill: paymentInfo.chequeWaybill, chequeNo: paymentInfo.chequeNo, chequeReceiptNo: paymentInfo.chequeReceiptNo, amountPaid: paymentInfo.chequeAmount, waybill: paymentInfo.chequeWaybill }
+      //   ]
+      // }
+
+
       let payload = {
-        transDate: new Date().toISOString(),
-        salesRef: modalData.Reference,
-        amount: (Number(paymentInfo.cashAmount) + Number(paymentInfo.momoAmount) + Number(paymentInfo.chequeAmount)),
-        paymentInfo: [
-          { "type": "Cash", waybill: paymentInfo.cashWaybill, amountPaid: paymentInfo.cashAmount },
-          { "type": "Momo", name: paymentInfo.momoName, receiptNo: paymentInfo.momoReceiptNo, amountPaid: paymentInfo.momoAmount },
-          { "type": "Cheque", waybill: paymentInfo.chequeWaybill, chequeNo: paymentInfo.chequeNo, chequeReceiptNo: paymentInfo.chequeReceiptNo, amountPaid: paymentInfo.chequeAmount, waybill: paymentInfo.chequeWaybill }
-        ]
-      }
+        "salesRef": modalData.Reference,
+        "amount":(Number(paymentInfo.cashAmount) + Number(paymentInfo.momoAmount) + Number(paymentInfo.chequeAmount)),
+        "transDate":  new Date().toISOString(),
+        "cashAmount":Number(paymentInfo.cashAmount),
+        "momoAmount":Number(paymentInfo.momoAmount),
+        "chequeAmount":Number(paymentInfo.chequeAmount),
+        "paymentInfo": [
+          {
+              "type": "Cash",
+              "waybill": paymentInfo.cashWaybill,
+              "amountPaid": paymentInfo.cashAmount
+          },
+          {
+              "type": "Momo",
+              "name": paymentInfo.momoName,
+              "receiptNo": paymentInfo.momoReceiptNo,
+              "amountPaid": paymentInfo.momoAmount
+          },
+          {
+              "type": "Cheque",
+              "waybill": paymentInfo.chequeWaybill,
+              "chequeNo": paymentInfo.chequeNo,
+              "chequeReceiptNo": paymentInfo.chequeReceiptNo,
+              "amountPaid": paymentInfo.chequeAmount
+          }
+      ]
+    }
 
 
       // if ((type == 'Paid') && payload.amount < modalData?.Total) {
@@ -384,7 +414,7 @@ const CreditPayment = () => {
           Payment: sale?.paymentType,
           Total: moneyInTxt(sale?.totalAmount),
           Paid: sale?.changeAmt,
-          Due: sale?.balance,
+          Due: moneyInTxt(sale?.balance),
           Biller: sale?.salesPerson,
           salestype: sale?.salesType
         }
@@ -437,11 +467,16 @@ const CreditPayment = () => {
       dataIndex: "Reference",
       sorter: (a, b) => a.Reference.length - b.Reference.length,
     },
+    {
+      title: "Total Amt (GHS)",
+      dataIndex: "Total",
+      sorter: (a, b) => a.Total.length - b.Total.length,
+    },
 
     {
       title: "Amt Due (GHS)",
-      dataIndex: "Total",
-      sorter: (a, b) => a.Total.length - b.Total.length,
+      dataIndex: "Due",
+      sorter: (a, b) => a.Due.length - b.Due.length,
     },
     {
       title: "Sales Type",
