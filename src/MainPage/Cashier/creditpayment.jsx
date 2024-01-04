@@ -21,6 +21,7 @@ import FeatherIcon from 'feather-icons-react'
 import { socket } from "../../InitialPage/Sidebar/Header";
 import useAuth from "../../hooks/useAuth";
 import { NotificationsContext } from "../../InitialPage/Sidebar/DefaultLayout";
+import { Purchase } from "../../EntryFile/imagePath";
 
 const CreditPayment = () => {
   const init = {
@@ -70,7 +71,7 @@ const CreditPayment = () => {
         Reference: sale?.salesRef,
         Payment: sale?.paymentType,
         Total: moneyInTxt(sale?.totalAmount),
-        Paid: sale?.changeAmt,
+        Paid: sale?.amountPaid,
         Due: sale?.balance,
         Biller: sale?.salesPerson,
         salestype: sale?.salesType
@@ -507,13 +508,24 @@ const CreditPayment = () => {
           <Link
               to="#"
               // className="dropdown-item confirm-text"
+              onClick={() => alert('Do you want to view Payment History?')}
+              title={'Payment History'}
+            >
+
+              <span className="badges btn-info me-2"><FeatherIcon icon="file-text" /> History</span>
+              {/* Remove  */}
+          </Link>
+          <Link
+              to="#"
+              // className="dropdown-item confirm-text"
               onClick={() => confirmText(record.id)}
               title={'Delete Transaction'}
             >
 
-              <span className="badges bg-lightred"><FeatherIcon icon="trash" /> Remove</span>
+              <span className="badges bg-lightred"><FeatherIcon icon="trash" /> Withdraw</span>
               {/* Remove  */}
           </Link>
+         
 
 
         </>
@@ -555,6 +567,7 @@ const CreditPayment = () => {
           <div className="card">
             <div className="card-body">
               <Tabletop inputfilter={inputfilter} togglefilter={togglefilter} />
+            
               {/* /Filter */}
               <div
                 className={`card mb-0 ${inputfilter ? "toggleCls" : ""}`}
@@ -577,13 +590,21 @@ const CreditPayment = () => {
                         />
                       </div>
                     </div>
-                    {/* <div className="col-lg-3 col-sm-6 col-12">
+                    <div className="col-lg-3 col-sm-6 col-12">
                       <div className="form-group">
-                        <Link className="btn btn-filters ms-auto">
-                          <img src={search_whites} alt="img" />
-                        </Link>
+                      <span style={{fontWeight:900}}>Total Amount: {moneyInTxt(data.reduce((total, item) =>  Number(total) + Number(item?.Total), 0))}</span>
                       </div>
-                    </div> */}
+                    </div>
+                    <div className="col-lg-3 col-sm-6 col-12">
+                      <div className="form-group">
+                      <span style={{fontWeight:900}}>Total Paid: {moneyInTxt(data.reduce((total, item) =>  Number(total) + Number(item?.Paid), 0))}</span>
+                      </div>
+                    </div>
+                    <div className="col-lg-3 col-sm-6 col-12">
+                      <div className="form-group">
+                      <span style={{fontWeight:900}}>Remaining Amount: {moneyInTxt(data.reduce((total, item) =>  Number(total) + Number(item?.Due), 0))}</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
