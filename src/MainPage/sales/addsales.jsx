@@ -287,17 +287,47 @@ const Addsales = () => {
             }
 
             const totalProductAmount = productGridData.reduce((total, item) => total + item.amount, 0)
+            // let payload = {
+            //   status: type,
+            //   salesRef: res.data.reference,
+            //   amount: (Number(paymentInfo.cashAmount) + Number(paymentInfo.momoAmount) + Number(paymentInfo.chequeAmount)),
+            //   // amount: productGridData.reduce((total, item) => total + item.amount, 0),
+            //   paymentType: pType,
+            //   paymentInfo: [
+            //     // { "type": "Cash", waybill: paymentInfo.cashWaybill, amountPaid: paymentInfo.cashAmount },
+            //     { "type": "Cash", waybill: paymentInfo.cashWaybill, amountPaid: (totalProductAmount - (paymentInfo.momoAmount + paymentInfo.chequeAmount)) },
+            //     { "type": "Momo", name: paymentInfo.momoName, receiptNo: paymentInfo.momoReceiptNo, amountPaid: paymentInfo.momoAmount },
+            //     { "type": "Cheque", waybill: paymentInfo.chequeWaybill, chequeNo: paymentInfo.chequeNo, chequeReceiptNo: paymentInfo.chequeReceiptNo, amountPaid: paymentInfo.chequeAmount, waybill: paymentInfo.chequeWaybill }
+            //   ]
+            // }
+
             let payload = {
-              status: type,
-              salesRef: res.data.reference,
-              amount: (Number(paymentInfo.cashAmount) + Number(paymentInfo.momoAmount) + Number(paymentInfo.chequeAmount)),
-              // amount: productGridData.reduce((total, item) => total + item.amount, 0),
-              paymentType: pType,
-              paymentInfo: [
-                // { "type": "Cash", waybill: paymentInfo.cashWaybill, amountPaid: paymentInfo.cashAmount },
-                { "type": "Cash", waybill: paymentInfo.cashWaybill, amountPaid: (totalProductAmount - (paymentInfo.momoAmount + paymentInfo.chequeAmount)) },
-                { "type": "Momo", name: paymentInfo.momoName, receiptNo: paymentInfo.momoReceiptNo, amountPaid: paymentInfo.momoAmount },
-                { "type": "Cheque", waybill: paymentInfo.chequeWaybill, chequeNo: paymentInfo.chequeNo, chequeReceiptNo: paymentInfo.chequeReceiptNo, amountPaid: paymentInfo.chequeAmount, waybill: paymentInfo.chequeWaybill }
+              "status": type,
+              "salesRef": res.data.reference,
+              "amount": (Number(paymentInfo.cashAmount) + Number(paymentInfo.momoAmount) + Number(paymentInfo.chequeAmount)),
+              "paymentType": pType,
+              "cashAmount":Number(paymentInfo.cashAmount),
+              "momoAmount":Number(paymentInfo.momoAmount),
+              "chequeAmount":Number(paymentInfo.chequeAmount),
+              "paymentInfo": [
+                  {
+                      "type": "Cash",
+                      "waybill": paymentInfo.cashWaybill,
+                      "amountPaid": paymentInfo.cashAmount
+                  },
+                  {
+                      "type": "Momo",
+                      "name": paymentInfo.momoName,
+                      "receiptNo": paymentInfo.momoReceiptNo,
+                      "amountPaid": paymentInfo.momoAmount
+                  },
+                  {
+                      "type": "Cheque",
+                      "waybill": paymentInfo.chequeWaybill,
+                      "chequeNo": paymentInfo.chequeNo,
+                      "chequeReceiptNo": paymentInfo.chequeReceiptNo,
+                      "amountPaid": paymentInfo.chequeAmount
+                  }
               ]
             }
 

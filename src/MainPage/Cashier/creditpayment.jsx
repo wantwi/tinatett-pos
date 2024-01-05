@@ -21,6 +21,7 @@ import FeatherIcon from 'feather-icons-react'
 import { socket } from "../../InitialPage/Sidebar/Header";
 import useAuth from "../../hooks/useAuth";
 import { NotificationsContext } from "../../InitialPage/Sidebar/DefaultLayout";
+import { Purchase } from "../../EntryFile/imagePath";
 
 const CreditPayment = () => {
   const init = {
@@ -70,7 +71,7 @@ const CreditPayment = () => {
         Reference: sale?.salesRef,
         Payment: sale?.paymentType,
         Total: moneyInTxt(sale?.totalAmount),
-        Paid: sale?.changeAmt,
+        Paid: sale?.amountPaid,
         Due: sale?.balance,
         Biller: sale?.salesPerson,
         salestype: sale?.salesType
@@ -92,6 +93,8 @@ const CreditPayment = () => {
 
   } = useGet("suspend", "/sales/credit", onSuccess);
   const [data, setData] = useState([])
+  const [isUpdate, setIsUpdate] = useState(false)
+  const [comment, setComment] = useState('')
 
 
   const togglefilter = (value) => {
@@ -173,35 +176,58 @@ const CreditPayment = () => {
       if (paymentInfo.chequeAmount > 0) {
         pType = pType.concat('Cheque,')
       }
-      let payload = {
-        transDate: new Date().toISOString(),
-        salesRef: modalData.Reference,
-        amount: (Number(paymentInfo.cashAmount) + Number(paymentInfo.momoAmount) + Number(paymentInfo.chequeAmount)),
-        paymentInfo: [
-          { "type": "Cash", waybill: paymentInfo.cashWaybill, amountPaid: paymentInfo.cashAmount },
-          { "type": "Momo", name: paymentInfo.momoName, receiptNo: paymentInfo.momoReceiptNo, amountPaid: paymentInfo.momoAmount },
-          { "type": "Cheque", waybill: paymentInfo.chequeWaybill, chequeNo: paymentInfo.chequeNo, chequeReceiptNo: paymentInfo.chequeReceiptNo, amountPaid: paymentInfo.chequeAmount, waybill: paymentInfo.chequeWaybill }
-        ]
-      }
-
-
-      // if ((type == 'Paid') && payload.amount < modalData?.Total) {
-      //   alertify.set("notifier", "position", "bottom-right");
-      //   alertify.warning("Please provide full payment amount before saving.");
-
-      //   let newNotification = {
-      //     id: Math.ceil(Math.random() * 1000000),
-      //     message: `${storage.name} Please provide full payment amount before saving.`,
-      //     time: new Date().toISOString(), type: 'warning'
-      //   }
-      //   setNotifications([newNotification, ...notifications])
+      // let payload = {
+      //   transDate: new Date().toISOString(),
+      //   salesRef: modalData.Reference,
+      //   amount: (Number(paymentInfo.cashAmount) + Number(paymentInfo.momoAmount) + Number(paymentInfo.chequeAmount)),
+      //   paymentInfo: [
+      //     { "type": "Cash", waybill: paymentInfo.cashWaybill, amountPaid: paymentInfo.cashAmount },
+      //     { "type": "Momo", name: paymentInfo.momoName, receiptNo: paymentInfo.momoReceiptNo, amountPaid: paymentInfo.momoAmount },
+      //     { "type": "Cheque", waybill: paymentInfo.chequeWaybill, chequeNo: paymentInfo.chequeNo, chequeReceiptNo: paymentInfo.chequeReceiptNo, amountPaid: paymentInfo.chequeAmount, waybill: paymentInfo.chequeWaybill }
+      //   ]
       // }
 
 
-     // else {
+      let payload = {
+        "salesRef": modalData.Reference,
+        "amount":(Number(paymentInfo.cashAmount) + Number(paymentInfo.momoAmount) + Number(paymentInfo.chequeAmount)),
+        "transDate":  new Date().toISOString(),
+        "cashAmount":Number(paymentInfo.cashAmount),
+        "momoAmount":Number(paymentInfo.momoAmount),
+        "chequeAmount":Number(paymentInfo.chequeAmount),
+        "paymentInfo": [
+          {
+              "type": "Cash",
+              "waybill": paymentInfo.cashWaybill,
+              "amountPaid": paymentInfo.cashAmount
+          },
+          {
+              "type": "Momo",
+              "name": paymentInfo.momoName,
+              "receiptNo": paymentInfo.momoReceiptNo,
+              "amountPaid": paymentInfo.momoAmount
+          },
+          {
+              "type": "Cheque",
+              "waybill": paymentInfo.chequeWaybill,
+              "chequeNo": paymentInfo.chequeNo,
+              "chequeReceiptNo": paymentInfo.chequeReceiptNo,
+              "amountPaid": paymentInfo.chequeAmount
+          }
+         ],
+         commnet: comment
+    }
+
+        let apiUrl = ''
+        if(isUpdate){
+          apiUrl = `/sales/credit/payment/${modalData.id}`
+        }
+        else{
+          apiUrl = `/sales/credit/payment`
+        }
         setIsSaving(true)
         // console.log(payload)
-        axios.put('/sales/credit/payment', payload)
+        axios.put(apiUrl, payload)
           .then((res) => {
 
             console.log(res.data.success)
@@ -324,7 +350,7 @@ const CreditPayment = () => {
           Reference: sale?.salesRef,
           Payment: sale?.paymentType,
           Total: moneyInTxt(sale?.totalAmount),
-          Paid: sale?.changeAmt,
+          Paid: sale?.amountPaid,
           Due: sale?.balance,
           Biller: sale?.salesPerson,
           salestype: sale?.salesType
@@ -351,7 +377,7 @@ const CreditPayment = () => {
           Reference: sale?.salesRef,
           Payment: sale?.paymentType,
           Total: moneyInTxt(sale?.totalAmount),
-          Paid: sale?.changeAmt,
+          Paid: sale?.amountPaid,
           Due: sale?.balance,
           Biller: sale?.salesPerson,
           salestype: sale?.salesType
@@ -384,7 +410,7 @@ const CreditPayment = () => {
           Payment: sale?.paymentType,
           Total: moneyInTxt(sale?.totalAmount),
           Paid: sale?.changeAmt,
-          Due: sale?.balance,
+          Due: moneyInTxt(sale?.balance),
           Biller: sale?.salesPerson,
           salestype: sale?.salesType
         }
@@ -437,11 +463,21 @@ const CreditPayment = () => {
       dataIndex: "Reference",
       sorter: (a, b) => a.Reference.length - b.Reference.length,
     },
+    {
+      title: "Total Amt (GHS)",
+      dataIndex: "Total",
+      sorter: (a, b) => a.Total.length - b.Total.length,
+    },
+    {
+      title: "Amt Paid (GHS)",
+      dataIndex: "Paid",
+      sorter: (a, b) => a.Paid.length - b.Paid.length,
+    },
 
     {
       title: "Amt Due (GHS)",
-      dataIndex: "Total",
-      sorter: (a, b) => a.Total.length - b.Total.length,
+      dataIndex: "Due",
+      sorter: (a, b) => a.Due.length - b.Due.length,
     },
     {
       title: "Sales Type",
@@ -469,16 +505,49 @@ const CreditPayment = () => {
             title={'Pay'}>
              <span className="badges bg-lightgreen me-2"><FeatherIcon icon="credit-card" /> Pay</span>
           </Link>
+         
+          <Link
+              to="#"  data-bs-toggle="modal"
+              data-bs-target="#showpayment"
+              onClick={() => { setModalData(record), setIsUpdate(true) }}
+             
+              title={'Edit Payment'}
+            >
+
+              <span className="badges btn-cancel me-2"><FeatherIcon icon="edit" /> Edit</span>
+             
+          </Link>
           <Link
               to="#"
               // className="dropdown-item confirm-text"
               onClick={() => confirmText(record.id)}
-              title={'Delete Transaction'}
+              title={'Reverse Payment'}
             >
 
-              <span className="badges bg-lightred"><FeatherIcon icon="trash" /> Remove</span>
+              <span className="badges btn-primary me-2"><FeatherIcon icon="repeat" /> Reverse</span>
+             
+          </Link>
+          <Link
+              to="#"
+              // className="dropdown-item confirm-text"
+              onClick={() => alert('Do you want to view Payment History?')}
+              title={'Payment History'}
+            >
+
+              <span className="badges btn-info me-2"><FeatherIcon icon="file-text" /> History</span>
+              {/* History  */}
+          </Link>
+          <Link
+              to="#"
+              // className="dropdown-item confirm-text"
+              onClick={() => confirmText(record.id)}
+              title={'Delete Payment'}
+            >
+
+              <span className="badges bg-lightred"><FeatherIcon icon="trash" /> Withdraw</span>
               {/* Remove  */}
           </Link>
+         
 
 
         </>
@@ -520,6 +589,7 @@ const CreditPayment = () => {
           <div className="card">
             <div className="card-body">
               <Tabletop inputfilter={inputfilter} togglefilter={togglefilter} />
+            
               {/* /Filter */}
               <div
                 className={`card mb-0 ${inputfilter ? "toggleCls" : ""}`}
@@ -542,13 +612,21 @@ const CreditPayment = () => {
                         />
                       </div>
                     </div>
-                    {/* <div className="col-lg-3 col-sm-6 col-12">
+                    <div className="col-lg-3 col-sm-6 col-12">
                       <div className="form-group">
-                        <Link className="btn btn-filters ms-auto">
-                          <img src={search_whites} alt="img" />
-                        </Link>
+                      <span style={{fontWeight:900}}>Total Amount: {moneyInTxt(data.reduce((total, item) =>  Number(total) + Number(item?.Total), 0))}</span>
                       </div>
-                    </div> */}
+                    </div>
+                    <div className="col-lg-3 col-sm-6 col-12">
+                      <div className="form-group">
+                      <span style={{fontWeight:900}}>Total Paid: {moneyInTxt(data.reduce((total, item) =>  Number(total) + Number(item?.Paid), 0))}</span>
+                      </div>
+                    </div>
+                    <div className="col-lg-3 col-sm-6 col-12">
+                      <div className="form-group">
+                      <span style={{fontWeight:900}}>Remaining Amount: {moneyInTxt(data.reduce((total, item) =>  Number(total) + Number(item?.Due), 0))}</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -579,7 +657,7 @@ const CreditPayment = () => {
                   className="close"
                   data-bs-dismiss="modal"
                   aria-label="Close"
-                  onClick={() => { setIsCredit(false), setPaymentInfo(init) }}
+                  onClick={() => { setIsCredit(false), setPaymentInfo(init), setIsUpdate(false) }}
                 >
                   <span aria-hidden="true">×</span>
                 </button>
@@ -852,6 +930,18 @@ const CreditPayment = () => {
                       </div>
 
                       <div className="row">
+                      <div className="col-lg-12 ">
+                          <div className="total-order w-100 max-widthauto m-auto mb-4">
+                            <ul>
+                              <li>
+                                 <label>Comment</label>
+                              </li>
+                              <li>
+                                <input className="form-control" type="text" placeholder="Type comment here.." value={comment} onChange={(e) => setComment(e.target.value)}/>
+                             </li>
+                            </ul>
+                          </div>
+                        </div>
                         <div className="col-lg-6 ">
                           <div className="total-order w-100 max-widthauto m-auto mb-4">
                             <ul>
@@ -900,9 +990,9 @@ const CreditPayment = () => {
                     {!isCredit && (<button className="btn btn-info me-2" data-bs-toggle="modal" data-bs-target="#confirmPaymentSellPrint" style={{ width: '20%' }}>
                       Sell and Print
                     </button>)}
-                    {/* {!isCredit && (<button className="btn btn-warning me-2" onClick={() => processPayment("Paid", false)} style={{ width: '20%' }}>
-                      Sell Only
-                    </button>)} */}
+                    {isUpdate && (<button className="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#confirmPaymentUpdate" style={{ width: '20%' }}>
+                     Update Payment
+                    </button>)}
                     {/* <button className="btn btn-danger me-2" style={{ width: '20%' }} data-bs-toggle="modal" data-bs-target="#confirmPaymentCreditPrint" >
                       Credit and Print
                     </button> */}
@@ -1087,9 +1177,9 @@ const CreditPayment = () => {
 
         <div
           className="modal fade"
-          id="confirmPaymentCreditPrint"
+          id="confirmPaymentUpdate"
           tabIndex={-1}
-          aria-labelledby="confirmPaymentCreditPrint"
+          aria-labelledby="confirmPaymentUpdate"
           aria-hidden="true">
 
           <div className="modal-dialog modal-md modal-dialog-centered" role="document">
@@ -1106,7 +1196,7 @@ const CreditPayment = () => {
                 </button>
               </div>
               <div className="modal-body">
-                Are you sure you want to save this payment Transaction?
+                Are you sure you want to Update this payment Transaction?
               </div>
               <div className="modal-footer">
                 <Link to="#" className="btn btn-submit me-2" data-bs-dismiss="modal" onClick={() => processPayment("Credit", true)}>
