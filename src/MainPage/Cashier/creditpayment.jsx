@@ -93,6 +93,8 @@ const CreditPayment = () => {
 
   } = useGet("suspend", "/sales/credit", onSuccess);
   const [data, setData] = useState([])
+  const [isUpdate, setIsUpdate] = useState(false)
+  const [comment, setComment] = useState('')
 
 
   const togglefilter = (value) => {
@@ -212,27 +214,20 @@ const CreditPayment = () => {
               "chequeReceiptNo": paymentInfo.chequeReceiptNo,
               "amountPaid": paymentInfo.chequeAmount
           }
-      ]
+         ],
+         commnet: comment
     }
 
-
-      // if ((type == 'Paid') && payload.amount < modalData?.Total) {
-      //   alertify.set("notifier", "position", "bottom-right");
-      //   alertify.warning("Please provide full payment amount before saving.");
-
-      //   let newNotification = {
-      //     id: Math.ceil(Math.random() * 1000000),
-      //     message: `${storage.name} Please provide full payment amount before saving.`,
-      //     time: new Date().toISOString(), type: 'warning'
-      //   }
-      //   setNotifications([newNotification, ...notifications])
-      // }
-
-
-     // else {
+        let apiUrl = ''
+        if(isUpdate){
+          apiUrl = `/sales/credit/payment/${modalData.id}`
+        }
+        else{
+          apiUrl = `/sales/credit/payment`
+        }
         setIsSaving(true)
         // console.log(payload)
-        axios.put('/sales/credit/payment', payload)
+        axios.put(apiUrl, payload)
           .then((res) => {
 
             console.log(res.data.success)
@@ -355,7 +350,7 @@ const CreditPayment = () => {
           Reference: sale?.salesRef,
           Payment: sale?.paymentType,
           Total: moneyInTxt(sale?.totalAmount),
-          Paid: sale?.changeAmt,
+          Paid: sale?.amountPaid,
           Due: sale?.balance,
           Biller: sale?.salesPerson,
           salestype: sale?.salesType
@@ -382,7 +377,7 @@ const CreditPayment = () => {
           Reference: sale?.salesRef,
           Payment: sale?.paymentType,
           Total: moneyInTxt(sale?.totalAmount),
-          Paid: sale?.changeAmt,
+          Paid: sale?.amountPaid,
           Due: sale?.balance,
           Biller: sale?.salesPerson,
           salestype: sale?.salesType
@@ -473,6 +468,11 @@ const CreditPayment = () => {
       dataIndex: "Total",
       sorter: (a, b) => a.Total.length - b.Total.length,
     },
+    {
+      title: "Amt Paid (GHS)",
+      dataIndex: "Paid",
+      sorter: (a, b) => a.Paid.length - b.Paid.length,
+    },
 
     {
       title: "Amt Due (GHS)",
@@ -505,6 +505,28 @@ const CreditPayment = () => {
             title={'Pay'}>
              <span className="badges bg-lightgreen me-2"><FeatherIcon icon="credit-card" /> Pay</span>
           </Link>
+         
+          <Link
+              to="#"  data-bs-toggle="modal"
+              data-bs-target="#showpayment"
+              onClick={() => { setModalData(record), setIsUpdate(true) }}
+             
+              title={'Edit Payment'}
+            >
+
+              <span className="badges btn-cancel me-2"><FeatherIcon icon="edit" /> Edit</span>
+             
+          </Link>
+          <Link
+              to="#"
+              // className="dropdown-item confirm-text"
+              onClick={() => confirmText(record.id)}
+              title={'Reverse Payment'}
+            >
+
+              <span className="badges btn-primary me-2"><FeatherIcon icon="repeat" /> Reverse</span>
+             
+          </Link>
           <Link
               to="#"
               // className="dropdown-item confirm-text"
@@ -513,13 +535,13 @@ const CreditPayment = () => {
             >
 
               <span className="badges btn-info me-2"><FeatherIcon icon="file-text" /> History</span>
-              {/* Remove  */}
+              {/* History  */}
           </Link>
           <Link
               to="#"
               // className="dropdown-item confirm-text"
               onClick={() => confirmText(record.id)}
-              title={'Delete Transaction'}
+              title={'Delete Payment'}
             >
 
               <span className="badges bg-lightred"><FeatherIcon icon="trash" /> Withdraw</span>
@@ -635,7 +657,7 @@ const CreditPayment = () => {
                   className="close"
                   data-bs-dismiss="modal"
                   aria-label="Close"
-                  onClick={() => { setIsCredit(false), setPaymentInfo(init) }}
+                  onClick={() => { setIsCredit(false), setPaymentInfo(init), setIsUpdate(false) }}
                 >
                   <span aria-hidden="true">×</span>
                 </button>
@@ -908,6 +930,18 @@ const CreditPayment = () => {
                       </div>
 
                       <div className="row">
+                      <div className="col-lg-12 ">
+                          <div className="total-order w-100 max-widthauto m-auto mb-4">
+                            <ul>
+                              <li>
+                                 <label>Comment</label>
+                              </li>
+                              <li>
+                                <input className="form-control" type="text" placeholder="Type comment here.." value={comment} onChange={(e) => setComment(e.target.value)}/>
+                             </li>
+                            </ul>
+                          </div>
+                        </div>
                         <div className="col-lg-6 ">
                           <div className="total-order w-100 max-widthauto m-auto mb-4">
                             <ul>
@@ -956,9 +990,9 @@ const CreditPayment = () => {
                     {!isCredit && (<button className="btn btn-info me-2" data-bs-toggle="modal" data-bs-target="#confirmPaymentSellPrint" style={{ width: '20%' }}>
                       Sell and Print
                     </button>)}
-                    {/* {!isCredit && (<button className="btn btn-warning me-2" onClick={() => processPayment("Paid", false)} style={{ width: '20%' }}>
-                      Sell Only
-                    </button>)} */}
+                    {isUpdate && (<button className="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#confirmPaymentUpdate" style={{ width: '20%' }}>
+                     Update Payment
+                    </button>)}
                     {/* <button className="btn btn-danger me-2" style={{ width: '20%' }} data-bs-toggle="modal" data-bs-target="#confirmPaymentCreditPrint" >
                       Credit and Print
                     </button> */}
@@ -1143,9 +1177,9 @@ const CreditPayment = () => {
 
         <div
           className="modal fade"
-          id="confirmPaymentCreditPrint"
+          id="confirmPaymentUpdate"
           tabIndex={-1}
-          aria-labelledby="confirmPaymentCreditPrint"
+          aria-labelledby="confirmPaymentUpdate"
           aria-hidden="true">
 
           <div className="modal-dialog modal-md modal-dialog-centered" role="document">
@@ -1162,7 +1196,7 @@ const CreditPayment = () => {
                 </button>
               </div>
               <div className="modal-body">
-                Are you sure you want to save this payment Transaction?
+                Are you sure you want to Update this payment Transaction?
               </div>
               <div className="modal-footer">
                 <Link to="#" className="btn btn-submit me-2" data-bs-dismiss="modal" onClick={() => processPayment("Credit", true)}>
