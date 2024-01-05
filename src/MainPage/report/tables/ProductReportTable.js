@@ -282,7 +282,6 @@ function ProductReportTable({ disableBatchNo, isQuantityChecked, isAllChecked, i
     const pdfHeaderQueryCellInfo = (args) => {
         args.cell.row.pdfGrid.repeatHeader = true;
     };
-
     const beforePdfExport = function (args) {
         console.log({ beforePdfExport: args })
         args.headerPageNumbers = [1];

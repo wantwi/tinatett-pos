@@ -427,7 +427,7 @@ const ProductMovement = () => {
                   <label>To</label>
                   <div className="input-groupicon">
                     <input
-                      disabled
+
                       type="date" className={`form-control `}
                       id="amount"
                       placeholder=""
