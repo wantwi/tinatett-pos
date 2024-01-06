@@ -11,7 +11,7 @@ import {
 } from "../EntryFile/imagePath";
 import { jsPDF } from 'jspdf'
 
-const Tabletop = ({ inputfilter, togglefilter, data, title, handleSearch }) => {
+const Tabletop = ({ inputfilter, togglefilter, data, title, handleSearch, showSearch=true }) => {
 
 
   const createPDF = (id) => {
@@ -246,7 +246,7 @@ const Tabletop = ({ inputfilter, togglefilter, data, title, handleSearch }) => {
 
   return (
     <div className="table-top">
-      <div className="search-set">
+      {showSearch && (<div className="search-set">
         <div className="search-path">
           <a
             className={` btn ${inputfilter ? "btn-filter setclose" : "btn-filter"
@@ -262,6 +262,7 @@ const Tabletop = ({ inputfilter, togglefilter, data, title, handleSearch }) => {
         </div>
         <div className="search-input">
           <input
+            style={{width:300}}
             className="form-control form-control-sm search-icon"
             type="text"
             placeholder="Search..."
@@ -271,7 +272,7 @@ const Tabletop = ({ inputfilter, togglefilter, data, title, handleSearch }) => {
             <img src={Search} alt="img" />
           </Link>
         </div>
-      </div>
+      </div>)}
       <div className="wordset">
         <ul>
           <ReactTooltip place="top" type="dark" effect="solid" />

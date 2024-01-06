@@ -620,26 +620,13 @@ const Sidebar = (props) => {
               </li>) : null}
 
 
-              {/* Cashier Window */}
-
-
-              {/* {userType == 'admin' || userType == 'supervisor' || userType == 'cashier' ? (<li className={pathname.includes("/tinatett-pos/cashier/suspended") ? "active" : ""}>
-                <Link
-                  to="/tinatett-pos/cashier/suspended"
-                  onClick={() => toggleSidebar(isSideMenu == "cashier" ? "" : "")}
-                >
-                  <img src={debitcard} alt="img" />
-                  <span>Cashier </span>
-                </Link>
-              </li>) : null} */}
-
 
               {/* Cashier */}
               {userType == 'admin' || userType == 'supervisor' || userType == 'cashier' ? (<li className="submenu">
                 <a
                   href="#"
                   className={
-                    pathname.includes("/tinatett-pos/cashier/")
+                    (pathname.includes("/sales-payment"))
                       ? "subdrop active"
                       : "" || isSideMenu == "cashier"
                         ? "subdrop active"
@@ -665,22 +652,73 @@ const Sidebar = (props) => {
                         Sales Payment
                       </Link>
                     </li>
-                    <li>
-                      <Link
-                        className={
-                          pathname.includes("/cashier/credit-payment") ? "active" : ""
-                        }
-                        to="/tinatett-pos/cashier/credit-payment"
-                      >
-                        Credit Payment
-                      </Link>
-                    </li>
+  
 
                   </ul>
                 ) : (
                   ""
                 )}
               </li>) : null}
+              
+
+            {/* Credit Payment */}
+              {userType == 'admin' || userType == 'supervisor'  || userType == 'cashier' ? (<li className="submenu">
+                <a
+                  href="#"
+                  className={
+                    (pathname.includes("/credit-list") ||  pathname.includes("/credit-payment"))
+                      ? "subdrop active"
+                      : "" || isSideMenu == "credit"
+                        ? "subdrop active"
+                        : ""
+                  }
+                  onClick={() =>
+                    toggleSidebar(isSideMenu == "credit" ? "" : "credit")
+                  }
+                >
+                  {" "}
+                  <img src={debitcard} alt="img" /> <span>Credit</span>{" "}
+                  <span className="menu-arrow"></span>
+                </a>
+                {isSideMenu == "credit" ? (
+                  <ul>
+                    <li>
+                    <Link
+                        className={
+                          pathname.includes("/cashier/credit-list") ? "active" : ""
+                        }
+                        to="/tinatett-pos/cashier/credit-list"
+                      >
+                        Credit List
+                      </Link>
+                    </li>
+                    <li>
+                    <Link
+                        to="/tinatett-pos/cashier/credit-payment"
+                        onClick={() => toggleSidebar(isSideMenu == "" ? "" : "")}
+                      >
+                        <span>Credit Payment </span>
+                      </Link>
+                    </li>
+
+                    {/* <li>
+                        <Link
+                          className={
+                            pathname.includes("importtransfer-") ? "active" : ""
+                          }
+                          to="/tinatett-pos/transfer/importtransfer-transfer"
+                        >
+                          Import Transfer
+                        </Link>
+                      </li> */}
+                  </ul>
+                ) : (
+                  ""
+                )}
+              </li>) : null}
+
+
+
 
               {/* Transfer */}
               {userType == 'admin' || userType == 'supervisor' ? (<li className="submenu">
