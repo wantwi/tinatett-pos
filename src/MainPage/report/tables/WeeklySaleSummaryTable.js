@@ -142,18 +142,23 @@ function WeeklySaleSummaryTable({ data = [], startDate, endDate, title = "", fil
     const pdfHeaderQueryCellInfo = (args) => {
         args.cell.row.pdfGrid.repeatHeader = true;
     };
+    const sumTemp = ({ Expenses, total }) => {
+        const sum = total - Expenses
+        return sum > 0 ? sum : `(${Math.abs(sum)})`
+    }
     return (<div className='control-pane'>
         <div className='control-section'>
             <div>
                 <GridComponent id="Grid" height={500} dataSource={data?.map(x => ({ ...x, total: +x?.Cash + +x?.Momo + +x?.Cheque + +x?.Credit }))} ref={grid => gridInstance = grid} pdfHeaderQueryCellInfo={pdfHeaderQueryCellInfo} toolbar={toolbarOptions} allowExcelExport={true} allowPdfExport={true} toolbarClick={toolbarClick.bind(this)} allowPaging={true} pageSettings={{ pageCount: 2, pageSize: 100 }}>
                     <ColumnsDirective>
-                        <ColumnDirective field='transDate' headerText='Date' width={"6%"}></ColumnDirective>
-                        <ColumnDirective field='Cash' headerText='Cash' textAlign='Right' format='N2' width={"6%"}></ColumnDirective>
-                        <ColumnDirective field='Momo' headerText='Momo' textAlign='Right' format='N2' width={"6%"}></ColumnDirective>
-                        <ColumnDirective field='Cheque' headerText='Cheque' textAlign='Right' format='N2' width={"6%"}></ColumnDirective>
-                        <ColumnDirective field='Credit' headerText='Credit' textAlign='Right' format='N2' width={"6%"}></ColumnDirective>
-                        <ColumnDirective field='Total' headerText='Total' textAlign='Right' format='N2' width={"6%"}></ColumnDirective>
-                        <ColumnDirective field='Total' headerText='Total-Credit' textAlign='Right' format='N2' width={"6%"}></ColumnDirective>
+                        <ColumnDirective field='transDate' headerText='Date' width={"5%"} ></ColumnDirective>
+                        <ColumnDirective field='Cash' headerText='Cash' textAlign='Right' format='N2' width={"5%"} ></ColumnDirective>
+                        <ColumnDirective field='Momo' headerText='Momo' textAlign='Right' format='N2' width={"5%"} ></ColumnDirective>
+                        <ColumnDirective field='Cheque' headerText='Cheque' textAlign='Right' format='N2' width={"5%"} ></ColumnDirective>
+                        <ColumnDirective field='Credit' headerText='Credit' textAlign='Right' format='N2' width={"5%"} ></ColumnDirective>
+                        <ColumnDirective field='total' headerText='Total' textAlign='Right' format='N2' width={"5%"} ></ColumnDirective>
+                        <ColumnDirective field='Expenses' headerText='Expense' textAlign='Right' format='N2' width={"5%"} ></ColumnDirective>
+                        <ColumnDirective field='total' headerText='Total-Credit' textAlign='Right' format='N2' width={"7%"} template={sumTemp} ></ColumnDirective>
                     </ColumnsDirective>
                     <AggregatesDirective>
                         <AggregateDirective>
@@ -162,6 +167,9 @@ function WeeklySaleSummaryTable({ data = [], startDate, endDate, title = "", fil
                                 <AggregateColumnDirective field='Momo' type='Sum' format='N2' footerTemplate={footerSum} />
                                 <AggregateColumnDirective field='Cheque' type='Sum' format='N2' footerTemplate={footerSum} />
                                 <AggregateColumnDirective field='Credit' type='Sum' format='N2' footerTemplate={footerSum} />
+                                <AggregateColumnDirective field='Total' type='Sum' format='N2' footerTemplate={footerSum} />
+                                <AggregateColumnDirective field='Expenses' type='Sum' format='N2' footerTemplate={footerSum} />
+
                                 <AggregateColumnDirective field='Total' type='Sum' format='N2' footerTemplate={footerSum} />
 
                             </AggregateColumnsDirective>
