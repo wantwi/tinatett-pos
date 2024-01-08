@@ -71,11 +71,11 @@ const CreditPayment = () => {
         Status: sale?.summary.transactionStatus,
         Reference: sale?.summary.reference,
         Payment: sale?.paymentType,
-        Total: moneyInTxt(sale?.summary.amount),
-        Paid: moneyInTxt(sale?.summary.totalAmountPaid),
-        Due: moneyInTxt(sale?.summary.remainingBalance),
+        Total: (sale?.summary.amount),
+        Paid: (sale?.summary.totalAmountPaid),
+        Due: (sale?.summary.remainingBalance),
         Biller: sale?.summary.salesPerson,
-        salestype: sale?.salesType,
+        salestype: sale?.summary.salesType,
         paymentHistory: sale?.paymentHistory
       }
     })
@@ -352,11 +352,11 @@ const CreditPayment = () => {
           Status: sale?.summary.transactionStatus,
           Reference: sale?.summary.reference,
           Payment: sale?.paymentType,
-          Total: moneyInTxt(sale?.summary.amount),
-          Paid: moneyInTxt(sale?.summary.totalAmountPaid),
-          Due: moneyInTxt(sale?.summary.remainingBalance),
+          Total: (sale?.summary.amount),
+          Paid: (sale?.summary.totalAmountPaid),
+          Due: (sale?.summary.remainingBalance),
           Biller: sale?.summary.salesPerson,
-          salestype: sale?.salesType,
+          salestype: sale?.summary.salesType,
           paymentHistory: sale?.paymentHistory
         }
       })
@@ -374,16 +374,17 @@ const CreditPayment = () => {
       let mappedData = data?.response.map((sale) => {
         return {
           id: sale?.id,
-          Date: sale?.transDate,
-          Name: sale?.CustomerName || 'N/A',
-          Status: sale?.status,
-          Reference: sale?.salesRef,
+          Date: sale?.summary.transDate,
+          Name: sale?.summary.customerName || 'N/A',
+          Status: sale?.summary.transactionStatus,
+          Reference: sale?.summary.reference,
           Payment: sale?.paymentType,
-          Total: moneyInTxt(sale?.totalAmount),
-          Paid: sale?.amountPaid,
-          Due: sale?.balance,
-          Biller: sale?.salesPerson,
-          salestype: sale?.salesType
+          Total: (sale?.summary.amount),
+          Paid: (sale?.summary.totalAmountPaid),
+          Due: (sale?.summary.remainingBalance),
+          Biller: sale?.summary.salesPerson,
+          salestype: sale?.summary.salesType,
+          paymentHistory: sale?.paymentHistory
         }
       })
 
@@ -406,16 +407,17 @@ const CreditPayment = () => {
       let mappedData = sales?.data.map((sale) => {
         return {
           id: sale?.id,
-          Date: sale?.transDate,
-          Name: sale?.CustomerName || 'N/A',
-          Status: sale?.status,
-          Reference: sale?.salesRef,
+          Date: sale?.summary.transDate,
+          Name: sale?.summary.customerName || 'N/A',
+          Status: sale?.summary.transactionStatus,
+          Reference: sale?.summary.reference,
           Payment: sale?.paymentType,
-          Total: moneyInTxt(sale?.totalAmount),
-          Paid: sale?.changeAmt,
-          Due: moneyInTxt(sale?.balance),
-          Biller: sale?.salesPerson,
-          salestype: sale?.salesType
+          Total: (sale?.summary.amount),
+          Paid: (sale?.summary.totalAmountPaid),
+          Due: (sale?.summary.remainingBalance),
+          Biller: sale?.summary.salesPerson,
+          salestype: sale?.summary.salesType,
+          paymentHistory: sale?.paymentHistory
         }
       })
       if (filter == 'All') {
@@ -455,17 +457,17 @@ const CreditPayment = () => {
     let mapped = res?.data.data.map((sale) => {
       return {
         id: sale?.id,
-        Date: sale?.summary.transDate,
-        Name: sale?.summary.customerName || 'N/A',
-        Status: sale?.summary.transactionStatus,
-        Reference: sale?.summary.reference,
-        Payment: sale?.paymentType,
-        Total: moneyInTxt(sale?.summary.amount),
-        Paid: moneyInTxt(sale?.summary.totalAmountPaid),
-        Due: moneyInTxt(sale?.summary.remainingBalance),
-        Biller: sale?.summary.salesPerson,
-        salestype: sale?.salesType,
-        paymentHistory: sale?.paymentHistory
+          Date: sale?.summary.transDate,
+          Name: sale?.summary.customerName || 'N/A',
+          Status: sale?.summary.transactionStatus,
+          Reference: sale?.summary.reference,
+          Payment: sale?.paymentType,
+          Total: (sale?.summary.amount),
+          Paid: (sale?.summary.totalAmountPaid),
+          Due: (sale?.summary.remainingBalance),
+          Biller: sale?.summary.salesPerson,
+          salestype: sale?.summary.salesType,
+          paymentHistory: sale?.paymentHistory
       }
     })
   setData(mapped)
@@ -538,7 +540,7 @@ const CreditPayment = () => {
           <Link
               to="#"  data-bs-toggle="modal"
               data-bs-target="#showpayment"
-              onClick={() => { setModalData(record), setIsUpdate(true) }}
+              onClick={() => { setModalData(record), setIsUpdate(false) }}
              
               title={'View Invoice'}
             >
@@ -560,7 +562,7 @@ const CreditPayment = () => {
           <Link
               to="#"
               // className="dropdown-item confirm-text"
-              onClick={() => confirmText(record.id)}
+              onClick={() => alert('Upcoming feature')}
               
               title={'Write Off Payment'}
             >
@@ -608,7 +610,7 @@ const CreditPayment = () => {
           {/* /product list */}
           <div className="card">
             <div className="card-body">
-              <Tabletop inputfilter={inputfilter} togglefilter={togglefilter} handleSearch={handleSearch} showSearch={true}/>
+              <Tabletop inputfilter={inputfilter} togglefilter={togglefilter} handleSearch={handleSearch} showSearch={true} searchLabel={'Search by Customer or Reference'}/>
             
               {/* /Filter */}
               <div
@@ -690,7 +692,7 @@ const CreditPayment = () => {
           <div className="modal-dialog modal-lg modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">Sales Type: {modalData?.salestype}</h5>
+                <h5 className="modal-title">Sales Ref: {modalData?.Reference}</h5>
                 <button
                   type="button"
                   className="close"
@@ -1027,7 +1029,7 @@ const CreditPayment = () => {
                 <div className="row mt-2">
                   <div className="col-lg-12" style={{ display: 'flex', justifyContent: 'flex-start' }} >
                     {!isCredit && (<button className="btn btn-info me-2" data-bs-toggle="modal" data-bs-target="#confirmPaymentSellPrint" style={{ width: '20%' }}>
-                      Sell and Print
+                     Pay
                     </button>)}
                     {isUpdate && (<button className="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#confirmPaymentUpdate" style={{ width: '20%' }}>
                      Update Payment
@@ -1047,7 +1049,7 @@ const CreditPayment = () => {
         </div>
 
         {/* cash payment Modal */}
-        <div
+        {/* <div
           className="modal fade"
           id="cashpayment"
           tabIndex={-1}
@@ -1057,7 +1059,7 @@ const CreditPayment = () => {
           <div className="modal-dialog modal-lg modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">Sales Type: {modalData?.salestype}</h5>
+                <h5 className="modal-title">Sales Type: {modalData?.reference}</h5>
                 <button
                   type="button"
                   className="close"
@@ -1168,12 +1170,12 @@ const CreditPayment = () => {
                       Sell Only
                     </button>)} */}
 
-                  </div>
+                  {/* </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        </div>  */}
 
         {/* Payment Confirm Modal */}
 

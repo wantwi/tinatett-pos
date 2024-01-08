@@ -55,6 +55,7 @@ const CreditList = () => {
   const [isSaving, setIsSaving] = useState(false)
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
+  const [isReloading, setIsReloading] = useState(false)
 
   const { notifications, setNotifications } = useContext(NotificationsContext)
   let storage = JSON.parse(localStorage.getItem("auth"))
@@ -72,7 +73,7 @@ const CreditList = () => {
         Status: sale?.transactionStatus,
         Reference: sale?.reference,
         Payment: sale?.transactionType,
-        Total: moneyInTxt(sale?.totalAmount),
+        Total: (sale?.totalAmount),
         Paid: sale?.amountPaid,
         Due: sale?.balance,
         Biller: sale?.cashierName,
@@ -92,7 +93,7 @@ const CreditList = () => {
     isError,
     isLoading,
     refetch,
-
+    isFetching
   } = useGet("suspend", `/sales/credit/payments?startDate=${startDate}&endDate=${endDate}`, onSuccess);
 
   const [data, setData] = useState([])
@@ -109,6 +110,11 @@ const CreditList = () => {
       title: "Are you sure?",
       text: "You won't be able to revert this!",
       type: "warning",
+      html: 
+      `<div> 
+        <h4>Please provide a reason for Reversal</h4><br/>
+        <textarea type='text' class="form-control" id="reason"></textarea>
+       </div>`,
       showCancelButton: !0,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
@@ -124,8 +130,10 @@ const CreditList = () => {
 
         let payload = {
           "id": id,
-          "reason":"Reverse Sales Transaction"
+          "reason": $('#reason').val()
         }
+
+        console.log(payload, "Payload")
 
         let data = await axios.post(`/sales/payment-reverse`, payload)
         if (data.status < 205) {
@@ -147,7 +155,7 @@ const CreditList = () => {
             confirmButtonClass: "btn btn-danger",
           });
         }
-      }
+       }
 
 
       t.dismiss === Swal.DismissReason.cancel &&
@@ -360,7 +368,7 @@ const CreditList = () => {
           Status: sale?.transactionStatus,
           Reference: sale?.reference,
           Payment: sale?.transactionType,
-          Total: moneyInTxt(sale?.totalAmount),
+          Total: (sale?.totalAmount),
           Paid: sale?.amountPaid,
           Due: sale?.balance,
           Biller: sale?.cashierName,
@@ -387,7 +395,7 @@ const CreditList = () => {
           Status: sale?.transactionStatus,
           Reference: sale?.reference,
           Payment: sale?.transactionType,
-          Total: moneyInTxt(sale?.totalAmount),
+          Total: (sale?.totalAmount),
           Paid: sale?.amountPaid,
           Due: sale?.balance,
           Biller: sale?.cashierName,
@@ -420,7 +428,7 @@ const CreditList = () => {
           Status: sale?.transactionStatus,
           Reference: sale?.reference,
           Payment: sale?.transactionType,
-          Total: moneyInTxt(sale?.totalAmount),
+          Total: (sale?.totalAmount),
           Paid: sale?.amountPaid,
           Due: sale?.balance,
           Biller: sale?.cashierName,
@@ -438,9 +446,9 @@ const CreditList = () => {
   }, [filter])
 
 
-  useEffect(() => {
-    refetch()
-  }, [startDate, endDate])
+  // useEffect(() => {
+  //   refetch()
+  // }, [startDate, endDate])
 
 
 
@@ -501,7 +509,12 @@ const CreditList = () => {
           <Link
               to="#"  data-bs-toggle="modal"
               data-bs-target="#showpayment"
-              onClick={() => { setModalData(record), setIsUpdate(true) }}
+              onClick={() => { 
+                console.log("Record", record)
+                setModalData(record)
+                setIsUpdate(true)
+                setPaymentInfo({ ...paymentInfo, cashAmount: (record?.Paid)})
+               }}
              
               title={'Edit Payment'}
             >
@@ -545,6 +558,10 @@ const CreditList = () => {
     return (<LoadingSpinner message="Fetching Credited sales.." />)
   }
 
+  if (isFetching) {
+    return (<LoadingSpinner message="Fetching Credited sales.." />)
+  }
+
 
   if (isDeleting) {
     return (<LoadingSpinner />)
@@ -584,7 +601,7 @@ const CreditList = () => {
                 <div className="card-body pb-0">
                   <div className="row">
 
-                    <div className="col-lg-3 col-sm-6 col-12">
+                    <div className="col-lg-3 col-sm-6 col-12" hidden>
                       <div className="form-group">
                       <label>Filter By</label>
                         <Select2
@@ -610,6 +627,13 @@ const CreditList = () => {
                       <div className="form-group">
                         <label>End Date</label>
                         <input className="form-control" type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)}/>
+                      </div>
+                    </div>
+
+                    <div className="col-lg-3 col-sm-6 col-12">
+                      <div className="form-group">
+                        <label>&nbsp;</label>
+                        <button className="btn btn-success" type="submit" onClick={refetch}>Apply</button>
                       </div>
                     </div>
                   
@@ -953,11 +977,11 @@ const CreditList = () => {
                           <div className="total-order w-100 max-widthauto m-auto mb-4">
                             <ul>
                               <li>
-                                <h4>Amount Given</h4>
+                                <h4>Updated Amount</h4>
                                 <h5>GHS {moneyInTxt(paymentInfo?.amountPaid)} </h5>
                               </li>
                               <li>
-                                <h4>Amount Already Paid </h4>
+                                <h4>Amount Prev Paid </h4>
                                 <h5>GHS {moneyInTxt(modalData?.Paid)}</h5>
                               </li>
                             </ul>
@@ -970,9 +994,9 @@ const CreditList = () => {
                                 <h4>Grand Total</h4>
                                 <h5>GHS {moneyInTxt(modalData?.Total)}</h5>
                               </li>
-                              <li style={{ border: Number(modalData?.Due) - Number(paymentInfo.amountPaid) > 0 ? '2px solid red' : Number(modalData?.Total) - Number(paymentInfo.amountPaid) < 0 ? '2px solid green' : null }}>
-                                <h4>{Number(modalData?.Due) - Number(paymentInfo.amountPaid) < 0 ? 'Change' : 'Balance'}</h4>
-                                <h5>GHS {moneyInTxt(Math.abs(Number(modalData?.Due) - Number(paymentInfo.amountPaid)))}</h5>
+                              <li>
+                                <h4>Balance</h4>
+                                <h5>GHS {moneyInTxt(Number(modalData?.Total) - Number(paymentInfo?.amountPaid))}</h5>
                               </li>
 
                             </ul>
@@ -994,8 +1018,8 @@ const CreditList = () => {
 
                 <div className="row mt-2">
                   <div className="col-lg-12" style={{ display: 'flex', justifyContent: 'flex-start' }} >
-                    {!isCredit && (<button className="btn btn-info me-2" data-bs-toggle="modal" data-bs-target="#confirmPaymentSellPrint" style={{ width: '20%' }}>
-                      Sell and Print
+                    {!isCredit && !isUpdate && (<button className="btn btn-info me-2" data-bs-toggle="modal" data-bs-target="#confirmPaymentSellPrint" style={{ width: '20%' }}>
+                      Pay
                     </button>)}
                     {isUpdate && (<button className="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#confirmPaymentUpdate" style={{ width: '20%' }}>
                      Update Payment

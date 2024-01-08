@@ -17,5 +17,5 @@ export const useGet = (key, url, onSuccess =()=>{}, onError = () => {}) => {
 
   });
 
-  return { data, refetch, isError, isLoading, isSuccess, status };
+  return { data, refetch, isError, isLoading, isSuccess, status, isFetching };
 };

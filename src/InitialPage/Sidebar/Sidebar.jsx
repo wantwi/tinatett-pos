@@ -682,8 +682,21 @@ const Sidebar = (props) => {
                 </a>
                 {isSideMenu == "credit" ? (
                   <ul>
+                    
                     <li>
                     <Link
+                        className={
+                          pathname.includes("/cashier/credit-payment") ? "active" : ""
+                        }
+                        to="/tinatett-pos/cashier/credit-payment"
+                        onClick={() => toggleSidebar(isSideMenu == "" ? "" : "")}
+                      >
+                        <span>Credit Payment </span>
+                      </Link>
+                    </li>
+
+                    <li>
+                      <Link
                         className={
                           pathname.includes("/cashier/credit-list") ? "active" : ""
                         }
@@ -692,25 +705,8 @@ const Sidebar = (props) => {
                         Credit List
                       </Link>
                     </li>
-                    <li>
-                    <Link
-                        to="/tinatett-pos/cashier/credit-payment"
-                        onClick={() => toggleSidebar(isSideMenu == "" ? "" : "")}
-                      >
-                        <span>Credit Payment </span>
-                      </Link>
-                    </li>
 
-                    {/* <li>
-                        <Link
-                          className={
-                            pathname.includes("importtransfer-") ? "active" : ""
-                          }
-                          to="/tinatett-pos/transfer/importtransfer-transfer"
-                        >
-                          Import Transfer
-                        </Link>
-                      </li> */}
+                    
                   </ul>
                 ) : (
                   ""

@@ -119,7 +119,7 @@ const TransferList = () => {
     });
   };
   const togglefilter = (value) => {
-    setInputfilter(value);
+    setInputfilter(false);
   };
 
 

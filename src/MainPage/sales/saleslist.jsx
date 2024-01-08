@@ -45,7 +45,7 @@ const SalesList = () => {
 
   const axios = useCustomApi()
 
-  const confirmText = (id) => {
+  const confirmText = (Reference) => {
     Swal.fire({
       title: "Are you sure?",
       text: "You won't be able to revert this!",
@@ -59,8 +59,12 @@ const SalesList = () => {
       buttonsStyling: !1,
     }).then(async (t) => {
 
+      let payload = {
+        "salesRef":Reference,
+        "reason":"Testing Sales deleted record"
+      }
       if (t.isConfirmed) {
-        let data = await axios.delete(`/sales/${id}`)
+        let data = await axios.post(`/sales/cancel`, payload)
         if (data.status < 205) {
           Swal.fire({
             type: "success",
@@ -68,7 +72,7 @@ const SalesList = () => {
             text: "Your sales item has been deleted.",
             confirmButtonClass: "btn btn-success",
           });
-        
+          refetch()
 
         }
         else {
@@ -117,6 +121,7 @@ const SalesList = () => {
     isError,
     isLoading,
     isSuccess,
+    refetch
   } = useGet("suspend", "/sales");
 
 
@@ -262,10 +267,10 @@ const SalesList = () => {
           </a>
 
 
-          {userType == 'admin' &&  <Link
+          {userType == 'admin' || userType == 'supervisor' &&  <Link
                   to="#"
                   className="confirm-text"
-                  onClick={() => confirmText(record?.id)}
+                  onClick={() => confirmText(record?.Reference)}
                   title=" Delete Sale"
                 >
                   <img src={DeleteIcon} alt="img" />
