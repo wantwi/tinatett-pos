@@ -525,7 +525,7 @@ const CreditList = () => {
           <Link
               to="#"  data-bs-toggle="modal"
               data-bs-target="#showpayment"
-              onClick={() => { setModalData(record), setIsUpdate(true) }}
+              onClick={() => { setModalData(record), setIsUpdate(false) }}
              
               title={'View Invoice'}
             >
@@ -682,7 +682,7 @@ const CreditList = () => {
           <div className="modal-dialog modal-lg modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">Sales Type: {modalData?.salestype}</h5>
+                <h5 className="modal-title">Sales Ref: {modalData?.Reference}</h5>
                 <button
                   type="button"
                   className="close"
