@@ -54,6 +54,8 @@ const CreditPayment = () => {
   const [isDeleting, setIsDeleting] = useState(false)
   const [receiptFile, setReceiptFile] = useState(null)
   const [isSaving, setIsSaving] = useState(false)
+  const [isLoadingPDF, setIsLoadingPDF] = useState(false)
+  const [isErrorPDF, setIsError] = useState('')
 
   const { notifications, setNotifications } = useContext(NotificationsContext)
   let storage = JSON.parse(localStorage.getItem("auth"))
@@ -233,7 +235,7 @@ const CreditPayment = () => {
         axios.put(apiUrl, payload)
           .then((res) => {
 
-            console.log(res.data.success)
+            //console.log(res.data.success)
             if (res.data.success) {
               if (print) {
                 getInvoiceReceipt(modalData.Reference)
@@ -300,18 +302,40 @@ const CreditPayment = () => {
   }
 
   const getInvoiceReceipt = (salesref) => {
+    setIsLoadingPDF(true)
+    $('#pdfViewer').modal('show')
     axios.get('/sales/getSaleReceipt/' + salesref)
       .then((res) => {
-        let base64 = res.data.base64
-        const blob = base64ToBlob(base64, 'application/pdf');
-        const blobFile = `data:application/pdf;base64,${base64}`
-        const url = URL.createObjectURL(blob);
-        setReceiptFile(blobFile)
-        //window.open(url, "_blank", "width=600, height=600", 'modal=yes');
-        // var newWindow = window.open(url, "_blank", "width=800, height=800");  
-        //pdfWindow.document.write("<iframe width='100%' height='100%' src='" + url + "'></iframe>");
+        if(res.status == 201){
+          let base64 = res.data.base64
+          const blob = base64ToBlob(base64, 'application/pdf');
+          const blobFile = `data:application/pdf;base64,${base64}`
+          const url = URL.createObjectURL(blob);
+          setReceiptFile(blobFile)
+          //window.open(url, "_blank", "width=600, height=600", 'modal=yes');
+          // var newWindow = window.open(url, "_blank", "width=800, height=800");  
+          //pdfWindow.document.write("<iframe width='100%' height='100%' src='" + url + "'></iframe>");
+  
+         
+        }
+        else{
+          alertify.set("notifier", "position", "bottom-right");
+          alertify.warning("No Invoice Available for this Transaction.");
+          setIsError(true)
+          // $('#pdfViewer').html(`<h1>No Invoice Available for this Transaction`)
+        }
+       
+      })
+      .catch((err) => {
+        alertify.set("notifier", "position", "bottom-right");
+        alertify.warning("No Invoice Available for this Transaction.");
+        $('#pdfViewer').hide()
+        $('#errorMessage').modal('show')
 
-        $('#pdfViewer').modal('show')
+       
+      })
+      .finally(() => {
+        setIsLoadingPDF(false)
       })
 
     function base64ToBlob(base64, type = "application/octet-stream") {
@@ -324,9 +348,6 @@ const CreditPayment = () => {
       return new Blob([arr], { type: type });
     }
   }
-
-
-
 
   const options = [
     { id: 'Retail', text: "Retail", text: "Retail" },
@@ -539,8 +560,9 @@ const CreditPayment = () => {
           </Link>
           <Link
               to="#"  data-bs-toggle="modal"
-              data-bs-target="#showpayment"
-              onClick={() => { setModalData(record), setIsUpdate(false) }}
+              //data-bs-target="#pdfViewer"
+              onClick={() => getInvoiceReceipt(record?.Reference)}
+              //onClick={() => { setModalData(record), setIsUpdate(false) }}
              
               title={'View Invoice'}
             >
@@ -582,7 +604,6 @@ const CreditPayment = () => {
     return (<LoadingSpinner message="Fetching Credited sales.." />)
   }
 
-
   if (isDeleting) {
     return (<LoadingSpinner message="Deleting.." />)
   }
@@ -590,6 +611,7 @@ const CreditPayment = () => {
   if (isSaving) {
     return <LoadingSpinner message="Processing...please wait" />
   }
+
 
   return (
     <>
@@ -1382,7 +1404,40 @@ const CreditPayment = () => {
                 </button>
               </div>
               <div className="modal-body">
-                <iframe width='100%' height='800px' src={receiptFile}></iframe>
+                {isLoadingPDF ? <p>Loading...</p> : <iframe width='100%' height='800px' src={receiptFile}></iframe>}
+                {isError ? <p>Error</p>: null}
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+
+        
+        {/* Error Modal */}
+        <div
+          className="modal fade"
+          id="errorMessage"
+          tabIndex={-1}
+          aria-labelledby="errorMessage"
+          aria-hidden="true"
+        >
+          <div className="modal-dialog modal-md modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Notice</h5>
+                <button
+                  type="button"
+                  className="close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                  onClick={() => $('.modal').modal('hide')}
+                >
+                  <span aria-hidden="true">×</span>
+                </button>
+              </div>
+              <div className="modal-body">
+                <p>No Invoice found for this Transaction</p>
               </div>
 
             </div>

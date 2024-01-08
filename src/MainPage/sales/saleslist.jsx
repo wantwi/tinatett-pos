@@ -26,10 +26,12 @@ import { debounce } from "lodash";
 const SalesList = () => {
   const [startDate, setStartDate] = useState(new Date());
   const [startDate1, setStartDate1] = useState(new Date());
-  const [inputfilter, setInputfilter] = useState(false);
+  const [inputfilter, setInputfilter] = useState(true);
   const [receiptFile, setReceiptFile] = useState(null)
   const [isSaving, setIsSaving] = useState(false)
   const [userType, setUserType] = useState('')
+  const [fromDate, setFromDate] = useState('')
+  const [endDate, setEndDate] = useState('')
 
   const togglefilter = (value) => {
     setInputfilter(value);
@@ -121,9 +123,35 @@ const SalesList = () => {
     isError,
     isLoading,
     isSuccess,
-    refetch
-  } = useGet("suspend", "/sales");
+    refetch,
+    isFetching
+  } = useGet("sales", `/sales?startDate=${fromDate}&endDate=${endDate}`);
 
+
+    //
+    useEffect(() => {
+      // refetch()
+      if (sales) {
+        let mappedData = sales?.data.map((sale) => {
+          return {
+            id: sale?.id,
+            Date: sale?.transDate,
+            Name: sale?.customerName,
+            Status: sale?.status,
+            Reference: sale?.salesRef,
+            // Payment: JSON.parse(sale?.paymentInfo).type,
+            Total: moneyInTxt(sale?.totalAmount) || '',
+            Paid: moneyInTxt(sale?.amountPaid),
+            Balance: moneyInTxt(sale?.balance),
+            Biller: sale?.salesPerson,
+          }
+        })
+        let sortedData = mappedData.sort((a, b) => new Date(b.Date) - new Date(a.Date))
+        setData(sortedData)
+       
+      }
+      
+    }, [sales])
 
   useEffect(() => {
     if (!isLoading) {
@@ -145,11 +173,9 @@ const SalesList = () => {
       })
       let sortedData = mappedData.sort((a, b) => new Date(b.Date) - new Date(a.Date))
       setData(sortedData)
-      console.log('loaded..')
+     
     }
-    else {
-      console.log('loading...')
-    }
+   
   }, [isLoading])
 
 
@@ -340,6 +366,10 @@ const SalesList = () => {
     return (<LoadingSpinner message="Fetching Sales.." />)
   }
 
+  if (isFetching) {
+    return (<LoadingSpinner message="Fetching sales.." />)
+  }
+
   if (isSaving) {
     return <LoadingSpinner message="Downloading...please wait" />
   }
@@ -364,45 +394,42 @@ const SalesList = () => {
           <div className="card">
             <div className="card-body">
               <Tabletop inputfilter={inputfilter} togglefilter={togglefilter} handleSearch={handleSearch}/>
-              {/* /Filter */}
-              {/* <div
+        {/* /Filter */}
+        <div
                 className={`card mb-0 ${inputfilter ? "toggleCls" : ""}`}
                 id="filter_inputs"
                 style={{ display: inputfilter ? "block" : "none" }}
               >
                 <div className="card-body pb-0">
                   <div className="row">
+
+
                     <div className="col-lg-3 col-sm-6 col-12">
                       <div className="form-group">
-                        <input type="text" placeholder="Enter Name" />
+                        <label>Start Date</label>
+                        <input className="form-control"  type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)}/>
                       </div>
                     </div>
+
                     <div className="col-lg-3 col-sm-6 col-12">
                       <div className="form-group">
-                        <input type="text" placeholder="Enter Reference No" />
+                        <label>End Date</label>
+                        <input className="form-control" type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)}/>
                       </div>
                     </div>
+
                     <div className="col-lg-3 col-sm-6 col-12">
                       <div className="form-group">
-                        <Select2
-                          className="select"
-                          data={options}
-                          options={{
-                            placeholder: "Choose Suppliers",
-                          }}
-                        />
+                        <label>&nbsp;</label>
+                        <button className="btn btn-success" type="submit" onClick={refetch}>Apply</button>
                       </div>
                     </div>
-                    <div className="col-lg-3 col-sm-6 col-12">
-                      <div className="form-group">
-                        <Link className="btn btn-filters ms-auto">
-                          <img src={search_whites} alt="img" />
-                        </Link>
-                      </div>
-                    </div>
+                  
                   </div>
+
+                
                 </div>
-              </div> */}
+              </div>
               {/* /Filter */}
               <div className="table-responsive">
                 <Table columns={columns} dataSource={data} />

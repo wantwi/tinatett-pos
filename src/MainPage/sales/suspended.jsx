@@ -108,7 +108,7 @@ const Suspended = () => {
   const axios = useCustomApi()
   
   const togglefilter = (value) => {
-    setInputfilter(value);
+    setInputfilter(false);
   };
 
   const confirmText = (id) => {
