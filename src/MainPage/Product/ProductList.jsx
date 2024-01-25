@@ -5,13 +5,7 @@ import Table from "../../EntryFile/datatable";
 import Tabletop from "../../EntryFile/tabletop";
 import {
   PlusIcon,
-  MacbookIcon,
-  IphoneIcon,
-  SamsungIcon,
-  EarpodIcon,
-  OrangeImage,
-  PineappleImage,
-  StawberryImage,
+
   AvocatImage,
   EyeIcon,
   EditIcon,
@@ -25,6 +19,7 @@ import { moneyInTxt } from "../../utility";
 import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 import { debounce } from "lodash";
 import useCustomApi from "../../hooks/useCustomApi";
+import FeatherIcon from 'feather-icons-react'
 
 const ProductList = () => {
   const [inputfilter, setInputfilter] = useState(false);
@@ -165,7 +160,7 @@ const ProductList = () => {
               <img src={EyeIcon} alt="img" />
             </Link> */}
             <Link className="me-3" to={{ pathname:`/tinatett-pos/product/editproduct`, state:record}} title="Edit Product">
-              <img src={EditIcon} alt="img" />
+            <span className="badges btn-cancel me-2"><FeatherIcon icon="edit" /> Edit</span> 
             </Link>
             {/* <Link className="confirm-text" to="#" onClick={confirmText} title="Delete Product">
               <img src={DeleteIcon} alt="img" />

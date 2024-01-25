@@ -20,6 +20,7 @@ import {
 import { useGet } from "../../hooks/useGet";
 import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 import useCustomApi from "../../hooks/useCustomApi";
+import FeatherIcon from 'feather-icons-react'
 
 const TransferList = () => {
   const [inputfilter, setInputfilter] = useState(false);
@@ -169,10 +170,10 @@ const TransferList = () => {
       render: (record) => (
         <>
           <Link className="me-3" to= {{pathname:"/tinatett-pos/transfer/edittransfer-transfer", state: record}}>
-            <img src={EditIcon} alt="img" />
+          <span className="badges btn-cancel me-2"><FeatherIcon icon="edit" /> Edit</span>
           </Link>
           <Link className="confirm-text" to="#" onClick={() => confirmText(record.id)}>
-            <img src={DeleteIcon} alt="img" />
+          <span className="badges btn-danger me-2"><FeatherIcon icon="trash" /> Delete</span>
           </Link>
         </>
       ),

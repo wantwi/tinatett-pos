@@ -22,6 +22,7 @@ import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 import { moneyInTxt } from "../../utility";
 import useCustomApi from "../../hooks/useCustomApi";
 import { debounce } from "lodash";
+import FeatherIcon from 'feather-icons-react'
 
 const SalesList = () => {
   const [startDate, setStartDate] = useState(new Date());
@@ -288,7 +289,7 @@ const SalesList = () => {
               setIsSaving(true)
               getInvoiceReceipt(record?.Reference)
             }}>
-            <img src={Download} className="me-2" alt="img" />
+            <span className="badges btn-cancel me-2"><FeatherIcon icon="download" /> Download</span> 
 
           </a>
 
@@ -299,7 +300,7 @@ const SalesList = () => {
                   onClick={() => confirmText(record?.Reference)}
                   title=" Delete Sale"
                 >
-                  <img src={DeleteIcon} alt="img" />
+                 <span className="badges btn-danger me-2"><FeatherIcon icon="trash" /> Delete</span> 
                  
                 </Link>}
 

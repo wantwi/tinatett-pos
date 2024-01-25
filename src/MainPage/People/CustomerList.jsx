@@ -4,9 +4,7 @@ import Tabletop from "../../EntryFile/tabletop"
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import {
-  ClosesIcon,
-  Excel,
-  Filter,
+
   Pdf,
   PlusIcon,
   Printer,
@@ -15,15 +13,13 @@ import {
   EditIcon,
   DeleteIcon,
   Thomas,
-  Benjamin,
-  James,
-  Bruklin,
-  Beverly,
+
 } from "../../EntryFile/imagePath";
 import { useGet } from "../../hooks/useGet";
 import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 import { debounce } from "lodash";
 import useCustomApi from "../../hooks/useCustomApi";
+import FeatherIcon from 'feather-icons-react'
 
 const CustomerList = () => {
   const [tableID] = useState("customerList")
@@ -162,7 +158,7 @@ const CustomerList = () => {
       render: (a, record) => (
         <>
           <Link className="me-3" to={{pathname:"/tinatett-pos/people/editcustomer", state:record}}>
-            <img src={EditIcon} alt="img" />
+          <span className="badges btn-cancel me-2"><FeatherIcon icon="edit" /> Edit</span> 
           </Link>
           {/* <Link className="confirm-text" to="#" onClick={confirmText}>
             <img src={DeleteIcon} alt="img" />

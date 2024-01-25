@@ -20,6 +20,7 @@ import { useGet } from "../../hooks/useGet";
 import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 import { debounce } from "lodash";
 import useCustomApi from "../../hooks/useCustomApi";
+import FeatherIcon from 'feather-icons-react'
 
 const SupplierList = () => {
   const [inputfilter, setInputfilter] = useState(false);
@@ -165,7 +166,7 @@ const SupplierList = () => {
       render: (a, record) => (
         <>
           <Link className="me-3" to={{pathname:"/tinatett-pos/people/editsupplier", state:record}}>
-            <img src={EditIcon} alt="img" />
+          <span className="badges btn-cancel me-2"><FeatherIcon icon="edit" /> Edit</span> 
           </Link>
           {/* <Link className="confirm-text" to="#" onClick={confirmText}>
             <img src={DeleteIcon} alt="img" />

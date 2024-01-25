@@ -21,6 +21,7 @@ import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 import { useGet } from "../../hooks/useGet";
 import useCustomApi from "../../hooks/useCustomApi";
 import { moneyInTxt } from "../../utility";
+import FeatherIcon from 'feather-icons-react'
 
 const ExpenseList = () => {
   const [inputfilter, setInputfilter] = useState(false);
@@ -163,11 +164,11 @@ const ExpenseList = () => {
         <>
           {/* <Link className="me-3"  to={{pathname:"/tinatett-pos/expense/editexpense", state:record}} > */}
           <a href={`/tinatett-pos/expense/editexpense?id=${record.id}`} >
-            <img src={EditIcon} alt="img" />
+            <span className="badges btn-cancel me-2"><FeatherIcon icon="edit" /> Edit</span>
           </a>
           {/* </Link> */}
           <Link className="confirm-text" to="#" onClick={() => confirmText(record.id)}>
-            <img src={DeleteIcon} alt="img" />
+          <span className="badges btn-danger me-2"><FeatherIcon icon="trash" /> Delete</span>
           </Link>
         </>
       ),
