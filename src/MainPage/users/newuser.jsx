@@ -10,6 +10,7 @@ import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 import alertify from "alertifyjs";
 import "../../../node_modules/alertifyjs/build/css/alertify.css";
 import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
+import { useGet } from "../../hooks/useGet";
 
 const Newuser = () => {
   const [passwordShown, setPasswordShown] = useState(false);
@@ -28,9 +29,26 @@ const Newuser = () => {
     { id: 5, label: "Owner", value: "admin" },
   ];
 
+
+  const onSuccess = (data) => {
+    console.log("Branches", data)
+    let mappedData = data?.data.map((item) => {
+      return {
+        id: item?.id,
+        label: item?.name,
+        value: item?.id
+      }
+    })
+
+    setBranches(mappedData)
+  }
+
   const [role, setRole] = useState(null)
+  const [branches, setBranches] = useState([])
+  const [selectedBranch, setSelectedBranch] = useState(null)
   
   const { isLoading, data, isError, error, mutate } = usePost("/user");
+  const { } = useGet("branch", "/branch", onSuccess);
 
   const validationSchema = Yup.object().shape({
     userName: Yup.string().required("user name is required"),
@@ -53,8 +71,6 @@ const Newuser = () => {
       "userName": "",
       "password": "",
       "role": "",
-      "branchId": storage?.branchId
-
     },
     resolver: yupResolver(validationSchema),
   });
@@ -62,10 +78,12 @@ const Newuser = () => {
 
   const onSubmit = (data) => {
    
-    mutate({...data, role: role.value})
+    mutate({...data, branchId:selectedBranch?.id, role: role.value})
     alertify.set("notifier", "position", "bottom-right");
     alertify.success("User successfully created");
     reset()
+    setSelectedBranch(null)
+    setRole(null)
    
   };
 
@@ -109,10 +127,6 @@ const Newuser = () => {
                   </div>
                 </div>
 
-
-              </div>
-
-              <div className="row">
                 <div className="col-lg-3 col-sm-6 col-12">
                   <div className="form-group">
                     <label>User Name</label>
@@ -121,6 +135,11 @@ const Newuser = () => {
                     }`} {...register("userName")}/>
                   </div>
                 </div>
+
+              </div>
+
+              <div className="row">
+               
 
                 <div className="col-lg-3 col-sm-6 col-12">
                   <div className="form-group">
@@ -138,10 +157,7 @@ const Newuser = () => {
                     </div>
                   </div>
                 </div>
-              </div>
 
-
-              <div className="row">
                 <div className="col-lg-3 col-sm-6 col-12">
                   <div className="form-group">
                     <label>Confirm Password</label>
@@ -158,6 +174,25 @@ const Newuser = () => {
                     </div>
                   </div>
                 </div>
+
+                <div className="col-lg-3 col-sm-6 col-12">
+
+                  <div className="form-group">
+                    <label>Branch</label>
+                    <Select
+                      className="select"
+                      options={branches}
+                      value={selectedBranch}
+                      onChange={(e) => setSelectedBranch(e)}
+                    />
+                  </div>
+                </div>
+
+              </div>
+
+
+              <div className="row">
+               
 
 
                 <div className="col-lg-3 col-sm-6 col-12">
