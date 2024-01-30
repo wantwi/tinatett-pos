@@ -11,11 +11,6 @@ import {
   FlagES,
   FlagDE,
   Notification,
-  Avatar2,
-  Avatar3,
-  Avatar6,
-  Avatar17,
-  Avatar13,
   Avatar,
   Logout,
 } from "../../EntryFile/imagePath";
@@ -26,6 +21,9 @@ export const socket = io.connect(SOCKET_BASE_URL)
 import { NotificationsContext } from "./DefaultLayout";
 import { notification } from "antd";
 import { timeAgo } from "../../utility";
+import Select from "react-select";
+import { useGet } from "../../hooks/useGet";
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 // import { useIdleTimer } from "react-idle-timer"
 
 
@@ -35,9 +33,35 @@ const Header = (props) => {
   const [toggle, SetToggle] = useState(false);
   const [dateState, setDateState] = useState(new Date());
   const [loggedInUser, setLoggedInUser] = useState({})
+  const [selectedBranch, setSelectedBranch] = useState({label:'Select Branch', value:''})
+  const [branchesList, setBranchesList] = useState()
+  const [userType, setUserType] = useState('')
+  const [loggedIn, setLoggedIn] = useState(true)
 
 
   const { notifications, setNotifications } = useContext(NotificationsContext)
+  const { data: branches, isLoading } = useGet("branches", "/branch");
+
+
+  useEffect(() => {
+    let userRole = localStorage.getItem('auth')
+    let obj = JSON.parse(userRole)
+    //console.log("Role:", obj.role)
+    setUserType(obj.role)
+  }, [])
+
+  useEffect(() => {
+    if (!isLoading) {
+     // console.log("Branches", branches)
+      let mappedData = branches?.data.map((branch) => {
+        return {
+          value: branch?.id,
+          label: branch?.name,
+        }
+      })
+      setBranchesList(mappedData)
+    }
+  }, [isLoading])
 
   useEffect(() => {
     let userDetails = localStorage.getItem('auth')
@@ -64,27 +88,77 @@ const Header = (props) => {
     document.querySelector("html").classList.toggle("menu-opened");
   };
 
+  const checkForInactivity = () => {
+    const expireTime = localStorage.getItem('expireTime')
+    if(expireTime < Date.now()){
+      console.log('Log out')
+      setOpenModal(true)
+      setLoggedInUser(false)
+    }
+  }
+
+  const updateExpireTime = () => {
+    const expireTime = Date.now() + 10000
+
+    //set expire time in local storage
+    localStorage.setItem("expireTime", expireTime)
+  }
+
+  useEffect(() => {
+
+    //set initial expire time
+    updateExpireTime()
+
+    //set eventListeners
+    window.addEventListener("click", updateExpireTime)
+    window.addEventListener("keypress", updateExpireTime)
+    window.addEventListener("scroll", updateExpireTime)
+    window.addEventListener("mousemove", updateExpireTime)
+
+
+    //clean up
+    return () => {
+      window.removeEventListener("click", updateExpireTime)
+      window.removeEventListener("keypress", updateExpireTime)
+      window.removeEventListener("scroll", updateExpireTime)
+      window.removeEventListener("mousemove", updateExpireTime)
+    }
+  }, [])
+
   let pathname = location.pathname;
 
   useEffect(() => {
     setInterval(() => setDateState(new Date()), 1000);
+
+    const interval = setInterval(() => {
+      checkForInactivity()
+    }, 5000)
+
+    return () => clearInterval(interval)
   }, []);
 
 
   const [openModal, setOpenModal] = useState(false)
 
   const handleIdle = () => {
-      setOpenModal(true);
+    setOpenModal(true);
   }
-  //const {idleTimer} = useIdleTimer({ onIdle: handleIdle, idleTime: 5 })
-  const stay = () => {
-      setOpenModal(false)
-     // idleTimer.reset()
-  }
+
+  const history = useHistory()
+
   const handleLogout = () => {
-      //logout()
-      console.log('...loggin out')
-      setOpenModal(false)
+    //logout()
+    console.log('...loggin out')
+    setOpenModal(false)
+    localStorage.removeItem('auth')
+    setTimeout(() => {
+      history.push('/')
+    }, 1000)
+  }
+
+  const handleContinue = () => {
+    updateExpireTime()
+    setOpenModal(false)
   }
 
   return (
@@ -130,7 +204,14 @@ const Header = (props) => {
         </Link>
         {/* Header Menu */}
         <ul className="nav user-menu">
-          <li className="nav-item" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', marginRight: 50 }}>Branch: {loggedInUser?.branchName}</li>
+         
+          {userType == 'admin' || userType == 'owner' ? (<li className="nav-item" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', marginRight: 50 }}>
+            <span style={{marginRight:10}}>Branch:</span>  <Select id="selectedBranch" className="select form-control" options={branchesList} value={selectedBranch} onChange={(e) => { setSelectedBranch(e) }}/>
+          </li>) :
+          (<li className="nav-item" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', marginRight: 50 }}>
+              <span style={{marginRight:10}}>Branch: {loggedInUser?.branchName}</span>
+          </li>)}
+
           <li className="nav-item" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
 
             {dateState.toUTCString('en-GB', {
@@ -219,18 +300,18 @@ const Header = (props) => {
                     return (
                       <li className="notification-message" key={idx} onClick={() => {
                         let data = [...notifications]
-                        let filtered = data.filter((item) => item.message != notification.message)   
+                        let filtered = data.filter((item) => item.message != notification.message)
                         //data.forEach(item => console.log(item, notification))
                         setNotifications(filtered)
                       }}>
                         <Link to="#">
                           <div className="media d-flex">
-                            <span className="avatar flex-shrink-0" style={{background: notification.type == 'success' ? '#008179' : notification.type == 'warning' ? 'orange' : notification.type == 'error' ? 'darkred' : '#45b6fe'}}>
+                            <span className="avatar flex-shrink-0" style={{ background: notification.type == 'success' ? '#008179' : notification.type == 'warning' ? 'orange' : notification.type == 'error' ? 'darkred' : '#45b6fe' }}>
                               <i className="far fa-bell" />
                             </span>
                             <div className="media-body flex-grow-1">
                               <p className="noti-details">
-                                <span className="noti-title">{notification.message.split(' ').slice(0,2)}</span> {notification.message.split(' ').slice(2).join(' ')}
+                                <span className="noti-title">{notification.message.split(' ').slice(0, 2)}</span> {notification.message.split(' ').slice(2).join(' ')}
                                 {" "}
                                 {/* <span className="noti-title">
                             successfully
@@ -327,21 +408,21 @@ const Header = (props) => {
         {/* /Mobile Menu */}
       </div>
 
-      <Modal isOpen={openModal} onHide={stay}>
-      <ModalHeader>You Have Been Idle!</ModalHeader>
-      <ModalBody>
-        Your session has been timed Out. Do you want to stay? You have <span style={{fontSize:30, fontWeight:600}}>{60}</span> seconds left...
-      </ModalBody>
-      <ModalFooter>
-        <Button variant='danger' onClick={handleLogout}>
-          {' '}
-          Logout
-        </Button>{' '}
-        <Button variant='primary' onClick={stay}>
-          Continue Session
-        </Button>
-      </ModalFooter>
-    </Modal>
+      <Modal isOpen={openModal} onHide={updateExpireTime}>
+        <ModalHeader>You Have Been Idle!</ModalHeader>
+        <ModalBody>
+          Your session has been timed Out. Do you want to stay? 
+        </ModalBody>
+        <ModalFooter>
+          <Button variant='danger' onClick={handleLogout}>
+            {' '}
+            Logout
+          </Button>{' '}
+          <Button variant='primary' onClick={handleContinue}>
+            Continue Session
+          </Button>
+        </ModalFooter>
+      </Modal>
     </>
   );
 };
