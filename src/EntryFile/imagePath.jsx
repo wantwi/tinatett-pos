@@ -68,7 +68,7 @@ export {default as Customer6} from '../assets/img/customer/customer6.jpg'
 export {default as Customer7} from '../assets/img/customer/customer7.jpg'
 export {default as Customer8} from '../assets/img/customer/customer8.jpg'
 export {default as EditSet} from '../assets/img/icons/edit-set.svg'
-export {default as Macbook} from '../assets/img/icons/macbook.svg'
+// export {default as Macbook} from '../assets/img/icons/macbook.svg'
 export {default as Samsung} from '../assets/img/brand/samsung.png'
 
 export {default as Scanner} from '../assets/img/icons/scanners.svg'
