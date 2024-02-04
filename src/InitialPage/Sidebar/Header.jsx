@@ -98,7 +98,7 @@ const Header = (props) => {
   }
 
   const updateExpireTime = () => {
-    const expireTime = Date.now() + 10000
+    const expireTime = Date.now() + 600000
 
     //set expire time in local storage
     localStorage.setItem("expireTime", expireTime)
