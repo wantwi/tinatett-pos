@@ -169,7 +169,7 @@ const CreditPayment = () => {
 
   const processPayment = (type, print) => {
 
-    if ((Number(paymentInfo.cashAmount) + Number(paymentInfo.cashAmount) + Number(paymentInfo.cashAmount) > 0) || type == 'Credit') {
+    if ((Number(paymentInfo.cashAmount) + Number(paymentInfo.momoAmount) + Number(paymentInfo.chequeAmount) > 0) || type == 'Credit') {
       let pType = ''
       if (paymentInfo.cashAmount > 0) {
         pType = pType.concat('Cash,')

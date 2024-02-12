@@ -22,6 +22,7 @@ import "react-select2-wrapper/css/select2.css";
 import { useGet } from "../../hooks/useGet";
 import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 import useCustomApi from "../../hooks/useCustomApi";
+import FeatherIcon from 'feather-icons-react'
 
 const UserLists = () => {
   const [startDate, setStartDate] = useState(new Date());
@@ -96,12 +97,11 @@ const UserLists = () => {
       title: "Action",
       render: (text, record) => (
         <>
-          <Link to= {{pathname:"/tinatett-pos/users/newuseredit", state: record}} className="me-3" >
-            <img src={EditIcon} alt="img" />
+         <Link to= {{pathname:"/tinatett-pos/users/newuseredit", state: record}}>
+            <span className="badges btn-cancel me-2"><FeatherIcon icon="edit" /> Edit</span> 
           </Link>
-          <Link className="me-3 confirm-text" to="#" onClick={() => confirmText(record.id)}>
-            <img src={DeleteIcon} alt="img" />
-          </Link>
+         
+          <span className="badges btn-danger me-2" onClick={() => confirmText(record.id)}><FeatherIcon icon="trash" /> Delete</span>          
         </>
       ),
     },

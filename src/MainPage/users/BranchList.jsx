@@ -4,26 +4,19 @@ import Tabletop from "../../EntryFile/tabletop"
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import {
-  ClosesIcon,
-  Excel,
-  Filter,
-  Pdf,
+  DeleteIcon,
+  EditIcon,
   PlusIcon,
   Printer,
   Search,
   search_whites,
-  EditIcon,
-  DeleteIcon,
-  Thomas,
-  Benjamin,
-  James,
-  Bruklin,
-  Beverly,
+
 } from "../../EntryFile/imagePath";
 import { useGet } from "../../hooks/useGet";
 import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 import { debounce } from "lodash";
 import useCustomApi from "../../hooks/useCustomApi";
+import FeatherIcon from 'feather-icons-react'
 
 const BranchList = () => {
   const [tableID] = useState("BranchList")
@@ -128,13 +121,22 @@ const BranchList = () => {
     {
       title: "Action",
       render: (a, record) => (
+        // <>
+        //   <Link className="me-3" to={{pathname:"/tinatett-pos/users/new-branch", state:record}}>
+        //     <img src={EditIcon} alt="img" />
+        //   </Link>
+        //   <span className="me-3" onClick={() => confirmText(record.id)}>
+        //     <img src={DeleteIcon} alt="img" />
+        //   </span>
+        // </>
+
         <>
-          <Link className="me-3" to={{pathname:"/tinatett-pos/users/new-branch", state:record}}>
-            <img src={EditIcon} alt="img" />
-          </Link>
-          <span className="me-3" onClick={() => confirmText(record.id)}>
-            <img src={DeleteIcon} alt="img" />
-          </span>
+        <Link to={{pathname:"/tinatett-pos/users/new-branch", state:record}}>
+          <span className="badges btn-cancel me-2"><FeatherIcon icon="edit" /> Edit</span> 
+        </Link>
+
+        <span className="badges btn-danger me-2" onClick={() => confirmText(record.id)}>
+          <FeatherIcon icon="trash" /> Delete</span>          
         </>
       ),
     },
