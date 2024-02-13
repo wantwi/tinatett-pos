@@ -74,7 +74,7 @@ const Addsales = () => {
   const [transDate, setTransDate] = useState(new Date().toISOString().substring(0, 10))
   const [invoiceNo, setInvoiceNo] = useState('')
   const [referenceData, setReferenceData] = useState({ data: [], reference: '', amountToPay: '', balance: '' })
-  const [isSaving, setIsSaving] = useState(false)
+  const [isSaving, setIsSaving] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
   const [paymentInfo, setPaymentInfo] = useState(init)
   const [transactionType, setTransactionType] = useState('SP')
@@ -150,7 +150,6 @@ const Addsales = () => {
           }
           setCustomerList([addedCustomer, ...customerList])
           reset();
-          setIsSaving(false)
 
           alertify.set("notifier", "position", "bottom-right");
           alertify.success("Customer added successfully.");

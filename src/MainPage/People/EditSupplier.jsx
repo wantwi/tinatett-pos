@@ -340,3 +340,33 @@ const EditSupplier = () => {
 };
 
 export default EditSupplier;
+
+// let BAM_PROPS = {
+//   included_environments: [
+//       {
+//         "id":16,
+//        "name": "EFT86_v8.0.6.16_SQL",
+//        "mftServer": "EFT"
+//       }
+// ],
+//   global_settings: {
+//     "dateFormat":"yyyy-MM-dd",
+//     "autoRefreshValue":"300000",
+//     "dateRange":"today",
+//     "appLogLevel":"DEBUG",
+//     "resultsPerPage":"100",
+//     "showTransactionLogs":true,
+//     "cacheEnabled":false,
+//     "authUserAccess":false,
+//     "showUnknownTransactionsForAllUsers":false,
+//     "sessionTimeoutValue":"600",
+//     "menuColor":"#0087BD",
+//     "appBaseUrl":"https://localhost:9443",
+//     "longRunningTransactionDuration":"30",
+//     "serverTransactions":true,
+//     "adhoc":true,
+//     "workspaces":false,
+//     "securemail":false
+//   }
+
+// }
