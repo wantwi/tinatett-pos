@@ -74,7 +74,7 @@ const Addsales = () => {
   const [transDate, setTransDate] = useState(new Date().toISOString().substring(0, 10))
   const [invoiceNo, setInvoiceNo] = useState('')
   const [referenceData, setReferenceData] = useState({ data: [], reference: '', amountToPay: '', balance: '' })
-  const [isSaving, setIsSaving] = useState(false)
+  const [isSaving, setIsSaving] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
   const [paymentInfo, setPaymentInfo] = useState(init)
   const [transactionType, setTransactionType] = useState('SP')
@@ -82,6 +82,7 @@ const Addsales = () => {
   const [receiptFile, setReceiptFile] = useState(null)
   const [isBatchLoading, setIsBatchLoading] = useState(false)
   const [userType, setUserType] = useState('')
+
 
   const retailpriceTypeRef = useRef()
   const specialpriceTypeRef = useRef()
@@ -133,6 +134,7 @@ const Addsales = () => {
 
   //save adhoc customer
   const onSubmit = (data) => {
+    setIsSaving(true)
     let payload = { ...data, customerType }
 
     axios.post(`/customer`, payload)
@@ -635,14 +637,19 @@ const Addsales = () => {
       setFormData({ quantity: '', amount: '', batchNumber: '', manuDate: '', expDate: '' })
       setSelectedProduct({ remainingStock: '' })
 
-      if (salesType == 'Retail') {
-        retailpriceTypeRef.current.checked = true
-        editretailpriceTypeRef.current.checked = true
-      }
-      else {
-        wholesalepriceTypeRef.current.checked = true
-        editwholesalepriceTypeRef.current.checked = true
-      }
+      // if (salesType == 'Retail') {
+      //   retailpriceTypeRef.current.checked = true
+      //   editretailpriceTypeRef.current.checked = true
+      // }
+      // else if (salesType == 'Wholesale') {
+      //   wholesalepriceTypeRef.current.checked = true
+      //   editwholesalepriceTypeRef.current.checked = true
+      // }
+
+      // else{
+      //   specialpriceTypeRef.current.checked = true
+      //   editspecialpriceTypeRef.current.checked = true
+      // }
 
       // specialpriceTypeRef.current.checked = false
       setWholesalePrice('')
@@ -744,15 +751,17 @@ const Addsales = () => {
     }
 
     else if (selectedCustomer && (!selectedCustomer?.label.includes('Whole')) && (!selectedCustomer?.label.includes('Retail'))) {
+      // setSalesType('Special')
+      // specialpriceTypeRef.current.checked = true
 
-      wholesalepriceTypeRef.current.disabled = false
-      editwholesalepriceTypeRef.current.disabled = false
+      // wholesalepriceTypeRef.current.disabled = false
+      // editwholesalepriceTypeRef.current.disabled = false
 
-      retailpriceTypeRef.current.disabled = false
-      editretailpriceTypeRef.current.disabled = false
+      // retailpriceTypeRef.current.disabled = false
+      // editretailpriceTypeRef.current.disabled = false
 
-      setDisableUnselectedPrice({ wholesale: false, retail: false, special: false })
-      setDisableUnselectedPriceEdit({ wholesale: true, retail: false, special: true })
+      // setDisableUnselectedPrice({ wholesale: false, retail: false, special: false })
+      // setDisableUnselectedPriceEdit({ wholesale: true, retail: false, special: true })
     }
 
 
@@ -812,9 +821,11 @@ const Addsales = () => {
     return <LoadingSpinner message="Loading...please wait" />
   }
 
-  if (isSaving) {
-    return <LoadingSpinner message="Processing...please wait" />
-  }
+
+
+  // if (isCustomerSaving) {
+  //   return <LoadingSpinner message="Saving...please wait" />
+  // }
 
 
 
@@ -2283,7 +2294,10 @@ const Addsales = () => {
               </div>
 
               <div className="col-lg-12" style={{ textAlign: 'right' }}>
-                <button type="submit" className="btn btn-submit me-2"><FeatherIcon icon="save" /> Save</button>
+                <button type="submit" className="btn btn-submit me-2">
+                {isSaving ? <div className="spinner-border text-default me-1" role="status" style={{ height: 20, width: 20 }}>
+                          <span className="sr-only">Loading...</span>
+                </div> : <FeatherIcon icon="save" />} Save</button>
                 <button type="button" className="btn btn-cancel" data-bs-dismiss="modal">Close</button>
               </div>
             </div>

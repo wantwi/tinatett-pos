@@ -18,6 +18,7 @@ import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 const EditCustomer = () => {
   const {state} = useLocation()
 
+
   const [formData, setFormData] = useState(state)
   const [customerType, setCustomerType] = useState(formData?.customerType)
   const [userType, setUserType] = useState(null)
@@ -92,7 +93,7 @@ const EditCustomer = () => {
           <div className="page-header">
             <div className="page-title">
               <h4>Customer Management</h4>
-              <h6>Edit/Update Customer</h6>
+              {state?.mode == 'view' ? <h6>View Customer</h6> : <h6>Update Customer</h6>}
             </div>
           </div>
           {/* /edit */}
@@ -183,12 +184,14 @@ const EditCustomer = () => {
                   </div>
                 </div>
 
+                
+                {state?.mode == 'edit' ? 
                 <div className="col-lg-12" style={{textAlign:'right'}}>
                   <button  type="submit" className="btn btn-submit me-2">Update</button>
                   <Link to="/tinatett-pos/people/customerlist" className="btn btn-cancel">
                     Cancel
                   </Link>
-                </div>
+                </div> : null}
                 </div>
             </form>
           </div>

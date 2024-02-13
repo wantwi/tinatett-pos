@@ -157,9 +157,13 @@ const CustomerList = () => {
       title: "Action",
       render: (a, record) => (
         <>
-          <Link className="me-3" to={{pathname:"/tinatett-pos/people/editcustomer", state:record}}>
-          <span className="badges btn-cancel me-2"><FeatherIcon icon="edit" /> Edit</span> 
+          <Link className="me-3" to={{pathname:"/tinatett-pos/people/editcustomer", state:{...record, mode:'view'}}}>
+          <span className="badges btn-cancel me-2"><FeatherIcon icon="eye" /> View</span> 
           </Link>
+          <Link className="me-3" to={{pathname:"/tinatett-pos/people/editcustomer", state:{...record, mode:'edit'}}}>
+          <span className="badges btn-info me-2"><FeatherIcon icon="edit" /> Edit</span> 
+          </Link>
+
           {/* <Link className="confirm-text" to="#" onClick={confirmText}>
             <img src={DeleteIcon} alt="img" />
           </Link> */}

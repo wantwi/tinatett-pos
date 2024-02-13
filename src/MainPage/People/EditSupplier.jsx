@@ -143,7 +143,7 @@ const EditSupplier = () => {
           <div className="page-header">
             <div className="page-title">
               <h4>Supplier Management</h4>
-              <h6>Update Supplier</h6>
+              {state?.mode == 'view' ? <h6>View Supplier</h6> : <h6>Update Supplier</h6>}
             </div>
           </div>
           {/* /add */}
@@ -321,13 +321,13 @@ const EditSupplier = () => {
                     </div>
                   </fieldset>
 
-
+                  {state?.mode == 'edit' ? 
                   <div className="col-lg-12" style={{ textAlign: 'right' }}>
                     <button type="submit" className="btn btn-submit me-2">Update</button>
                     <Link to="/tinatett-pos/people/supplierlist" className="btn btn-cancel">
                       Cancel
                     </Link>
-                  </div>
+                  </div> : null}
                 </div>
               </form>
             </div>
@@ -340,3 +340,33 @@ const EditSupplier = () => {
 };
 
 export default EditSupplier;
+
+// let BAM_PROPS = {
+//   included_environments: [
+//       {
+//         "id":16,
+//        "name": "EFT86_v8.0.6.16_SQL",
+//        "mftServer": "EFT"
+//       }
+// ],
+//   global_settings: {
+//     "dateFormat":"yyyy-MM-dd",
+//     "autoRefreshValue":"300000",
+//     "dateRange":"today",
+//     "appLogLevel":"DEBUG",
+//     "resultsPerPage":"100",
+//     "showTransactionLogs":true,
+//     "cacheEnabled":false,
+//     "authUserAccess":false,
+//     "showUnknownTransactionsForAllUsers":false,
+//     "sessionTimeoutValue":"600",
+//     "menuColor":"#0087BD",
+//     "appBaseUrl":"https://localhost:9443",
+//     "longRunningTransactionDuration":"30",
+//     "serverTransactions":true,
+//     "adhoc":true,
+//     "workspaces":false,
+//     "securemail":false
+//   }
+
+// }
