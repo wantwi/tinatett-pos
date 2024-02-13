@@ -143,7 +143,7 @@ const EditSupplier = () => {
           <div className="page-header">
             <div className="page-title">
               <h4>Supplier Management</h4>
-              <h6>Update Supplier</h6>
+              {state?.mode == 'view' ? <h6>View Supplier</h6> : <h6>Update Supplier</h6>}
             </div>
           </div>
           {/* /add */}
@@ -321,13 +321,13 @@ const EditSupplier = () => {
                     </div>
                   </fieldset>
 
-
+                  {state?.mode == 'edit' ? 
                   <div className="col-lg-12" style={{ textAlign: 'right' }}>
                     <button type="submit" className="btn btn-submit me-2">Update</button>
                     <Link to="/tinatett-pos/people/supplierlist" className="btn btn-cancel">
                       Cancel
                     </Link>
-                  </div>
+                  </div> : null}
                 </div>
               </form>
             </div>
