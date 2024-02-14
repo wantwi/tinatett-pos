@@ -497,6 +497,17 @@ const EditSales = () => {
   }
 
   useEffect(() => {
+
+    if( specialpriceTypeRef.current?.checked == true){
+      setPrice(specialpriceTypeRef.current?.value)
+    }
+    else  if( wholesalepriceTypeRef.current?.checked == true){
+      setPrice(wholesalepriceTypeRef.current?.value)
+    }
+    else  if( retailpriceTypeRef.current?.checked == true){
+      setPrice(retailpriceTypeRef.current?.value)
+    }
+    
     axios.get(`${BASE_URL}/purchase/product/${selectedProduct?.value}`).then((res) => {
       setIsLoading(true)
       if (res.data.success) {
