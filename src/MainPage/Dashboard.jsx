@@ -153,7 +153,7 @@ const Dashboard = (props) => {
   const [topProductsData, settopProductsData] = useState([])
   const [topcustomersData, settopcustomersData] = useState([])
   const [alertListData, setAlerListData] = useState([])
-  const [profitMarginData, setprofitMarginData] = useState([])
+  const [profitMarginData, setprofitMarginData] = useState(null)
 
   const [userType, setUserType] = useState('')
  // const [summaryData, setSummaryData] = useState([])
@@ -179,12 +179,18 @@ const Dashboard = (props) => {
       setExpiredData(expiring?.data)
       settopProductsData(topproducts?.data)
       settopcustomersData(topcustomers?.data)
-      setprofitMarginData(profitmargin?.data)
+      setprofitMarginData( profitmargin.data)
       setAlerListData(alertList?.data)
       // setSummaryData(summary?.data)
+    
     }
   
   }, [isLoading, expLoading, topproductsLoading, topcustomersLoading, profitmarginLoading, alertListLoading ])
+
+
+  useEffect(() => {
+    console.log("Profit Margin", profitMarginData)
+  }, [profitMarginData])
 
   if(isLoading || topproductsLoading || topcustomersLoading){
     return <LoadingSpinner/>
@@ -358,7 +364,7 @@ const Dashboard = (props) => {
                   <h5>
                    GHS {' '}
                     <span className="counters">
-                      <CountUp end={moneyInTxt(profitMarginData?.total_daily_profit_margin) || 0} />
+                      <CountUp end={profitMarginData?.total_daily_profit_margin} />
                     </span>
                   </h5>
                   <h6>Total Profit Margin (Daily)</h6>
@@ -376,7 +382,7 @@ const Dashboard = (props) => {
                   <h5>
                     GHS {' '}
                     <span className="counters">
-                      <CountUp end={moneyInTxt(profitMarginData?.total_current_month_profit_margin) || 0} />
+                      <CountUp end={profitMarginData?.total_current_month_profit_margin} />
                     </span>
                   </h5>
                   <h6>Total Profit Margin (Monthly)</h6>

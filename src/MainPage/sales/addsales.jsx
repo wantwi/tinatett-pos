@@ -754,11 +754,14 @@ const Addsales = () => {
       // setSalesType('Special')
       // specialpriceTypeRef.current.checked = true
 
-      // wholesalepriceTypeRef.current.disabled = false
-      // editwholesalepriceTypeRef.current.disabled = false
+       wholesalepriceTypeRef.current.disabled = false
+       editwholesalepriceTypeRef.current.disabled = false
 
-      // retailpriceTypeRef.current.disabled = false
-      // editretailpriceTypeRef.current.disabled = false
+       retailpriceTypeRef.current.disabled = false
+       editretailpriceTypeRef.current.disabled = false
+
+       specialpriceTypeRef.current.disabled = false
+       editspecialpriceTypeRef.current.disabled = false
 
       // setDisableUnselectedPrice({ wholesale: false, retail: false, special: false })
       // setDisableUnselectedPriceEdit({ wholesale: true, retail: false, special: true })
