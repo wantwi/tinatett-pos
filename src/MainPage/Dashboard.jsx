@@ -169,7 +169,7 @@ const Dashboard = (props) => {
   useEffect(() => {
     let userRole = localStorage.getItem('auth')
     let obj =JSON.parse(userRole)
-    console.log("Role:", obj.role)
+    //console.log("Role:", obj.role)
     setUserType(obj.role)
   }, [])
 
@@ -188,9 +188,7 @@ const Dashboard = (props) => {
   }, [isLoading, expLoading, topproductsLoading, topcustomersLoading, profitmarginLoading, alertListLoading ])
 
 
-  useEffect(() => {
-    console.log("Profit Margin", profitMarginData)
-  }, [profitMarginData])
+
 
   if(isLoading || topproductsLoading || topcustomersLoading){
     return <LoadingSpinner/>

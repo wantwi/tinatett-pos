@@ -74,7 +74,7 @@ const Addsales = () => {
   const [transDate, setTransDate] = useState(new Date().toISOString().substring(0, 10))
   const [invoiceNo, setInvoiceNo] = useState('')
   const [referenceData, setReferenceData] = useState({ data: [], reference: '', amountToPay: '', balance: '' })
-  const [isSaving, setIsSaving] = useState(true)
+  const [isSaving, setIsSaving] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [paymentInfo, setPaymentInfo] = useState(init)
   const [transactionType, setTransactionType] = useState('SP')
@@ -126,7 +126,7 @@ const Addsales = () => {
   useEffect(() => {
     let userRole = localStorage.getItem('auth')
     let obj = JSON.parse(userRole)
-    console.log("Role:", obj.role)
+    //console.log("Role:", obj.role)
     setUserType(obj.role)
   }, [])
 
@@ -675,6 +675,22 @@ const Addsales = () => {
 
   useEffect(() => {
     // console.log("Selected Prod", selectedProduct)
+
+    // console.log(specialpriceTypeRef.current?.value, specialpriceTypeRef.current?.checked, 'SP')
+    // console.log(wholesalepriceTypeRef.current?.value, wholesalepriceTypeRef.current?.checked, 'WP')
+    // console.log(retailpriceTypeRef.current?.value, retailpriceTypeRef.current?.checked, 'RP')
+
+
+    if( specialpriceTypeRef.current?.checked == true){
+      setPrice(specialpriceTypeRef.current?.value)
+    }
+    else  if( wholesalepriceTypeRef.current?.checked == true){
+      setPrice(wholesalepriceTypeRef.current?.value)
+    }
+    else  if( retailpriceTypeRef.current?.checked == true){
+      setPrice(retailpriceTypeRef.current?.value)
+    }
+
 
     axios.get(`${BASE_URL}/purchase/product/${selectedProduct?.value}`).then((res) => {
       setIsLoading(true)
