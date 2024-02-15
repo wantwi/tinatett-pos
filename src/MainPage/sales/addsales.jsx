@@ -246,7 +246,7 @@ const Addsales = () => {
         transDate: transDate,
         // totalAmount: (Number(paymentInfo.cashAmount) + Number(paymentInfo.momoAmount) + Number(paymentInfo.chequeAmount)) ,
         totalAmount: productGridData.reduce((total, item) => total + item.amount, 0),
-     
+        salesType: retailpriceTypeRef.current.checked == true ? 'Retail' : 'Wholesale',
         products: productGridData.map((item) => {
           return {
             "productId": item.productId,
@@ -495,7 +495,7 @@ const Addsales = () => {
         customerId: selectedCustomer?.value,
         transDate: transDate,
         totalAmount: productGridData.reduce((total, item) => total + item.amount, 0),
-  
+        salesType: retailpriceTypeRef.current.checked == true ? 'Retail' : 'Wholesale',
         products: productGridData.map((item) => {
           return {
             "productId": item.productId,
@@ -581,7 +581,7 @@ const Addsales = () => {
       manufacturingDate: formData?.manuDate.substring(0, 10),
       unitPrice: price,
       // priceType: salesType,
-      priceType: retailpriceTypeRef.current.checked == true ? 'retail' : 'wholesale',
+      priceType: retailpriceTypeRef.current.checked == true ? 'Retail' : 'Wholesale',
       amount: formData.quantity * price
     }
  

@@ -71,7 +71,7 @@ const ProformaDetail = () => {
                   </Link>
                 </li> */}
                 <li>
-                  <Link to="#">
+                  <Link to="#" hidden={true}>
                     <img src={Pdf} alt="img" onClick={() => createPDF("proformaDetails" , "Proforma")}/>
                   </Link>
                 </li>
