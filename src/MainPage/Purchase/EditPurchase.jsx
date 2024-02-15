@@ -346,17 +346,17 @@ useEffect(() => {
     {
       title: "QTY",
       dataIndex: "quantity",
-      render: (text, record) => <p style={{textAlign:'center'}}>{(record.quantity) || 0}</p>
+      render: (text, record) => <p style={{textAlign:  state?.mode == 'view' ? 'left' : 'center'}}>{(record.quantity) || 0}</p>
     },
     {
       title: "Unit Price",
       dataIndex: "unitPrice",
-      render: (text, record) => <p style={{textAlign:'center'}}>{moneyInTxt(text)}</p>
+      render: (text, record) => <p style={{textAlign:  state?.mode == 'view' ? 'left' : 'center'}}>{moneyInTxt(text)}</p>
     },
     {
       title: "Amount",
       dataIndex: "amount",
-      render: (text, record) => <p style={{textAlign:'center'}}>{moneyInTxt(text)}</p>
+      render: (text, record) => <p style={{textAlign:  state?.mode == 'view' ? 'left' : 'center'}}>{moneyInTxt(text)}</p>
     },
     {
       title: "Batch #",
@@ -367,24 +367,24 @@ useEffect(() => {
     {
       title: "Manufacturing",
       dataIndex: "manufacturingDate",
-      render: (text, record) => <p style={{textAlign:'center'}}>{record.manufacturingDate.substring(0,10) || ''}</p>
+      render: (text, record) => <p style={{textAlign:  state?.mode == 'view' ? 'left' : 'center'}}>{record.manufacturingDate.substring(0,10) || ''}</p>
     },
     {
       title: "Expiring",
       dataIndex: "expireDate",
-      render: (text, record) => <p style={{textAlign:'center'}}>{record.expireDate.substring(0,10) || ''}</p>
+      render: (text, record) => <p style={{textAlign:  state?.mode == 'view' ? 'left' : 'center'}}>{record.expireDate.substring(0,10) || ''}</p>
     },
     {
-      title:"Action",
+      title:  state?.mode == 'view' ? null : "Action",
       render: (text, record) => (
-        <>
+        <div hidden= {state?.mode == 'view' ? true :  false}>
          <span className="me-3" to="#" data-bs-target="#editproduct" data-bs-toggle="modal"  onClick={() => handleEdit(record)} style={{cursor:'pointer'}}>
             <img src={EditIcon} alt="img" />
           </span>
           <span className="delete-set" to="#" onClick={() => confirmText(record)} style={{cursor:'pointer'}}>
             <img src={DeleteIcon} alt="img" />
           </span>
-        </>
+        </div>
       ),
     },
   ];
@@ -453,12 +453,13 @@ useEffect(() => {
           <div className="page-header">
             <div className="page-title">
               <h4>Purchase </h4>
-              <h6>Update Purchase</h6>
+              {state?.mode == 'view' ? <h6>View Purchase</h6> : <h6>Update Purchase</h6>}
             </div>
           </div>
 
           <div style={{display:'flex', gap:20}}>
-            <div  style={{width: '30%'}}>
+     
+            <div  style={{width: '30%'}} hidden= {state?.mode == 'view' ? true :  false}>
               <div className="card">
                 <div className="card-body">
 
@@ -657,7 +658,7 @@ useEffect(() => {
               </div>
             </div>
 
-            <div className="card"  style={{width: '70%'}}>
+            <div className="card"  style={{width: state?.mode == 'view' ? '100%' : '70%'}}>
               <div className="card-body">
                 <div className="row">
                   <div className="table-responsive">
@@ -725,7 +726,7 @@ useEffect(() => {
                     </div>
                   </div> */}
                   
-                  <div className="col-lg-12" style={{textAlign:'right'}}>
+                  <div className="col-lg-12" style={{textAlign:'right'}} hidden= {state?.mode == 'view' ? true :  false}>
                     <button className="btn btn-submit me-2" type="submit" onClick={onSubmit}>Update</button>
                     <Link to="/tinatett-pos/purchase/purchaselist" className="btn btn-cancel">
                     Cancel
