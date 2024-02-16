@@ -1625,7 +1625,7 @@ const Addsales = () => {
 
               <div className="row">
 
-                <div className="form-group">
+                <div className="form-group" hidden>
                       <label>Unit Price</label>
 
                     <div className="row">

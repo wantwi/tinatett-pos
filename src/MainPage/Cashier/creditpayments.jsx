@@ -22,9 +22,8 @@ import { socket } from "../../InitialPage/Sidebar/Header";
 import useAuth from "../../hooks/useAuth";
 import { NotificationsContext } from "../../InitialPage/Sidebar/DefaultLayout";
 import { Purchase } from "../../EntryFile/imagePath";
-import { debounce } from "lodash";
 
-const CreditPayment = () => {
+const CreditPayments = () => {
   const init = {
     type: '',
     cashWaybill: '',
@@ -54,31 +53,31 @@ const CreditPayment = () => {
   const [isDeleting, setIsDeleting] = useState(false)
   const [receiptFile, setReceiptFile] = useState(null)
   const [isSaving, setIsSaving] = useState(false)
+  const [startDate, setStartDate] = useState('')
+  const [endDate, setEndDate] = useState('')
   const [isLoadingPDF, setIsLoadingPDF] = useState(false)
-  const [isErrorPDF, setIsError] = useState('')
 
   const { notifications, setNotifications } = useContext(NotificationsContext)
   let storage = JSON.parse(localStorage.getItem("auth"))
 
 
   const onSuccess = (data) => {
-  
+
     setData([])
 
     let mappedData = data?.data.map((sale) => {
       return {
         id: sale?.id,
-        Date: sale?.summary.transDate,
-        Name: sale?.summary.customerName || 'N/A',
-        Status: sale?.summary.transactionStatus,
-        Reference: sale?.summary.reference,
-        Payment: sale?.paymentType,
-        Total: (sale?.summary.amount),
-        Paid: (sale?.summary.totalAmountPaid),
-        Due: (sale?.summary.remainingBalance),
-        Biller: sale?.summary.salesPerson,
-        salestype: sale?.summary.salesType,
-        paymentHistory: sale?.paymentHistory
+        Date: sale?.transactionDate,
+        Name: sale?.customerName || 'N/A',
+        Status: sale?.transactionStatus,
+        Reference: sale?.reference,
+        Payment: sale?.transactionType,
+        Total: (sale?.totalAmount),
+        Paid: sale?.amountPaid,
+        Due: sale?.balance,
+        Biller: sale?.cashierName,
+        salestype: sale?.salesType
       }
     })
     setData(mappedData)
@@ -89,14 +88,14 @@ const CreditPayment = () => {
     setPaymentInfo({ ...paymentInfo, amountPaid: Number(paymentInfo.cashAmount) + Number(paymentInfo.chequeAmount) + Number(paymentInfo.momoAmount) })
   }, [paymentInfo.cashAmount, paymentInfo.chequeAmount, paymentInfo.momoAmount])
 
-  const [query, setQuery] = useState([])
   const {
     data: sales,
     isError,
     isLoading,
     refetch,
+    isFetching
+  } = useGet("suspend", `/sales/credit/payments?startDate=${startDate}&endDate=${endDate}`, onSuccess);
 
-  } = useGet("suspend", `/sales/creditlist?name=${query}`, onSuccess);
   const [data, setData] = useState([])
   const [isUpdate, setIsUpdate] = useState(false)
   const [comment, setComment] = useState('')
@@ -108,13 +107,18 @@ const CreditPayment = () => {
 
   const confirmText = (id) => {
     Swal.fire({
-      title: "Are you sure you want to write off this transaction?",
+      title: "Are you sure?",
       text: "You won't be able to revert this!",
       type: "warning",
+      html: 
+      `<div> 
+        <h4>Please provide a reason for Reversal</h4><br/>
+        <textarea type='text' class="form-control" id="reason"></textarea>
+       </div>`,
       showCancelButton: !0,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it!",
+      confirmButtonText: "Yes, reverse it!",
       confirmButtonClass: "btn btn-primary",
       cancelButtonClass: "btn btn-danger ml-1",
       buttonsStyling: !1,
@@ -124,13 +128,20 @@ const CreditPayment = () => {
         setIsDeleting(true)
 
 
-        let data = await axios.delete(`/sales/suspend/${id}`)
+        let payload = {
+          "id": id,
+          "reason": $('#reason').val()
+        }
+
+        console.log(payload, "Payload")
+
+        let data = await axios.post(`/sales/payment-reverse`, payload)
         if (data.status < 205) {
           setIsDeleting(false)
           Swal.fire({
             type: "success",
-            title: "Deleted!",
-            text: "Your suspended item has been deleted.",
+            title: "Reversed!",
+            text: "Your sale item has been reversed.",
             confirmButtonClass: "btn btn-success",
           });
           refetch()
@@ -144,13 +155,13 @@ const CreditPayment = () => {
             confirmButtonClass: "btn btn-danger",
           });
         }
-      }
+       }
 
 
       t.dismiss === Swal.DismissReason.cancel &&
         Swal.fire({
           title: "Cancelled",
-          text: "You cancelled the delete action",
+          text: "You cancelled the reverse action",
           type: "error",
           confirmButtonClass: "btn btn-success",
         });
@@ -162,6 +173,9 @@ const CreditPayment = () => {
           text: error,
           confirmButtonClass: "btn btn-danger",
         });
+      })
+      .finally(() => {
+        setIsDeleting(false)
       });
   };
 
@@ -169,7 +183,7 @@ const CreditPayment = () => {
 
   const processPayment = (type, print) => {
 
-    if ((Number(paymentInfo.cashAmount) + Number(paymentInfo.momoAmount) + Number(paymentInfo.chequeAmount) > 0) || type == 'Credit') {
+    if ((Number(paymentInfo.cashAmount) + Number(paymentInfo.cashAmount) + Number(paymentInfo.cashAmount) > 0) || type == 'Credit') {
       let pType = ''
       if (paymentInfo.cashAmount > 0) {
         pType = pType.concat('Cash,')
@@ -349,6 +363,7 @@ const CreditPayment = () => {
     }
   }
 
+
   const options = [
     { id: 'Retail', text: "Retail", text: "Retail" },
     { id: 'Wholesale', text: "Wholesale", text: "Wholesale" },
@@ -368,20 +383,20 @@ const CreditPayment = () => {
       let mappedData = sales?.data.map((sale) => {
         return {
           id: sale?.id,
-          Date: sale?.summary.transDate,
-          Name: sale?.summary.customerName || 'N/A',
-          Status: sale?.summary.transactionStatus,
-          Reference: sale?.summary.reference,
-          Payment: sale?.paymentType,
-          Total: (sale?.summary.amount),
-          Paid: (sale?.summary.totalAmountPaid),
-          Due: (sale?.summary.remainingBalance),
-          Biller: sale?.summary.salesPerson,
-          salestype: sale?.summary.salesType,
-          paymentHistory: sale?.paymentHistory
+          Date: sale?.transactionDate,
+          Name: sale?.customerName || 'N/A',
+          Status: sale?.transactionStatus,
+          Reference: sale?.reference,
+          Payment: sale?.transactionType,
+          Total: (sale?.totalAmount),
+          Paid: sale?.amountPaid,
+          Due: sale?.balance,
+          Biller: sale?.cashierName,
+          salestype: sale?.salesType
         }
       })
       setData(mappedData)
+      console.log('loaded..')
     }
     else {
       console.log('loading...')
@@ -395,19 +410,18 @@ const CreditPayment = () => {
       let mappedData = data?.response.map((sale) => {
         return {
           id: sale?.id,
-          Date: sale?.summary.transDate,
-          Name: sale?.summary.customerName || 'N/A',
-          Status: sale?.summary.transactionStatus,
-          Reference: sale?.summary.reference,
-          Payment: sale?.paymentType,
-          Total: (sale?.summary.amount),
-          Paid: (sale?.summary.totalAmountPaid),
-          Due: (sale?.summary.remainingBalance),
-          Biller: sale?.summary.salesPerson,
-          salestype: sale?.summary.salesType,
-          paymentHistory: sale?.paymentHistory
+          Date: sale?.transactionDate,
+          Name: sale?.customerName || 'N/A',
+          Status: sale?.transactionStatus,
+          Reference: sale?.reference,
+          Payment: sale?.transactionType,
+          Total: (sale?.totalAmount),
+          Paid: sale?.amountPaid,
+          Due: sale?.balance,
+          Biller: sale?.cashierName,
+          salestype: sale?.salesType
         }
-      })
+      }).sort((a,b) => new Date(b.Date) - new Date(a.Date))
 
       setData([])
       setData(mappedData)
@@ -423,24 +437,24 @@ const CreditPayment = () => {
 
 
 
+
   useEffect(() => {
     if (!isLoading) {
       let mappedData = sales?.data.map((sale) => {
         return {
           id: sale?.id,
-          Date: sale?.summary.transDate,
-          Name: sale?.summary.customerName || 'N/A',
-          Status: sale?.summary.transactionStatus,
-          Reference: sale?.summary.reference,
-          Payment: sale?.paymentType,
-          Total: (sale?.summary.amount),
-          Paid: (sale?.summary.totalAmountPaid),
-          Due: (sale?.summary.remainingBalance),
-          Biller: sale?.summary.salesPerson,
-          salestype: sale?.summary.salesType,
-          paymentHistory: sale?.paymentHistory
+          Date: sale?.transactionDate,
+          Name: sale?.customerName || 'N/A',
+          Status: sale?.transactionStatus,
+          Reference: sale?.reference,
+          Payment: sale?.transactionType,
+          Total: (sale?.totalAmount),
+          Paid: sale?.amountPaid,
+          Due: sale?.balance,
+          Biller: sale?.cashierName,
+          salestype: sale?.salesType
         }
-      })
+      }).sort((a,b) => new Date(b.Date) - new Date(a.Date))
       if (filter == 'All') {
         setData(mappedData)
       }
@@ -452,50 +466,10 @@ const CreditPayment = () => {
   }, [filter])
 
 
-  const getSalesProductById = (id) => {
-    axios.get(`/sales/suspend/items/${id}`)
-      .then((res) => {
-        let x = (res.data?.data)
-        console.log("Items", x)
-        let mapped = x.map((item) => {
-          return {
-            salesRef: item?.salesRef,
-            name: item?.product?.name,
-            productId: item?.id,
-            quantity: item?.quantity,
-            unitPrice: item?.unitPrice,
-            amount: item?.amount
-          }
-        })
-        setProductGridData(mapped)
-      })//.finally(() => setLoading(false))
-  }
+  // useEffect(() => {
+  //   refetch()
+  // }, [startDate, endDate])
 
-
- const handleSearch = debounce((value) => {
-  axios.get(`/sales/creditlist?name=${value}`)
-    .then((res) => {
-    let mapped = res?.data.data.map((sale) => {
-      return {
-        id: sale?.id,
-          Date: sale?.summary.transDate,
-          Name: sale?.summary.customerName || 'N/A',
-          Status: sale?.summary.transactionStatus,
-          Reference: sale?.summary.reference,
-          Payment: sale?.paymentType,
-          Total: (sale?.summary.amount),
-          Paid: (sale?.summary.totalAmountPaid),
-          Due: (sale?.summary.remainingBalance),
-          Biller: sale?.summary.salesPerson,
-          salestype: sale?.summary.salesType,
-          paymentHistory: sale?.paymentHistory
-      }
-    })
-  setData(mapped)
-})
-  
-
-}, 300)
 
 
   const columns = [
@@ -550,19 +524,29 @@ const CreditPayment = () => {
       title: "Action",
       render: (text, record) => (
         <>
-         <Link
+     
+         
+          <Link
               to="#"  data-bs-toggle="modal"
               data-bs-target="#showpayment"
-              onClick={() => { setModalData(record), setIsCredit(false) }}
-             title={'Pay'}>
-              <span className="badges bg-lightgreen me-2"><FeatherIcon icon="credit-card" /> Pay</span>
+              onClick={() => { 
+                console.log("Record", record)
+                setModalData(record)
+                setIsUpdate(true)
+                setPaymentInfo({ ...paymentInfo, cashAmount: (record?.Paid)})
+               }}
+             
+              title={'Edit Payment'}
+            >
+
+              <span className="badges bg-lightgreen me-2"><FeatherIcon icon="edit" /> Edit</span>
              
           </Link>
           <Link
               to="#"  data-bs-toggle="modal"
-              //data-bs-target="#pdfViewer"
               onClick={() => getInvoiceReceipt(record?.Reference)}
-              //onClick={() => { setModalData(record), setIsUpdate(false) }}
+              // data-bs-target="#pdfViewer"
+              // onClick={() => { setModalData(record), setIsUpdate(false), getInvoiceReceipt(record?.Reference) }}
              
               title={'View Invoice'}
             >
@@ -570,28 +554,19 @@ const CreditPayment = () => {
               <span className="badges btn-cancel me-2"><FeatherIcon icon="eye" /> View Invoice</span>
              
           </Link>
-          <Link
-              to="#"  data-bs-toggle="modal"
-              data-bs-target="#paymentHistory"
-              onClick={() => { setModalData(record) }}
-             
-              title={'View History'}
-            >
-
-              <span className="badges btn-info me-2"><FeatherIcon icon="file-text" />  History</span>
-             
-          </Link>
+         
           <Link
               to="#"
               // className="dropdown-item confirm-text"
-              onClick={() => alert('Upcoming feature')}
-              
-              title={'Write Off Payment'}
+              onClick={() => confirmText(record.id)}
+              title={'Reverse Payment'}
             >
 
-              <span className="badges bg-lightred"><FeatherIcon icon="trash" /> Write Off Debt </span>
+              <span className="badges bg-lightred"><FeatherIcon icon="repeat" /> Reverse </span>
              
           </Link>
+      
+         
 
 
         </>
@@ -604,8 +579,13 @@ const CreditPayment = () => {
     return (<LoadingSpinner message="Fetching Credited sales.." />)
   }
 
+  if (isFetching) {
+    return (<LoadingSpinner message="Fetching Credited sales.." />)
+  }
+
+
   if (isDeleting) {
-    return (<LoadingSpinner message="Deleting.." />)
+    return (<LoadingSpinner />)
   }
 
   if (isSaving) {
@@ -619,8 +599,8 @@ const CreditPayment = () => {
         <div className="content">
           <div className="page-header">
             <div className="page-title">
-              <h4>Credit Payment</h4>
-              <h6>Payment for credit purchases </h6>
+              <h4>Credit Payments</h4>
+              <h6>Manage your credit payments </h6>
             </div>
             <div className="page-btn">
               {/* <Link to="/tinatett-pos/sales/add-sales" className="btn btn-added">
@@ -632,7 +612,7 @@ const CreditPayment = () => {
           {/* /product list */}
           <div className="card">
             <div className="card-body">
-              <Tabletop inputfilter={inputfilter} togglefilter={togglefilter} handleSearch={handleSearch} showSearch={true} searchLabel={'Search by Customer or Reference'}/>
+              <Tabletop inputfilter={inputfilter} togglefilter={togglefilter} showSearch={false}/>
             
               {/* /Filter */}
               <div
@@ -643,8 +623,9 @@ const CreditPayment = () => {
                 <div className="card-body pb-0">
                   <div className="row">
 
-                    <div className="col-lg-3 col-sm-6 col-12">
+                    <div className="col-lg-3 col-sm-6 col-12" hidden>
                       <div className="form-group">
+                      <label>Filter By</label>
                         <Select2
                           className="select"
                           data={options}
@@ -656,22 +637,31 @@ const CreditPayment = () => {
                         />
                       </div>
                     </div>
-                    {/* <div className="col-lg-3 col-sm-6 col-12">
-                      <div className="form-group">
-                      <span style={{fontWeight:900}}>Total Amount: {moneyInTxt(data.reduce((total, item) =>  Number(total) + Number(item?.Total), 0))}</span>
-                      </div>
-                    </div>
+
                     <div className="col-lg-3 col-sm-6 col-12">
                       <div className="form-group">
-                      <span style={{fontWeight:900}}>Total Paid: {moneyInTxt(data.reduce((total, item) =>  Number(total) + Number(item?.Paid), 0))}</span>
+                        <label>Start Date</label>
+                        <input className="form-control"  type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)}/>
                       </div>
                     </div>
+
                     <div className="col-lg-3 col-sm-6 col-12">
                       <div className="form-group">
-                      <span style={{fontWeight:900}}>Remaining Amount: {moneyInTxt(data.reduce((total, item) =>  Number(total) + Number(item?.Due), 0))}</span>
+                        <label>End Date</label>
+                        <input className="form-control" type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)}/>
                       </div>
-                    </div> */}
+                    </div>
+
+                    <div className="col-lg-3 col-sm-6 col-12">
+                      <div className="form-group">
+                        <label>&nbsp;</label>
+                        <button className="btn btn-success" type="submit" onClick={refetch}>Apply</button>
+                      </div>
+                    </div>
+                  
                   </div>
+
+                
                 </div>
               </div>
               {/* /Filter */}
@@ -1000,7 +990,7 @@ const CreditPayment = () => {
                                  <label>Comment</label>
                               </li>
                               <li>
-                                <textarea className="form-control" type="text" placeholder="Type comment here.." value={comment} onChange={(e) => setComment(e.target.value)}></textarea>
+                                <input className="form-control" type="text" placeholder="Type comment here.." value={comment} onChange={(e) => setComment(e.target.value)}/>
                              </li>
                             </ul>
                           </div>
@@ -1009,11 +999,11 @@ const CreditPayment = () => {
                           <div className="total-order w-100 max-widthauto m-auto mb-4">
                             <ul>
                               <li>
-                                <h4>Amount Given</h4>
+                                <h4>Updated Amount</h4>
                                 <h5>GHS {moneyInTxt(paymentInfo?.amountPaid)} </h5>
                               </li>
                               <li>
-                                <h4>Amount Already Paid </h4>
+                                <h4>Amount Prev Paid </h4>
                                 <h5>GHS {moneyInTxt(modalData?.Paid)}</h5>
                               </li>
                             </ul>
@@ -1026,9 +1016,9 @@ const CreditPayment = () => {
                                 <h4>Grand Total</h4>
                                 <h5>GHS {moneyInTxt(modalData?.Total)}</h5>
                               </li>
-                              <li style={{ border: Number(modalData?.Due) - Number(paymentInfo.amountPaid) > 0 ? '2px solid red' : Number(modalData?.Total) - Number(paymentInfo.amountPaid) < 0 ? '2px solid green' : null }}>
-                                <h4>{Number(modalData?.Due) - Number(paymentInfo.amountPaid) < 0 ? 'Change' : 'Balance'}</h4>
-                                <h5>GHS {moneyInTxt(Math.abs(Number(modalData?.Due) - Number(paymentInfo.amountPaid)))}</h5>
+                              <li>
+                                <h4>Balance</h4>
+                                <h5>GHS {moneyInTxt(Number(modalData?.Total) - Number(paymentInfo?.amountPaid))}</h5>
                               </li>
 
                             </ul>
@@ -1050,8 +1040,8 @@ const CreditPayment = () => {
 
                 <div className="row mt-2">
                   <div className="col-lg-12" style={{ display: 'flex', justifyContent: 'flex-start' }} >
-                    {!isCredit && (<button className="btn btn-info me-2" data-bs-toggle="modal" data-bs-target="#confirmPaymentSellPrint" style={{ width: '20%' }}>
-                     Pay
+                    {!isCredit && !isUpdate && (<button className="btn btn-info me-2" data-bs-toggle="modal" data-bs-target="#confirmPaymentSellPrint" style={{ width: '20%' }}>
+                      Pay
                     </button>)}
                     {isUpdate && (<button className="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#confirmPaymentUpdate" style={{ width: '20%' }}>
                      Update Payment
@@ -1071,7 +1061,7 @@ const CreditPayment = () => {
         </div>
 
         {/* cash payment Modal */}
-        {/* <div
+        <div
           className="modal fade"
           id="cashpayment"
           tabIndex={-1}
@@ -1081,7 +1071,7 @@ const CreditPayment = () => {
           <div className="modal-dialog modal-lg modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">Sales Type: {modalData?.reference}</h5>
+                <h5 className="modal-title">Sales Type: {modalData?.salestype}</h5>
                 <button
                   type="button"
                   className="close"
@@ -1192,12 +1182,12 @@ const CreditPayment = () => {
                       Sell Only
                     </button>)} */}
 
-                  {/* </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>  */}
+        </div>
 
         {/* Payment Confirm Modal */}
 
@@ -1381,6 +1371,7 @@ const CreditPayment = () => {
         </div>
 
 
+     
         {/* PDF Modal */}
         <div
           className="modal fade"
@@ -1444,73 +1435,10 @@ const CreditPayment = () => {
           </div>
         </div>
 
-          {/* History Modal */}
-          <div
-          className="modal fade"
-          id="paymentHistory"
-          tabIndex={-1}
-          aria-labelledby="paymentHistory"
-          aria-hidden="true"
-        >
-          <div className="modal-dialog modal-lg modal-dialog-centered">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">Payment History</h5>
-                <button
-                  type="button"
-                  className="close"
-                  data-bs-dismiss="modal"
-                  aria-label="Close"
-                  onClick={() => $('.modal').modal('hide')}
-                >
-                  <span aria-hidden="true">×</span>
-                </button>
-              </div>
-              <div className="modal-body">
-              <div className="row">
-                  <div className="table-responsive mb-3">
-                    <table className="table">
-                      <thead>
-                        <tr>
-                          <th>#</th>
-                          <th>Date</th>
-                          <th>Reference</th>
-                          <th>Total Amount</th>
-                          <th>Amount Paid</th>
-                          <th>Balance</th>
-                          <th>Cashier</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                         {modalData?.paymentHistory?.map((item, index) => {
-                          return (
-                            <tr key={item?.id}>
-                              <td>{index + 1}</td>
-                              <td>
-                                {item?.transactionDate}
-                              </td>
-                              <td>{item?.reference}</td>
-                              <td>{item?.totalAmount}</td>
-                              <td>{item?.amountPaid}</td>
-                              <td>{item?.balance}</td>
-                              <td>{item?.cashierName}</td>
-                            </tr>
-                          )
-                        })} 
-
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-                
-              </div>
-
-            </div>
-          </div>
-        </div>
+       
       </>
     </>
   );
 };
 
-export default CreditPayment;
+export default CreditPayments;
