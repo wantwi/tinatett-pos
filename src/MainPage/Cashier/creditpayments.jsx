@@ -476,7 +476,7 @@ const CreditPayments = () => {
     {
       title: "Date",
       dataIndex: "Date",
-      sorter: (x) => convertDateUSA(x),
+      render: (x) => convertDateUSA(x),
     },
     {
       title: "Customer name",

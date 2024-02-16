@@ -22,7 +22,7 @@ import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 import alertify from "alertifyjs";
 import "../../../node_modules/alertifyjs/build/css/alertify.css";
 import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
-import { moneyInTxt } from "../../utility";
+import { convertDateUSA, moneyInTxt } from "../../utility";
 import FeatherIcon from 'feather-icons-react'
 
 const ProformaList = () => {
@@ -240,7 +240,7 @@ const ProformaList = () => {
     {
       title: "Date",
       dataIndex: "date",
-      sorter: (a, b) => a.createdAt.length - b.createdAt.length,
+      render: (date) => convertDateUSA(date)
     },
     {
       title: "Customer Name",
@@ -339,7 +339,7 @@ const ProformaList = () => {
         numberOfProduct: proforma?.numberOfProduct,
         createdBy: proforma?.createdBy || 'N/A',
       }
-    })
+    }).sort((a,b) => new Date(b.date) - new Date(a.date))
     setData(mapped)
   })
 }, 300)

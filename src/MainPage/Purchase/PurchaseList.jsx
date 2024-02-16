@@ -22,6 +22,7 @@ import Swal from "sweetalert2";
 import { useDelete } from "../../hooks/useDelete";
 import useCustomApi from "../../hooks/useCustomApi";
 import FeatherIcon from 'feather-icons-react'
+import { convertDateUSA } from "../../utility";
 
 const PurchaseList = () => {
   const [inputfilter, setInputfilter] = useState(false);
@@ -172,7 +173,7 @@ const PurchaseList = () => {
 
             
           }
-        })
+        }).sort((a,b) => new Date(b.date) - new Date(a.date))
       setData(mappedData)
 
     }
@@ -215,7 +216,7 @@ const PurchaseList = () => {
     {
       title: "Purchase Date",
       dataIndex: "date",
-      sorter: (a, b) => a.date.length - b.date.length,
+      render: (date) => convertDateUSA(date)
     },
     {
       title: "Supplier Name",

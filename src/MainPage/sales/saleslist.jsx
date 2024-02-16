@@ -19,7 +19,7 @@ import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
 import { useGet } from "../../hooks/useGet";
 import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
-import { moneyInTxt } from "../../utility";
+import { convertDateUSA, moneyInTxt } from "../../utility";
 import useCustomApi from "../../hooks/useCustomApi";
 import { debounce } from "lodash";
 import FeatherIcon from 'feather-icons-react'
@@ -184,7 +184,7 @@ const SalesList = () => {
     {
       title: "Date",
       dataIndex: "Date",
-      sorter: (a, b) => a.Date.length - b.Date.length,
+      render: (date) => convertDateUSA(date)
     },
     {
       title: "Customer name",
@@ -326,7 +326,7 @@ const SalesList = () => {
         Balance: moneyInTxt(sale?.balance),
         Biller: sale?.salesPerson,
       }
-    })
+    }).sort((a,b) => new Date(b.Date) - new Date(a.Date))
     setData(mapped)
   })
 }, 300)
