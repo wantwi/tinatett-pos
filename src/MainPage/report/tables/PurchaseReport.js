@@ -165,13 +165,13 @@ function PurchaseReport({ data = [], title = "PURCHASE REPORT", fileName = "purc
             <div>
                 <GridComponent id="Grid" pdfQueryCellInfo={pdfQueryCellInfo} beforePdfExport={beforePdfExport} dataSource={data} ref={grid => gridInstance = grid} pdfHeaderQueryCellInfo={pdfHeaderQueryCellInfo} toolbar={toolbarOptions} allowExcelExport={true} allowPdfExport={true} toolbarClick={toolbarClick.bind(this)} height={500} allowPaging={true} pageSettings={{ pageCount: 2, pageSize: 1000 }}>
                     <ColumnsDirective>
-                        <ColumnDirective field='date' headerText='Date' width={90}></ColumnDirective>
+                        <ColumnDirective field='date' headerText='Date' width={90} format='d-MMM-yyyy'></ColumnDirective>
                         <ColumnDirective field='refrence' headerText='Ref.#' width={100} ></ColumnDirective>
                         <ColumnDirective field='supplier' headerText={`${isSupplier ? "Supplier" : "Customer"} `} width={200}></ColumnDirective>
                         <ColumnDirective field='product' headerText='Product' width={200}></ColumnDirective>
                         <ColumnDirective field='batchNumber' headerText='Batch#' width={100}></ColumnDirective>
-                        <ColumnDirective field='manufacturingDate' headerText='MGF Date' width={90}></ColumnDirective>
-                        <ColumnDirective field='expireDate' headerText='EXP Date' width={90}></ColumnDirective>
+                        <ColumnDirective field='manufacturingDate' headerText='MGF Date' width={90} format='d-MMM-yyyy'></ColumnDirective>
+                        <ColumnDirective field='expireDate' headerText='EXP Date' width={90} format='d-MMM-yyyy'></ColumnDirective>
                         <ColumnDirective field='quantity' headerText='Qty' width={50}></ColumnDirective>
                         <ColumnDirective field='unitPrice' headerText='Unit Price' format='N2' width={90}></ColumnDirective>
                         <ColumnDirective field='amount' headerText='Amount' format='N2' width={100}></ColumnDirective>
