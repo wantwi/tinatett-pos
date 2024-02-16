@@ -10,7 +10,7 @@ import Select2 from "react-select2-wrapper";
 import "react-select2-wrapper/css/select2.css";
 import { useGet } from "../../hooks/useGet";
 import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
-import { commaRemover, isValidNumber, moneyInTxt } from "../../utility";
+import { commaRemover, convertDateUSA, isValidNumber, moneyInTxt } from "../../utility";
 import useCustomApi from "../../hooks/useCustomApi";
 import { usePost } from "../../hooks/usePost";
 import alertify from "alertifyjs";
@@ -502,7 +502,7 @@ const CreditList = () => {
     {
       title: "Date",
       dataIndex: "Date",
-      sorter: (a, b) => new Date(b.Date) - new Date(a.Date),
+      render: (x) => convertDateUSA(x)
     },
     {
       title: "Customer name",
