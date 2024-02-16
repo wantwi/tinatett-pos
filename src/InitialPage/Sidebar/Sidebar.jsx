@@ -652,21 +652,21 @@ const Sidebar = (props) => {
                         Sales Payment
                       </Link>
                     </li>
-  
+
 
                   </ul>
                 ) : (
                   ""
                 )}
               </li>) : null}
-              
 
-            {/* Credit Payment */}
-              {userType == 'admin' || userType == 'supervisor'  || userType == 'cashier' ? (<li className="submenu">
+
+              {/* Credit Payment */}
+              {userType == 'admin' || userType == 'supervisor' || userType == 'cashier' ? (<li className="submenu">
                 <a
                   href="#"
                   className={
-                    (pathname.includes("/credit-list") ||  pathname.includes("/credit-payment"))
+                    (pathname.includes("/credit-list") || pathname.includes("/credit-payment"))
                       ? "subdrop active"
                       : "" || isSideMenu == "credit"
                         ? "subdrop active"
@@ -682,16 +682,15 @@ const Sidebar = (props) => {
                 </a>
                 {isSideMenu == "credit" ? (
                   <ul>
-                    
+
                     <li>
-                    <Link
+                      <Link
                         className={
                           pathname.includes("/cashier/credit-payment") ? "active" : ""
                         }
                         to="/tinatett-pos/cashier/credit-payment"
-                        onClick={() => toggleSidebar(isSideMenu == "" ? "" : "")}
                       >
-                        <span>Credit Payment </span>
+                        Credit Payments
                       </Link>
                     </li>
 
@@ -701,12 +700,15 @@ const Sidebar = (props) => {
                           pathname.includes("/cashier/credit-list") ? "active" : ""
                         }
                         to="/tinatett-pos/cashier/credit-list"
+                        onClick={() => toggleSidebar(isSideMenu == "" ? "" : "")}
                       >
-                        Credit List
+                        <span>Credit List </span>
                       </Link>
                     </li>
 
-                    
+
+
+
                   </ul>
                 ) : (
                   ""
