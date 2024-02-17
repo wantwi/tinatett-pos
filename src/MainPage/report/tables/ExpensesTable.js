@@ -4,7 +4,7 @@ import { image } from './image';
 import { getCurrentDateInWords } from './helper';
 import useAuth from '../../../hooks/useAuth';
 
-function ProductMovementTable({ data = [], startDate, endDate, title = "PURCHASE REPORT", fileName = "purchaseReport", isSupplier = true }) {
+function ExpensesTable({ data = [], startDate, endDate, title = "PURCHASE REPORT", fileName = "purchaseReport", isSupplier = true }) {
     const { auth } = useAuth()
     console.log({ auth });
     const month = ((new Date()).getMonth().toString()) + '/';
@@ -189,31 +189,19 @@ function ProductMovementTable({ data = [], startDate, endDate, title = "PURCHASE
             <div>
                 <GridComponent id="Grid" queryCellInfo={queryCellInfoEvent} showColumnChooser={true} pdfQueryCellInfo={pdfQueryCellInfo} beforePdfExport={beforePdfExport} dataSource={[...data]} ref={grid => gridInstance = grid} pdfHeaderQueryCellInfo={pdfHeaderQueryCellInfo} toolbar={toolbarOptions} allowExcelExport={true} allowPdfExport={true} toolbarClick={toolbarClick.bind(this)} height={500} allowPaging={true} pageSettings={{ pageCount: 2, pageSize: 1000 }}>
                     <ColumnsDirective>
-                        <ColumnDirective field='transactionDate' headerText='Date' format='d-MMM-yyyy' ></ColumnDirective>
-                        <ColumnDirective field='batchNumber' headerText='Batch No.' ></ColumnDirective>
-                        <ColumnDirective field='openingStock' headerText='Open Stock' ></ColumnDirective>
-                        <ColumnDirective field='additions' headerText={`Additions`}  ></ColumnDirective>
-                        <ColumnDirective field='totalStock' headerText='Total Stock' ></ColumnDirective>
-                        <ColumnDirective field='sales' headerText='Sales' ></ColumnDirective>
-                        <ColumnDirective field='transfer' headerText='Transfer' ></ColumnDirective>
-                        <ColumnDirective field='totalDelevered' headerText='Total Delivered' ></ColumnDirective>
-                        <ColumnDirective field='closingStock' headerText='Close Stock' ></ColumnDirective>
-                        <ColumnDirective field='supplier' headerText='Supplier' template={({ additions, supplier }) => additions === 0 ? '' : supplier} ></ColumnDirective>
-                        <ColumnDirective field='customer' headerText='Customer' template={({ sales, customer }) => sales === 0 ? '' : customer} ></ColumnDirective>
-                        <ColumnDirective field='branch' headerText='Branch' template={({ transfer, branch }) => transfer === 0 ? '' : branch} ></ColumnDirective>
+                        <ColumnDirective field='expenseDate' headerText='Date' type="datetime" format='d-MMM-yyyy' ></ColumnDirective>
+                        <ColumnDirective field='category' headerText='Category' ></ColumnDirective>
+                        <ColumnDirective field='expenseFor' headerText='Expense Type' ></ColumnDirective>
+                        <ColumnDirective field='description' headerText={`Description`}  ></ColumnDirective>
+                        <ColumnDirective field='amount' headerText='Amount' format={'N2'}></ColumnDirective>
 
 
                     </ColumnsDirective>
                     <AggregatesDirective>
                         <AggregateDirective>
                             <AggregateColumnsDirective>
-                                <AggregateColumnDirective field='openingStock' type='Sum' format='N2' footerTemplate={footerSum} />
-                                <AggregateColumnDirective field='additions' type='Sum' format='N2' footerTemplate={footerSum} />
-                                <AggregateColumnDirective field='totalStock' type='Sum' format='N2' footerTemplate={footerSum} />
-                                <AggregateColumnDirective field='sales' type='Sum' format='N2' footerTemplate={footerSum} />
-                                <AggregateColumnDirective field='transfer' type='Sum' format='N2' footerTemplate={footerSum} />
-                                <AggregateColumnDirective field='totalDelevered' type='Sum' format='N2' footerTemplate={footerSum} />
-                                <AggregateColumnDirective field='closingStock' type='Sum' format='N2' footerTemplate={footerSum} />
+
+                                <AggregateColumnDirective field='amount' type='Sum' format='N2' footerTemplate={footerSum} />
                             </AggregateColumnsDirective>
                         </AggregateDirective>
                     </AggregatesDirective>
@@ -223,4 +211,4 @@ function ProductMovementTable({ data = [], startDate, endDate, title = "PURCHASE
         </div>
     </div>);
 }
-export default ProductMovementTable;
+export default ExpensesTable;

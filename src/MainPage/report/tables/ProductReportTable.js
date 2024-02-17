@@ -366,8 +366,8 @@ function ProductReportTable({ disableBatchNo, isQuantityChecked, isAllChecked, i
                                     <ColumnDirective field='specialPrice' visible={showSpecial} headerText='Special' textAlign='Right' format='N2' width={"6%"}></ColumnDirective>
                                     <ColumnDirective field='batchNumber' headerText='Batch No.' format='N2' width={"7%"}></ColumnDirective>
                                     <ColumnDirective field='quantity' headerText='QTY' textAlign='Center' format='N2' width={"5%"}></ColumnDirective>
-                                    <ColumnDirective field='manufacturingDate' headerText='MGF Date' width={"6%"}></ColumnDirective>
-                                    <ColumnDirective field='expireDate' headerText='EXP. Date' width={"6%"}></ColumnDirective>
+                                    <ColumnDirective field='manufacturingDate' headerText='MGF Date' width={"6%"} format='d-MMM-yyyy'></ColumnDirective>
+                                    <ColumnDirective field='expireDate' headerText='EXP. Date' width={"6%"} format='d-MMM-yyyy'></ColumnDirective>
 
                                 </ColumnsDirective>
                                 <AggregatesDirective>

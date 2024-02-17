@@ -353,14 +353,14 @@ const EditTransfer = () => {
       <div className="content">
         <div className="page-header">
           <div className="page-title">
-            <h4>Edit Transfer</h4>
+          {state?.mode == 'view' ?<h4>View Transfer</h4> :  <h4>Edit Transfer</h4>}
             <h6>Transfer products to other branches</h6>
           </div>
         </div>
 
         <div style={{ display: 'flex', gap: 20 }}>
 
-          <div style={{ display: 'flex', flexDirection: 'column', width: '40%', }}>
+        {state?.mode == 'edit' && <div style={{ display: 'flex', flexDirection: 'column', width: '40%', }}>
             <div className="card">
               {/* <form onSubmit={handleSubmit(onSubmit)}> */}
               <div className="card-body">
@@ -584,10 +584,10 @@ const EditTransfer = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </div>}
 
 
-          <div className="card" style={{ width: '60%' }} >
+          <div className="card" style={{ width: state?.mode == 'edit' ? '60%' : '100%' }} >
             <div className="card-body">
               <div className="row">
                 <div className="table-responsive mb-3">
@@ -600,7 +600,7 @@ const EditTransfer = () => {
                         <th>Unit Price</th>
                         <th>Amount</th>
                         <th>Batch #</th>
-                        <th>Action</th>
+                        {state?.mode == 'edit' && <th>Action</th>}
                         <th />
                       </tr>
                     </thead>
@@ -617,14 +617,14 @@ const EditTransfer = () => {
                             <td>{item?.amount}</td>
                             <td>{item?.batchNumber}</td>
 
-                            <td>
+                            {state?.mode == 'edit' &&  <td>
                               <Link to="#" className="delete-set me-2" data-bs-toggle="modal" data-bs-target="#editproduct" onClick={() => {setEditFormData(item)}}>
                                 <img src={EditIcon} alt="svg" />
                               </Link>
                               <Link to="#" className="delete-set" onClick={() => deleteRow(item)}>
                                 <img src={DeleteIcon} alt="svg" />
                               </Link>
-                            </td>
+                            </td>}
                           </tr>
                         )
                       })}
@@ -664,9 +664,9 @@ const EditTransfer = () => {
                   </div>
                 </div>
                 <div className="col-lg-12" style={{ textAlign: 'right' }}>
-                  <button type="submit" className="btn btn-submit me-2" onClick={onSubmit}><FeatherIcon icon="save" />
+                {state?.mode == 'edit' && <button type="submit" className="btn btn-submit me-2" onClick={onSubmit}><FeatherIcon icon="save" />
                     {" Update"}
-                  </button>
+                  </button>}
                   {/* <Link id="printModalClick" to="#" className="btn btn-cancel me-2" style={{ backgroundColor: '#FF9F43' }} data-bs-toggle="modal"
                     data-bs-target="#create" >
                     Refresh
@@ -757,7 +757,7 @@ const EditTransfer = () => {
                    
                   </div>
                 </div>
-                <div className="modal-footer" style={{justifyContent:'flex-end'}}>
+                {state?.mode == 'edit' && <div className="modal-footer" style={{justifyContent:'flex-end'}}>
                   <button type="button" className="btn btn-submit" onClick={handleUpdate}>
                     Update
                   </button>
@@ -768,7 +768,7 @@ const EditTransfer = () => {
                   >
                     Close
                   </button>
-                </div>
+                </div>}
               </div>
             </div>
           </div>

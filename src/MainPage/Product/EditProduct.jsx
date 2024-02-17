@@ -97,8 +97,8 @@ const EditProduct = () => {
         <div className="content">
           <div className="page-header">
             <div className="page-title">
-              <h4>Product Edit</h4>
-              <h6>Update your product</h6>
+              <h4>Product Management</h4>
+              {state?.mode == 'view' ? <h6>Product Details</h6> : <h6>Update your product</h6>}
             </div>
           </div>
           {/* /add */}
@@ -290,7 +290,7 @@ const EditProduct = () => {
                     </ul>
                   </div>
                 </div> */}
-                <div className="col-lg-12" style={{textAlign:'right'}}>
+                {state?.mode == 'edit' && <div className="col-lg-12" style={{textAlign:'right'}}>
                   <button
                     href="javascript:void(0);"
                     className="btn btn-submit me-2"
@@ -300,8 +300,8 @@ const EditProduct = () => {
                   <Link to="/tinatett-pos/product/productlist" className="btn btn-cancel">
                     Cancel
                   </Link>
-                </div>
-              </div>
+                </div>}
+              </div> 
             </form>
             </div>
           </div>

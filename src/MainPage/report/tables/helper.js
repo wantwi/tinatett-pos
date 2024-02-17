@@ -5,7 +5,7 @@ export function getCurrentDateInWords(date) {
     const month = currentDate.toLocaleString('default', { month: 'short' }); // Use 'short' option for short month names
     const year = currentDate.getFullYear();
 
-    const dateInWords = `${month} ${day}, ${year}`;
+    const dateInWords = `${day}-${month}-${year}`;
 
     return dateInWords;
 }
