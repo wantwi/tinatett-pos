@@ -169,7 +169,10 @@ const TransferList = () => {
       title: "Action",
       render: (record) => (
         <>
-          <Link className="me-3" to= {{pathname:"/tinatett-pos/transfer/edittransfer-transfer", state: record}}>
+         <Link className="me-3" to= {{pathname:"/tinatett-pos/transfer/edittransfer-transfer", state: {...record, mode:'view'}}}>
+          <span className="badges btn-info me-2"><FeatherIcon icon="eye" /> View</span>
+          </Link>
+          <Link className="me-3" to= {{pathname:"/tinatett-pos/transfer/edittransfer-transfer", state: {...record, mode:'edit'}}}>
           <span className="badges btn-cancel me-2"><FeatherIcon icon="edit" /> Edit</span>
           </Link>
           <Link className="confirm-text" to="#" onClick={() => confirmText(record.id)}>

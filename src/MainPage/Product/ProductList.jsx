@@ -159,7 +159,10 @@ const ProductList = () => {
             {/* <Link className="me-3" to="/tinatett-pos/product/product-details">
               <img src={EyeIcon} alt="img" />
             </Link> */}
-            <Link className="me-3" to={{ pathname:`/tinatett-pos/product/editproduct`, state:record}} title="Edit Product">
+            <Link className="me-3" to={{pathname:"/tinatett-pos/product/editproduct", state:{...record, mode:'view'}}}>
+            <span className="badges btn-info me-2"><FeatherIcon icon="eye" /> View</span> 
+            </Link>
+            <Link className="me-3" to={{ pathname:`/tinatett-pos/product/editproduct`, state:{...record, mode:'edit'}}} title="Edit Product">
             <span className="badges btn-cancel me-2"><FeatherIcon icon="edit" /> Edit</span> 
             </Link>
             {/* <Link className="confirm-text" to="#" onClick={confirmText} title="Delete Product">
