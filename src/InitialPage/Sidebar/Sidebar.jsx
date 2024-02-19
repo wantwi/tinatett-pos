@@ -1020,6 +1020,17 @@ const Sidebar = (props) => {
                         Expenses
                       </Link>
                     </li>
+                    <li>
+                      <Link
+                        to="/tinatett-pos/report/deleted-sales"
+                        className={
+                          pathname.includes("deleted-sales") ? "active" : ""
+                        }
+                      >
+                        Deleted Sales
+                      </Link>
+                    </li>
+
 
 
                     {/* <li>
