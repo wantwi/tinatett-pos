@@ -674,7 +674,7 @@ const Addsales = () => {
   }
 
   useEffect(() => {
-    // console.log("Selected Prod", selectedProduct)
+     
 
     // console.log(specialpriceTypeRef.current?.value, specialpriceTypeRef.current?.checked, 'SP')
     // console.log(wholesalepriceTypeRef.current?.value, wholesalepriceTypeRef.current?.checked, 'WP')
@@ -700,12 +700,13 @@ const Addsales = () => {
         setSelectedProductInfo(res.data.newProduct)
         setSelectedProductInfoEditMode(res.data.newProduct)
         let x = res.data.newProduct.batchNumber?.map((item) => {
-          return { value: item.batchNumber, label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')' : item?.batchNumber + '-(' + item?.availablequantity + ')', expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
+          return { value: item.batchNumber, quantity: item?.Quantity, label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')' : item?.batchNumber + '-(' + item?.availablequantity + ')', expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
         })
         setIsBatchLoading(false)
         setFormData({ ...formData, batchNumber: x[0], manuDate: (x[0]?.manufacturingDate).substring(0, 10), expDate: (x[0]?.expireDate).substring(0, 10) })
         setEditFormData({ ...editFormData, batchNumber: x[0], manuDate: (x[0]?.manufacturingDate).substring(0, 10), expDate: (x[0]?.expireDate).substring(0, 10) })
         //retailpriceTypeRef.current.checked = true
+       
       }
     })
     $('#selectedProduct').css('border', '1px solid rgba(145, 158, 171, 0.32)')
@@ -830,6 +831,8 @@ const Addsales = () => {
 
     }
   }, [productsIsLoading, customersIsLoading])
+
+
 
   useEffect(() => {
     //console.log(customerList[0])
@@ -1118,7 +1121,7 @@ const Addsales = () => {
                             // if (e.target.value == '') {
                             //   setFormData({ ...formData, quantity: '' })
                             // }
-                            if (Number(e.target.value) > (selectedProduct?.remainingStock)) {
+                            if (Number(e.target.value) > (formData?.batchNumber?.quantity)) {
                               alertify.set("notifier", "position", "bottom-right");
                               alertify.message('Quantity can not be greater than quantity in stock')
                               let newNotification = {

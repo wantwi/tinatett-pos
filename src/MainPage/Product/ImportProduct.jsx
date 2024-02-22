@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useState} from 'react'
 import { EditIcon, Upload } from '../../EntryFile/imagePath';
-import { read} from 'xlsx'
+import { read, utils} from 'xlsx'
 import { useDropzone } from 'react-dropzone'
 import Table from "../../EntryFile/datatable";
 import { moneyInTxt } from '../../utility';
@@ -67,6 +67,9 @@ const ImportProduct = () => {
   const getSheetData = (e) => {
     let sheetName = e.target.value
     let xdt = uploadedData.Sheets[sheetName]
+    const excelData = utils.sheet_to_json(xdt);
+
+
     let xData = Object.keys(xdt).map((key) => {
       return [key, xdt[key].v]
     })
@@ -110,7 +113,8 @@ const ImportProduct = () => {
 
  
 
-    setimportedRecords(excelSheets[0].Data)
+    // setimportedRecords(excelSheets[0].Data)
+    setimportedRecords(excelData)
     setLast(Number(excelSheets[0].Last.Row))
   }
 
@@ -122,87 +126,13 @@ const ImportProduct = () => {
       $('#sheetName').css('border', '1px solid red')
     }
     else{
-      let arr = importedRecords
-      let keys = [...new Set(arr)]
-    
-      let col1 = keys.filter((item) => item.Column === 'A')
-      let col2 = keys.filter((item) => item.Column === 'B')
-      let col3 = keys.filter((item) => item.Column === 'C')
-      let col4 = keys.filter((item) => item.Column === 'D')
-      let col5 = keys.filter((item) => item.Column === 'E')
-      let col6 = keys.filter((item) => item.Column === 'F')
-
-      // console.log(col1, col2, col3, col4, col5)
-
-
-      let ItemsNameArr = []
-      let RetailPriceArr = []
-      let WholesalePriceArr = []
-      let SpecialPriceArr = []
-      let AlertArr = []
-      let IsTinatettArr = []
-
-
-      col1.forEach((name) => ItemsNameArr.push(name.Value))
-      col2.forEach((retail) => RetailPriceArr.push(retail.Value))
-      col3.forEach((wholesale) => WholesalePriceArr.push(wholesale.Value))
-      col4.forEach((special) => SpecialPriceArr.push(special.Value))
-      col5.forEach((alert) => AlertArr.push(alert.Value))
-      col6.forEach((isTinatett) => IsTinatettArr.push(isTinatett.Value))
-
-      let finalData = []
-      finalData.push(
-        ItemsNameArr,
-        RetailPriceArr,
-        WholesalePriceArr,
-        SpecialPriceArr,
-        AlertArr,
-        IsTinatettArr
-      )
-
-    // console.log(finalData, "DATA")
-
-      let postData = []
-      let res = []
-
-      let obj = {}
-      for (let i = 1; i < last; i++) {
-        finalData.map((item, ix) => {
-          obj[item[0]] = item[i]
-          let ob = { [item[0]]: item[i] }
-          res.push(ob)
-        })
-        postData = [...postData, obj]
-
-        postData.push([obj][0])
-      }
-
-      
-      let chunkSize = 6
-      let chunks = []
-      for (let i = 0; i < res.length; i += chunkSize) {
-        const chunk = res.slice(i, i + chunkSize)
-        // do whatever
-        chunks.push(chunk)
-      }
-
-      let results = []
-      chunks.map((item) => {
-        let newObject = {}
-        item.map((value) => {
-          newObject[`${Object.keys(value)}`] = `${Object.values(value)}`
-        })
-
-        results.push(newObject)
-      })
-
-    
-      const renderData = results.map((value) => ({
+      //console.log("RESULTS", results)
+      const renderData = importedRecords.map((value) => ({
         name: value.PRODUCT_NAME,
-        retailPrice: value.RETAIL_PRICE,
-        wholeSalePrice: value.WHOLESALE_PRICE,
-        specialPrice: value.SPECIAL_PRICE,
-        alert: value.ALERT,
+        retailPrice: Number(value.RETAIL_PRICE) || 0,
+        wholeSalePrice: Number(value.WHOLESALE_PRICE) || 0,
+        specialPrice: Number(value.SPECIAL_PRICE) || 0,
+        alert: Number(value.ALERT),
         ownershipType: value.IS_TINATETT_PRODUCT == 'Yes' ? 'Tinatett' : 'Competitor'
       }))
 
