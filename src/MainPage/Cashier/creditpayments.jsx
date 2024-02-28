@@ -672,17 +672,17 @@ const CreditPayments = () => {
                     </div>
                     <div className="col-lg-2 ">
                       <div className="form-group">
-                      <span style={{fontWeight:900}}>Total Amount: {moneyInTxt(data.reduce((total, item) =>  Number(total) + Number(item?.Total), 0))}</span>
+                      <span style={{fontWeight:900}}>Total Amount: {moneyInTxt(creditSummary?.OUTSTANDING_BAL)}</span>
                       </div>
                     </div>
                     <div className="col-lg-2 ">
                       <div className="form-group">
-                      <span style={{fontWeight:900}}>Total Paid: {moneyInTxt(data.reduce((total, item) =>  Number(total) + Number(item?.Paid), 0))}</span>
+                      <span style={{fontWeight:900}}>Total Paid:{moneyInTxt(creditSummary?.CREDIT_PAID)}</span>
                       </div>
                     </div>
                     <div className="col-lg-2 ">
                       <div className="form-group">
-                      <span style={{fontWeight:900}}>Remaining Amount: {moneyInTxt(data.reduce((total, item) =>  Number(total) + Number(item?.Due), 0))}</span>
+                      <span style={{fontWeight:900}}>Remaining Amount: {moneyInTxt(creditSummary?.REMAINING_BAL)}</span>
                       </div>
                     </div>
                   </div>

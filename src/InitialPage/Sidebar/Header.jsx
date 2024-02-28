@@ -93,7 +93,7 @@ const Header = (props) => {
     if(expireTime < Date.now()){
       console.log('Log out')
       setOpenModal(true)
-      setLoggedInUser(false)
+      setLoggedIn(false)
     }
   }
 
