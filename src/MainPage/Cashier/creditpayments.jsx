@@ -95,6 +95,7 @@ const CreditPayments = () => {
     refetch,
     isFetching
   } = useGet("suspend", `/sales/credit/payments?startDate=${startDate}&endDate=${endDate}`, onSuccess);
+  const {data: creditSummary} = useGet("creditSummary", `/sales/creditSummary`);
 
   const [data, setData] = useState([])
   const [isUpdate, setIsUpdate] = useState(false)
