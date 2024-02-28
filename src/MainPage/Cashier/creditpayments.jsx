@@ -84,6 +84,11 @@ const CreditPayments = () => {
 
   }
 
+  const onSummarySuccess = (data) => {
+    console.log("credit summary", data)
+    setCreditSummary(data?.data[0])
+  }
+
   useEffect(() => {
     setPaymentInfo({ ...paymentInfo, amountPaid: Number(paymentInfo.cashAmount) + Number(paymentInfo.chequeAmount) + Number(paymentInfo.momoAmount) })
   }, [paymentInfo.cashAmount, paymentInfo.chequeAmount, paymentInfo.momoAmount])
@@ -95,11 +100,12 @@ const CreditPayments = () => {
     refetch,
     isFetching
   } = useGet("suspend", `/sales/credit/payments?startDate=${startDate}&endDate=${endDate}`, onSuccess);
-  const {data: creditSummary} = useGet("creditSummary", `/sales/creditSummary`);
+  const {} = useGet("creditSummary", `/sales/creditSummary`, onSummarySuccess);
 
   const [data, setData] = useState([])
   const [isUpdate, setIsUpdate] = useState(false)
   const [comment, setComment] = useState('')
+  const [creditSummary, setCreditSummary] = useState(null)
 
 
   const togglefilter = (value) => {
