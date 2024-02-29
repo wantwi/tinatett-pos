@@ -80,7 +80,7 @@ const CreditList = () => {
         salestype: sale?.summary.salesType,
         paymentHistory: sale?.paymentHistory
       }
-    })
+    }).sort((a,b) => new Date(b.Date) - new Date(a.Date))
     setData(mappedData)
 
   }
@@ -416,7 +416,7 @@ const CreditList = () => {
           salestype: sale?.summary.salesType,
           paymentHistory: sale?.paymentHistory
         }
-      })
+      }).sort((a,b) => new Date(b.Date) - new Date(a.Date))
 
       setData([])
       setData(mappedData)
@@ -449,7 +449,7 @@ const CreditList = () => {
           salestype: sale?.summary.salesType,
           paymentHistory: sale?.paymentHistory
         }
-      })
+      }).sort((a,b) => new Date(b.Date) - new Date(a.Date))
       if (filter == 'All') {
         setData(mappedData)
       }

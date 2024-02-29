@@ -79,7 +79,7 @@ const CreditPayments = () => {
         Biller: sale?.cashierName,
         salestype: sale?.salesType
       }
-    })
+    }).sort((a,b) => new Date(b.Date) - new Date(a.Date))
     setData(mappedData)
 
   }
@@ -401,7 +401,7 @@ const CreditPayments = () => {
           Biller: sale?.cashierName,
           salestype: sale?.salesType
         }
-      })
+      }).sort((a,b) => new Date(b.Date) - new Date(a.Date))
       setData(mappedData)
       console.log('loaded..')
     }
