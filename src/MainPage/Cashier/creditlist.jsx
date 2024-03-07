@@ -80,9 +80,14 @@ const CreditList = () => {
         salestype: sale?.summary.salesType,
         paymentHistory: sale?.paymentHistory
       }
-    })
+    }).sort((a,b) => new Date(b.Date) - new Date(a.Date))
     setData(mappedData)
 
+  }
+
+  const onSummarySuccess = (data) => {
+    console.log("credit summary", data)
+    setCreditSummary(data?.data[0])
   }
 
 
@@ -99,10 +104,11 @@ const CreditList = () => {
     refetch,
 
   } = useGet("suspend", `/sales/creditlist?name=${query}`, onSuccess);
-  const {data: creditSummary} = useGet("creditSummary", `/sales/creditSummary`);
+  const {} = useGet("creditSummary", `/sales/creditSummary`, onSummarySuccess);
   const [data, setData] = useState([])
   const [isUpdate, setIsUpdate] = useState(false)
   const [comment, setComment] = useState('')
+  const [creditSummary, setCreditSummary] = useState(null)
 
 
   const togglefilter = (value) => {
@@ -410,7 +416,7 @@ const CreditList = () => {
           salestype: sale?.summary.salesType,
           paymentHistory: sale?.paymentHistory
         }
-      })
+      }).sort((a,b) => new Date(b.Date) - new Date(a.Date))
 
       setData([])
       setData(mappedData)
@@ -443,7 +449,7 @@ const CreditList = () => {
           salestype: sale?.summary.salesType,
           paymentHistory: sale?.paymentHistory
         }
-      })
+      }).sort((a,b) => new Date(b.Date) - new Date(a.Date))
       if (filter == 'All') {
         setData(mappedData)
       }
