@@ -16,6 +16,7 @@ import TransferSummaryReport from './transferSummary';
 import ProductMovement from './productMovement';
 import WeeklySummary from './weeklySummary';
 import Expenses from './expenses';
+import Financialactivity from "./FinancialActivityReport"
 import DeletedSales from './delectedSales';
 
 
@@ -36,6 +37,7 @@ const AppIndex = ({ match }) => (
         <Route path={`${match.url}/product-movement`} component={ProductMovement} />
         <Route path={`${match.url}/weekly-summary`} component={WeeklySummary} />
         <Route path={`${match.url}/expenses`} component={Expenses} />
+        <Route path={`${match.url}/financialactivity`} component={Financialactivity} />
         <Route path={`${match.url}/deleted-sales`} component={DeletedSales} />
 
     </Switch>
