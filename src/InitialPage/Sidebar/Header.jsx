@@ -18,8 +18,7 @@ import { Link } from "react-router-dom";
 import { io } from 'socket.io-client';
 import { SOCKET_BASE_URL } from "../../api/CustomAxios";
 export const socket = io.connect(SOCKET_BASE_URL)
-import { NotificationsContext } from "./DefaultLayout";
-import { notification } from "antd";
+import { AppContext } from "./DefaultLayout";
 import { timeAgo } from "../../utility";
 import Select from "react-select";
 import { useGet } from "../../hooks/useGet";
@@ -33,13 +32,12 @@ const Header = (props) => {
   const [toggle, SetToggle] = useState(false);
   const [dateState, setDateState] = useState(new Date());
   const [loggedInUser, setLoggedInUser] = useState({})
-  const [selectedBranch, setSelectedBranch] = useState({label:'Select Branch', value:''})
   const [branchesList, setBranchesList] = useState()
   const [userType, setUserType] = useState('')
   const [loggedIn, setLoggedIn] = useState(true)
 
 
-  const { notifications, setNotifications } = useContext(NotificationsContext)
+  const { notifications, setNotifications, selectedBranch, setSelectedBranch } = useContext(AppContext)
   const { data: branches, isLoading } = useGet("branches", "/branch");
 
 
@@ -49,6 +47,18 @@ const Header = (props) => {
     //console.log("Role:", obj.role)
     setUserType(obj.role)
   }, [])
+
+
+  useEffect(() => {
+    let userRole = localStorage.getItem('auth')
+    let obj = JSON.parse(userRole)
+    //console.log("branches", branchesList)
+    if(obj.branchId && !isLoading){
+      let branch = branchesList.find((branch) => branch.value == obj?.branchId)
+      setSelectedBranch(branch)
+    }
+   
+  },[branchesList])
 
   useEffect(() => {
     if (!isLoading) {
@@ -161,6 +171,11 @@ const Header = (props) => {
     setOpenModal(false)
   }
 
+
+  // useEffect(() => {
+  //   console.log(selectedBranch)
+  // }, [selectedBranch])
+
   return (
     <>
       <div className="header">
@@ -205,12 +220,10 @@ const Header = (props) => {
         {/* Header Menu */}
         <ul className="nav user-menu">
          
-          {userType == 'admin' || userType == 'owner' ? (<li className="nav-item" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', marginRight: 50 }}>
-            <span style={{marginRight:10}}>Branch:</span>  <Select id="selectedBranch" className="select form-control" options={branchesList} value={selectedBranch} onChange={(e) => { setSelectedBranch(e) }}/>
-          </li>) :
-          (<li className="nav-item" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', marginRight: 50 }}>
-              <span style={{marginRight:10}}>Branch: {loggedInUser?.branchName}</span>
-          </li>)}
+          <li className="nav-item" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', marginRight: 50 }}>
+            <span style={{marginRight:10}}>Branch:</span>  <Select isDisabled={userType !== 'admin'} id="selectedBranch" className="select form-control" options={branchesList} value={selectedBranch} onChange={(e) => { setSelectedBranch(e) }}/>
+          </li>
+         
 
           <li className="nav-item" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
 

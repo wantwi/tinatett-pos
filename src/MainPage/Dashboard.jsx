@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   AvocatImage,
   Dash1,
@@ -26,6 +26,7 @@ import { useGet } from "../hooks/useGet";
 import { moneyInTxt } from "../utility";
 import useAuth from "../hooks/useAuth";
 import LoadingSpinner from "../InitialPage/Sidebar/LoadingSpinner";
+import { AppContext } from "../InitialPage/Sidebar/DefaultLayout";
 
 
 const Dashboard = (props) => {
@@ -157,19 +158,23 @@ const Dashboard = (props) => {
 
   const [userType, setUserType] = useState('')
  // const [summaryData, setSummaryData] = useState([])
+
+ const {selectedBranch } = useContext(AppContext)
+ //console.log("Selected Branch", selectedBranch)
   
-  const {data: salesAndpurchase,isLoading} = useGet("salesAndpurchase", "/dashboard/salesAndpurchase");
+  const {data: salesAndpurchase,isLoading, isFetched: issalesAndpurchaseRefetched, refetch: refetchsalesAndpurchase} = useGet("salesAndpurchase", `/dashboard/salesAndpurchase?branch=${selectedBranch?.value}`);
  // const {data: summary,isLoading: summaryIsLoading} = useGet("dashboardSummary", "/dashboard/summary");
-  const {data: expiring, isLoading: expLoading} = useGet("expiring", "/dashboard/productExpirationStatus");
-  const {data: topproducts, isLoading: topproductsLoading} = useGet("topproducts", "/dashboard/topproducts");
-  const {data: topcustomers, isLoading: topcustomersLoading} = useGet("topcustomers", "/dashboard/topcustomers");
-  const {data: profitmargin, isLoading: profitmarginLoading} = useGet("profitmargin", "/dashboard/product/profitmargin");
-  const {data: alertList, isLoading: alertListLoading} = useGet("productalert", "/dashboard/product/alert");
+  const {data: expiring, isLoading: expLoading, isFetched: isexpiringRefetched,  refetch: refetchsexpiring} = useGet("expiring", `/dashboard/productExpirationStatus?branch=${selectedBranch?.value}`);
+  const {data: topproducts, isLoading: topproductsLoading, isFetched: istopproductsRefetched,  refetch: refetchtopproducts} = useGet("topproducts", `/dashboard/topproducts?branch=${selectedBranch?.value}`);
+  const {data: topcustomers, isLoading: topcustomersLoading, isFetched: istopcustomersRefetched, refetch: refetchtopcustomers} = useGet("topcustomers", `/dashboard/topcustomers?branch=${selectedBranch?.value}`);
+  const {data: profitmargin, isLoading: profitmarginLoading, isFetched: isprofitmarginRefetched, refetch: refetchprofitmargin} = useGet("profitmargin", `/dashboard/product/profitmargin?branch=${selectedBranch?.value}`);
+  const {data: alertList, isLoading: alertListLoading, isFetched: isproductalertRefetched, refetch: refetchproductalert} = useGet("productalert", `/dashboard/product/alert?branch=${selectedBranch?.value}`);
+
+
 
   useEffect(() => {
     let userRole = localStorage.getItem('auth')
     let obj =JSON.parse(userRole)
-    //console.log("Role:", obj.role)
     setUserType(obj.role)
   }, [])
 
@@ -179,7 +184,7 @@ const Dashboard = (props) => {
       setExpiredData(expiring?.data)
       settopProductsData(topproducts?.data)
       settopcustomersData(topcustomers?.data)
-      setprofitMarginData( profitmargin.data)
+      setprofitMarginData( profitmargin?.data)
       setAlerListData(alertList?.data)
       // setSummaryData(summary?.data)
     
@@ -188,7 +193,33 @@ const Dashboard = (props) => {
   }, [isLoading, expLoading, topproductsLoading, topcustomersLoading, profitmarginLoading, alertListLoading ])
 
 
+  useEffect(() => {
+ 
+   
+   refetchsalesAndpurchase()
+   refetchsexpiring()
+   refetchtopproducts()
+   refetchtopcustomers()
+   refetchprofitmargin()
+   refetchproductalert()
 
+   console.log('refetch all data');
+  //  if (issalesAndpurchaseRefetched && isexpiringRefetched && istopcustomersRefetched && istopproductsRefetched && isprofitmarginRefetched && isproductalertRefetched) {
+  //   setData(salesAndpurchase?.data[0])
+
+  // }
+
+  }, [selectedBranch, issalesAndpurchaseRefetched, isexpiringRefetched,istopcustomersRefetched, istopproductsRefetched, isprofitmarginRefetched, isproductalertRefetched])
+
+
+  useEffect(() => {
+    setData(salesAndpurchase?.data[0])
+    setExpiredData(expiring?.data)
+    settopProductsData(topproducts?.data)
+    settopcustomersData(topcustomers?.data)
+    setprofitMarginData( profitmargin?.data)
+    setAlerListData(alertList?.data)
+  }, [salesAndpurchase, expiring, topproducts, topcustomers, profitmargin, alertList])
 
   if(isLoading || topproductsLoading || topcustomersLoading){
     return <LoadingSpinner/>
