@@ -475,7 +475,7 @@ const AddPurchase = () => {
       setNotifications([newNotification, ...notifications])
       
     }
-    else if (isError) {
+    else if (isError && !isSubmitSuccessful) {
       alertify.set("notifier", "position", "bottom-right");
       alertify.error("Error...Could not save purchase transaction");
   

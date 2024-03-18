@@ -6,7 +6,7 @@ import Header from "./Header";
 import Sidebar from "./Sidebar";
 
 
-export const NotificationsContext = createContext()
+export const AppContext = createContext()
 
 const DefaultLayout =(props)=> {
   let storage = JSON.parse(localStorage.getItem("auth"))
@@ -14,6 +14,7 @@ const DefaultLayout =(props)=> {
     const [notifications, setNotifications] = useState([
       { message: `${storage.name} welcome to Tinatett POS`, time: new Date().toISOString()}
     ])
+    const [selectedBranch, setSelectedBranch] = useState({label:'Select Branch', value:'00000000-0000-0000-0000-000000000000'})
     
     useEffect(() => {
       const loggedInUser = localStorage.getItem('auth')
@@ -26,7 +27,7 @@ const DefaultLayout =(props)=> {
  
     return (
       <>
-      <NotificationsContext.Provider value={{notifications, setNotifications}}>
+      <AppContext.Provider value={{notifications, setNotifications, selectedBranch, setSelectedBranch}}>
         <div className="main-wrapper">
           <Header />
           <div>
@@ -41,7 +42,7 @@ const DefaultLayout =(props)=> {
           </div>
           <Sidebar />
         </div>
-      </NotificationsContext.Provider >
+      </AppContext.Provider >
         <div className="sidebar-overlay"></div>
        
       </>
