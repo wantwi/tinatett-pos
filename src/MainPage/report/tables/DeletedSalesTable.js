@@ -32,95 +32,93 @@ function DeletedSalesTable({ data = [], startDate, endDate, title = "", fileName
     /* tslint:disable-next-line:no-any */
     function getPdfExportProperties() {
         return {
-            // pageOrientation: 'Portrait',
+            pageOrientation: 'Landscape',
             screenX: 0,
-
-            // pageSize: 'A4',
-
+            pageSize: 'A4',
             header: {
 
-                fromTop: 0,
-                // minHeight: 200,
+                fromTop: 20,
+
                 height: 150,
 
                 contents: [
                     {
                         position: { x: 0, y: 0 },
-                        size: { height: 60, width: 90 },
+                        size: { height: 80, width: 120 },
                         src: image,
                         type: 'Image'
                     },
                     {
                         type: 'Text',
                         value: 'TINATETT MARKETING COMPANY LIMITED',
-                        position: { x: 150, y: 0 },
-                        style: { textBrushColor: '#575C88', fontSize: 17 },
+                        position: { x: 308, y: 0 },
+                        style: { textBrushColor: '#575C88', fontSize: 18 },
                     },
                     {
                         type: 'Text',
                         value: 'P.O. BOX CO 2699, TEMA-ACCRA, WHOLESALE AND RETAIL OF HERBAL MEDICINE',
-                        position: { x: 95, y: 20 },
-                        style: { textBrushColor: '#575C88', fontSize: 13 },
+                        position: { x: 218, y: 20 },
+                        style: { textBrushColor: '#575C88', fontSize: 14 },
                     },
                     {
                         type: 'Text',
                         value: 'KOTOBABI SPINTEX - FACTORY WAREHOUSE, 02081660807, tinatettonline@gmail.com',
-                        position: { x: 95, y: 40 },
-                        style: { textBrushColor: '#575C88', fontSize: 13 },
+                        position: { x: 218, y: 40 },
+                        style: { textBrushColor: '#575C88', fontSize: 14 },
                     },
                     {
                         type: 'Text',
                         value: `${title}`,
-                        position: { x: 220, y: 100 },
+                        position: { x: 420, y: 95 },
                         style: { textBrushColor: '#000000', fontSize: 15, textDecoration: "underline" },
                     },
                     {
                         type: 'Text',
                         value: `From ${getCurrentDateInWords(startDate)} to ${getCurrentDateInWords(endDate)}`,
-                        position: { x: 250, y: 120 },
+                        position: { x: 420, y: 115 },
                         style: { textBrushColor: '#000000', fontSize: 12, textDecoration: "underline" },
                     },
                     {
                         type: 'Text',
                         value: 'Branch Info',
-                        position: { x: 0, y: 90 },
+                        position: { x: 0, y: 100 },
                         style: { textBrushColor: '#000000', fontSize: 16 }
                     },
                     {
                         type: 'Text',
                         value: `${auth?.branchName}`,
-                        position: { x: 0, y: 110 },
+                        position: { x: 0, y: 120 },
                         style: { textBrushColor: '#000000', fontSize: 11 }
                     },
                     {
                         type: 'Text',
                         value: `${getCurrentDateInWords(Date.now())}`,
-                        position: { x: 600, y: 110 },
+                        position: { x: 940, y: 120 },
                         style: { textBrushColor: '#000000', fontSize: 11 }
                     },
                 ]
             },
             footer: {
-                fromBottom: 100,
-                height: 80,
+                fromBottom: 20,
+                height: 20,
                 contents: [
                     {
                         type: 'Text',
                         value: 'Prepared By:',
-                        position: { x: 0, y: 60 },
+                        position: { x: 0, y: 0 },
                         style: { textBrushColor: '#575C88', fontSize: 14 }
                     },
                     {
                         type: 'Text',
                         value: `${auth?.name}`,
-                        position: { x: 80, y: 60 },
+                        position: { x: 80, y: 0 },
                         style: { textBrushColor: '#0A1172', fontSize: 14 }
                     },
                     {
                         /** format is optional */
                         format: 'Page {$current} of {$total}',
                         pageNumberType: 'Arabic',
-                        position: { x: 630, y: 65 },
+                        position: { x: 950, y: 0 },
                         style: {
                             fontSize: 11,
                             hAlign: 'Center',
@@ -149,18 +147,18 @@ function DeletedSalesTable({ data = [], startDate, endDate, title = "", fileName
     return (<div className='control-pane'>
         <div className='control-section'>
             <div>
-                <GridComponent id="Grid" height={500} dataSource={data?.map(x => ({ ...x, total: +x?.Cash + +x?.Momo + +x?.Cheque + +x?.Credit }))} ref={grid => gridInstance = grid} pdfHeaderQueryCellInfo={pdfHeaderQueryCellInfo} toolbar={toolbarOptions} allowExcelExport={true} allowPdfExport={true} toolbarClick={toolbarClick.bind(this)} allowPaging={true} pageSettings={{ pageCount: 2, pageSize: 100 }}>
+                <GridComponent id="Grid" height={500} dataSource={data?.map(x => ({ ...x, manufacturingDate: getCurrentDateInWords(x?.manufacturingDate), expireDate: getCurrentDateInWords(x?.expireDate), transactionDate: getCurrentDateInWords(x?.transactionDate), total: +x?.Cash + +x?.Momo + +x?.Cheque + +x?.Credit }))} ref={grid => gridInstance = grid} pdfHeaderQueryCellInfo={pdfHeaderQueryCellInfo} toolbar={toolbarOptions} allowExcelExport={true} allowPdfExport={true} toolbarClick={toolbarClick.bind(this)} allowPaging={true} pageSettings={{ pageCount: 2, pageSize: 100 }}>
                     <ColumnsDirective>
-                        <ColumnDirective field='transactionDate' headerText='Date' type="datetime" format='d-MMM-yyyy'></ColumnDirective>
-                        <ColumnDirective field='productName' headerText='Product'></ColumnDirective>
+                        <ColumnDirective field='transactionDate' headerText='Date' ></ColumnDirective>
+                        <ColumnDirective field='productName' headerText='Product' width={"15%"}></ColumnDirective>
                         <ColumnDirective field='quantity' headerText='QTY'  ></ColumnDirective>
                         <ColumnDirective field='batchNumber' headerText='Batch No.'></ColumnDirective>
-                        <ColumnDirective field='expireDate' headerText='Exp. Date' type="datetime" format='d-MMM-yyyy'  ></ColumnDirective>
-                        <ColumnDirective field='manufacturingDate' headerText='MFG. Date' type="datetime" format='d-MMM-yyyy'  ></ColumnDirective>
+                        <ColumnDirective field='expireDate' headerText='Exp. Date'   ></ColumnDirective>
+                        <ColumnDirective field='manufacturingDate' headerText='MFG. Date'   ></ColumnDirective>
                         <ColumnDirective field='unitPrice' headerText='Unit Price' textAlign='Right' format='N2'  ></ColumnDirective>
                         <ColumnDirective field='totalAmt' headerText='Amount' textAlign='Right' format='N2'  ></ColumnDirective>
 
-                        <ColumnDirective field='userName' headerText='User'></ColumnDirective>
+                        <ColumnDirective field='userName' headerText='Deleted By' width={"15%"}></ColumnDirective>
                     </ColumnsDirective>
                     {/* <AggregatesDirective>
                         <AggregateDirective>
