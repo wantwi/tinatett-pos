@@ -27,7 +27,6 @@ import { moneyInTxt } from "../utility";
 import useAuth from "../hooks/useAuth";
 import LoadingSpinner from "../InitialPage/Sidebar/LoadingSpinner";
 import { AppContext } from "../InitialPage/Sidebar/DefaultLayout";
-import { AppContext } from "../InitialPage/Sidebar/DefaultLayout";
 
 
 const Dashboard = (props) => {
