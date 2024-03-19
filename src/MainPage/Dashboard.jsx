@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   AvocatImage,
   Dash1,
@@ -26,6 +26,7 @@ import { useGet } from "../hooks/useGet";
 import { moneyInTxt } from "../utility";
 import useAuth from "../hooks/useAuth";
 import LoadingSpinner from "../InitialPage/Sidebar/LoadingSpinner";
+import { AppContext } from "../InitialPage/Sidebar/DefaultLayout";
 
 
 const Dashboard = (props) => {
@@ -46,17 +47,17 @@ const Dashboard = (props) => {
       ),
       sorter: (a, b) => a.productName.length - b.productName.length,
     },
-   
+
     {
       title: "Manufacturing Date",
       dataIndex: "manufacturingDate",
-      render: (text, record) => <div style={{ fontSize: "14px" }}>{text ? text.substring(0,10) : new Date('2023-01-01').toISOString().substring(0,10)}</div>,
+      render: (text, record) => <div style={{ fontSize: "14px" }}>{text ? text.substring(0, 10) : new Date('2023-01-01').toISOString().substring(0, 10)}</div>,
       sorter: (a, b) => a.manufacturingDate.length - b.manufacturingDate.length,
     },
     {
       title: "Expiry Date",
       dataIndex: "expireDate",
-      render: (text, record) => <div style={{ fontSize: "14px" }}>{text ? text.substring(0,10) : new Date('2023-01-01').toISOString().substring(0,10)}</div>,
+      render: (text, record) => <div style={{ fontSize: "14px" }}>{text ? text.substring(0, 10) : new Date('2023-01-01').toISOString().substring(0, 10)}</div>,
       sorter: (a, b) => a.expireDate.length - b.expireDate.length,
     },
     {
@@ -72,7 +73,7 @@ const Dashboard = (props) => {
       title: "Product",
       dataIndex: "productName",
       sorter: (a, b) => a.productName.length - b.productName.length,
-      
+
     },
     {
       title: "QTY Sold",
@@ -84,7 +85,7 @@ const Dashboard = (props) => {
           </Link>
         </div>
       ),
-     
+
     },
     {
       title: "Amount Sold",
@@ -98,13 +99,13 @@ const Dashboard = (props) => {
       title: "Product",
       dataIndex: "name",
       sorter: (a, b) => a.name.length - b.name.length,
-     
+
     },
     {
       title: "Alert",
       dataIndex: "alert",
       sorter: (a, b) => a.alert.length - b.alert.length,
-     
+
     },
     {
       title: "Stock",
@@ -116,9 +117,9 @@ const Dashboard = (props) => {
           </Link>
         </div>
       ),
-     
+
     },
-   
+
   ];
 
   const customerDataColumns = [
@@ -156,20 +157,24 @@ const Dashboard = (props) => {
   const [profitMarginData, setprofitMarginData] = useState(null)
 
   const [userType, setUserType] = useState('')
- // const [summaryData, setSummaryData] = useState([])
-  
-  const {data: salesAndpurchase,isLoading} = useGet("salesAndpurchase", "/dashboard/salesAndpurchase");
- // const {data: summary,isLoading: summaryIsLoading} = useGet("dashboardSummary", "/dashboard/summary");
-  const {data: expiring, isLoading: expLoading} = useGet("expiring", "/dashboard/productExpirationStatus");
-  const {data: topproducts, isLoading: topproductsLoading} = useGet("topproducts", "/dashboard/topproducts");
-  const {data: topcustomers, isLoading: topcustomersLoading} = useGet("topcustomers", "/dashboard/topcustomers");
-  const {data: profitmargin, isLoading: profitmarginLoading} = useGet("profitmargin", "/dashboard/product/profitmargin");
-  const {data: alertList, isLoading: alertListLoading} = useGet("productalert", "/dashboard/product/alert");
+  // const [summaryData, setSummaryData] = useState([])
+
+  const { selectedBranch } = useContext(AppContext)
+  //console.log("Selected Branch", selectedBranch)
+
+  const { data: salesAndpurchase, isLoading, isFetched: issalesAndpurchaseRefetched, refetch: refetchsalesAndpurchase } = useGet("salesAndpurchase", `/dashboard/salesAndpurchase?branch=${selectedBranch?.value}`);
+  // const {data: summary,isLoading: summaryIsLoading} = useGet("dashboardSummary", "/dashboard/summary");
+  const { data: expiring, isLoading: expLoading, isFetched: isexpiringRefetched, refetch: refetchsexpiring } = useGet("expiring", `/dashboard/productExpirationStatus?branch=${selectedBranch?.value}`);
+  const { data: topproducts, isLoading: topproductsLoading, isFetched: istopproductsRefetched, refetch: refetchtopproducts } = useGet("topproducts", `/dashboard/topproducts?branch=${selectedBranch?.value}`);
+  const { data: topcustomers, isLoading: topcustomersLoading, isFetched: istopcustomersRefetched, refetch: refetchtopcustomers } = useGet("topcustomers", `/dashboard/topcustomers?branch=${selectedBranch?.value}`);
+  const { data: profitmargin, isLoading: profitmarginLoading, isFetched: isprofitmarginRefetched, refetch: refetchprofitmargin } = useGet("profitmargin", `/dashboard/product/profitmargin?branch=${selectedBranch?.value}`);
+  const { data: alertList, isLoading: alertListLoading, isFetched: isproductalertRefetched, refetch: refetchproductalert } = useGet("productalert", `/dashboard/product/alert?branch=${selectedBranch?.value}`);
+
+
 
   useEffect(() => {
     let userRole = localStorage.getItem('auth')
-    let obj =JSON.parse(userRole)
-    //console.log("Role:", obj.role)
+    let obj = JSON.parse(userRole)
     setUserType(obj.role)
   }, [])
 
@@ -179,19 +184,45 @@ const Dashboard = (props) => {
       setExpiredData(expiring?.data)
       settopProductsData(topproducts?.data)
       settopcustomersData(topcustomers?.data)
-      setprofitMarginData( profitmargin.data)
+      setprofitMarginData(profitmargin?.data)
       setAlerListData(alertList?.data)
       // setSummaryData(summary?.data)
-    
+
     }
-  
-  }, [isLoading, expLoading, topproductsLoading, topcustomersLoading, profitmarginLoading, alertListLoading ])
+
+  }, [isLoading, expLoading, topproductsLoading, topcustomersLoading, profitmarginLoading, alertListLoading])
 
 
+  useEffect(() => {
 
 
-  if(isLoading || topproductsLoading || topcustomersLoading){
-    return <LoadingSpinner/>
+    refetchsalesAndpurchase()
+    refetchsexpiring()
+    refetchtopproducts()
+    refetchtopcustomers()
+    refetchprofitmargin()
+    refetchproductalert()
+
+    console.log('refetch all data');
+    //  if (issalesAndpurchaseRefetched && isexpiringRefetched && istopcustomersRefetched && istopproductsRefetched && isprofitmarginRefetched && isproductalertRefetched) {
+    //   setData(salesAndpurchase?.data[0])
+
+    // }
+
+  }, [selectedBranch, issalesAndpurchaseRefetched, isexpiringRefetched, istopcustomersRefetched, istopproductsRefetched, isprofitmarginRefetched, isproductalertRefetched])
+
+
+  useEffect(() => {
+    setData(salesAndpurchase?.data[0])
+    setExpiredData(expiring?.data)
+    settopProductsData(topproducts?.data)
+    settopcustomersData(topcustomers?.data)
+    setprofitMarginData(profitmargin?.data)
+    setAlerListData(alertList?.data)
+  }, [salesAndpurchase, expiring, topproducts, topcustomers, profitmargin, alertList])
+
+  if (isLoading || topproductsLoading || topcustomersLoading) {
+    return <LoadingSpinner />
   }
 
   return (
@@ -201,9 +232,9 @@ const Dashboard = (props) => {
           <title>Tinatett POS</title>
           <meta name="description" content="Dashboard page" />
         </Helmet>
-     
+
         <div className="content">
-        {userType !== 'sales' && <div className="row">
+          {userType !== 'sales' && <div className="row">
             <div className="col-lg-3 col-sm-6 col-12">
               <div className="dash-widget">
                 <div className="dash-widgetimg">
@@ -213,7 +244,7 @@ const Dashboard = (props) => {
                 </div>
                 <div className="dash-widgetcontent">
                   <h5>
-                    GHS {' '} 
+                    GHS {' '}
                     <span className="counters">
                       <CountUp end={data?.monthlySales || 0} />
                     </span>
@@ -231,7 +262,7 @@ const Dashboard = (props) => {
                 </div>
                 <div className="dash-widgetcontent">
                   <h5>
-                  GHS {' '} 
+                    GHS {' '}
                     <span className="counters">
                       <CountUp end={data?.dailySales} />
                     </span>
@@ -250,7 +281,7 @@ const Dashboard = (props) => {
                 </div>
                 <div className="dash-widgetcontent">
                   <h5>
-                    GHS {' '} 
+                    GHS {' '}
                     <span className="counters">
                       <CountUp end={data?.monthlyPurchase || 0} />
                     </span>
@@ -269,7 +300,7 @@ const Dashboard = (props) => {
                 </div>
                 <div className="dash-widgetcontent">
                   <h5>
-                  GHS {' '} 
+                    GHS {' '}
                     <span className="counters">
                       <CountUp end={data?.dailyPurchase} />
                     </span>
@@ -288,7 +319,7 @@ const Dashboard = (props) => {
                 </div>
                 <div className="dash-widgetcontent">
                   <h5>
-                  GHS {' '} 
+                    GHS {' '}
                     <span className="counters">
                       <CountUp end={data?.stock_value} />
                     </span>
@@ -306,7 +337,7 @@ const Dashboard = (props) => {
                 </div>
                 <div className="dash-widgetcontent">
                   <h5>
-                  
+
                     <span className="counters">
                       <CountUp end={data?.numberOfSaleInvoice} />
                     </span>
@@ -324,7 +355,7 @@ const Dashboard = (props) => {
                 </div>
                 <div className="dash-widgetcontent">
                   <h5>
-                  
+
                     <span className="counters">
                       <CountUp end={data?.dailyNumberOfProductSold || 0} />
                     </span>
@@ -342,7 +373,7 @@ const Dashboard = (props) => {
                 </div>
                 <div className="dash-widgetcontent">
                   <h5>
-                  
+
                     <span className="counters">
                       <CountUp end={data?.monthlyNumberOfProductSold} />
                     </span>
@@ -360,7 +391,7 @@ const Dashboard = (props) => {
                 </div>
                 <div className="dash-widgetcontent">
                   <h5>
-                   GHS {' '}
+                    GHS {' '}
                     <span className="counters">
                       <CountUp end={profitMarginData?.total_daily_profit_margin} />
                     </span>
@@ -387,8 +418,8 @@ const Dashboard = (props) => {
                 </div>
               </div>
             </div>)}
-         
-           
+
+
             <div className="col-lg-3 col-sm-6 col-12">
               <div className="dash-widget dash3">
                 <div className="dash-widgetimg">
@@ -398,7 +429,7 @@ const Dashboard = (props) => {
                 </div>
                 <div className="dash-widgetcontent">
                   <h5>
-                  GHS {' '} 
+                    GHS {' '}
                     <span className="counters">
                       <CountUp end={data?.dailyExpenses || 0} />
                     </span>
@@ -416,7 +447,7 @@ const Dashboard = (props) => {
                 </div>
                 <div className="dash-widgetcontent">
                   <h5>
-                  GHS {' '} 
+                    GHS {' '}
                     <span className="counters">
                       <CountUp end={data?.monthlyExpenses || 0} />
                     </span>
@@ -509,7 +540,7 @@ const Dashboard = (props) => {
                   </div>
                 </div>
                 <div className="card-body">
-                  <div className="table-responsive dataview" style={{height:400}}>
+                  <div className="table-responsive dataview" style={{ height: 400 }}>
                     <Table
                       className="table datatable"
                       key={props}
@@ -558,7 +589,7 @@ const Dashboard = (props) => {
                   </div>
                 </div>
                 <div className="card-body">
-                  <div className="table-responsive dataview" style={{height:400}}>
+                  <div className="table-responsive dataview" style={{ height: 400 }}>
                     <Table
                       className="table datatable"
                       key={props}
@@ -607,7 +638,7 @@ const Dashboard = (props) => {
                   </div>
                 </div>
                 <div className="card-body">
-                  <div className="table-responsive dataview" style={{height:400}}>
+                  <div className="table-responsive dataview" style={{ height: 400 }}>
                     <Table
                       className="table datatable"
                       key={props}

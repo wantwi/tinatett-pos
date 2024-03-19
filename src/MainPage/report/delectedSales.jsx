@@ -65,11 +65,9 @@ const DelectedSales = () => {
   } = useGet("suspend", "/sales");
 
   const [productsDropdown, setProductsDropdown] = useState([]);
-  const [suppliersDropdown, setSuppliersDropdown] = useState([]);
+  const [suppliersDropdown, setTypesDropdown] = useState([]);
   const [usersDropdown, setUsersDropdown] = useState([]);
 
-  const { data: products, isLoading: productsIsLoading } = useGet("products", "/product");
-  const { data: suppliers, isLoading: suppliersIsLoading } = useGet("suppliers", "/supplier");
   useGet("users", "/user/branchUsers", (data) => {
     setUsersDropdown(data?.data.map(x => ({
       id: x?.id,
@@ -83,7 +81,7 @@ const DelectedSales = () => {
 
   const [selectedProduct, setSelectedProduct] = useState({})
   const [selectedProductInfo, setSelectedProductInfo] = useState({})
-  const [supplier, setSupplier] = useState('')
+  const [type, setType] = useState('')
   //const [isLoading, setIsLoading] = useState(false)
   const [isBatchLoading, setIsBatchLoading] = useState(false)
   const [formData, setFormData] = useState({ quantity: '', amount: '', batchNumber: {}, startDate: '', endDate: '' })
@@ -93,55 +91,9 @@ const DelectedSales = () => {
   const [selectedUser, setSelectedUser] = useState({})
   const [showOnlyActive, setShowOnlyActive] = useState(true)
 
-  useEffect(() => {
-    if (!productsIsLoading && !suppliersIsLoading) {
-      let mappedProducts = products?.data.map((item) => {
-        return {
-          id: item?.id,
-          label: item?.name,
-          value: item?.id,
-          retailPrice: item?.retailPrice,
-          wholeSalePrice: item?.wholeSalePrice,
-          specialPrice: item?.wholeSalePrice,
-          ownershipType: item?.ownershipType
-        }
 
-      })
-      setProductsDropdown(mappedProducts)
 
-      let mappedSuppliers = suppliers?.data.map((item) => {
-        return {
-          id: item?.id,
-          label: item?.name,
-          value: item?.id,
-        }
 
-      })
-      setSuppliersDropdown(mappedSuppliers)
-    }
-
-  }, [suppliers, products])
-
-  useEffect(() => {
-    // console.log("Selected Prod", selectedProduct)
-
-    axios.get(`${BASE_URL}/purchase/product/${selectedProduct?.value}`).then((res) => {
-      setFormData({ ...formData, batchNumber: null })
-      if (res.data.success) {
-        // setIsLoading(false)
-        console.log(res.data.newProduct)
-        setSelectedProductInfo(res.data.newProduct)
-        // let x = res.data.newProduct.batchNumber?.map((item) => {
-        //   return { value: item.batchNumber, label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')' : item?.batchNumber + '-(' + item?.availablequantity + ')', expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
-        // })
-        // setIsBatchLoading(false)
-        // setFormData({ ...formData, batchNumber: x[0], manuDate: (x[0]?.manufacturingDate).substring(0, 10), expDate: (x[0]?.expireDate).substring(0, 10) })
-
-      }
-    })
-    $('#selectedProduct').css('border', '1px solid rgba(145, 158, 171, 0.32)')
-
-  }, [selectedProduct])
 
   useEffect(() => {
     let userDetails = localStorage.getItem('auth')
@@ -154,36 +106,36 @@ const DelectedSales = () => {
     setSelectedProduct(e)
   }
 
-  useEffect(() => {
-    if (!isLoading) {
+  // useEffect(() => {
+  //   if (!isLoading) {
 
-      let mappedData = sales?.data.map((sale) => {
-        // console.log("Payment Infor:", (JSON.parse(sale?.paymentInfo)).type)
-        return {
-          id: sale?.id,
-          Date: sale?.transDate,
-          Name: sale?.customerName,
-          Status: sale?.status,
-          Reference: sale?.salesRef,
-          // Payment: JSON.parse(sale?.paymentInfo).type,
-          Total: moneyInTxt(sale?.totalAmount) || '',
-          Paid: moneyInTxt(sale?.amountPaid),
-          Balance: moneyInTxt(sale?.balance),
-          Biller: sale?.salesPerson,
-        }
-      })
-      let sortedData = mappedData.sort((a, b) => new Date(b.Date) - new Date(a.Date))
-      setData(sortedData)
-      console.log('loaded..')
-    }
-    else {
-      console.log('loading...')
-    }
-  }, [isLoading])
+  //     let mappedData = sales?.data.map((sale) => {
+  //       // console.log("Payment Infor:", (JSON.parse(sale?.paymentInfo)).type)
+  //       return {
+  //         id: sale?.id,
+  //         Date: sale?.transDate,
+  //         Name: sale?.customerName,
+  //         Status: sale?.status,
+  //         Reference: sale?.salesRef,
+  //         // Payment: JSON.parse(sale?.paymentInfo).type,
+  //         Total: moneyInTxt(sale?.totalAmount) || '',
+  //         Paid: moneyInTxt(sale?.amountPaid),
+  //         Balance: moneyInTxt(sale?.balance),
+  //         Biller: sale?.salesPerson,
+  //       }
+  //     })
+  //     let sortedData = mappedData.sort((a, b) => new Date(b.Date) - new Date(a.Date))
+  //     setData(sortedData)
+  //     console.log('loaded..')
+  //   }
+  //   else {
+  //     console.log('loading...')
+  //   }
+  // }, [isLoading])
 
   const handleReset = () => {
     setFormData({ quantity: '', amount: '', batchNumber: '', startDate: '', endDate: '' })
-    setSupplier(null)
+    setType(null)
     setSelectedProduct(null)
     setSelectedUser(null)
   }
@@ -200,27 +152,24 @@ const DelectedSales = () => {
 
 
   const handleGenerateReport = () => {
-    // if (!formData?.startDate || !formData?.endDate) {
+    if (!type) {
 
-    //   alertify.warning("Please select a date range");
-    //   return
+      alertify.warning("Please select the report type");
+      return
 
-    // }
-    // if (!selectedProduct?.id || !formData?.batchNumber?.label) {
+    }
+    if (!formData?.startDate || !formData?.endDate) {
 
-    //   alertify.warning("Please product and batch number");
-    //   return
+      alertify.warning("Please select a date range");
+      return
 
-    // }
+    }
+
     const baseUrl = "report/getDeletedReport";
     let filters = {
-      // productId: selectedProduct?.id || "",
-      type: 'SL',
+      type: type?.value === 0 ? 'SL' : 'PR',
       startDate: formData?.startDate || "",
       endDate: formData?.endDate || "",
-      // batchNumber: formData?.batchNumber?.label || "",
-      // clientId: supplier?.id || "",
-      // userId: selectedUser?.value || "",
     };
 
     const encodeFilterValue = (value) => encodeURIComponent(value);
@@ -348,8 +297,8 @@ const DelectedSales = () => {
         <div className="content">
           <div className="page-header">
             <div className="page-title">
-              <h4>Deleted Sales Report</h4>
-              <h6>Generate your Deleted Sales Report</h6>
+              <h4>Deleted Report</h4>
+              <h6>Generate your Deleted Report</h6>
             </div>
             <div className="page-btn">
               <Link
@@ -358,7 +307,7 @@ const DelectedSales = () => {
                 className="btn btn-success"
               >
 
-                Generate Deletded Sales Report
+                Generate Deletded Report
               </Link>
             </div>
           </div>
@@ -382,7 +331,7 @@ const DelectedSales = () => {
               </div>
               {/* /Filter */}
               <div className="table-responsive">
-                <DeletedSalesTable startDate={formData?.startDate} endDate={formData?.endDate} title="WEEKLY SALE SUMMARY REPORT" fileName="weeklysalereport" data={report} />
+                <DeletedSalesTable startDate={formData?.startDate} endDate={formData?.endDate} title="DELETED SALES REPORT" fileName="deletedsalereport" data={report} />
               </div>
             </div>
           </div>
@@ -403,7 +352,7 @@ const DelectedSales = () => {
         <div className="modal-dialog modal-md modal-dialog-centered" role="document">
           <div className="modal-content">
             <div className="modal-header">
-              <h5 className="modal-title">Deleted Sale Search</h5>
+              <h5 className="modal-title">Deleted Report Search</h5>
               <button
                 type="button"
                 className="close"
@@ -414,6 +363,21 @@ const DelectedSales = () => {
               </button>
             </div>
             <div className="modal-body">
+              <div className="row">
+                <div className="form-group">
+                  <label>Type</label>
+                  <Select
+                    id="type"
+                    className="select"
+                    options={[{ label: "Sales", value: 0 }, { label: "Purchase", value: 1 }]}
+                    value={type}
+                    // isLoading={suppliersIsLoading}
+                    onChange={(e) => {
+                      setType(e)
+                    }}
+                  />
+                </div>
+              </div>
               <div className="row">
                 <div className="form-group">
                   <label>From</label>
@@ -443,87 +407,6 @@ const DelectedSales = () => {
                   </div>
                 </div>
               </div>
-              <div className="row" hidden>
-                <div className="form-group">
-                  <label>Supplier</label>
-                  <Select
-                    id="supplier"
-                    className="select"
-                    options={suppliersDropdown}
-                    value={supplier}
-                    isLoading={suppliersIsLoading}
-                    onChange={(e) => {
-                      setSupplier(e)
-                    }}
-                  />
-                </div>
-              </div>
-              <div className="row" hidden>
-                <div className="form-group">
-                  <label>Product</label>
-                  <Select
-                    id="productName"
-                    className="select"
-                    options={productsDropdown}
-                    placeholder="Select product"
-                    value={selectedProduct}
-                    isLoading={productsIsLoading}
-                    onChange={(e) => handleProductSelect(e)}
-
-                  />
-                </div>
-              </div>
-              <div className="row" hidden>
-                <div className="form-group">
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <label>Batch No.</label>
-                    {isBatchLoading && <div className="spinner-border text-primary me-1" role="status" style={{ height: 20, width: 20 }}>
-                      <span className="sr-only">Loading...</span>
-                    </div>}
-                  </div>
-                  <div className="input-groupicon">
-                    <Select
-
-                      options={selectedProductInfo?.batchNumber?.map((item) => {
-                        return { value: item.batchNumber, label: item?.batchNumber, expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
-                      })}
-                      placeholder="Select batch number"
-                      value={formData.batchNumber}
-                      onChange={(e) => setFormData({ ...formData, batchNumber: (e) })}
-                    //onChange={(e) => console.log(e)}
-                    />
-
-                  </div>
-                </div>
-              </div>
-              <div hidden>
-                <div className="col">
-
-                  <div className="input-group" style={{ marginLeft: -13 }}>
-                    <div className="input-group-text">
-                      <input className="form-check-input" type="checkbox" checked={showOnlyActive} name="priceType" value={'Hide Dormat Product'}
-                        onClick={(e) => {
-                          setShowOnlyActive(!showOnlyActive)
-                        }} />
-                    </div>
-                    <input type="text" className="form-control" aria-label="Text input with radio button" placeholder={`Hide Dormat Product `} />
-                  </div>
-
-                </div>
-              </div>
-              <div className="row" hidden>
-                <div className="form-group">
-                  <label>User</label>
-                  <Select
-                    id="users"
-                    className="select"
-                    options={usersDropdown}
-                    value={selectedUser}
-                    onChange={(e) => setSelectedUser(e)}
-                  />
-                </div>
-              </div>
-
             </div>
             <div className="modal-footer">
               <Link to="#" className="btn btn-cancel me-2" style={{ width: '47%' }} onClick={handleReset}>
