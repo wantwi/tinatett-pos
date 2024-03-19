@@ -53,10 +53,13 @@ const Header = (props) => {
     let userRole = localStorage.getItem('auth')
     let obj = JSON.parse(userRole)
     //console.log("branches", branchesList)
-    if(obj.branchId && !isLoading){
-      let branch = branchesList.find((branch) => branch.value == obj?.branchId)
-      setSelectedBranch(branch)
-    }
+    setTimeout(() => {
+      if(obj.branchId && !isLoading){
+        let branch = branchesList.find((branch) => branch.value == obj?.branchId)
+        setSelectedBranch(branch)
+      }
+    }, 2000)
+    
    
   },[branchesList])
 
