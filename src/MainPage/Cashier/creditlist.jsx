@@ -20,7 +20,7 @@ import { Button } from "antd";
 import FeatherIcon from 'feather-icons-react'
 import { socket } from "../../InitialPage/Sidebar/Header";
 import useAuth from "../../hooks/useAuth";
-import { NotificationsContext } from "../../InitialPage/Sidebar/DefaultLayout";
+import { AppContext } from "../../InitialPage/Sidebar/DefaultLayout";
 import { Purchase } from "../../EntryFile/imagePath";
 import { debounce } from "lodash";
 
@@ -57,7 +57,7 @@ const CreditList = () => {
   const [isLoadingPDF, setIsLoadingPDF] = useState(false)
   const [isErrorPDF, setIsError] = useState('')
 
-  const { notifications, setNotifications } = useContext(NotificationsContext)
+  const { notifications, setNotifications } = useContext(AppContext)
   let storage = JSON.parse(localStorage.getItem("auth"))
 
 

@@ -1,11 +1,11 @@
 import React, { useContext } from "react";
 import { Link } from 'react-router-dom'
 import {Bruklin,Profile3,Profile4,Profile5} from "../EntryFile/imagePath";
-import { NotificationsContext } from "../InitialPage/Sidebar/DefaultLayout";
+import { AppContext } from "../InitialPage/Sidebar/DefaultLayout";
 import { timeAgo } from "../utility";
 
 const Activities = () => {
-  const { notifications, setNotifications } = useContext(NotificationsContext)
+  const { notifications, setNotifications } = useContext(AppContext)
   return (
     <div className="page-wrapper">
       <div className="content">

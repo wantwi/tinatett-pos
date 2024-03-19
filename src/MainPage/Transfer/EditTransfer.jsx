@@ -34,7 +34,7 @@ import jsPDF from "jspdf";
 import useCustomApi from "../../hooks/useCustomApi";
 import { BASE_URL } from "../../api/CustomAxios";
 import { useLocation } from "react-router-dom/cjs/react-router-dom.min";
-import { NotificationsContext } from "../../InitialPage/Sidebar/DefaultLayout";
+import { AppContext } from "../../InitialPage/Sidebar/DefaultLayout";
 
 
 const EditTransfer = () => {
@@ -72,7 +72,7 @@ const EditTransfer = () => {
   const [isSubmitSuccessful, setIsSubmitSuccessful] = useState(false)
   const [isBatchLoading, setIsBatchLoading] = useState(false)
 
-  const { notifications, setNotifications } = useContext(NotificationsContext)
+  const { notifications, setNotifications } = useContext(AppContext)
   let storage = JSON.parse(localStorage.getItem("auth"))
 
 

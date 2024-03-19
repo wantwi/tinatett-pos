@@ -37,7 +37,7 @@ const Header = (props) => {
   const [loggedIn, setLoggedIn] = useState(true)
 
 
-  const { notifications, setNotifications, selectedBranch, setSelectedBranch } = useContext(AppContext)
+  const { notifications, setNotifications, selectedBranch, setSelectedBranch, setIsRefreshing } = useContext(AppContext)
   const { data: branches, isLoading } = useGet("branches", "/branch");
 
 
@@ -221,7 +221,7 @@ const Header = (props) => {
         <ul className="nav user-menu">
          
           <li className="nav-item" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', marginRight: 50 }}>
-            <span style={{marginRight:10}}>Branch:</span>  <Select isDisabled={userType !== 'admin'} id="selectedBranch" className="select form-control" options={branchesList} value={selectedBranch} onChange={(e) => { setSelectedBranch(e) }}/>
+            <span style={{marginRight:10}}>Branch:</span>  <Select isDisabled={userType !== 'admin'} id="selectedBranch" className="select form-control" options={branchesList} value={selectedBranch} onChange={(e) => { setSelectedBranch(e), setIsRefreshing(true) }}/>
           </li>
          
 

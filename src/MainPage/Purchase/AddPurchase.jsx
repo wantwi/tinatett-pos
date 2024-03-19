@@ -27,7 +27,7 @@ import { usePost } from "../../hooks/usePost";
 import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
 import FeatherIcon from "feather-icons-react";
 import useCustomApi from "../../hooks/useCustomApi";
-import { NotificationsContext } from "../../InitialPage/Sidebar/DefaultLayout";
+import { AppContext } from "../../InitialPage/Sidebar/DefaultLayout";
 
 const options2 = [
   { id: 1, text: "choose Status", text: "choose Status" },
@@ -56,7 +56,7 @@ const AddPurchase = () => {
   const [isSubmitSuccessful, setIsSubmitSuccessful] = useState(false)
   const [loading, setLoading] = useState(false)
   const [isExpired, setIsExpired] = useState(false)
-  const { notifications, setNotifications } = useContext(NotificationsContext)
+  const { notifications, setNotifications } = useContext(AppContext)
   let storage = JSON.parse(localStorage.getItem("auth"))
 
   //add customer states

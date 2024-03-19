@@ -15,7 +15,8 @@ const DefaultLayout =(props)=> {
       { message: `${storage.name} welcome to Tinatett POS`, time: new Date().toISOString()}
     ])
     const [selectedBranch, setSelectedBranch] = useState({label:'Select Branch', value:'00000000-0000-0000-0000-000000000000'})
-    
+    const [isRefreshing, setIsRefreshing] = useState(false)
+
     useEffect(() => {
       const loggedInUser = localStorage.getItem('auth')
       if(!loggedInUser){
@@ -27,7 +28,7 @@ const DefaultLayout =(props)=> {
  
     return (
       <>
-      <AppContext.Provider value={{notifications, setNotifications, selectedBranch, setSelectedBranch}}>
+      <AppContext.Provider value={{notifications, setNotifications, selectedBranch, setSelectedBranch, isRefreshing, setIsRefreshing}}>
         <div className="main-wrapper">
           <Header />
           <div>

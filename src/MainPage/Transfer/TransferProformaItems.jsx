@@ -31,7 +31,7 @@ import useCustomApi from "../../hooks/useCustomApi";
 import { BASE_URL } from "../../api/CustomAxios";
 import { usePost } from "../../hooks/usePost";
 import { LoadingOutlined } from "@ant-design/icons";
-import { NotificationsContext } from "../../InitialPage/Sidebar/DefaultLayout";
+import { AppContext } from "../../InitialPage/Sidebar/DefaultLayout";
 
 
 const TransferProformaItems = () => {
@@ -76,7 +76,7 @@ const TransferProformaItems = () => {
   const [isBatchLoading, setIsBatchLoading] = useState(false)
   const [receiptFile, setReceiptFile] = useState(null)
 
-  const { notifications, setNotifications } = useContext(NotificationsContext)
+  const { notifications, setNotifications } = useContext(AppContext)
   let storage = JSON.parse(localStorage.getItem("auth"))
 
 
