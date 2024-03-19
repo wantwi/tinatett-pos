@@ -19,7 +19,7 @@ import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
 import { Button } from "antd";
 import FeatherIcon from 'feather-icons-react'
 import { socket } from "../../InitialPage/Sidebar/Header";
-import { NotificationsContext } from "../../InitialPage/Sidebar/DefaultLayout";
+import { AppContext } from "../../InitialPage/Sidebar/DefaultLayout";
 
 const Cashier = () => {
   const init = {
@@ -52,7 +52,7 @@ const Cashier = () => {
   const [receiptFile, setReceiptFile] = useState(null)
   const [isSaving, setIsSaving] = useState(false)
 
-  const { notifications, setNotifications } = useContext(NotificationsContext)
+  const { notifications, setNotifications } = useContext(AppContext)
   let storage = JSON.parse(localStorage.getItem("auth"))
 
 

@@ -32,7 +32,7 @@ import FeatherIcon from 'feather-icons-react'
 import jsPDF from "jspdf";
 import useCustomApi from "../../hooks/useCustomApi";
 import { BASE_URL } from "../../api/CustomAxios";
-import { NotificationsContext } from "../../InitialPage/Sidebar/DefaultLayout";
+import { AppContext } from "../../InitialPage/Sidebar/DefaultLayout";
 
 
 const AddTransfer = () => {
@@ -66,7 +66,7 @@ const AddTransfer = () => {
   const [isBatchLoading, setIsBatchLoading] = useState(false)
   
 
-  const { notifications, setNotifications } = useContext(NotificationsContext)
+  const { notifications, setNotifications } = useContext(AppContext)
   let storage = JSON.parse(localStorage.getItem("auth"))
 
   const axios = useCustomApi()

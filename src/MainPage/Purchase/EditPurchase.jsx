@@ -24,7 +24,7 @@ import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
 import Select from "react-select";
 import Swal from "sweetalert2";
 import useCustomApi from "../../hooks/useCustomApi";
-import { NotificationsContext } from "../../InitialPage/Sidebar/DefaultLayout";
+import { AppContext } from "../../InitialPage/Sidebar/DefaultLayout";
 
 
 const EditPurchase = () => {
@@ -55,7 +55,7 @@ const EditPurchase = () => {
   const [editFormData, setEditFormData] = useState({ id:'', unitPrice: '', quantity: '', amount: '', manufacturingDate:'', expireDate:''})
   const [productList, setProductList] = useState([])
 
-  const { notifications, setNotifications } = useContext(NotificationsContext)
+  const { notifications, setNotifications } = useContext(AppContext)
   let storage = JSON.parse(localStorage.getItem("auth"))
 
   const axios = useCustomApi()
