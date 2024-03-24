@@ -30,7 +30,7 @@ import * as Yup from "yup";
 import FeatherIcon from 'feather-icons-react'
 import jsPDF from "jspdf";
 import useCustomApi from "../../hooks/useCustomApi";
-import { NotificationsContext } from "../../InitialPage/Sidebar/DefaultLayout";
+import { AppContext } from "../../InitialPage/Sidebar/DefaultLayout";
 
 
 
@@ -62,7 +62,7 @@ const AddProforma = () => {
   const [proformaFile, setProformaFile] = useState(null)
   const [priceType, setPriceType] = useState('')
 
-  const { notifications, setNotifications } = useContext(NotificationsContext)
+  const { notifications, setNotifications } = useContext(AppContext)
   let storage = JSON.parse(localStorage.getItem("auth"))
 
   //add customer states

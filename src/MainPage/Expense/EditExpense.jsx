@@ -24,7 +24,7 @@ import "../../../node_modules/alertifyjs/build/css/alertify.css";
 import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import { useGet } from "../../hooks/useGet";
-import { NotificationsContext } from "../../InitialPage/Sidebar/DefaultLayout";
+import { AppContext } from "../../InitialPage/Sidebar/DefaultLayout";
 
 const EditExpense = () => {
   //const { state } = useLocation()
@@ -98,7 +98,7 @@ const EditExpense = () => {
   const editcompanyRef = useRef()
   const editproductionRef = useRef()
 
-  const { notifications, setNotifications } = useContext(NotificationsContext)
+  const { notifications, setNotifications } = useContext(AppContext)
 
   const axios = useCustomApi();
 

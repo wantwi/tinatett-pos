@@ -22,7 +22,7 @@ import alertify from "alertifyjs";
 import "../../../node_modules/alertifyjs/build/css/alertify.css";
 import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
 import LoadingSpinner from "../../InitialPage/Sidebar/LoadingSpinner";
-import { NotificationsContext } from "../../InitialPage/Sidebar/DefaultLayout";
+import { AppContext } from "../../InitialPage/Sidebar/DefaultLayout";
 
 
 
@@ -85,7 +85,7 @@ const AddQuotation = () => {
     },
   ];
 
-  const { notifications, setNotifications } = useContext(NotificationsContext)
+  const { notifications, setNotifications } = useContext(AppContext)
   let storage = JSON.parse(localStorage.getItem("auth"))
 
   const handleProductSelect = (e) => {

@@ -28,7 +28,7 @@ import "../../../node_modules/alertifyjs/build/css/alertify.css";
 import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
 import { useLocation } from "react-router-dom/cjs/react-router-dom.min";
 import { LoadingOutlined } from "@ant-design/icons";
-import { NotificationsContext } from "../../InitialPage/Sidebar/DefaultLayout";
+import { AppContext } from "../../InitialPage/Sidebar/DefaultLayout";
 
 
 const ProformaSales = () => {
@@ -103,7 +103,7 @@ const ProformaSales = () => {
 
 
   const axios = useCustomApi()
-  const { notifications, setNotifications } = useContext(NotificationsContext)
+  const { notifications, setNotifications } = useContext(AppContext)
   let storage = JSON.parse(localStorage.getItem("auth"))
 
   const deleteRow = (record) => {

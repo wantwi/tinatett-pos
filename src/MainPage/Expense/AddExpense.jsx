@@ -21,7 +21,7 @@ import "../../../node_modules/alertifyjs/build/css/alertify.css";
 import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
 import Select from "react-select";
 import FeatherIcon from 'feather-icons-react'
-import { NotificationsContext } from "../../InitialPage/Sidebar/DefaultLayout";
+import { AppContext } from "../../InitialPage/Sidebar/DefaultLayout";
 
 const AddExpense = () => {
   const [expenseDate, setExpenseDate] = useState(new Date().toISOString().substring(0, 10));
@@ -88,7 +88,7 @@ const AddExpense = () => {
 
   const axios = useCustomApi();
 
-  const { notifications, setNotifications } = useContext(NotificationsContext)
+  const { notifications, setNotifications } = useContext(AppContext)
 
 
   const handleTypeChange = (e) => {
