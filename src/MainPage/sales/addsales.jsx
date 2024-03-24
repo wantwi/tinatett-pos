@@ -581,7 +581,7 @@ const Addsales = () => {
       manufacturingDate: formData?.manuDate.substring(0, 10),
       unitPrice: price,
       // priceType: salesType,
-      priceType: retailpriceTypeRef.current.checked == true ? 'Retail' : 'Wholesale',
+      priceType: retailpriceTypeRef.current.checked == true ? 'Retail' : wholesalepriceTypeRef.current.checked == true ?  'Wholesale' : 'Special',
       amount: formData.quantity * price
     }
  
@@ -839,15 +839,16 @@ const Addsales = () => {
     setSelectedCustomer(customerList[0])
   }, [customerList])
 
+  useEffect(() => {
+    console.log('edit price:', editPrice)
+  }, [editPrice])
+
   if (productsIsLoading && customersIsLoading) {
     return <LoadingSpinner message="Loading...please wait" />
   }
 
 
 
-  // if (isCustomerSaving) {
-  //   return <LoadingSpinner message="Saving...please wait" />
-  // }
 
 
 
@@ -1473,6 +1474,7 @@ const Addsales = () => {
 
                                     <td>
                                       <Link to="#" className="delete-set me-2" data-bs-toggle="modal" data-bs-target="#editproduct" onClick={() => {
+                                        console.log(item, "EDIT ITEM")
                                         setEditFormData(item)
                                        
                                         }}>
@@ -1731,7 +1733,7 @@ const Addsales = () => {
               <div className="col-lg-6">
                 <div className="form-group">
                   <label>Amount</label>
-                  <input type="number" min={0} className="form-control" value={editFormData?.quantity * editPrice} />
+                  <input type="number" min={0} className="form-control" value={editFormData?.amount} />
                 </div>
               </div>
 

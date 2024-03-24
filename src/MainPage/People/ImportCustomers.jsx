@@ -1,12 +1,10 @@
-import React, {useCallback, useEffect, useState} from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { EditIcon, Upload } from '../../EntryFile/imagePath';
-import { read} from 'xlsx'
+import { read, utils} from 'xlsx'
 import { useDropzone } from 'react-dropzone'
 import Table from "../../EntryFile/datatable";
-import { moneyInTxt } from '../../utility';
-import { Link } from "react-router-dom";
 import alertify from "alertifyjs";
-import "../../../node_modules/alertifyjs/build/css/alertify.css"; 
+import "../../../node_modules/alertifyjs/build/css/alertify.css";
 import "../../../node_modules/alertifyjs/build/css/themes/semantic.css";
 import { usePost } from '../../hooks/usePost';
 import LoadingSpinner from '../../InitialPage/Sidebar/LoadingSpinner';
@@ -23,20 +21,20 @@ const ImportCustomers = () => {
         })
       )
     )
-    
+
   }, [])
 
-  const {acceptedFiles, getRootProps, getInputProps} = useDropzone({ accept: '.xlsx,.xls,.csv', maxFiles: 1, onDrop})
+  const { acceptedFiles, getRootProps, getInputProps } = useDropzone({ accept: '.xlsx,.xls,.csv', maxFiles: 1, onDrop })
   const [uploadedData, setData] = useState([])
   const [importedRecords, setimportedRecords] = useState([])
   const [last, setLast] = useState(0)
   const [selectedSheet, setSelectedSheet] = useState('')
-  const [productsList, setProductsList] =useState([])
+  const [productsList, setProductsList] = useState([])
 
-  useEffect(() =>{
-    
+  useEffect(() => {
+
     if (uploadedData.length > 0) {
-     
+
       const reader = new FileReader()
       reader.onabort = () => console.log('file reading was aborted')
       reader.onerror = () => console.log('file reading has failed')
@@ -49,15 +47,15 @@ const ImportCustomers = () => {
 
         //console.log("Workbook:", workbook)
         setData(workbook)
-      
+
         //get sheet Data
-        
+
       }
       reader.readAsArrayBuffer(uploadedData[0], 'utf-8')
     }
   }, [uploadedData])
-  
- const files = acceptedFiles.map((file) => (
+
+  const files = acceptedFiles.map((file) => (
     <li key={file.path}>
       {file.path} - {file.size} bytes
     </li>
@@ -67,6 +65,9 @@ const ImportCustomers = () => {
   const getSheetData = (e) => {
     let sheetName = e.target.value
     let xdt = uploadedData.Sheets[sheetName]
+    const excelData = utils.sheet_to_json(xdt);
+
+
     let xData = Object.keys(xdt).map((key) => {
       return [key, xdt[key].v]
     })
@@ -108,101 +109,23 @@ const ImportCustomers = () => {
       Columns: xColums.filter((v, i, a) => a.indexOf(v) === i),
     })
 
- 
 
-    setimportedRecords(excelSheets[0].Data)
+
+    // setimportedRecords(excelSheets[0].Data)
+    setimportedRecords(excelData)
     setLast(Number(excelSheets[0].Last.Row))
   }
 
   const processUpload = () => {
     $('#processUpload').css('border', 'none')
-    if(selectedSheet == ''){
+    if (selectedSheet == '') {
       alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please select a sheet");
       $('#sheetName').css('border', '1px solid red')
     }
-    else{
-      let arr = importedRecords
-      let keys = [...new Set(arr)]
-    
-      let col1 = keys.filter((item) => item.Column === 'A')
-      let col2 = keys.filter((item) => item.Column === 'B')
-      let col3 = keys.filter((item) => item.Column === 'C')
-      let col4 = keys.filter((item) => item.Column === 'D')
-      let col5 = keys.filter((item) => item.Column === 'E')
-      let col6 = keys.filter((item) => item.Column === 'F')
-      let col7 = keys.filter((item) => item.Column === 'G')
+    else {
 
-      // console.log(col1, col2, col3, col4, col5)
-
-
-      let NamesArr = []
-      let EmailsArr = []
-      let ContactArr = []
-      let OtherContactArr = []
-      let LocationArr = []
-      let GPSAddressArr = []
-      let CustomerTypeArr = []
-
-
-      col1.forEach((name) => NamesArr.push(name.Value))
-      col2.forEach((retail) => EmailsArr.push(retail.Value))
-      col3.forEach((wholesale) => ContactArr.push(wholesale.Value))
-      col4.forEach((special) => OtherContactArr.push(special.Value))
-      col5.forEach((alert) => LocationArr.push(alert.Value))
-      col6.forEach((alert) => GPSAddressArr.push(alert.Value))
-      col7.forEach((alert) => CustomerTypeArr.push(alert.Value))
-    
-
-      let finalData = []
-      finalData.push(
-        NamesArr,
-        EmailsArr,
-        ContactArr,
-        OtherContactArr,
-        LocationArr,
-        GPSAddressArr,
-        CustomerTypeArr
-      )
-
-    // console.log(finalData, "DATA")
-
-      let postData = []
-      let res = []
-
-      let obj = {}
-      for (let i = 1; i < last; i++) {
-        finalData.map((item, ix) => {
-          obj[item[0]] = item[i]
-          let ob = { [item[0]]: item[i] }
-          res.push(ob)
-        })
-        postData = [...postData, obj]
-
-        postData.push([obj][0])
-      }
-
-      
-      let chunkSize = 7
-      let chunks = []
-      for (let i = 0; i < res.length; i += chunkSize) {
-        const chunk = res.slice(i, i + chunkSize)
-        // do whatever
-        chunks.push(chunk)
-      }
-
-      let results = []
-      chunks.map((item) => {
-        let newObject = {}
-        item.map((value) => {
-          newObject[`${Object.keys(value)}`] = `${Object.values(value)}`
-        })
-
-        results.push(newObject)
-      })
-
-    
-      const renderData = results.map((value) => ({
+      const renderData = importedRecords.map((value) => ({
         name: value.CustomerName,
         email: value.Email,
         contact: value.Contact,
@@ -210,20 +133,21 @@ const ImportCustomers = () => {
         location: value.Location,
         customerType: value.CustomerType == 'Individual' ? 0 : 1,
         gpsAddress: value.GhanaPostAddress
-        
+
       }))
 
       console.log(renderData, "Results")
-      
+
 
       setProductsList(renderData)
-      
+
     }
+
   }
 
   const onSuccess = (data) => {
-    if(data)
-    alertify.set("notifier", "position", "bottom-right");
+    if (data)
+      alertify.set("notifier", "position", "bottom-right");
     alertify.success("Customers uploaded successfully.");
     setProductsList([])
   }
@@ -239,7 +163,7 @@ const ImportCustomers = () => {
   const columns = [
     {
       title: "Customer",
-      dataIndex: "name",    
+      dataIndex: "name",
     },
     {
       title: "Location",
@@ -267,41 +191,41 @@ const ImportCustomers = () => {
           {text == "1" && (
             <span className="badges bg-lightgreen">{"Company"}</span>
           )}
-         
+
         </>)
     },
 
   ];
 
   const submit = () => {
-      let payload = {
-        customers: productsList
-      }
+    let payload = {
+      customers: productsList
+    }
 
-      if(selectedSheet == ''){
-        alertify.set("notifier", "position", "bottom-right");
-        alertify.warning("Please select a sheet");
-        $('#sheetName').css('border', '1px solid red')
-      }
+    if (selectedSheet == '') {
+      alertify.set("notifier", "position", "bottom-right");
+      alertify.warning("Please select a sheet");
+      $('#sheetName').css('border', '1px solid red')
+    }
 
-      else if(productsList.length < 1){
-        $('#processUpload').css('border', '1px solid red')
-        alertify.set("notifier", "position", "bottom-right");
-        alertify.warning("Please process your uploaded document first");
-      }
-      else{
-        mutate(payload)
-      }
+    else if (productsList.length < 1) {
+      $('#processUpload').css('border', '1px solid red')
+      alertify.set("notifier", "position", "bottom-right");
+      alertify.warning("Please process your uploaded document first");
+    }
+    else {
+      mutate(payload)
+    }
 
-      
+
   }
 
   useEffect(() => {
     $('#sheetName').css('border', '1px solid rgba(145, 158, 171, 0.32)')
   }, [selectedSheet])
 
-  if(isLoading){
-    return <LoadingSpinner message='saving...'/>
+  if (isLoading) {
+    return <LoadingSpinner message='saving...' />
   }
 
 
@@ -316,7 +240,7 @@ const ImportCustomers = () => {
             </div>
           </div>
           {/* /product list */}
-          <div style={{display:'grid', gap:20, gridTemplateColumns: '2fr 3fr'}}>
+          <div style={{ display: 'grid', gap: 20, gridTemplateColumns: '2fr 3fr' }}>
             <div className="card">
               <div className="card-body">
                 <div className="requiredfield">
@@ -331,7 +255,7 @@ const ImportCustomers = () => {
                   <div className="col-lg-12">
                     <div className="form-group">
                       <label> Upload CSV File</label>
-                      <div  {...getRootProps({className: 'dropzone'})} style={{border: '2px dashed #008179', height:200, textAlign:'center'}}>
+                      <div  {...getRootProps({ className: 'dropzone' })} style={{ border: '2px dashed #008179', height: 200, textAlign: 'center' }}>
                         <input {...getInputProps()} />
                         <div className="image-uploads">
                           <img src={Upload} alt="img" />
@@ -339,14 +263,14 @@ const ImportCustomers = () => {
                         </div>
                       </div>
 
-                      <div style={{display:'flex', flexDirection:'column'}}>
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
                         <aside>
                           <label>File Name:</label>
                           <ul style={{ color: 'green' }}>{files}</ul>
                         </aside>
 
-                        <aside style={{marginTop: 10}}>
-                        
+                        <aside style={{ marginTop: 10 }}>
+
                           <select
                             className='form-control col-lg-12'
                             id='sheetName'
@@ -363,10 +287,10 @@ const ImportCustomers = () => {
                           </select>
                         </aside>
                       </div>
-                      
+
                     </div>
                   </div>
-                  <div className="col-lg-12 col-sm-12" style={{marginTop:10}}>
+                  <div className="col-lg-12 col-sm-12" style={{ marginTop: 10 }}>
                     <div className="productdetails productdetailnew">
                       <ul className="product-bar">
                         <li>
@@ -385,17 +309,17 @@ const ImportCustomers = () => {
                           <h4>Location</h4>
                           <h6 className="manitorygreen">This Field is required</h6>
                         </li>
-                       
+
                       </ul>
                     </div>
                   </div>
-                
+
                   <div className="col-lg-12">
                     <div className="form-group mb-0" id='processUpload'>
-                      <button className="btn btn-submit me-2"  onClick={processUpload}>
+                      <button className="btn btn-submit me-2" onClick={processUpload}>
                         Process Upload
                       </button>
-                      
+
                     </div>
                   </div>
                 </div>
@@ -403,20 +327,20 @@ const ImportCustomers = () => {
             </div>
 
             <div className='card'>
-                <div className="col-lg-12 col-sm-12"  style={{marginTop:10}}>
-                    <div className="table-responsive" style={{height:680}}>
-                      <Table columns={columns} dataSource={productsList} />
-                    </div>
-
-                    <div className="col-lg-12">                    
-                        <button className="btn btn-submit me-2 col-lg-12" onClick={submit}>
-                           Submit
-                        </button>
-                  </div>
+              <div className="col-lg-12 col-sm-12" style={{ marginTop: 10 }}>
+                <div className="table-responsive" style={{ height: 680 }}>
+                  <Table columns={columns} dataSource={productsList} />
                 </div>
+
+                <div className="col-lg-12">
+                  <button className="btn btn-submit me-2 col-lg-12" onClick={submit}>
+                    Submit
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
-        
+
           {/* /product list */}
         </div>
       </div>
