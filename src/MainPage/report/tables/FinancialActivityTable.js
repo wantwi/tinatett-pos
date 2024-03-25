@@ -386,9 +386,9 @@ function FinancialActivityTable({ data, startDate, endDate, fileName, title }) {
                 <Inject services={[PdfExport, ExcelExport, Toolbar, Page, Aggregate, ColumnChooser]} />
             </GridComponent>
             <div className='e-statustext mt-4 mb-2' style={{ fontWeight: 700 }}> Cash at Hand</div>
-            <GridComponent allowPaging={true} height={400} id='CashAtHandGrid' dataSource={cashInHand.map(x => ({ ...x, transDate: getCurrentDateInWords(x?.transDate) }))} allowExcelExport={true} allowPdfExport={true} toolbar={toolbarOptions} allowSelection={false} ref={grid => cashGrid = grid} toolbarClick={toolbarClick}>
+            <GridComponent allowPaging={true} height={80} id='CashAtHandGrid' dataSource={cashInHand.map(x => ({ ...x, transDate: getCurrentDateInWords(x?.transDate) }))} allowExcelExport={true} allowPdfExport={true} toolbar={toolbarOptions} allowSelection={false} ref={grid => cashGrid = grid} toolbarClick={toolbarClick}>
                 <ColumnsDirective>
-                    <ColumnDirective field='transDate' headerText='Date' width={100}  ></ColumnDirective>
+                    {/* <ColumnDirective field='transDate' headerText='Date' width={100}  ></ColumnDirective> */}
                     <ColumnDirective field='CASH' headerText='Total Cash' format='N2' textAlign='Right' width={110}></ColumnDirective>
                     <ColumnDirective field='CHEQUE' headerText='Total Cheques' format='N2' textAlign='Right' width={110}></ColumnDirective>
                     <ColumnDirective field='MOMO' headerText='Total Momo' format='N2' textAlign='Right' width={110}></ColumnDirective>
