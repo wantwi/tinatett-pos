@@ -340,7 +340,7 @@ const PurchaseOrder = () => {
         <div className="content">
           <div className="page-header">
             <div className="page-title">
-              <h4>Purchase Order Report</h4>
+              <h4>Purchase Report</h4>
               <h6>Generate your Purchase Report</h6>
             </div>
             <div className="page-btn">
@@ -521,7 +521,7 @@ const PurchaseOrder = () => {
         <div className="modal-dialog modal-xl modal-dialog-centered">
           <div className="modal-content">
             <div className="modal-header">
-              <h5 className="modal-title">Purchase Order Report</h5>
+              <h5 className="modal-title">Purchase Report</h5>
               <button
                 type="button"
                 className="close"

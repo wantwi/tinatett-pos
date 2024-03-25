@@ -926,7 +926,7 @@ const Sidebar = (props) => {
                             : ""
                         }
                       >
-                        Purchase order
+                        Purchase
                       </Link>
                     </li>
                     <li>
