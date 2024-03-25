@@ -142,8 +142,8 @@ function WeeklySaleSummaryTable({ data = [], startDate, endDate, title = "", fil
     const pdfHeaderQueryCellInfo = (args) => {
         args.cell.row.pdfGrid.repeatHeader = true;
     };
-    const sumTemp = ({ Expenses, total, Credit }) => {
-        const sum = total - Credit
+    const sumTemp = ({ Expenses, totalValue, Credit }) => {
+        const sum = totalValue - Credit
         return sum > 0 ? sum : `(${Math.abs(sum)})`
     }
     return (<div className='control-pane'>
