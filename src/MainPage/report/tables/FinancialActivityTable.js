@@ -297,7 +297,7 @@ function FinancialActivityTable({ data, startDate, endDate, fileName, title }) {
     return (<div className='control-pane'>
         <div className='control-section'>
             <p className="e-mastertext" style={{ fontWeight: 700 }}>Sales Details</p>
-            <GridComponent allowPaging={true} height={400} id='MasterGrid' dataSource={salesTrans.map(x => ({ ...x, transDate: getCurrentDateInWords(x?.transDate) }))} selectedRowIndex={2} ref={grid => masterGrid = grid} allowExcelExport={true} allowPdfExport={true} toolbar={toolbarOptions} exportGrids={gridsToexport} toolbarClick={toolbarClick}>
+            <GridComponent allowPaging={true} height={400} id='MasterGrid' dataSource={salesTrans.map(x => ({ ...x, SALE_MINUS_BAL: +x?.SALE_VALUE - +x?.BALANCE, transDate: getCurrentDateInWords(x?.transDate) }))} selectedRowIndex={2} ref={grid => masterGrid = grid} allowExcelExport={true} allowPdfExport={true} toolbar={toolbarOptions} exportGrids={gridsToexport} toolbarClick={toolbarClick}>
                 <ColumnsDirective>
                     <ColumnDirective field='transDate' headerText='Date' width={110}></ColumnDirective>
                     <ColumnDirective field='SALE_VALUE' headerText='Sales Value' format='N2' textAlign='Right' width={130}></ColumnDirective>
@@ -305,7 +305,7 @@ function FinancialActivityTable({ data, startDate, endDate, fileName, title }) {
                     <ColumnDirective field='CHEQUE' headerText='Cheque' format='N2' textAlign='Right' width={120}></ColumnDirective>
                     <ColumnDirective field='MOMO' headerText='Momo' format='N2' textAlign='Right' width={120}></ColumnDirective>
                     <ColumnDirective field='BALANCE' headerText='Credit/Balance' format='N2' textAlign='Right' width={130}></ColumnDirective>
-                    <ColumnDirective field='SALE_MINUS_BAL' headerText='Sales-Balance' format='N2' textAlign='Right' width={130} template={({ SALE_VALUE, BALANCE }) => SALE_VALUE - BALANCE}></ColumnDirective>
+                    <ColumnDirective field='SALE_MINUS_BAL' headerText='Sales-Balance' format='N2' textAlign='Right' width={130} ></ColumnDirective>
                     <ColumnDirective field='EXPENSES' headerText='Expenses' format='N2' textAlign='Right' width={130}></ColumnDirective>
                 </ColumnsDirective>
                 <AggregatesDirective>
@@ -386,14 +386,14 @@ function FinancialActivityTable({ data, startDate, endDate, fileName, title }) {
                 <Inject services={[PdfExport, ExcelExport, Toolbar, Page, Aggregate, ColumnChooser]} />
             </GridComponent>
             <div className='e-statustext mt-4 mb-2' style={{ fontWeight: 700 }}> Cash at Hand</div>
-            <GridComponent allowPaging={true} height={80} id='CashAtHandGrid' dataSource={cashInHand.map(x => ({ ...x, transDate: getCurrentDateInWords(x?.transDate) }))} allowExcelExport={true} allowPdfExport={true} toolbar={toolbarOptions} allowSelection={false} ref={grid => cashGrid = grid} toolbarClick={toolbarClick}>
+            <GridComponent allowPaging={true} height={80} id='CashAtHandGrid' dataSource={cashInHand.map(x => ({ ...x, CASH_IN_HAND: +x?.CASH - x?.EXPENSES, transDate: getCurrentDateInWords(x?.transDate) }))} allowExcelExport={true} allowPdfExport={true} toolbar={toolbarOptions} allowSelection={false} ref={grid => cashGrid = grid} toolbarClick={toolbarClick}>
                 <ColumnsDirective>
                     {/* <ColumnDirective field='transDate' headerText='Date' width={100}  ></ColumnDirective> */}
                     <ColumnDirective field='CASH' headerText='Total Cash' format='N2' textAlign='Right' width={110}></ColumnDirective>
                     <ColumnDirective field='CHEQUE' headerText='Total Cheques' format='N2' textAlign='Right' width={110}></ColumnDirective>
                     <ColumnDirective field='MOMO' headerText='Total Momo' format='N2' textAlign='Right' width={110}></ColumnDirective>
                     <ColumnDirective field='EXPENSES' headerText='Total Expense' format='N2' textAlign='Right' width={110} />
-                    <ColumnDirective field='CASH_IN_HAND' headerText='Cash at Hand' format='N2' textAlign='Right' width={110} template={({ CASH_IN_HAND }) => CASH_IN_HAND <= 0 ? 0 : CASH_IN_HAND} />
+                    <ColumnDirective field='CASH_IN_HAND' headerText='Cash at Hand' format='N2' textAlign='Right' width={110} />
                 </ColumnsDirective>
                 <AggregatesDirective>
                     <AggregateDirective>
