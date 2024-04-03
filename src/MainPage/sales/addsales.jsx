@@ -559,7 +559,9 @@ const Addsales = () => {
         })
         .finally(() => {
           setIsSaving(false)
+          $('#confirm').modal('hide')
           $('#reference').modal('show')
+          
           if (customerList) {
             setSelectedCustomer(customerList[0])
           }
@@ -700,7 +702,7 @@ const Addsales = () => {
         setSelectedProductInfo(res.data.newProduct)
         setSelectedProductInfoEditMode(res.data.newProduct)
         let x = res.data.newProduct.batchNumber?.map((item) => {
-          return { value: item.batchNumber, quantity: item?.Quantity, label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')' : item?.batchNumber + '-(' + item?.availablequantity + ')', expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
+          return { value: item.batchNumber, quantity: item?.availablequantity == 0 ? item?.Quantity : item?.availablequantity , label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')' : item?.batchNumber + '-(' + item?.availablequantity + ')', expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
         })
         setIsBatchLoading(false)
         setFormData({ ...formData, batchNumber: x[0], manuDate: (x[0]?.manufacturingDate).substring(0, 10), expDate: (x[0]?.expireDate).substring(0, 10) })
@@ -2078,11 +2080,14 @@ const Addsales = () => {
                     <span aria-hidden="true">×</span>
                 </button>
               </div>
-              <div className="modal-body">
-                Are you sure you want to suspend this sale?
+              <div className="modal-body" style={{height:100}}>
+                <p>Are you sure you want to suspend this sale?</p>
+                 {isSaving ? <div id="global-loader" style={{marginLeft:200, width:50, height:50}}>
+                    <div className="whirly-loader"></div>
+                </div> : null} 
               </div>
               <div className="modal-footer">
-                  <Link to="#" className="btn btn-submit me-2" data-bs-dismiss="modal" onClick={handleSuspend}>
+                  <Link to="#" className="btn btn-submit me-2"  onClick={handleSuspend} disabled={isSaving}>
                     Yes
                   </Link>
                   <Link to="#" className="btn btn-cancel" data-bs-dismiss="modal">
