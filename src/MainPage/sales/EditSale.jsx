@@ -103,7 +103,8 @@ const EditSales = () => {
   const handleUpdate = () => {
     let updated = editFormData
     let listCopy = [...productGridData]
-    let index = productGridData.findIndex(item => item.productId == updated.productId)
+    //let index = productGridData.findIndex(item => item.productId == updated.productId)
+    let index = productGridData.findIndex(item => item.id == updated.id)
     listCopy[index] = updated
     setProductGridData(listCopy)
     $('.modal').modal('hide')
@@ -450,7 +451,7 @@ const EditSales = () => {
     //console.log(productFormData)
     //console.log(selectedCustomer)
     let obj = {
-      id: productGridData.length + 1,
+      id: Math.ceil(Math.random() * 1000000),
       name: selectedProduct.label,
       productId: selectedProduct.value,
       batchNumber: formData.batchNumber?.value,
@@ -1711,8 +1712,8 @@ const EditSales = () => {
       </div>
 
                 
-{/* PDF Modal */}
-<div
+          {/* PDF Modal */}
+          <div
             className="modal fade"
             id="pdfViewer"
             tabIndex={-1}

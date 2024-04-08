@@ -425,6 +425,7 @@ const Addsales = () => {
         .finally(() => {
           setIsSaving(false)
           //retailRef.current.checked = true
+          setActiveTab('Cash')
           $('#reference').modal('show')
         }
         )
