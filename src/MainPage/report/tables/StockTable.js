@@ -190,29 +190,29 @@ function StockReport({ data = [], startDate, endDate, title = "PURCHASE REPORT",
                 <GridComponent id="Grid" queryCellInfo={queryCellInfoEvent} showColumnChooser={true} pdfQueryCellInfo={pdfQueryCellInfo} beforePdfExport={beforePdfExport} dataSource={[...data]} ref={grid => gridInstance = grid} pdfHeaderQueryCellInfo={pdfHeaderQueryCellInfo} toolbar={toolbarOptions} allowExcelExport={true} allowPdfExport={true} toolbarClick={toolbarClick.bind(this)} height={500} allowPaging={true} pageSettings={{ pageCount: 2, pageSize: 1000 }}>
                     <ColumnsDirective>
                         <ColumnDirective field='name' template={rowTem} headerText='Product' width={"21%"} ></ColumnDirective>
-                        <ColumnDirective field='openStock' headerText='Open Stock' ></ColumnDirective>
-                        <ColumnDirective field='transferIn' headerText={`Additions`}  ></ColumnDirective>
-                        <ColumnDirective field='totalStock' headerText='Total Stock' ></ColumnDirective>
-                        <ColumnDirective field='stockOut' headerText='Sales' ></ColumnDirective>
-                        <ColumnDirective field='saleValue' headerText='Sale Value' ></ColumnDirective>
-                        <ColumnDirective field='transferOut' headerText='Transfer' ></ColumnDirective>
-                        <ColumnDirective field='closeStock' headerText='Close Stock' ></ColumnDirective>
-                        <ColumnDirective field='stockValue' headerText='Stock Value' format='N2' ></ColumnDirective>
-                        <ColumnDirective field='stockStatus' headerText='Stock Status' format='N2' ></ColumnDirective>
+                        <ColumnDirective field='openingStock' headerText='Open Stock' ></ColumnDirective>
+                        <ColumnDirective field='Additions' headerText={`Additions`}  ></ColumnDirective>
+                        <ColumnDirective field='TotalStock' headerText='Total Stock' ></ColumnDirective>
+                        <ColumnDirective field='Sales' headerText='Sales' ></ColumnDirective>
+                        <ColumnDirective field='SalesValue' headerText='Sale Value' ></ColumnDirective>
+                        <ColumnDirective field='Transfer' headerText='Transfer' ></ColumnDirective>
+                        <ColumnDirective field='CloseStock' headerText='Close Stock' ></ColumnDirective>
+                        <ColumnDirective field='StockValue' headerText='Stock Value' format='N2' ></ColumnDirective>
+                        {/* <ColumnDirective field='stockStatus' headerText='Stock Status' format='N2' ></ColumnDirective> */}
 
 
                     </ColumnsDirective>
                     <AggregatesDirective>
                         <AggregateDirective>
                             <AggregateColumnsDirective>
-                                <AggregateColumnDirective field='openStock' type='Sum' format='N2' footerTemplate={footerSum} />
-                                <AggregateColumnDirective field='transferIn' type='Sum' format='N2' footerTemplate={footerSum} />
-                                <AggregateColumnDirective field='totalStock' type='Sum' format='N2' footerTemplate={footerSum} />
-                                <AggregateColumnDirective field='stockOut' type='Sum' format='N2' footerTemplate={footerSum} />
-                                <AggregateColumnDirective field='saleValue' type='Sum' format='N2' footerTemplate={footerSum} />
-                                <AggregateColumnDirective field='transferOut' type='Sum' format='N2' footerTemplate={footerSum} />
-                                <AggregateColumnDirective field='closeStock' type='Sum' format='N2' footerTemplate={footerSum} />
-                                <AggregateColumnDirective field='stockValue' type='Sum' format='N2' footerTemplate={footerSum} />
+                                <AggregateColumnDirective field='openingStock' type='Sum' format='N2' footerTemplate={footerSum} />
+                                <AggregateColumnDirective field='Additions' type='Sum' format='N2' footerTemplate={footerSum} />
+                                <AggregateColumnDirective field='TotalStock' type='Sum' format='N2' footerTemplate={footerSum} />
+                                <AggregateColumnDirective field='Sales' type='Sum' format='N2' footerTemplate={footerSum} />
+                                <AggregateColumnDirective field='SalesValue' type='Sum' format='N2' footerTemplate={footerSum} />
+                                <AggregateColumnDirective field='Transfer' type='Sum' format='N2' footerTemplate={footerSum} />
+                                <AggregateColumnDirective field='CloseStock' type='Sum' format='N2' footerTemplate={footerSum} />
+                                <AggregateColumnDirective field='StockValue' type='Sum' format='N2' footerTemplate={footerSum} />
                             </AggregateColumnsDirective>
                         </AggregateDirective>
                     </AggregatesDirective>

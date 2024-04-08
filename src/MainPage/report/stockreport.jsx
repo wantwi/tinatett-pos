@@ -175,7 +175,8 @@ const SalesSummary = () => {
     let filters = {
       productId: selectedProduct?.id || "",
       startDate: formData?.startDate || "",
-      endDate: formData?.endDate || ""
+      endDate: formData?.endDate || "",
+      status: showOnlyActive ? 1 : 0
       // batchNumber: formData?.batchNumber?.label || "",
       // clientId: supplier?.id || "",
       // userId: selectedUser?.value || "",
@@ -195,11 +196,8 @@ const SalesSummary = () => {
     // axios.get(`report/getSalesSummaryReport?startDate=${formData.startDate}&endDate=${formData.endDate}&productId=${selectedProduct?.id || ''}&batchNumber=${formData?.batchNumber?.value || ''}&clientId=${supplier?.value || ''}`)
     axios.get(dynamicUrl).then((res) => {
 
-      if (showOnlyActive) {
-        setReport(res.data?.data.filter(x => x?.stockStatus === "Active"))
-      } else {
-        setReport(res.data?.data)
-      }
+      setReport(res.data?.data)
+
 
 
 
@@ -418,6 +416,7 @@ const SalesSummary = () => {
                     onChange={(e) => {
                       setSupplier(e)
                     }}
+                    isClearable
                   />
                 </div>
               </div>
@@ -431,6 +430,7 @@ const SalesSummary = () => {
                     value={selectedProduct}
                     isLoading={productsIsLoading}
                     onChange={(e) => handleProductSelect(e)}
+                    isClearable
                   />
                 </div>
               </div>
