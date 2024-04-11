@@ -208,6 +208,7 @@ const Suspended = () => {
           alertify.error("Error...Could not complete transaction");
         })
         .finally(() => {
+          setActiveTab('Cash')
           setPaymentInfo({
             type: '',
             cashWaybill: '',

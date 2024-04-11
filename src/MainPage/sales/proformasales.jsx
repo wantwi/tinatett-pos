@@ -347,6 +347,7 @@ const ProformaSales = () => {
                 setNotifications([newNotification, ...notifications])
               })
               .finally(() => {
+                setActiveTab('Cash')
                 setPaymentInfo({
                   type: '',
                   cashWaybill: '',
