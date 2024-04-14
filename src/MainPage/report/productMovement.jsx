@@ -59,7 +59,7 @@ const ProductMovement = () => {
   const [loggedInUser, setLoggedInUser] = useState({})
 
   const [selectedProduct, setSelectedProduct] = useState({})
-  const [selectedProductInfo, setSelectedProductInfo] = useState({})
+  const [selectedProductInfo, setSelectedProductInfo] = useState([])
   const [supplier, setSupplier] = useState('')
   //const [isLoading, setIsLoading] = useState(false)
   const [isBatchLoading, setIsBatchLoading] = useState(false)
@@ -69,6 +69,7 @@ const ProductMovement = () => {
   const [report, setReport] = useState([])
   const [selectedUser, setSelectedUser] = useState({})
   const [showOnlyActive, setShowOnlyActive] = useState(true)
+  const [productBatchNumbers, setProductBatchNumbers] = useState([])
 
   useEffect(() => {
     if (!productsIsLoading && !suppliersIsLoading) {
@@ -99,23 +100,36 @@ const ProductMovement = () => {
 
   }, [suppliers, products])
 
+  const getProductBatch = async () => {
+    const request = await axios.get(`${BASE_URL}/product/productsBatch/${selectedProduct?.value}`)
+    if (request) {
+      setProductBatchNumbers(request?.data?.data)
+    }
+  }
+
   useEffect(() => {
     // console.log("Selected Prod", selectedProduct)
 
-    axios.get(`${BASE_URL}/purchase/product/${selectedProduct?.value}`).then((res) => {
-      setFormData({ ...formData, batchNumber: null })
-      if (res.data.success) {
-        // setIsLoading(false)
-        console.log(res.data.newProduct)
-        setSelectedProductInfo(res.data.newProduct)
-        // let x = res.data.newProduct.batchNumber?.map((item) => {
-        //   return { value: item.batchNumber, label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')' : item?.batchNumber + '-(' + item?.availablequantity + ')', expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
-        // })
-        // setIsBatchLoading(false)
-        // setFormData({ ...formData, batchNumber: x[0], manuDate: (x[0]?.manufacturingDate).substring(0, 10), expDate: (x[0]?.expireDate).substring(0, 10) })
+    if (selectedProduct) {
+      getProductBatch()
+    }
 
-      }
-    })
+    // axios.get(`${BASE_URL}/product/productsBatch/${selectedProduct?.value}`).then((res) => {
+
+    //   //return
+    //   //setFormData({ ...formData, batchNumber: null })
+    //   if (res.data) {
+    //     // setIsLoading(false)
+    //     console.log({ data: res.data })
+    //     // setSelectedProductInfo(res?.data || [])
+    //     // let x = res.data.newProduct.batchNumber?.map((item) => {
+    //     //   return { value: item.batchNumber, label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')' : item?.batchNumber + '-(' + item?.availablequantity + ')', expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
+    //     // })
+    //     // setIsBatchLoading(false)
+    //     // setFormData({ ...formData, batchNumber: x[0], manuDate: (x[0]?.manufacturingDate).substring(0, 10), expDate: (x[0]?.expireDate).substring(0, 10) })
+
+    //   }
+    // })
     $('#selectedProduct').css('border', '1px solid rgba(145, 158, 171, 0.32)')
 
   }, [selectedProduct])
@@ -127,9 +141,11 @@ const ProductMovement = () => {
   }, [])
 
   const handleProductSelect = (e) => {
-    console.log(e)
+
     setSelectedProduct(e)
   }
+
+
 
   useEffect(() => {
     if (!isLoading) {
@@ -428,6 +444,7 @@ const ProductMovement = () => {
                     value={selectedProduct}
                     isLoading={productsIsLoading}
                     onChange={(e) => handleProductSelect(e)}
+                    isClearable
 
                   />
                 </div>
@@ -443,9 +460,7 @@ const ProductMovement = () => {
                   <div className="input-groupicon">
                     <Select
 
-                      options={selectedProductInfo?.batchNumber?.map((item) => {
-                        return { value: item.batchNumber, label: item?.batchNumber, expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
-                      })}
+                      options={productBatchNumbers?.map((item) => ({ value: item.batchNumber, label: item?.batchNumber }))}
                       placeholder="Select batch number"
                       value={formData.batchNumber}
                       onChange={(e) => setFormData({ ...formData, batchNumber: (e) })}

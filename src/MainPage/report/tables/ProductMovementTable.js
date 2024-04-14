@@ -187,7 +187,7 @@ function ProductMovementTable({ data = [], startDate, endDate, title = "PURCHASE
     return (<div className='control-pane'>
         <div className='control-section'>
             <div>
-                <GridComponent id="Grid" queryCellInfo={queryCellInfoEvent} showColumnChooser={true} pdfQueryCellInfo={pdfQueryCellInfo} beforePdfExport={beforePdfExport} dataSource={[...data]} ref={grid => gridInstance = grid} pdfHeaderQueryCellInfo={pdfHeaderQueryCellInfo} toolbar={toolbarOptions} allowExcelExport={true} allowPdfExport={true} toolbarClick={toolbarClick.bind(this)} height={500} allowPaging={true} pageSettings={{ pageCount: 2, pageSize: 1000 }}>
+                <GridComponent id="Grid" queryCellInfo={queryCellInfoEvent} showColumnChooser={true} pdfQueryCellInfo={pdfQueryCellInfo} beforePdfExport={beforePdfExport} dataSource={[...data].map(x => ({ ...x, transactionDate: getCurrentDateInWords(x?.transactionDate) }))} ref={grid => gridInstance = grid} pdfHeaderQueryCellInfo={pdfHeaderQueryCellInfo} toolbar={toolbarOptions} allowExcelExport={true} allowPdfExport={true} toolbarClick={toolbarClick.bind(this)} height={500} allowPaging={true} pageSettings={{ pageCount: 2, pageSize: 1000 }}>
                     <ColumnsDirective>
                         <ColumnDirective field='transactionDate' headerText='Date' format='d-MMM-yyyy' ></ColumnDirective>
                         <ColumnDirective field='batchNumber' headerText='Batch No.' ></ColumnDirective>
