@@ -149,9 +149,9 @@ function WeeklySaleSummaryTable({ data = [], startDate, endDate, title = "", fil
     return (<div className='control-pane'>
         <div className='control-section'>
             <div>
-                <GridComponent id="Grid" height={500} dataSource={data?.map(x => ({ ...x, totalValue: +x?.Cash + +x?.Momo + +x?.Cheque + +x?.Credit, total: +x?.Cash + +x?.Momo + +x?.Cheque + +x?.Credit - x?.Credit }))} ref={grid => gridInstance = grid} pdfHeaderQueryCellInfo={pdfHeaderQueryCellInfo} toolbar={toolbarOptions} allowExcelExport={true} allowPdfExport={true} toolbarClick={toolbarClick.bind(this)} allowPaging={true} pageSettings={{ pageCount: 2, pageSize: 100 }}>
+                <GridComponent id="Grid" height={500} dataSource={data?.map(x => ({ ...x, transDate: getCurrentDateInWords(x?.transDate), totalValue: +x?.Cash + +x?.Momo + +x?.Cheque + +x?.Credit, total: +x?.Cash + +x?.Momo + +x?.Cheque + +x?.Credit - x?.Credit }))} ref={grid => gridInstance = grid} pdfHeaderQueryCellInfo={pdfHeaderQueryCellInfo} toolbar={toolbarOptions} allowExcelExport={true} allowPdfExport={true} toolbarClick={toolbarClick.bind(this)} allowPaging={true} pageSettings={{ pageCount: 2, pageSize: 100 }}>
                     <ColumnsDirective>
-                        <ColumnDirective field='transDate' headerText='Date' width={"5%"} format='d-MMM-yyyy'></ColumnDirective>
+                        <ColumnDirective field='transDate' headerText='Date' width={"5%"}></ColumnDirective>
                         <ColumnDirective field='Cash' headerText='Cash' textAlign='Right' format='N2' width={"5%"} ></ColumnDirective>
                         <ColumnDirective field='Momo' headerText='Momo' textAlign='Right' format='N2' width={"5%"} ></ColumnDirective>
                         <ColumnDirective field='Cheque' headerText='Cheque' textAlign='Right' format='N2' width={"5%"} ></ColumnDirective>
