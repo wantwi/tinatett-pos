@@ -391,54 +391,61 @@ useEffect(() => {
 
 
   const deleteRow = (record) => {
-    let newGridData = productList.filter((item) => item.productId !== record.productId)
+    let newGridData = productList.filter((item) => item.id !== record.id)
     //console.log(newGridData)
     setProductList(newGridData)
    };
 
   const confirmText = (record) => {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
-      type: "warning",
-      showCancelButton: !0,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it!",
-      confirmButtonClass: "btn btn-primary",
-      cancelButtonClass: "btn btn-danger ml-1",
-      buttonsStyling: !1,
-    })
-    .then( async() => {
-      //console.log('deleting...')
-      let data = await axios.delete(`/purchase/item/${record.id}`)
-      console.log(data)
-      if(data.status == 204){
+    if(!record.hasOwnProperty('transactionId')){
+        console.log('New Item')
         deleteRow(record)
-        Swal.fire({
-          type: "success",
-          title: "Deleted!",
-          text: "Your purchase item has been deleted.",
-          confirmButtonClass: "btn btn-success",
-        });
-      }
-      else{
-        Swal.fire({
-          type: "danger",
-          title: "Error!",
-          text: data.response.data.error,
-          confirmButtonClass: "btn btn-danger",
-        });
-      }
-    })
-    .catch( (error) => {
-        Swal.fire({
-          type: "danger",
-          title: "Error!",
-          text: error,
-          confirmButtonClass: "btn btn-danger",
-        });
-    });
+    }
+    else{
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        type: "warning",
+        showCancelButton: !0,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!",
+        confirmButtonClass: "btn btn-primary",
+        cancelButtonClass: "btn btn-danger ml-1",
+        buttonsStyling: !1,
+      })
+      .then( async() => {
+        //console.log('deleting...')
+        let data = await axios.delete(`/purchase/item/${record.id}`)
+       
+        if(data.status == 204){
+          deleteRow(record)
+          Swal.fire({
+            type: "success",
+            title: "Deleted!",
+            text: "Your purchase item has been deleted.",
+            confirmButtonClass: "btn btn-success",
+          });
+        }
+        else{
+          Swal.fire({
+            type: "danger",
+            title: "Error!",
+            text: data.response.data.error,
+            confirmButtonClass: "btn btn-danger",
+          });
+        }
+      })
+      .catch( (error) => {
+          Swal.fire({
+            type: "danger",
+            title: "Error!",
+            text: "Sorry, Purchase item has been used in transaction",
+            confirmButtonClass: "btn btn-danger",
+          });
+      });
+    }
+   
   };
 
 

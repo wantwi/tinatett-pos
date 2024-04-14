@@ -282,6 +282,7 @@ const CreditPayments = () => {
             setNotifications([newNotification, ...notifications])
           })
           .finally(() => {
+            setActiveTab('Cash')
             setIsSaving(false)
             setIsCredit(false)
             setPaymentInfo({

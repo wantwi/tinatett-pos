@@ -103,7 +103,8 @@ const EditSales = () => {
   const handleUpdate = () => {
     let updated = editFormData
     let listCopy = [...productGridData]
-    let index = productGridData.findIndex(item => item.productId == updated.productId)
+    //let index = productGridData.findIndex(item => item.productId == updated.productId)
+    let index = productGridData.findIndex(item => item.id == updated.id)
     listCopy[index] = updated
     setProductGridData(listCopy)
     $('.modal').modal('hide')
@@ -450,7 +451,7 @@ const EditSales = () => {
     //console.log(productFormData)
     //console.log(selectedCustomer)
     let obj = {
-      id: productGridData.length + 1,
+      id: Math.ceil(Math.random() * 1000000),
       name: selectedProduct.label,
       productId: selectedProduct.value,
       batchNumber: formData.batchNumber?.value,
@@ -512,13 +513,22 @@ const EditSales = () => {
       setIsLoading(true)
       if (res.data.success) {
         setIsLoading(false)
-        setSelectedProductInfo(res.data.data)
-        let x = res.data.data.batchNumber?.map((item) => {
-          return { value: item.batchNumber, label: item?.batchNumber + '-(' + item?.Quantity + ')', expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
-        })
-        setIsBatchLoading(false)
-        setFormData({ ...formData, batchNumber: x[0], manuDate: x[0].manufacturingDate, expDate: x[0].expireDate })
-        // retailpriceTypeRef.current.checked = true
+        if(res.data.newProduct.totalCount == 0){
+          setSelectedProductInfo({totalCount: 0})
+          setFormData({ quantity: '', amount: '', batchNumber: '', manuDate: '', expDate: '' })
+          setIsBatchLoading(false)
+        }
+        else{
+          setSelectedProductInfo(res.data.newProduct)
+          setSelectedProductInfoEditMode(res.data.newProduct)
+          let x = res.data.newProduct.batchNumber?.map((item) => {
+            return { value: item.batchNumber, quantity: item?.availablequantity == 0 ? item?.Quantity : item?.availablequantity , label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')' : item?.batchNumber + '-(' + item?.availablequantity + ')', expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
+          })
+          setIsBatchLoading(false)
+          setFormData({ ...formData, batchNumber: x[0], manuDate: (x[0]?.manufacturingDate).substring(0, 10), expDate: (x[0]?.expireDate).substring(0, 10) })
+          setEditFormData({ ...editFormData, batchNumber: x[0], manuDate: (x[0]?.manufacturingDate).substring(0, 10), expDate: (x[0]?.expireDate).substring(0, 10) })
+          //retailpriceTypeRef.current.checked = true
+        }
       }
     })
 
@@ -713,7 +723,7 @@ const EditSales = () => {
                           onChange={handleProductSelect}
                           isSearchable={true}
                           isLoading={productsIsLoading}
-
+                          isClearable={true}
                         />
 
                       </div>
@@ -727,7 +737,7 @@ const EditSales = () => {
                         <input
                           className="form-control"
                           type="text"
-                          value={selectedProduct?.remainingStock}
+                          value={selectedProductInfo?.totalCount}
                           disabled
                         />
 
@@ -744,15 +754,18 @@ const EditSales = () => {
                           </div>}
                         </div>
                       <div className="input-groupicon">
-                        <Select
+                      <Select
                           isLoading={isLoading}
                           options={selectedProductInfo?.batchNumber?.map((item) => {
-                            return { value: item.batchNumber, label: item?.batchNumber + '-(' + item?.Quantity + ')', expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
+                            return { value: item.batchNumber, label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')' : item?.batchNumber + '-(' + item?.availablequantity + ')', expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
                           })}
                           placeholder=""
                           value={formData.batchNumber}
-                          onChange={(e) => setFormData({ ...formData, batchNumber: (e), manuDate: e.manufacturingDate, expDate: e.expireDate })}
-                        //onChange={(e) => console.log(e)}
+                          onChange={(e) => {
+                            console.log("Selected Batch:", e)
+                            setFormData({ ...formData, batchNumber: (e), manuDate: e.manufacturingDate.substring(0,10), expDate: e.expireDate.substring(0,10) })
+                          }}
+                          //isClearable={true}
                         />
 
                       </div>
@@ -1711,8 +1724,8 @@ const EditSales = () => {
       </div>
 
                 
-{/* PDF Modal */}
-<div
+          {/* PDF Modal */}
+          <div
             className="modal fade"
             id="pdfViewer"
             tabIndex={-1}

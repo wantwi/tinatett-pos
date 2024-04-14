@@ -270,6 +270,7 @@ const CreditList = () => {
             setNotifications([newNotification, ...notifications])
           })
           .finally(() => {
+            setActiveTab('Cash')
             setIsSaving(false)
             setIsCredit(false)
             setPaymentInfo({
