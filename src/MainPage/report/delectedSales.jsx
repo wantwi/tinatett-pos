@@ -48,6 +48,34 @@ function getWeek(dateString) {
   return formattedEndDate
 }
 
+const getTitle = (type) => {
+  switch (type) {
+    case "SL":
+
+      return "DELETED SALES REPORT"
+
+    case "PR":
+      return "DELETED PURCHASE REPORT"
+    case "TO":
+      return "DELETED TRANSFER REPORT"
+    default:
+      return "DELETED SALES REPORT"
+  }
+}
+
+const getFileName = (type) => {
+  console.log({ getFileName: type })
+  switch (type) {
+    case "SL":
+      return "deletedsalesreport"
+    case "PR":
+      return "deletedpurchasereport"
+    case "TO":
+      return "deletedtransferreport"
+    default:
+      return "deletedsalesreport"
+  }
+}
 
 
 const DelectedSales = () => {
@@ -140,15 +168,15 @@ const DelectedSales = () => {
     setSelectedUser(null)
   }
 
-  useEffect(() => {
-    if (formData?.startDate) {
-      setFormData(prev => ({ ...prev, endDate: getWeek(formData?.startDate) }))
-    }
+  // useEffect(() => {
+  //   if (formData?.startDate) {
+  //     setFormData(prev => ({ ...prev, endDate: getWeek(formData?.startDate) }))
+  //   }
 
-    return () => {
+  //   return () => {
 
-    }
-  }, [formData?.startDate])
+  //   }
+  // }, [formData?.startDate])
 
 
   const handleGenerateReport = () => {
@@ -167,7 +195,7 @@ const DelectedSales = () => {
 
     const baseUrl = "report/getDeletedReport";
     let filters = {
-      type: type?.value === 0 ? 'SL' : 'PR',
+      type: type?.value || "",
       startDate: formData?.startDate || "",
       endDate: formData?.endDate || "",
     };
@@ -188,9 +216,9 @@ const DelectedSales = () => {
 
       console.log({ deletedSales: res.data?.data })
 
-      const deletedList = res.data?.data?.map(item => ({ ...item, items: JSON.parse(JSON.parse(item?.data))?.salesItems })).flatMap(x => x?.items);
-      console.log({ deletedList })
-      setReport(deletedList.map(x => ({ ...x, totalAmt: x?.quantity * x?.unitPrice })))
+      // const deletedList = res.data?.data?.map(item => ({ ...item, items: JSON.parse(JSON.parse(item?.data))?.salesItems })).flatMap(x => x?.items);
+      // console.log({ deletedList })
+      setReport(res.data?.data || [])
 
 
       $('#filters').modal('hide')
@@ -331,7 +359,7 @@ const DelectedSales = () => {
               </div>
               {/* /Filter */}
               <div className="table-responsive">
-                <DeletedSalesTable startDate={formData?.startDate} endDate={formData?.endDate} title="DELETED SALES REPORT" fileName="deletedsalereport" data={report} />
+                <DeletedSalesTable startDate={formData?.startDate} endDate={formData?.endDate} title={getTitle(type?.value)} fileName={getFileName(type?.value)} data={report} />
               </div>
             </div>
           </div>
@@ -369,7 +397,7 @@ const DelectedSales = () => {
                   <Select
                     id="type"
                     className="select"
-                    options={[{ label: "Sales", value: 0 }, { label: "Purchase", value: 1 }]}
+                    options={[{ label: "Sales", value: "SL" }, { label: "Purchase", value: "PR" }, { label: "Transfer", value: "TO" }]}
                     value={type}
                     // isLoading={suppliersIsLoading}
                     onChange={(e) => {
@@ -384,7 +412,7 @@ const DelectedSales = () => {
                   <div className="input-groupicon">
                     <input
                       type="date" className={`form-control `}
-                      id="amount"
+                      id="startDate"
                       placeholder=""
                       value={formData.startDate}
                       onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
@@ -399,7 +427,7 @@ const DelectedSales = () => {
                     <input
 
                       type="date" className={`form-control `}
-                      id="amount"
+                      id="endDate"
                       placeholder=""
                       value={formData.endDate}
                       onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}

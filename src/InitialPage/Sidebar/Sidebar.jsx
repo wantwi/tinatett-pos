@@ -1032,12 +1032,12 @@ const Sidebar = (props) => {
                     </li>
                     <li>
                       <Link
-                        to="/tinatett-pos/report/deleted-sales"
+                        to="/tinatett-pos/report/deleted-report"
                         className={
-                          pathname.includes("deleted-sales") ? "active" : ""
+                          pathname.includes("deleted-report") ? "active" : ""
                         }
                       >
-                        Deleted Sales
+                        Delete Report
                       </Link>
                     </li>
 

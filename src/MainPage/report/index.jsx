@@ -38,7 +38,7 @@ const AppIndex = ({ match }) => (
         <Route path={`${match.url}/weekly-summary`} component={WeeklySummary} />
         <Route path={`${match.url}/expenses`} component={Expenses} />
         <Route path={`${match.url}/financialactivity`} component={Financialactivity} />
-        <Route path={`${match.url}/deleted-sales`} component={DeletedSales} />
+        <Route path={`${match.url}/deleted-report`} component={DeletedSales} />
 
     </Switch>
 )

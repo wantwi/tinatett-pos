@@ -4,6 +4,8 @@ import { GridComponent, ColumnsDirective, ColumnDirective, Inject, Toolbar, Exce
 import { image } from './image';
 import useAuth from '../../../hooks/useAuth';
 import { getCurrentDateInWords } from './helper';
+
+
 function DeletedSalesTable({ data = [], startDate, endDate, title = "", fileName = "" }) {
     const { auth } = useAuth()
     const month = ((new Date()).getMonth().toString()) + '/';
@@ -147,7 +149,7 @@ function DeletedSalesTable({ data = [], startDate, endDate, title = "", fileName
     return (<div className='control-pane'>
         <div className='control-section'>
             <div>
-                <GridComponent id="Grid" height={500} dataSource={data?.map(x => ({ ...x, manufacturingDate: getCurrentDateInWords(x?.manufacturingDate), expireDate: getCurrentDateInWords(x?.expireDate), transactionDate: getCurrentDateInWords(x?.transactionDate), total: +x?.Cash + +x?.Momo + +x?.Cheque + +x?.Credit }))} ref={grid => gridInstance = grid} pdfHeaderQueryCellInfo={pdfHeaderQueryCellInfo} toolbar={toolbarOptions} allowExcelExport={true} allowPdfExport={true} toolbarClick={toolbarClick.bind(this)} allowPaging={true} pageSettings={{ pageCount: 2, pageSize: 100 }}>
+                <GridComponent id="Grid" height={500} dataSource={data?.map(x => ({ ...x, manufacturingDate: getCurrentDateInWords(x?.manufacturingDate), expireDate: getCurrentDateInWords(x?.expireDate), transactionDate: getCurrentDateInWords(x?.transactionDate) }))} ref={grid => gridInstance = grid} pdfHeaderQueryCellInfo={pdfHeaderQueryCellInfo} toolbar={toolbarOptions} allowExcelExport={true} allowPdfExport={true} toolbarClick={toolbarClick.bind(this)} allowPaging={true} pageSettings={{ pageCount: 2, pageSize: 100 }}>
                     <ColumnsDirective>
                         <ColumnDirective field='transactionDate' headerText='Date' ></ColumnDirective>
                         <ColumnDirective field='productName' headerText='Product' width={"15%"}></ColumnDirective>
@@ -156,7 +158,7 @@ function DeletedSalesTable({ data = [], startDate, endDate, title = "", fileName
                         <ColumnDirective field='expireDate' headerText='Exp. Date'   ></ColumnDirective>
                         <ColumnDirective field='manufacturingDate' headerText='MFG. Date'   ></ColumnDirective>
                         <ColumnDirective field='unitPrice' headerText='Unit Price' textAlign='Right' format='N2'  ></ColumnDirective>
-                        <ColumnDirective field='totalAmt' headerText='Amount' textAlign='Right' format='N2'  ></ColumnDirective>
+                        <ColumnDirective field='total' headerText='Amount' textAlign='Right' format='N2'  ></ColumnDirective>
 
                         <ColumnDirective field='userName' headerText='Deleted By' width={"15%"}></ColumnDirective>
                     </ColumnsDirective>
