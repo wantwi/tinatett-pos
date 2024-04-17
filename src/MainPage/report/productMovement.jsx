@@ -188,9 +188,9 @@ const ProductMovement = () => {
       return
 
     }
-    if (!selectedProduct?.id || !formData?.batchNumber?.label) {
+    if (!selectedProduct?.id) {
 
-      alertify.warning("Please product and batch number");
+      alertify.warning("Please select a product.");
       return
 
     }
