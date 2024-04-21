@@ -251,7 +251,7 @@ const Dashboard = (props) => {
                       <h5>
                         GHS {' '}
                         <span className="counters">
-                          <CountUp end={data?.monthlySales || 0} />
+                          {moneyInTxt(data?.monthlySales || 0)} 
                         </span>
                       </h5>
                       <h6>Total Monthly Sales</h6>
@@ -269,7 +269,8 @@ const Dashboard = (props) => {
                       <h5>
                         GHS {' '}
                         <span className="counters">
-                          <CountUp end={data?.dailySales} />
+                          {/* <CountUp end={data?.dailySales} /> */}
+                          {moneyInTxt(data?.dailySales || 0)} 
                         </span>
                       </h5>
                       <h6>Daily Sales Amount</h6>
@@ -288,7 +289,8 @@ const Dashboard = (props) => {
                       <h5>
                         GHS {' '}
                         <span className="counters">
-                          <CountUp end={data?.monthlyPurchase || 0} />
+                          {/* <CountUp end={data?.monthlyPurchase || 0} /> */}
+                          {moneyInTxt(data?.monthlyPurchase || 0)} 
                         </span>
                       </h5>
                       <h6>Total Monthly Purchase</h6>
@@ -307,7 +309,8 @@ const Dashboard = (props) => {
                       <h5>
                         GHS {' '}
                         <span className="counters">
-                          <CountUp end={data?.dailyPurchase} />
+                          {/* <CountUp end={data?.dailyPurchase} /> */}
+                          {moneyInTxt(data?.dailyPurchase || 0)} 
                         </span>
                       </h5>
                       <h6>Daily Purchase Amount</h6>
@@ -326,7 +329,8 @@ const Dashboard = (props) => {
                       <h5>
                         GHS {' '}
                         <span className="counters">
-                          <CountUp end={data?.stock_value} />
+                          {/* <CountUp end={data?.stock_value} /> */}
+                          {moneyInTxt(data?.stock_value || 0)} 
                         </span>
                       </h5>
                       <h6>Total Stock Value</h6>
@@ -344,7 +348,8 @@ const Dashboard = (props) => {
                       <h5>
 
                         <span className="counters">
-                          <CountUp end={data?.numberOfSaleInvoice} />
+                          {/* <CountUp end={data?.numberOfSaleInvoice} /> */}
+                          {moneyInTxt(data?.numberOfSaleInvoice || 0)} 
                         </span>
                       </h5>
                       <h6>No of Invoices</h6>
@@ -362,7 +367,8 @@ const Dashboard = (props) => {
                       <h5>
 
                         <span className="counters">
-                          <CountUp end={data?.dailyNumberOfProductSold || 0} />
+                          {/* <CountUp end={data?.dailyNumberOfProductSold || 0} /> */}
+                          {moneyInTxt(data?.dailyNumberOfProductSold || 0)} 
                         </span>
                       </h5>
                       <h6>Total Quantity of Products Sold (Daily)</h6>
@@ -380,7 +386,8 @@ const Dashboard = (props) => {
                       <h5>
 
                         <span className="counters">
-                          <CountUp end={data?.monthlyNumberOfProductSold} />
+                          {/* <CountUp end={data?.monthlyNumberOfProductSold} /> */}
+                          {moneyInTxt(data?.monthlyNumberOfProductSold || 0)} 
                         </span>
                       </h5>
                       <h6>Total Quantity of Products Sold (Monthly)</h6>
@@ -398,7 +405,8 @@ const Dashboard = (props) => {
                       <h5>
                         GHS {' '}
                         <span className="counters">
-                          <CountUp end={profitMarginData?.total_daily_profit_margin} />
+                          {/* <CountUp end={profitMarginData?.total_daily_profit_margin} /> */}
+                          {moneyInTxt(profitMarginData?.total_daily_profit_margin || 0)} 
                         </span>
                       </h5>
                       <h6>Total Profit Margin (Daily)</h6>
@@ -416,7 +424,8 @@ const Dashboard = (props) => {
                       <h5>
                         GHS {' '}
                         <span className="counters">
-                          <CountUp end={profitMarginData?.total_current_month_profit_margin} />
+                          {/* <CountUp end={profitMarginData?.total_current_month_profit_margin} /> */}
+                          {moneyInTxt(profitMarginData?.total_current_month_profit_margin || 0)} 
                         </span>
                       </h5>
                       <h6>Total Profit Margin (Monthly)</h6>
@@ -436,7 +445,8 @@ const Dashboard = (props) => {
                       <h5>
                         GHS {' '}
                         <span className="counters">
-                          <CountUp end={data?.dailyExpenses || 0} />
+                          {/* <CountUp end={data?.dailyExpenses || 0} /> */}
+                          {moneyInTxt(data?.dailyExpenses || 0)} 
                         </span>
                       </h5>
                       <h6>Total Expenses (Daily)</h6>
@@ -454,7 +464,8 @@ const Dashboard = (props) => {
                       <h5>
                         GHS {' '}
                         <span className="counters">
-                          <CountUp end={data?.monthlyExpenses || 0} />
+                          {/* <CountUp end={data?.monthlyExpenses || 0} /> */}
+                          {moneyInTxt(data?.monthlyExpenses || 0)} 
                         </span>
                       </h5>
                       <h6>Total Expenses (Monthly)</h6>

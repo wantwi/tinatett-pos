@@ -175,7 +175,7 @@ const Cashier = () => {
             
 
       let finalPaymentAmount = (Number(paymentInfo.cashAmount) + Number(paymentInfo.momoAmount) + Number(paymentInfo.chequeAmount))
-      finalPaymentAmount = finalPaymentAmount < modalData?.Total ? finalPaymentAmount : (modalData?.Total)
+      //finalPaymentAmount = finalPaymentAmount < modalData?.Total ? finalPaymentAmount : (modalData?.Total)
       let payload = {
         status: type,
         salesRef: modalData.Reference,

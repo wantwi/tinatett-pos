@@ -16,6 +16,7 @@ import FeatherIcon from "feather-icons-react";
 const AddCustomer = () => {
   const axios = useCustomApi();
   const [customerType, setCustomerType] = useState(0)
+  const [isLoading, setIsLoading] = useState(false)
   const validationSchema = Yup.object().shape({
     name: Yup.string().required("Customer name is required"),
     // email: Yup.string()
@@ -46,28 +47,38 @@ const AddCustomer = () => {
     resolver: yupResolver(validationSchema),
   });
 
-  const { isLoading, data, isError, error, mutate } = usePost("/customer");
+
+
+  //const { isLoading, data, isError, error, mutate } = usePost("/customer", onPostSuccess, onPostError);
   // const { mutate: updateMutate } = usePut(`/product/${getValues()?.id}`);
 
 
-
   const onSubmit = (data) => {
-    console.log({...data, customerType})
-    mutate({...data, customerType})
-    // const { name, wholeSalePrice, retailPrice, specialPrice, alert } = data;
-    // isEditMode
-    //   ? updateMutate({ name, wholeSalePrice, retailPrice, specialPrice, alert })
-    //   : mutate(data);
+    setIsLoading(true)
+    let payload = {...data, customerType}
+    try{
+      axios.post("/customer", payload)
+      .then((res) => {
+        if(res.data){
+        reset();
+        alertify.set("notifier", "position", "bottom-right");
+        alertify.success("Customer added successfully.");
+        }
+      })
+      .catch((error) => {
+        console.log(error)
+        alertify.set("notifier", "position", "bottom-right");
+        alertify.error(error.response.data.error || "Error. Failed to add Customer. Contact Admin");
+      })
+     .finally(() => setIsLoading(false))
+    }
+    catch(error){
+      console.log(error)
+      setIsLoading(false)
+    }
+   
   };
 
-  useEffect(() => {
-    if (isSubmitSuccessful && !isError) {
-      reset();
-      alertify.set("notifier", "position", "bottom-right");
-      alertify.success("Customer added successfully.");
-    }
-    return () => {};
-  }, [isSubmitSuccessful, isError, data]);
 
   if(isLoading){
     return <LoadingSpinner message={'Please wait, saving..'}/>

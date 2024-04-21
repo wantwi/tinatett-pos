@@ -292,7 +292,7 @@ const Addsales = () => {
             
 
             let finalPaymentAmount = (Number(paymentInfo.cashAmount) + Number(paymentInfo.momoAmount) + Number(paymentInfo.chequeAmount))
-            finalPaymentAmount = finalPaymentAmount < totalProductAmount ? finalPaymentAmount : (totalProductAmount)
+            //finalPaymentAmount = finalPaymentAmount < totalProductAmount ? finalPaymentAmount : (totalProductAmount)
             let payload = {
               "status": type,
               "salesRef": res.data.reference,
@@ -727,7 +727,7 @@ const Addsales = () => {
           //retailpriceTypeRef.current.checked = true
         }
 
-
+    
       }
     })
     $('#selectedProduct').css('border', '1px solid rgba(145, 158, 171, 0.32)')
@@ -1025,7 +1025,10 @@ const Addsales = () => {
                         <Select
                           isLoading={isLoading}
                           options={selectedProductInfo?.batchNumber?.map((item) => {
-                            return { value: item.batchNumber, label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')' : item?.batchNumber + '-(' + item?.availablequantity + ')', expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate }
+                            return { value: item.batchNumber, quantity: item?.availablequantity == 0 ? item?.Quantity : item?.availablequantity,
+                                   label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')' : item?.batchNumber + '-(' + item?.availablequantity + ')',
+                                   expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate
+                                   }
                           })}
                           placeholder=""
                           value={formData.batchNumber}
@@ -1173,7 +1176,7 @@ const Addsales = () => {
                         <input
                           className="form-control"
                           type="text"
-                          value={formData.quantity ? Number(formData.quantity * price).toFixed(2) : Number(price * 1).toFixed(2) || 0}
+                          value={moneyInTxt(formData.quantity ? Number(formData.quantity * price).toFixed(2) : Number(price * 1).toFixed(2) || 0)}
                         />
 
                       </div>
@@ -1492,8 +1495,8 @@ const Addsales = () => {
                                     <td>{item.batchNumber}</td>
                                     <td>{item?.expireDate}</td>
                                     <td>{item.quantity}</td>
-                                    <td>{item.unitPrice}</td>
-                                    <td>{item.amount}</td>
+                                    <td>{moneyInTxt(item.unitPrice)}</td>
+                                    <td>{moneyInTxt(item.amount)}</td>
 
                                     <td>
                                       <Link to="#" className="delete-set me-2" data-bs-toggle="modal" data-bs-target="#editproduct" onClick={() => {

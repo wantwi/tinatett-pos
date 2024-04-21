@@ -193,7 +193,7 @@ const CreditList = () => {
   
       
       let finalPaymentAmount = (Number(paymentInfo.cashAmount) + Number(paymentInfo.momoAmount) + Number(paymentInfo.chequeAmount))
-      finalPaymentAmount = finalPaymentAmount < modalData?.Total ? finalPaymentAmount : (modalData?.Total)
+      //finalPaymentAmount = finalPaymentAmount < modalData?.Total ? finalPaymentAmount : (modalData?.Total)
 
       let payload = {
         "salesRef": modalData.Reference,

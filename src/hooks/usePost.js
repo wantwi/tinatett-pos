@@ -18,7 +18,10 @@ export const usePost = (url, key, onsuccess = () => {}, onError = () => {}) => {
       queryClient.invalidateQueries({ queryKey: [key] })
       onsuccess(data)
     },
-    onError:(error) => onError(error)
+    onError:(error) => {
+      console.log("Error", error)
+      onError(error)
+    }
 
   });
 
