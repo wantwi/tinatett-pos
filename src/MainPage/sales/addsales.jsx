@@ -289,24 +289,14 @@ const Addsales = () => {
             }
 
             const totalProductAmount = productGridData.reduce((total, item) => total + item.amount, 0)
-            // let payload = {
-            //   status: type,
-            //   salesRef: res.data.reference,
-            //   amount: (Number(paymentInfo.cashAmount) + Number(paymentInfo.momoAmount) + Number(paymentInfo.chequeAmount)),
-            //   // amount: productGridData.reduce((total, item) => total + item.amount, 0),
-            //   paymentType: pType,
-            //   paymentInfo: [
-            //     // { "type": "Cash", waybill: paymentInfo.cashWaybill, amountPaid: paymentInfo.cashAmount },
-            //     { "type": "Cash", waybill: paymentInfo.cashWaybill, amountPaid: (totalProductAmount - (paymentInfo.momoAmount + paymentInfo.chequeAmount)) },
-            //     { "type": "Momo", name: paymentInfo.momoName, receiptNo: paymentInfo.momoReceiptNo, amountPaid: paymentInfo.momoAmount },
-            //     { "type": "Cheque", waybill: paymentInfo.chequeWaybill, chequeNo: paymentInfo.chequeNo, chequeReceiptNo: paymentInfo.chequeReceiptNo, amountPaid: paymentInfo.chequeAmount, waybill: paymentInfo.chequeWaybill }
-            //   ]
-            // }
+            
 
+            let finalPaymentAmount = (Number(paymentInfo.cashAmount) + Number(paymentInfo.momoAmount) + Number(paymentInfo.chequeAmount))
+            finalPaymentAmount = finalPaymentAmount < totalProductAmount ? finalPaymentAmount : (totalProductAmount)
             let payload = {
               "status": type,
               "salesRef": res.data.reference,
-              "amount": (Number(paymentInfo.cashAmount) + Number(paymentInfo.momoAmount) + Number(paymentInfo.chequeAmount)),
+              "amount": finalPaymentAmount,
               "paymentType": pType,
               "cashAmount": Number(paymentInfo.cashAmount),
               "momoAmount": Number(paymentInfo.momoAmount),
@@ -579,7 +569,7 @@ const Addsales = () => {
       name: selectedProduct.label,
       productId: selectedProduct.value,
       batchNumber: formData.batchNumber?.value,
-      quantity: formData.quantity,
+      quantity: Number(formData.quantity),
       expireDate: formData?.expDate.substring(0, 10),
       manufacturingDate: formData?.manuDate.substring(0, 10),
       unitPrice: price,
@@ -636,30 +626,50 @@ const Addsales = () => {
 
 
     else {
-      setProductGridData([...productGridData, obj])
-      setFormData({ quantity: '', amount: '', batchNumber: '', manuDate: '', expDate: '' })
-      setSelectedProduct({ remainingStock: '' })
+      //check if basket contains that batch number
+      let hasItem = productGridData.find((item) => item.batchNumber == obj.batchNumber)
+      //console.log(hasItem)
+      if(hasItem){
+        let filtered = productGridData.filter((item) => item.batchNumber == obj.batchNumber)
+        let totalQtyOfProductBatch = filtered.reduce((total, item) => total + Number(item.quantity), 0)
+        console.log(totalQtyOfProductBatch, formData.batchNumber?.quantity)
 
-      // if (salesType == 'Retail') {
-      //   retailpriceTypeRef.current.checked = true
-      //   editretailpriceTypeRef.current.checked = true
-      // }
-      // else if (salesType == 'Wholesale') {
-      //   wholesalepriceTypeRef.current.checked = true
-      //   editwholesalepriceTypeRef.current.checked = true
-      // }
+        if((totalQtyOfProductBatch + obj.quantity ) > formData.batchNumber?.quantity ){
+          alertify.set("notifier", "position", "bottom-right");
+          alertify.message("Total quantity for this item has reached the limit. Please select from another batch");
+          let newNotification = {
+            id: Math.ceil(Math.random() * 1000000),
+            message: `${storage.name} Total quantity for this product has reached the limit. Please select from another batch.`,
+            time: new Date().toISOString(), type: 'warning'
+          }
+          setNotifications([newNotification, ...notifications])
+        }
+        else if((totalQtyOfProductBatch + obj.quantity ) <= formData.batchNumber?.quantity){
+          setProductGridData([...productGridData, obj])
+          setFormData({ quantity: '', amount: '', batchNumber: '', manuDate: '', expDate: '' })
+          setSelectedProduct({ remainingStock: '' })
+  
+          setWholesalePrice('')
+          setSpecialPrice('')
+          setRetailPrice('')
+          setPrice(0)
+    
+        }
+      }
+      
+     
+      else{
+        setProductGridData([...productGridData, obj])
+        setFormData({ quantity: '', amount: '', batchNumber: '', manuDate: '', expDate: '' })
+        setSelectedProduct({ remainingStock: '' })
 
-      // else{
-      //   specialpriceTypeRef.current.checked = true
-      //   editspecialpriceTypeRef.current.checked = true
-      // }
-
-      // specialpriceTypeRef.current.checked = false
-      setWholesalePrice('')
-      setSpecialPrice('')
-      setRetailPrice('')
-      setPrice(0)
-
+        setWholesalePrice('')
+        setSpecialPrice('')
+        setRetailPrice('')
+        setPrice(0)
+  
+      }
+     
     }
 
 
@@ -850,9 +860,7 @@ const Addsales = () => {
     setSelectedCustomer(customerList[0])
   }, [customerList])
 
-  useEffect(() => {
-    console.log('edit price:', editPrice)
-  }, [editPrice])
+
 
   if (productsIsLoading && customersIsLoading) {
     return <LoadingSpinner message="Loading...please wait" />

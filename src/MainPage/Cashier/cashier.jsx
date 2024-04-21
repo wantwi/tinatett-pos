@@ -172,10 +172,14 @@ const Cashier = () => {
       if (paymentInfo.chequeAmount > 0) {
         pType = pType.concat('Cheque,')
       }
+            
+
+      let finalPaymentAmount = (Number(paymentInfo.cashAmount) + Number(paymentInfo.momoAmount) + Number(paymentInfo.chequeAmount))
+      finalPaymentAmount = finalPaymentAmount < modalData?.Total ? finalPaymentAmount : (modalData?.Total)
       let payload = {
         status: type,
         salesRef: modalData.Reference,
-        amount: (Number(paymentInfo.cashAmount) + Number(paymentInfo.momoAmount) + Number(paymentInfo.chequeAmount)),
+        amount: finalPaymentAmount,
         // amount:modalData?.Total,
         paymentType: pType,
         paymentInfo: [

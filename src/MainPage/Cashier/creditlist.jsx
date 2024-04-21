@@ -190,21 +190,14 @@ const CreditList = () => {
       if (paymentInfo.chequeAmount > 0) {
         pType = pType.concat('Cheque,')
       }
-      // let payload = {
-      //   transDate: new Date().toISOString(),
-      //   salesRef: modalData.Reference,
-      //   amount: (Number(paymentInfo.cashAmount) + Number(paymentInfo.momoAmount) + Number(paymentInfo.chequeAmount)),
-      //   paymentInfo: [
-      //     { "type": "Cash", waybill: paymentInfo.cashWaybill, amountPaid: paymentInfo.cashAmount },
-      //     { "type": "Momo", name: paymentInfo.momoName, receiptNo: paymentInfo.momoReceiptNo, amountPaid: paymentInfo.momoAmount },
-      //     { "type": "Cheque", waybill: paymentInfo.chequeWaybill, chequeNo: paymentInfo.chequeNo, chequeReceiptNo: paymentInfo.chequeReceiptNo, amountPaid: paymentInfo.chequeAmount, waybill: paymentInfo.chequeWaybill }
-      //   ]
-      // }
-
+  
+      
+      let finalPaymentAmount = (Number(paymentInfo.cashAmount) + Number(paymentInfo.momoAmount) + Number(paymentInfo.chequeAmount))
+      finalPaymentAmount = finalPaymentAmount < modalData?.Total ? finalPaymentAmount : (modalData?.Total)
 
       let payload = {
         "salesRef": modalData.Reference,
-        "amount":(Number(paymentInfo.cashAmount) + Number(paymentInfo.momoAmount) + Number(paymentInfo.chequeAmount)),
+        "amount": finalPaymentAmount,
         "transDate":  new Date().toISOString(),
         "cashAmount":Number(paymentInfo.cashAmount),
         "momoAmount":Number(paymentInfo.momoAmount),
