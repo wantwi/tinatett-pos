@@ -162,7 +162,9 @@ function ProductReportTable({ disableBatchNo, isQuantityChecked, isAllChecked, i
                     }
                 ]
             },
-            fileName: "ProductReport.pdf"
+            // fileName: "ProductReport.pdf"
+            fileName: `ProductReport_${auth?.branchName}_${getCurrentDateInWords(Date.now())}.pdf`
+
         };
 
 
@@ -268,7 +270,8 @@ function ProductReportTable({ disableBatchNo, isQuantityChecked, isAllChecked, i
                     }
                 ]
             },
-            fileName: `ProductReport.pdf`
+
+            fileName: `ProductReport_${auth?.branchName}_${getCurrentDateInWords(Date.now())}.pdf`
         };
 
     }

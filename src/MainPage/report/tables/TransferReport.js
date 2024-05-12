@@ -29,7 +29,7 @@ function TransferReport({ data = [], title = "TRANSFER REPORT", fileName = "tran
     function getExcelExportProperties() {
         return {
 
-            fileName: `${fileName}.xlsx`
+            fileName: `${fileName}_${auth?.branchName}_${getCurrentDateInWords(Date.now())}.xlsx`
         };
     }
     /* tslint:disable-next-line:no-any */
@@ -127,7 +127,7 @@ function TransferReport({ data = [], title = "TRANSFER REPORT", fileName = "tran
                     }
                 ]
             },
-            fileName: `${fileName}.pdf`
+            fileName: `${fileName}_${auth?.branchName}_${getCurrentDateInWords(Date.now())}.pdf`
         };
     }
     const footerSum = (props) => {

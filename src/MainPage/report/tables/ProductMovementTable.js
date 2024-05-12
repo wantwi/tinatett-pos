@@ -28,8 +28,7 @@ function ProductMovementTable({ data = [], startDate, endDate, title = "PURCHASE
     /* tslint:disable-next-line:no-any */
     function getExcelExportProperties() {
         return {
-
-            fileName: `${fileName}.xlsx`
+            fileName: `${fileName}_${auth?.branchName}_${getCurrentDateInWords(Date.now())}.xlsx`
         };
     }
     /* tslint:disable-next-line:no-any */
@@ -131,7 +130,8 @@ function ProductMovementTable({ data = [], startDate, endDate, title = "PURCHASE
                     }
                 ]
             },
-            fileName: `${fileName}.pdf`
+
+            fileName: `${fileName}_${auth?.branchName}_${getCurrentDateInWords(Date.now())}.pdf`
         };
     }
     const footerSum = (props) => {

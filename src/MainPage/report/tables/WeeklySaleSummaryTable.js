@@ -3,7 +3,8 @@ import { GridComponent, ColumnsDirective, ColumnDirective, Inject, Toolbar, Exce
 
 import { image } from './image';
 import useAuth from '../../../hooks/useAuth';
-import { getCurrentDateInWords } from './helper';
+import { currentDate, getCurrentDateInWords } from './helper';
+
 function WeeklySaleSummaryTable({ data = [], startDate, endDate, title = "", fileName = "" }) {
     const { auth } = useAuth()
     const month = ((new Date()).getMonth().toString()) + '/';
@@ -26,7 +27,7 @@ function WeeklySaleSummaryTable({ data = [], startDate, endDate, title = "", fil
     function getExcelExportProperties() {
         return {
 
-            fileName: `${fileName}.xlsx`
+            fileName: `${fileName}_${auth?.branchName}_${getCurrentDateInWords(Date.now())}.xlsx`
         };
     }
     /* tslint:disable-next-line:no-any */
@@ -130,7 +131,7 @@ function WeeklySaleSummaryTable({ data = [], startDate, endDate, title = "", fil
                     }
                 ]
             },
-            fileName: `${fileName}.pdf`
+            fileName: `${fileName}_${auth?.branchName}_${getCurrentDateInWords(Date.now())}.pdf`
         };
     }
     const footerSum = (props) => {

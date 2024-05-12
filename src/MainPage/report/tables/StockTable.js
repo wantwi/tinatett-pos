@@ -29,7 +29,7 @@ function StockReport({ data = [], startDate, endDate, title = "PURCHASE REPORT",
     function getExcelExportProperties() {
         return {
 
-            fileName: `${fileName}.xlsx`
+            fileName: `${fileName}_${auth?.branchName}_${getCurrentDateInWords(Date.now())}.xlsx`
         };
     }
     /* tslint:disable-next-line:no-any */
@@ -131,7 +131,8 @@ function StockReport({ data = [], startDate, endDate, title = "PURCHASE REPORT",
                     }
                 ]
             },
-            fileName: `${fileName}.pdf`
+
+            fileName: `${fileName}_${auth?.branchName}_${getCurrentDateInWords(Date.now())}.pdf`
         };
     }
     const footerSum = (props) => {
@@ -187,7 +188,7 @@ function StockReport({ data = [], startDate, endDate, title = "PURCHASE REPORT",
     return (<div className='control-pane'>
         <div className='control-section'>
             <div>
-                <GridComponent id="Grid" queryCellInfo={queryCellInfoEvent} showColumnChooser={true} pdfQueryCellInfo={pdfQueryCellInfo} beforePdfExport={beforePdfExport} dataSource={[...data]} ref={grid => gridInstance = grid} pdfHeaderQueryCellInfo={pdfHeaderQueryCellInfo} toolbar={toolbarOptions} allowExcelExport={true} allowPdfExport={true} toolbarClick={toolbarClick.bind(this)} height={500} allowPaging={true} pageSettings={{ pageCount: 2, pageSize: 1000 }}>
+                <GridComponent id="Grid" queryCellInfo={queryCellInfoEvent} showColumnChooser={true} pdfQueryCellInfo={pdfQueryCellInfo} beforePdfExport={beforePdfExport} dataSource={[...data]?.map(x => ({ ...x, SalesValue: x?.SalesValue + x?.previousSalesValue }))} ref={grid => gridInstance = grid} pdfHeaderQueryCellInfo={pdfHeaderQueryCellInfo} toolbar={toolbarOptions} allowExcelExport={true} allowPdfExport={true} toolbarClick={toolbarClick.bind(this)} height={500} allowPaging={true} pageSettings={{ pageCount: 2, pageSize: 1000 }}>
                     <ColumnsDirective>
                         <ColumnDirective field='name' template={rowTem} headerText='Product' width={"21%"} ></ColumnDirective>
                         <ColumnDirective field='openingStock' headerText='Open Stock' ></ColumnDirective>

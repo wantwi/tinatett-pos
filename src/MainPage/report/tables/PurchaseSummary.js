@@ -26,7 +26,7 @@ function PurchaseSummary({ data = [], title = "", fileName = "" }) {
     function getExcelExportProperties() {
         return {
 
-            fileName: `${fileName}.xlsx`
+            fileName: `${fileName}_${auth?.branchName}_${getCurrentDateInWords(Date.now())}.xlsx`
         };
     }
     /* tslint:disable-next-line:no-any */
@@ -124,7 +124,7 @@ function PurchaseSummary({ data = [], title = "", fileName = "" }) {
                     }
                 ]
             },
-            fileName: `${fileName}.pdf`
+            fileName: `${fileName}_${auth?.branchName}_${getCurrentDateInWords(Date.now())}.pdf`
         };
     }
     const footerSum = (props) => {

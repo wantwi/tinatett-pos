@@ -174,7 +174,7 @@ function FinancialActivityTable({ data, startDate, endDate, fileName, title }) {
                     }
                 ]
             },
-            fileName: `${fileName}.pdf`
+            fileName: `${fileName}_${auth?.branchName}_${getCurrentDateInWords(Date.now())}.pdf`
         };
     }
 
@@ -277,7 +277,7 @@ function FinancialActivityTable({ data, startDate, endDate, fileName, title }) {
                     }
                 ]
             },
-            fileName: `${fileName}.pdf`
+            fileName: `${fileName}_${auth?.branchName}_${getCurrentDateInWords(Date.now())}.pdf`
         };
     }
     const footerSum = (props) => {

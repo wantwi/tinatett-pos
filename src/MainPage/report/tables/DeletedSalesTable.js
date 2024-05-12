@@ -27,8 +27,7 @@ function DeletedSalesTable({ data = [], startDate, endDate, title = "", fileName
     /* tslint:disable-next-line:no-any */
     function getExcelExportProperties() {
         return {
-
-            fileName: `${fileName}.xlsx`
+            fileName: `${fileName}_${auth?.branchName}_${getCurrentDateInWords(Date.now())}.xlsx`
         };
     }
     /* tslint:disable-next-line:no-any */
@@ -130,7 +129,8 @@ function DeletedSalesTable({ data = [], startDate, endDate, title = "", fileName
                     }
                 ]
             },
-            fileName: `${fileName}.pdf`
+
+            fileName: `${fileName}_${auth?.branchName}_${getCurrentDateInWords(Date.now())}.pdf`
         };
     }
     const footerSum = (props) => {
