@@ -64,6 +64,8 @@ const AddTransfer = () => {
   const [isSubmitSuccessful, setIsSubmitSuccessful] = useState(false)
   const [receiptFile, setReceiptFile] = useState(null)
   const [isBatchLoading, setIsBatchLoading] = useState(false)
+  const [selectedProductInfoEditMode, setSelectedProductInfoEditMode] = useState()
+  const [loading, setIsLoading] = useState(false)
   
 
   const { notifications, setNotifications } = useContext(AppContext)
@@ -115,20 +117,31 @@ const AddTransfer = () => {
     //setPrice(e.retailPrice) 
     //console.log(e)
     setIsBatchLoading(true)
+
   }
 
 
   useEffect(() => {
     axios.get(`${BASE_URL}/purchase/product/${selectedProduct?.value}`).then((res) => {
+      setIsLoading(true)
       if(res.data.success){
-        setSelectedProductInfo(res.data.data)
-        let x = res.data.newProduct.batchNumber?.map((item) => {
-          return {value:item.batchNumber, label:item?.batchNumber + '-(' + item?.Quantity +')', expireDate:item?.expireDate, manufacturingDate: item?.manufacturingDate, SaleValue: item?.SaleValue}
-        })
-        setIsBatchLoading(false)
-        //console.log(x)
-        setFormData({...formData, batchNumber: x[0], manuDate: x[0]?.manufacturingDate || new Date().toISOString(), expDate: x[0]?.expireDate || new Date().toISOString(), saleValue: x[0].SaleValue || 0})
-        retailpriceTypeRef.current.checked = true
+        setIsLoading(false)
+
+        if (res.data.newProduct.totalCount == 0) {
+          setSelectedProductInfo({ totalCount: 0,  })
+          setFormData({ quantity: '', amount: '', batchNumber: {quantity: 0}, manuDate: '', expDate: '' })
+          setIsBatchLoading(false)
+        }
+        else{
+          setSelectedProductInfo(res.data.newProduct)
+          setSelectedProductInfoEditMode(res.data.newProduct)
+          let x = res.data.newProduct.batchNumber?.map((item) => {
+            return { value: item.batchNumber, quantity: item?.availablequantity == 0 ? item?.Quantity : item?.availablequantity, label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')' : item?.batchNumber + '-(' + item?.availablequantity + ')', expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate, SaleValue: item?.SaleValue }
+          })
+          setIsBatchLoading(false)
+          setFormData({ ...formData, batchNumber: x[0], manuDate: (x[0]?.manufacturingDate).substring(0, 10), expDate: (x[0]?.expireDate).substring(0, 10), saleValue: x[0].SaleValue || 0 })
+          //retailpriceTypeRef.current.checked = true
+        }
       }
     })
 
@@ -143,10 +156,10 @@ const AddTransfer = () => {
   }
 
   const handleAddItem = () => {
-    let item =
+    let obj =
 
     {
-      id: productGridData.length + 1,
+      id: Math.ceil(Math.random() * 1000000),
       productId: selectedProduct.id,
       name: selectedProduct.label,
       batchNumber: formData.batchNumber?.value,
@@ -159,7 +172,7 @@ const AddTransfer = () => {
     }
 
 
-     if (item.name == '' || item.name == null)  {
+     if (obj.name == '' || obj.name == null)  {
       alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please select a product.");
       let newNotification = {
@@ -171,7 +184,7 @@ const AddTransfer = () => {
       $('#selectedProduct').css('border', '1px solid red')
     }
 
-    else if (item.quantity == '' || item.quantity == null)  {
+    else if (obj.quantity == '' || obj.quantity == null)  {
       alertify.set("notifier", "position", "bottom-right");
       alertify.warning("Please enter quantity.");
       let newNotification = {
@@ -198,18 +211,51 @@ const AddTransfer = () => {
 
     else {
 
+      //check if basket contains that batch number
+      let hasItem = productGridData.find((x) => x.batchNumber == obj.batchNumber)
+      console.log(hasItem)
 
-      setProductGridData([...productGridData, item])
-      setPrintGridData([...printGridData, item])
-      setFormData({quantity:'', amount:'', batchNumber:'', manuDate:'', expDate:'', saleValue:''})
-      setSelectedProduct({totalQuantity:''})
-      retailpriceTypeRef.current.checked = false
-      wholesalepriceTypeRef.current.checked = false
-      specialpriceTypeRef.current.checked = false
-      setWholesalePrice('')
-      setSpecialPrice('')
-      setRetailPrice('')
-      setPrice(0)
+      if(hasItem){
+        let filtered = productGridData.filter((x) => x.batchNumber == obj.batchNumber)
+        let totalQtyOfProductBatch = filtered.reduce((total, x) => total + Number(x.quantity), 0)
+        console.log(totalQtyOfProductBatch, formData.batchNumber?.quantity)
+
+        if((totalQtyOfProductBatch + obj.quantity ) > formData.batchNumber?.quantity ){
+          alertify.set("notifier", "position", "bottom-right");
+          alertify.message( `Available quantity for this product batch is ${formData.batchNumber?.quantity - totalQtyOfProductBatch}. Please select from another batch if you need more`);
+          let newNotification = {
+            id: Math.ceil(Math.random() * 1000000),
+            message: `${storage.name} Available quantity for this product batch is ${formData.batchNumber?.quantity - totalQtyOfProductBatch}. Please select from another batch if you need more`,
+            time: new Date().toISOString(), type: 'warning'
+          }
+          setNotifications([newNotification, ...notifications])
+        }
+
+        else if((totalQtyOfProductBatch + obj.quantity ) <= formData.batchNumber?.quantity){
+          setProductGridData([...productGridData, obj])
+          setFormData({ quantity: '', amount: '', batchNumber: '', manuDate: '', expDate: '' })
+          setSelectedProduct({ remainingStock: '' })
+  
+          setWholesalePrice('')
+          setSpecialPrice('')
+          setRetailPrice('')
+          setPrice(0)
+    
+        }
+
+      }
+
+      else{
+        setProductGridData([...productGridData, obj])
+        setFormData({ quantity: '', amount: '', batchNumber: '', manuDate: '', expDate: '' })
+        setSelectedProduct({ remainingStock: '' })
+
+        setWholesalePrice('')
+        setSpecialPrice('')
+        setRetailPrice('')
+        setPrice(0)
+  
+      }
 
     }
 
@@ -474,13 +520,18 @@ const AddTransfer = () => {
                         
                         <div className="input-groupicon">
                           <Select
-                            options={selectedProductInfo?.batchNumber?.map((item) => {
-                              return {value:item.batchNumber, label:item?.batchNumber + '-(' + item?.Quantity +')', expireDate:item?.expireDate, manufacturingDate: item?.manufacturingDate}
+                             options={selectedProductInfo?.batchNumber?.map((item) => {
+                              return { value: item.batchNumber, quantity: item?.availablequantity == 0 ? item?.Quantity : item?.availablequantity,
+                                     label: item?.availablequantity == 0 ? item?.batchNumber + '-(' + item?.Quantity + ')' : item?.batchNumber + '-(' + item?.availablequantity + ')',
+                                     expireDate: item?.expireDate, manufacturingDate: item?.manufacturingDate
+                                     }
                             })}
                             placeholder=""
                             value={formData.batchNumber}
-                            onChange={(e) => setFormData({...formData, batchNumber: (e), manuDate: e.manufacturingDate, expDate: e.expireDate})}
-                            //onChange={(e) => console.log(e)}
+                            onChange={(e) => {
+                              console.log("Selected Batch:", e)
+                              setFormData({ ...formData, batchNumber: (e), manuDate: e.manufacturingDate.substring(0, 10), expDate: e.expireDate.substring(0, 10) })
+                            }}
                           />
                           
                         </div>

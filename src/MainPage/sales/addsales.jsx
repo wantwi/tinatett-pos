@@ -636,10 +636,10 @@ const Addsales = () => {
 
         if((totalQtyOfProductBatch + obj.quantity ) > formData.batchNumber?.quantity ){
           alertify.set("notifier", "position", "bottom-right");
-          alertify.message("Total quantity for this item has reached the limit. Please select from another batch");
+          alertify.message( `Available quantity for this product batch is ${formData.batchNumber?.quantity - totalQtyOfProductBatch}. Please select from another batch if you need more`);
           let newNotification = {
             id: Math.ceil(Math.random() * 1000000),
-            message: `${storage.name} Total quantity for this product has reached the limit. Please select from another batch.`,
+            message: `${storage.name} Available quantity for this product batch is ${formData.batchNumber?.quantity - totalQtyOfProductBatch}. Please select from another batch if you need more`,
             time: new Date().toISOString(), type: 'warning'
           }
           setNotifications([newNotification, ...notifications])

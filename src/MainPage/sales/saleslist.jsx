@@ -368,6 +368,8 @@ const SalesList = () => {
   }
 
   if (isFetching) {
+    $('body').removeClass('modal-open');
+    $('.modal-backdrop').remove();
     return (<LoadingSpinner message="Fetching sales.." />)
   }
 
@@ -704,7 +706,11 @@ const SalesList = () => {
                   className="close"
                   data-bs-dismiss="modal"
                   aria-label="Close"
-                  onClick={() => $('.modal').modal('hide')}
+                  onClick={() => {
+                    $('.modal').modal('hide')
+                    $('body').removeClass('modal-open');
+                    $('.modal-backdrop').remove();
+                  }}
                 >
                   <span aria-hidden="true">×</span>
                 </button>
